@@ -1,13 +1,13 @@
 @echo off
-REM Ranting chant - Development Startup Script (Windows)
+REM Ranting Chant Backend - Development Startup Script (Windows)
 
-echo 🚀 Ranting chant - Development Setup
+echo 🚀 Ranting Chant Backend - Development Setup
 echo ========================================
 
 REM Check if Python is installed
 python --version >nul 2>&1
 if errorlevel 1 (
-    echo ❌ Python is not installed. Please install Python 3.8+ and try again.
+    echo ❌ Python is not installed. Please install Python 3.12+ and try again.
     pause
     exit /b 1
 )
@@ -30,11 +30,11 @@ REM Install dependencies
 echo 📥 Installing dependencies...
 pip install -r requirements.txt
 
-REM Check if .env.local exists, if not copy from .env
-if not exist ".env.local" (
-    echo ⚙️  Creating .env.local from Ranting chant...
-    copy .env .env.local
-    echo ✅ .env.local created - please update with your configuration
+REM Check if .env exists, if not copy from .env.example
+if not exist ".env" (
+    echo ⚙️  Creating .env from .env.example...
+    copy .env.example .env
+    echo ✅ .env created - please update with your API keys and configuration
 )
 
 REM Create logs directory if it doesn't exist

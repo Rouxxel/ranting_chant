@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# Ranting chant - Development Startup Script
+# Ranting Chant Backend - Development Startup Script
 
-echo "🚀 Ranting chant - Development Setup"
+echo "🚀 Ranting Chant Backend - Development Setup"
 echo "========================================"
 
 # Check if Python is installed
 if ! command -v python3 &> /dev/null; then
-    echo "❌ Python 3 is not installed. Please install Python 3.8+ and try again."
+    echo "❌ Python 3 is not installed. Please install Python 3.12+ and try again."
     exit 1
 fi
 
@@ -28,11 +28,11 @@ source venv/bin/activate
 echo "📥 Installing dependencies..."
 pip install -r requirements.txt
 
-# Check if .env.local exists, if not copy from .env
-if [ ! -f ".env.local" ]; then
-    echo "⚙️  Creating .env.local from Ranting chant..."
-    cp .env .env.local
-    echo "✅ .env.local created - please update with your configuration"
+# Check if .env exists, if not copy from .env.example
+if [ ! -f ".env" ]; then
+    echo "⚙️  Creating .env from .env.example..."
+    cp .env.example .env
+    echo "✅ .env created - please update with your API keys and configuration"
 fi
 
 # Create logs directory if it doesn't exist
@@ -49,12 +49,12 @@ read -p "Enter choice (1-3): " choice
 case $choice in
     1)
         echo "🔄 Starting in development mode with hot reload..."
-        export $(cat .env.local | xargs)
+        export $(cat .env | xargs)
         uvicorn main:app --host 0.0.0.0 --port ${SERVER_PORT:-8000} --reload
         ;;
     2)
         echo "🚀 Starting in production mode..."
-        export $(cat .env.local | xargs)
+        export $(cat .env | xargs)
         python main.py
         ;;
     3)
@@ -63,7 +63,7 @@ case $choice in
         ;;
     *)
         echo "❌ Invalid choice. Starting in development mode..."
-        export $(cat .env.local | xargs)
+        export $(cat .env | xargs)
         uvicorn main:app --host 0.0.0.0 --port ${SERVER_PORT:-8000} --reload
         ;;
 esac
