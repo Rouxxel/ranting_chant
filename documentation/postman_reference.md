@@ -274,6 +274,23 @@ GET /requests/request_003
 
 ---
 
+### Get request summary
+```
+GET /requests/{request_id}/summary
+```
+No body. Replace `{request_id}` in the URL.
+
+**Examples:**
+```
+GET /requests/request_001/summary
+GET /requests/request_003/summary
+```
+
+**Expected response `200`:** request summary object with key details  
+**Expected response `404`:** `{ "detail": "Request 'request_999' not found" }`
+
+---
+
 ### Get notifications for a request
 ```
 GET /requests/{request_id}/notifications
@@ -395,6 +412,197 @@ Replace `{request_id}` in the URL. All body fields are optional — only provide
 **Expected response `200`:** fully updated request object  
 **Expected response `400`:** `{ "detail": "Request body must not be empty" }`  
 **Expected response `404`:** `{ "detail": "Request 'request_999' not found" }`
+
+---
+
+## Conversation
+
+### Start a conversation
+```
+POST /conversation/start
+```
+
+**Headers:**
+```
+Content-Type: application/json
+```
+
+**Body — required fields:**
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `tenant_id` | string | **Yes** | Tenant ID. e.g. `tenant_001` |
+| `message` | string | **Yes** | Initial message from tenant |
+
+**Example body:**
+```json
+{
+  "tenant_id": "tenant_001",
+  "message": "My kitchen sink is leaking"
+}
+```
+
+**Expected response `200`:** conversation object with request_id and AI response  
+**Expected response `404`:** `{ "detail": "Tenant 'tenant_999' not found" }`
+
+---
+
+### Send a message in conversation
+```
+POST /conversation/message
+```
+
+**Headers:**
+```
+Content-Type: application/json
+```
+
+**Body — required fields:**
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `request_id` | string | **Yes** | Request ID. e.g. `request_001` |
+| `tenant_id` | string | **Yes** | Tenant ID. e.g. `tenant_001` |
+| `message` | string | **Yes** | Message from tenant |
+
+**Example body:**
+```json
+{
+  "request_id": "request_001",
+  "tenant_id": "tenant_001",
+  "message": "It's getting worse, water is everywhere"
+}
+```
+
+**Expected response `200`:** updated conversation object with AI response  
+**Expected response `404`:** `{ "detail": "Request 'request_999' not found" }`
+
+---
+
+### Get conversation history
+```
+GET /conversation/{request_id}/history
+```
+No body. Replace `{request_id}` in the URL.
+
+**Examples:**
+```
+GET /conversation/request_001/history
+GET /conversation/request_003/history
+```
+
+**Expected response `200`:** conversation history array  
+**Expected response `404`:** `{ "detail": "Request 'request_999' not found" }`
+
+---
+
+## Voice
+
+### Transcribe audio to text
+```
+POST /voice/transcribe
+```
+
+**Headers:**
+```
+Content-Type: multipart/form-data
+```
+
+**Body:**
+- `audio`: Audio file (multipart/form-data upload)
+
+**Expected response `200`:**
+```json
+{
+  "transcript": "The transcribed text from the audio"
+}
+```
+
+**Expected response `400`:** `{ "detail": "Audio file is empty" }`  
+**Expected response `500`:** `{ "detail": "Internal server error while transcribing audio" }`
+
+---
+
+### Start a voice session
+```
+POST /voice/start
+```
+
+**Headers:**
+```
+Content-Type: application/json
+```
+
+**Body — required fields:**
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `tenant_id` | string | **Yes** | Tenant ID. e.g. `tenant_001` |
+
+**Example body:**
+```json
+{
+  "tenant_id": "tenant_001"
+}
+```
+
+**Expected response `200`:**
+```json
+{
+  "request_id": "request_001",
+  "greeting_text": "Hello John Tenant, welcome to Ranting Chant...",
+  "greeting_audio_base64": "base64_encoded_audio_data",
+  "tenant_name": "John Tenant",
+  "property_name": "Sunset Apartments"
+}
+```
+
+**Expected response `404`:** `{ "detail": "Tenant 'tenant_999' not found" }`  
+**Expected response `500`:** `{ "detail": "Internal server error while starting voice session" }`
+
+---
+
+### Send a voice message in a session
+```
+POST /voice/respond
+```
+
+**Headers:**
+```
+Content-Type: application/json
+```
+
+**Body — required fields:**
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `request_id` | string | **Yes** | Request ID. e.g. `request_001` |
+| `tenant_id` | string | **Yes** | Tenant ID. e.g. `tenant_001` |
+| `transcript` | string | **Yes** | Transcribed message from audio |
+
+**Example body:**
+```json
+{
+  "request_id": "request_001",
+  "tenant_id": "tenant_001",
+  "transcript": "The sink is still leaking badly"
+}
+```
+
+**Expected response `200`:**
+```json
+{
+  "reply_text": "I understand the situation is urgent...",
+  "audio_base64": "base64_encoded_audio_response",
+  "status": "escalated",
+  "urgency": "high",
+  "escalated": true,
+  "is_complete": false
+}
+```
+
+**Expected response `404`:** `{ "detail": "Request 'request_999' not found" }`  
+**Expected response `500`:** `{ "detail": "Internal server error while processing voice message" }`
 
 ---
 
