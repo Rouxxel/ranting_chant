@@ -17,7 +17,7 @@ from contextlib import asynccontextmanager
 
 #Third-party imports
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi.errors import RateLimitExceeded
 from dotenv import load_dotenv
@@ -66,6 +66,16 @@ app.state.limiter = limiter
 
 #Add global exception handler for rate limits
 app.add_exception_handler(RateLimitExceeded, rate_limit_handler)
+
+#Add global exception handler for unhandled 500 errors
+@app.exception_handler(Exception)
+async def global_exception_handler(request, exc):
+    """
+    Global exception handler for unhandled errors.
+    Logs the error and returns a generic error message.
+    """
+    log_handler.error(f"Unhandled exception: {exc}")
+    return {"error": "Internal server error"}
 
 #CORS
 app.add_middleware(
