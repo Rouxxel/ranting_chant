@@ -398,6 +398,41 @@ Replace `{request_id}` in the URL. All body fields are optional — only provide
 
 ---
 
+## MCP
+
+### List all registered MCP tools
+```
+GET /mcp/tools
+```
+No parameters. No body.
+
+**Expected response `200`:**
+```json
+{
+  "count": 16,
+  "tools": [
+    { "name": "lookup_tenant", "description": "Look up a tenant record by ID" },
+    { "name": "get_tenant_by_name_and_unit", "description": "Find a tenant by name and address unit (used for mock login)" },
+    { "name": "get_tenant_property", "description": "Return the property record associated with a tenant" },
+    { "name": "lookup_property", "description": "Look up a property record by ID" },
+    { "name": "get_property_manager", "description": "Return the manager record for a property" },
+    { "name": "get_property_owner", "description": "Return the owner record for a property" },
+    { "name": "find_vendors_by_service", "description": "Return all vendors offering a given service category" },
+    { "name": "get_emergency_vendors", "description": "Return emergency-available vendors for a service category" },
+    { "name": "get_vendor", "description": "Look up a vendor record by ID" },
+    { "name": "create_request", "description": "Create a new service/maintenance request record" },
+    { "name": "update_request", "description": "Merge updates into an existing request record" },
+    { "name": "get_request", "description": "Look up a request record by ID" },
+    { "name": "list_requests_by_tenant", "description": "Return all requests submitted by a specific tenant" },
+    { "name": "list_all_requests", "description": "Return all request records" },
+    { "name": "escalate_request", "description": "Escalate a request and append the reason to its history" },
+    { "name": "append_conversation_turn", "description": "Append a conversation message to a request's history" }
+  ]
+}
+```
+
+---
+
 ## Error Responses
 
 | Status | When |
