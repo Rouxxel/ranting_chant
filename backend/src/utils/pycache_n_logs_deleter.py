@@ -41,8 +41,8 @@ import sys
 import shutil
 
 # FORCE USER TO SET THE ROOT FOLDER NAME (e.g. "drone_battery_performance_prediction")
-ROOT_FOLDER = ""
-FOLDERS_TO_REMOVE = []
+ROOT_FOLDER = "ranting_chant"
+FOLDERS_TO_REMOVE = ["logs","__pycache__","bin","obj"]
 
 def find_project_root_by_name(start_path: str, target_name: str) -> str:
     """
