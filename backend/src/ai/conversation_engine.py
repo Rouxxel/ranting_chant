@@ -21,7 +21,7 @@ from google.genai import types
 
 #Other files imports
 from src.utils.custom_logger import log_handler
-from src.utils.json_store import find_by_id, find_by_field
+from src.mcp import tenant_mcp, property_mcp, vendor_mcp, request_mcp
 from src.ai.gemini_client import get_client
 from src.ai.system_prompt import SYSTEM_PROMPT
 
@@ -76,18 +76,18 @@ class ConversationEngine:
         )
 
         #Fetch tenant record
-        tenant = find_by_id("tenants", tenant_id)
+        tenant = tenant_mcp.lookup_tenant(tenant_id)
         if not tenant:
             log_handler.error(f"Tenant '{tenant_id}' not found")
             raise ValueError(f"Tenant '{tenant_id}' not found")
 
         #Fetch property record
-        property_record = find_by_id("properties", tenant.get("property_id", ""))
+        property_record = property_mcp.lookup_property(tenant.get("property_id", ""))
 
         #Fetch existing request if provided
         existing_request = None
         if request_id:
-            existing_request = find_by_id("requests", request_id)
+            existing_request = request_mcp.get_request(request_id)
 
         #Build context string
         context = self._build_context(tenant, property_record, existing_request)
@@ -104,6 +104,41 @@ class ConversationEngine:
 
         #Check escalation
         parsed["escalate"] = self._should_escalate(parsed)
+
+        #On first message (no request_id): create a stub request record
+        if not request_id and parsed.get("is_complete"):
+            new_request = request_mcp.create_request({
+                "requester_id": tenant_id,
+                "type": parsed.get("type", "general"),
+                "description": message,
+                "urgency": parsed.get("urgency", "low"),
+                "involved_parties": [tenant_id],
+                "sentiment": parsed.get("sentiment", "neutral"),
+                "confidence": parsed.get("confidence", 0.0),
+                "escalated": parsed.get("escalate", False),
+                "conversation_history": history_with_new + [
+                    {"role": "ai", "message": parsed.get("reply", ""), "timestamp": __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat()}
+                ]
+            })
+            parsed["request_id"] = new_request["id"]
+            log_handler.info(f"New request created from conversation: '{new_request['id']}'")
+
+            #If vendor service needed, find matching vendors
+            vendor_service = parsed.get("vendor_service_needed")
+            if vendor_service:
+                vendors = vendor_mcp.find_vendors_by_service(vendor_service)
+                parsed["suggested_vendors"] = vendors
+                log_handler.info(f"Found {len(vendors)} vendor(s) for service '{vendor_service}'")
+
+        #On escalation: call escalate_request if we have a request_id
+        if parsed.get("escalate") and request_id:
+            try:
+                request_mcp.escalate_request(
+                    request_id,
+                    f"Escalated by AI: urgency={parsed.get('urgency')}, sentiment={parsed.get('sentiment')}"
+                )
+            except ValueError as e:
+                log_handler.warning(f"Could not escalate request '{request_id}': {e}")
 
         #Attach context for callers that need it
         parsed["context"] = context

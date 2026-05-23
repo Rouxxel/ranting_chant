@@ -78,6 +78,14 @@
             "notifications_route": "/{request_id}/notifications",
             "create_route": "",
             "update_route": "/{request_id}"
+        },
+
+        "mcp_endpoint": {
+            "request_limit": 20,
+            "unit_of_time_for_limit": "m",
+            "endpoint_prefix": "/mcp",
+            "endpoint_tag": "MCP",
+            "tools_route": "/tools"
         }
     }
 }
