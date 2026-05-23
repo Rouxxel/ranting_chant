@@ -19,6 +19,7 @@ import uuid
 
 #Third-party imports
 from fastapi import APIRouter, HTTPException, Query, Request
+from pydantic import BaseModel, Field
 
 #Other files imports
 from src.utils.custom_logger import log_handler
@@ -28,6 +29,28 @@ from src.utils.json_store import (
     read_all, find_by_id, find_by_field, create_record, update_record
 )
 from src.ai.gemini_client import get_client
+
+"""PYDANTIC MODELS-----------------------------------------------------------"""
+class RequestCreatePayload(BaseModel):
+    """Payload accepted when creating a new request directly."""
+    requester_id: str = Field(..., description="ID of the tenant submitting the request")
+    type: str = Field(default="general", description="Category of the request")
+    description: str = Field(..., description="Human-readable description of the issue")
+    urgency: str = Field(default="low", description="Urgency level: low / medium / high")
+    involved_parties: list = Field(default_factory=list, description="IDs of parties involved")
+    vendor_id: Optional[str] = Field(None, description="ID of an assigned vendor")
+
+
+class RequestUpdatePayload(BaseModel):
+    """Payload accepted when updating an existing request."""
+    status: Optional[str] = Field(None, description="New status value")
+    urgency: Optional[str] = Field(None, description="New urgency level")
+    type: Optional[str] = Field(None, description="New request type")
+    description: Optional[str] = Field(None, description="Updated description")
+    escalated: Optional[bool] = Field(None, description="Escalation flag")
+    sentiment: Optional[str] = Field(None, description="Sentiment classification")
+    confidence: Optional[float] = Field(None, description="AI confidence score")
+    vendor_id: Optional[str] = Field(None, description="ID of assigned vendor")
 
 """API ROUTER-----------------------------------------------------------"""
 #Get API router
@@ -262,7 +285,7 @@ async def get_request(request: Request, request_id: str):
     f"{config_loader['endpoints']['requests_endpoint']['request_limit']}/"
     f"{config_loader['endpoints']['requests_endpoint']['unit_of_time_for_limit']}"
 )
-async def create_request(request: Request, body: dict):
+async def create_request(request: Request, body: RequestCreatePayload):
     """
     Create a new service/maintenance request directly.
 
@@ -292,37 +315,23 @@ async def create_request(request: Request, body: dict):
         If the rate limit is exceeded, the rate_limit_handler() handles the response.
     """
     try:
-        #Validate required fields
-        requester_id = body.get("requester_id", "").strip()
-        description = body.get("description", "").strip()
-
-        if not requester_id:
-            message = "Field 'requester_id' is required and must not be empty"
-            log_handler.warning(message)
-            raise HTTPException(status_code=400, detail=message)
-
-        if not description:
-            message = "Field 'description' is required and must not be empty"
-            log_handler.warning(message)
-            raise HTTPException(status_code=400, detail=message)
-
-        #Build the new record
+        #Build the new record from Pydantic model
         now = datetime.now(timezone.utc).isoformat()
         record = {
             "id": f"request_{uuid.uuid4().hex[:8]}",
-            "requester_id": requester_id,
-            "type": body.get("type", "general"),
-            "description": description,
+            "requester_id": body.requester_id.strip(),
+            "type": body.type,
+            "description": body.description.strip(),
             "status": "pending",
-            "urgency": body.get("urgency", "low"),
-            "involved_parties": body.get("involved_parties", []),
+            "urgency": body.urgency,
+            "involved_parties": body.involved_parties,
             "conversation_history": [],
             "created_at": now,
             "updated_at": now,
             "escalated": False,
             "sentiment": "neutral",
             "confidence": 0.0,
-            "vendor_id": body.get("vendor_id", None),
+            "vendor_id": body.vendor_id,
             "notifications_sent": []
         }
 
@@ -343,7 +352,7 @@ async def create_request(request: Request, body: dict):
     f"{config_loader['endpoints']['requests_endpoint']['request_limit']}/"
     f"{config_loader['endpoints']['requests_endpoint']['unit_of_time_for_limit']}"
 )
-async def update_request(request: Request, request_id: str, body: dict):
+async def update_request(request: Request, request_id: str, body: RequestUpdatePayload):
     """
     Partially update an existing service/maintenance request.
 
@@ -375,12 +384,6 @@ async def update_request(request: Request, request_id: str, body: dict):
         If the rate limit is exceeded, the rate_limit_handler() handles the response.
     """
     try:
-        #Validate body is not empty
-        if not body:
-            message = "Request body must not be empty"
-            log_handler.warning(message)
-            raise HTTPException(status_code=400, detail=message)
-
         log_handler.debug(f"Updating request with id='{request_id}'")
 
         #Confirm the record exists before attempting update
@@ -390,8 +393,8 @@ async def update_request(request: Request, request_id: str, body: dict):
             log_handler.warning(message)
             raise HTTPException(status_code=404, detail=message)
 
-        #Filter out None values and stamp updated_at
-        updates = {k: v for k, v in body.items() if v is not None}
+        #Filter out None values from Pydantic model and stamp updated_at
+        updates = body.model_dump(exclude_none=True)
         updates["updated_at"] = datetime.now(timezone.utc).isoformat()
 
         updated = update_record("requests", request_id, updates)
