@@ -1,0 +1,82 @@
+[
+  {
+    "id": "vendor_001",
+    "name": "QuickFix Locksmith",
+    "email": "dispatch@quickfix.com",
+    "phone": "+1-555-4444",
+    "services": ["locksmith"],
+    "emergency_available": true
+  },
+  {
+    "id": "vendor_002",
+    "name": "AquaFlow Plumbing",
+    "email": "support@aquaflow.com",
+    "phone": "+1-555-4445",
+    "services": ["plumbing"],
+    "emergency_available": true
+  },
+  {
+    "id": "vendor_003",
+    "name": "VoltPro Electrical Services",
+    "email": "contact@voltpro.com",
+    "phone": "+1-555-4446",
+    "services": ["electrical"],
+    "emergency_available": true
+  },
+  {
+    "id": "vendor_004",
+    "name": "ArcticAir HVAC Solutions",
+    "email": "service@arcticairhvac.com",
+    "phone": "+1-555-4447",
+    "services": ["hvac"],
+    "emergency_available": true
+  },
+  {
+    "id": "vendor_005",
+    "name": "HandyHero Maintenance",
+    "email": "help@handyhero.com",
+    "phone": "+1-555-4448",
+    "services": ["handyman", "general_repair"],
+    "emergency_available": false
+  },
+  {
+    "id": "vendor_006",
+    "name": "RapidGlass & Door Repair",
+    "email": "dispatch@rapidglass.com",
+    "phone": "+1-555-4449",
+    "services": ["glass_repair", "door_repair", "locksmith"],
+    "emergency_available": true
+  },
+  {
+    "id": "vendor_007",
+    "name": "SafeNest Pest Control",
+    "email": "support@safenestpest.com",
+    "phone": "+1-555-4450",
+    "services": ["pest_control"],
+    "emergency_available": false
+  },
+  {
+    "id": "vendor_008",
+    "name": "ClearFlow Drain Services",
+    "email": "service@clearflowdrains.com",
+    "phone": "+1-555-4451",
+    "services": ["drain_cleaning", "plumbing"],
+    "emergency_available": true
+  },
+  {
+    "id": "vendor_009",
+    "name": "BrightSpark Appliance Repair",
+    "email": "repair@brightspark.com",
+    "phone": "+1-555-4452",
+    "services": ["appliance_repair"],
+    "emergency_available": false
+  },
+  {
+    "id": "vendor_010",
+    "name": "SecureAccess Systems",
+    "email": "support@secureaccess.com",
+    "phone": "+1-555-4453",
+    "services": ["access_control", "security_systems", "locksmith"],
+    "emergency_available": true
+  }
+]

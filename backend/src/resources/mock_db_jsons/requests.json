@@ -1,0 +1,204 @@
+[
+  {
+    "id": "request_001",
+    "requester_id": "tenant_001",
+    "type": "key_replacement",
+    "description": "Tenant lost front door key",
+    "status": "pending",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001",
+      "manager_001"
+    ],
+    "conversation_history": [],
+    "created_at": "2026-05-23T12:00:00"
+  },
+  {
+    "id": "request_002",
+    "requester_id": "tenant_003",
+    "type": "plumbing_issue",
+    "description": "Kitchen sink is leaking continuously",
+    "status": "in_progress",
+    "urgency": "medium",
+    "involved_parties": [
+      "tenant_003",
+      "manager_002",
+      "vendor_002"
+    ],
+    "conversation_history": [
+      "Tenant reported leak in kitchen sink",
+      "AI asked severity and leak rate",
+      "Plumber dispatched"
+    ],
+    "created_at": "2026-05-23T09:15:00"
+  },
+  {
+    "id": "request_003",
+    "requester_id": "tenant_006",
+    "type": "emergency_electrical",
+    "description": "Power outage in apartment with burning smell",
+    "status": "escalated",
+    "urgency": "high",
+    "involved_parties": [
+      "tenant_006",
+      "manager_004",
+      "vendor_003"
+    ],
+    "conversation_history": [
+      "Tenant reported electrical failure",
+      "AI detected safety risk",
+      "Immediate escalation triggered"
+    ],
+    "created_at": "2026-05-23T10:45:00"
+  },
+  {
+    "id": "request_004",
+    "requester_id": "tenant_009",
+    "type": "hvac_repair",
+    "description": "Heating system not working during cold weather",
+    "status": "pending",
+    "urgency": "medium",
+    "involved_parties": [
+      "tenant_009",
+      "manager_001",
+      "vendor_004"
+    ],
+    "conversation_history": [
+      "Tenant reported heating issue",
+      "AI confirmed no immediate emergency"
+    ],
+    "created_at": "2026-05-23T11:30:00"
+  },
+  {
+    "id": "request_005",
+    "requester_id": "tenant_002",
+    "type": "lease_extension",
+    "description": "Tenant requesting 12-month lease extension",
+    "status": "pending_approval",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_002",
+      "manager_001",
+      "owner_001"
+    ],
+    "conversation_history": [
+      "Tenant requested lease extension",
+      "AI collected duration preference",
+      "Sent to owner for approval"
+    ],
+    "created_at": "2026-05-23T08:00:00"
+  },
+  {
+    "id": "request_006",
+    "requester_id": "tenant_008",
+    "type": "lockout_assistance",
+    "description": "Tenant locked out of apartment after leaving keys inside",
+    "status": "in_progress",
+    "urgency": "high",
+    "involved_parties": [
+      "tenant_008",
+      "manager_004",
+      "vendor_001"
+    ],
+    "conversation_history": [
+      "Tenant reported lockout",
+      "AI confirmed no safety risk",
+      "Locksmith dispatched"
+    ],
+    "created_at": "2026-05-23T12:20:00"
+  },
+  {
+    "id": "request_007",
+    "requester_id": "tenant_004",
+    "type": "appliance_repair",
+    "description": "Washing machine not spinning or draining",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_004",
+      "manager_002",
+      "vendor_009"
+    ],
+    "conversation_history": [
+      "Tenant reported washing machine issue",
+      "AI confirmed appliance is not leaking or hazardous",
+      "Repair scheduled"
+    ],
+    "created_at": "2026-05-23T13:10:00"
+  },
+  {
+    "id": "request_008",
+    "requester_id": "tenant_005",
+    "type": "pest_control",
+    "description": "Suspected cockroach infestation in kitchen",
+    "status": "pending",
+    "urgency": "medium",
+    "involved_parties": [
+      "tenant_005",
+      "manager_003",
+      "vendor_007"
+    ],
+    "conversation_history": [
+      "Tenant reported pest issue",
+      "AI asked about severity and spread",
+      "Pest control vendor assigned"
+    ],
+    "created_at": "2026-05-23T14:05:00"
+  },
+  {
+    "id": "request_009",
+    "requester_id": "tenant_007",
+    "type": "door_repair",
+    "description": "Front door does not close properly and lock is misaligned",
+    "status": "in_progress",
+    "urgency": "medium",
+    "involved_parties": [
+      "tenant_007",
+      "manager_004",
+      "vendor_006"
+    ],
+    "conversation_history": [
+      "Tenant reported door alignment issue",
+      "AI confirmed security risk is low",
+      "Repair scheduled with door specialist"
+    ],
+    "created_at": "2026-05-23T15:00:00"
+  },
+  {
+    "id": "request_010",
+    "requester_id": "tenant_001",
+    "type": "noise_complaint",
+    "description": "Loud noise from neighboring apartment at night",
+    "status": "pending_review",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001",
+      "manager_001"
+    ],
+    "conversation_history": [
+      "Tenant reported noise disturbance",
+      "AI asked frequency and timing",
+      "Complaint forwarded to property manager"
+    ],
+    "created_at": "2026-05-23T16:20:00"
+  },
+  {
+    "id": "request_011",
+    "requester_id": "tenant_010",
+    "type": "security_concern",
+    "description": "Suspicious person seen near building entrance multiple times",
+    "status": "escalated",
+    "urgency": "high",
+    "involved_parties": [
+      "tenant_010",
+      "owner_005",
+      "vendor_010"
+    ],
+    "conversation_history": [
+      "Tenant reported security concern",
+      "AI flagged potential risk",
+      "Escalated to management and security provider"
+    ],
+    "created_at": "2026-05-23T17:45:00"
+  }
+]

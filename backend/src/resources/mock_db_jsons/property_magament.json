@@ -1,0 +1,30 @@
+[
+    {
+    "id": "manager_001",
+    "name": "John management",
+    "email": "sarah@management.com",
+    "phone": "+1-555-2222",
+    "managed_properties": ["property_001"]
+  },
+  {
+    "id": "manager_002",
+    "name": "David Reynolds",
+    "email": "david.reynolds@management.com",
+    "phone": "+1-555-2223",
+    "managed_properties": ["property_002"]
+  },
+  {
+    "id": "manager_003",
+    "name": "Laura Mitchell",
+    "email": "laura.mitchell@management.com",
+    "phone": "+1-555-2224",
+    "managed_properties": ["property_003"]
+  },
+  {
+    "id": "manager_004",
+    "name": "Kevin Thompson",
+    "email": "kevin.thompson@management.com",
+    "phone": "+1-555-2225",
+    "managed_properties": ["property_004"]
+  }
+]
