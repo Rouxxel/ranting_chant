@@ -40,6 +40,7 @@ from src.api_endpoints.routers.vendors_router import router as vendors_router
 from src.api_endpoints.routers.managers_router import router as managers_router
 from src.api_endpoints.routers.requests_router import router as requests_router
 from src.api_endpoints.routers.mcp_router import router as mcp_router
+from src.api_endpoints.routers.conversation_router import router as conversation_router
 
 """API APP-----------------------------------------------------------"""
 #Lifespan event manager (startup and shutdown)
@@ -85,6 +86,7 @@ app.include_router(vendors_router)
 app.include_router(managers_router)
 app.include_router(requests_router)
 app.include_router(mcp_router)
+app.include_router(conversation_router)
 
 """Start server-----------------------------------------------------------"""
 if __name__ == "__main__":
