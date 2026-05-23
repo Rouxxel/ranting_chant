@@ -30,20 +30,54 @@
             "endpoint_tag":"root",
             "endpoint_route": "/"
         },
-        
-        "example_endpoint": {
-            "request_limit": 3,
+
+        "tenants_endpoint": {
+            "request_limit": 30,
             "unit_of_time_for_limit": "m",
-            "endpoint_prefix": "/subsection",
-            "endpoint_tag": "subsection",
-            "endpoint_route": "/endpoint_name"
+            "endpoint_prefix": "/tenants",
+            "endpoint_tag": "Tenants",
+            "list_route": "",
+            "detail_route": "/{tenant_id}"
         },
-        "example_endpoint_2": {
-            "request_limit": 5,
+
+        "properties_endpoint": {
+            "request_limit": 30,
             "unit_of_time_for_limit": "m",
-            "endpoint_prefix": "/subsection",
-            "endpoint_tag": "subsection",
-            "endpoint_route": "/endpoint_name"
+            "endpoint_prefix": "/properties",
+            "endpoint_tag": "Properties",
+            "list_route": "",
+            "detail_route": "/{property_id}"
+        },
+
+        "vendors_endpoint": {
+            "request_limit": 30,
+            "unit_of_time_for_limit": "m",
+            "endpoint_prefix": "/vendors",
+            "endpoint_tag": "Vendors",
+            "list_route": "",
+            "by_service_route": "/by-service/{service}",
+            "detail_route": "/{vendor_id}"
+        },
+
+        "managers_endpoint": {
+            "request_limit": 30,
+            "unit_of_time_for_limit": "m",
+            "endpoint_prefix": "/managers",
+            "endpoint_tag": "Managers",
+            "list_route": "",
+            "detail_route": "/{manager_id}"
+        },
+
+        "requests_endpoint": {
+            "request_limit": 30,
+            "unit_of_time_for_limit": "m",
+            "endpoint_prefix": "/requests",
+            "endpoint_tag": "Requests",
+            "list_route": "",
+            "detail_route": "/{request_id}",
+            "notifications_route": "/{request_id}/notifications",
+            "create_route": "",
+            "update_route": "/{request_id}"
         }
     }
 }
