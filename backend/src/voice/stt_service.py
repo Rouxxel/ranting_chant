@@ -33,7 +33,7 @@ client = None
 if ELEVENLABS_API_KEY:
     try:
         client = ElevenLabs(api_key=ELEVENLABS_API_KEY)
-        whisper_model = WhisperModel("base", device="cuda", compute_type="float16")
+        whisper_model = WhisperModel("base", device="auto", compute_type="auto")
         log_handler.debug("ElevenLabs client initialized, whisper model selected")
     except Exception as e:
         log_handler.warning(f"Failed to initialize ElevenLabs client: {e}")

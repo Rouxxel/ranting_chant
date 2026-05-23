@@ -63,13 +63,13 @@ def text_to_speech_bytes(text: str, voice_id: str | None = None) -> bytes:
         
         voice = voice_id or ELEVENLABS_VOICE_ID
         
-        audio_stream = client.generate(
+        audio_stream = client.text_to_speech.convert(
+            voice_id=voice,
             text=text,
-            voice=voice,
-            model="eleven_multilingual_v2",
+            model_id="eleven_multilingual_v2",
             output_format="mp3_44100_128"
         )
-        audio_bytes = b"".join(audio_stream)
+        audio_bytes = b"".join(chunk for chunk in audio_stream)
         
         log_handler.info("[tts_service] TTS conversion successful")
         return audio_bytes
