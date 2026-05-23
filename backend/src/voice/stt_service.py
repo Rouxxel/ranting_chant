@@ -26,7 +26,7 @@ from faster_whisper import WhisperModel
 from src.utils.custom_logger import log_handler
 
 """VARIABLES-----------------------------------------------------------"""
-ELEVENLABS_API_KEY = os.getenv("elevenlabs_api_key", "")
+ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "")
 
 # Initialize ElevenLabs client
 client = None
@@ -37,7 +37,7 @@ if ELEVENLABS_API_KEY:
     except Exception as e:
         log_handler.warning(f"Failed to initialize ElevenLabs client: {e}")
 else:
-    log_handler.warning("elevenlabs_api_key not set — STT will use Whisper fallback only")
+    log_handler.warning("ELEVENLABS_API_KEY not set — STT will use Whisper fallback only")
 
 """METHODS-----------------------------------------------------------"""
 def transcribe_elevenlabs(audio_bytes: bytes, language_code: str = "eng") -> str:

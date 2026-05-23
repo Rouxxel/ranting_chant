@@ -24,7 +24,7 @@ from elevenlabs.client import ElevenLabs
 from src.utils.custom_logger import log_handler
 
 """VARIABLES-----------------------------------------------------------"""
-ELEVENLABS_API_KEY = os.getenv("elevenlabs_api_key", "")
+ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "")
 ELEVENLABS_VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID", "21m00Tcm4TlvDq8ikWAM")
 
 # Initialize ElevenLabs client
@@ -36,7 +36,7 @@ if ELEVENLABS_API_KEY:
     except Exception as e:
         log_handler.warning(f"Failed to initialize ElevenLabs client: {e}")
 else:
-    log_handler.warning("elevenlabs_api_key not set — TTS will be disabled")
+    log_handler.warning("ELEVENLABS_API_KEY not set — TTS will be disabled")
 
 """METHODS-----------------------------------------------------------"""
 def text_to_speech_bytes(text: str, voice_id: str | None = None) -> bytes:
@@ -61,15 +61,16 @@ def text_to_speech_bytes(text: str, voice_id: str | None = None) -> bytes:
         
         voice = voice_id or ELEVENLABS_VOICE_ID
         
-        audio = client.generate(
+        audio_stream = client.generate(
             text=text,
             voice=voice,
             model="eleven_multilingual_v2",
             output_format="mp3_44100_128"
         )
+        audio_bytes = b"".join(audio_stream)
         
         log_handler.info("[tts_service] TTS conversion successful")
-        return audio
+        return audio_bytes
         
     except Exception as e:
         log_handler.error(f"[tts_service] TTS conversion failed: {e}")

@@ -23,9 +23,9 @@ from src.utils.custom_logger import log_handler
 
 """VARIABLES-----------------------------------------------------------"""
 #Read Twilio credentials from environment
-TWILIO_ACCOUNT_SID = os.getenv("twilio_account_sid", "")
-TWILIO_AUTH_TOKEN = os.getenv("twilio_auth_token", "")
-TWILIO_FROM_NUMBER = os.getenv("twilio_verified_phone", "")
+TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", "")
+TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", "")
+TWILIO_VERIFIED_PHONE = os.getenv("TWILIO_VERIFIED_PHONE", "")
 
 #Lazy-initialized Twilio client
 _twilio_client: Client | None = None
@@ -78,8 +78,8 @@ def send_emergency_sms(to_number: str, message: str) -> bool:
         log_handler.warning("[sms_service] Skipping send_emergency_sms — no Twilio client")
         return False
 
-    if not TWILIO_FROM_NUMBER:
-        log_handler.warning("[sms_service] twilio_verified_phone not set — cannot send SMS")
+    if not TWILIO_VERIFIED_PHONE:
+        log_handler.warning("[sms_service] TWILIO_VERIFIED_PHONE not set — cannot send SMS")
         return False
 
     try:
@@ -90,7 +90,7 @@ def send_emergency_sms(to_number: str, message: str) -> bool:
 
         sms = client.messages.create(
             body=full_message,
-            from_=f"+{TWILIO_FROM_NUMBER}" if not TWILIO_FROM_NUMBER.startswith("+") else TWILIO_FROM_NUMBER,
+            from_=f"+{TWILIO_VERIFIED_PHONE}" if not TWILIO_VERIFIED_PHONE.startswith("+") else TWILIO_VERIFIED_PHONE,
             to=to_number
         )
 

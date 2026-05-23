@@ -23,14 +23,14 @@ from src.utils.custom_logger import log_handler
 
 """VARIABLES-----------------------------------------------------------"""
 #Initialize Resend with API key from environment
-RESEND_API_KEY = os.getenv("resend_api_key", "")
+RESEND_API_KEY = os.getenv("RESEND_API_KEY", "")
 RESEND_FROM_EMAIL = os.getenv("RESEND_FROM_EMAIL", "onboarding@resend.dev")
 
 if RESEND_API_KEY:
     resend.api_key = RESEND_API_KEY
     log_handler.debug("Resend API key configured")
 else:
-    log_handler.warning("resend_api_key not set — email notifications will be disabled")
+    log_handler.warning("RESEND_API_KEY not set — email notifications will be disabled")
 
 """METHODS-----------------------------------------------------------"""
 def send_request_created(
