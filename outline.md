@@ -1,8 +1,8 @@
-# OpsPilot — AI Property Operations Agent
+# Ranting chant — AI Property Operations Agent
 
 ## Overview
 
-OpsPilot is an AI-powered property operations platform designed to automate communication and coordination between:
+Ranting chant is an AI-powered property operations platform designed to automate communication and coordination between:
 
 - Tenants
 - Property management companies
@@ -19,7 +19,7 @@ The system acts as an autonomous operational layer that handles:
 - Escalation workflows
 - Status tracking
 
-Instead of simply functioning as a chatbot, OpsPilot behaves like an AI operations coordinator capable of conducting intelligent back-and-forth conversations to collect all information necessary to complete operational workflows.
+Instead of simply functioning as a chatbot, Ranting chant behaves like an AI operations coordinator capable of conducting intelligent back-and-forth conversations to collect all information necessary to complete operational workflows.
 
 ---
 
@@ -457,7 +457,7 @@ Later versions can migrate to PostgreSQL or Supabase.
 
 # ElevenLabs Voice Agent Integration
 
-OpsPilot uses ElevenLabs to power a real-time conversational voice agent that interacts directly with tenants.
+Ranting chant uses ElevenLabs to power a real-time conversational voice agent that interacts directly with tenants.
 
 This transforms the system from a text-based intake tool into a fully interactive AI operations assistant.
 
@@ -676,7 +676,7 @@ Tenant: "I lost my apartment key."
 
 # Required API Keys & External Services
 
-OpsPilot relies on a small set of external APIs to enable AI reasoning, voice interaction, and communication automation.
+Ranting chant relies on a small set of external APIs to enable AI reasoning, voice interaction, and communication automation.
 
 ---
 
@@ -693,7 +693,7 @@ It is responsible for:
 - escalation decisions
 - workflow routing logic
 
-Without Gemini, OpsPilot cannot function as an autonomous operations coordinator.
+Without Gemini, Ranting chant cannot function as an autonomous operations coordinator.
 
 ### Required:
 - Gemini API key
@@ -794,7 +794,7 @@ This allows full system functionality without external service setup complexity.
 
 ## 💡 Key Design Insight
 
-OpsPilot separates responsibilities into modular layers:
+Ranting chant separates responsibilities into modular layers:
 
 - Gemini → reasoning and decision-making
 - ElevenLabs → voice interaction layer
@@ -942,7 +942,7 @@ if sentiment == "angry":
 
 # Key Product Positioning
 
-OpsPilot is NOT simply a chatbot.
+Ranting chant is NOT simply a chatbot.
 
 It is:
 
@@ -1013,6 +1013,6 @@ To:
 
 # Final Vision
 
-OpsPilot acts as an autonomous operational layer between tenants, property managers, property owners, and third-party providers.
+Ranting chant acts as an autonomous operational layer between tenants, property managers, property owners, and third-party providers.
 
 The system intelligently gathers information, coordinates stakeholders, automates repetitive operational workflows, and escalates issues only when necessary.
