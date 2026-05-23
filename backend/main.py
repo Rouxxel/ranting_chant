@@ -18,6 +18,7 @@ from contextlib import asynccontextmanager
 #Third-party imports
 import uvicorn
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from slowapi.errors import RateLimitExceeded
 from dotenv import load_dotenv
 load_dotenv()
@@ -33,6 +34,11 @@ from src.core_specs.data.data_loader import data_loader
 
 #Endpoints imports
 from src.api_endpoints.root_endpoint import router as root_router
+from src.api_endpoints.routers.tenants_router import router as tenants_router
+from src.api_endpoints.routers.properties_router import router as properties_router
+from src.api_endpoints.routers.vendors_router import router as vendors_router
+from src.api_endpoints.routers.managers_router import router as managers_router
+from src.api_endpoints.routers.requests_router import router as requests_router
 
 """API APP-----------------------------------------------------------"""
 #Lifespan event manager (startup and shutdown)
@@ -58,11 +64,25 @@ app.state.limiter = limiter
 #Add global exception handler for rate limits
 app.add_exception_handler(RateLimitExceeded, rate_limit_handler)
 
+#CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 """Routers-----------------------------------------------------------"""
 #Root
 app.include_router(root_router)
 
 #Others
+app.include_router(tenants_router)
+app.include_router(properties_router)
+app.include_router(vendors_router)
+app.include_router(managers_router)
+app.include_router(requests_router)
 
 """Start server-----------------------------------------------------------"""
 if __name__ == "__main__":
