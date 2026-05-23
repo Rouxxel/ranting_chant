@@ -32,9 +32,21 @@
       "vendor_002"
     ],
     "conversation_history": [
-      {"role": "system", "message": "Tenant reported leak in kitchen sink", "timestamp": "2026-05-23T09:15:00"},
-      {"role": "system", "message": "AI asked severity and leak rate", "timestamp": "2026-05-23T09:15:00"},
-      {"role": "system", "message": "Plumber dispatched", "timestamp": "2026-05-23T09:15:00"}
+      {
+        "role": "system",
+        "message": "Tenant reported leak in kitchen sink",
+        "timestamp": "2026-05-23T09:15:00"
+      },
+      {
+        "role": "system",
+        "message": "AI asked severity and leak rate",
+        "timestamp": "2026-05-23T09:15:00"
+      },
+      {
+        "role": "system",
+        "message": "Plumber dispatched",
+        "timestamp": "2026-05-23T09:15:00"
+      }
     ],
     "created_at": "2026-05-23T09:15:00",
     "updated_at": "2026-05-23T09:15:00",
@@ -57,9 +69,21 @@
       "vendor_003"
     ],
     "conversation_history": [
-      {"role": "system", "message": "Tenant reported electrical failure", "timestamp": "2026-05-23T10:45:00"},
-      {"role": "system", "message": "AI detected safety risk", "timestamp": "2026-05-23T10:45:00"},
-      {"role": "system", "message": "Immediate escalation triggered", "timestamp": "2026-05-23T10:45:00"}
+      {
+        "role": "system",
+        "message": "Tenant reported electrical failure",
+        "timestamp": "2026-05-23T10:45:00"
+      },
+      {
+        "role": "system",
+        "message": "AI detected safety risk",
+        "timestamp": "2026-05-23T10:45:00"
+      },
+      {
+        "role": "system",
+        "message": "Immediate escalation triggered",
+        "timestamp": "2026-05-23T10:45:00"
+      }
     ],
     "created_at": "2026-05-23T10:45:00",
     "updated_at": "2026-05-23T10:45:00",
@@ -82,8 +106,16 @@
       "vendor_004"
     ],
     "conversation_history": [
-      {"role": "system", "message": "Tenant reported heating issue", "timestamp": "2026-05-23T11:30:00"},
-      {"role": "system", "message": "AI confirmed no immediate emergency", "timestamp": "2026-05-23T11:30:00"}
+      {
+        "role": "system",
+        "message": "Tenant reported heating issue",
+        "timestamp": "2026-05-23T11:30:00"
+      },
+      {
+        "role": "system",
+        "message": "AI confirmed no immediate emergency",
+        "timestamp": "2026-05-23T11:30:00"
+      }
     ],
     "created_at": "2026-05-23T11:30:00",
     "updated_at": "2026-05-23T11:30:00",
@@ -106,9 +138,21 @@
       "owner_001"
     ],
     "conversation_history": [
-      {"role": "system", "message": "Tenant requested lease extension", "timestamp": "2026-05-23T08:00:00"},
-      {"role": "system", "message": "AI collected duration preference", "timestamp": "2026-05-23T08:00:00"},
-      {"role": "system", "message": "Sent to owner for approval", "timestamp": "2026-05-23T08:00:00"}
+      {
+        "role": "system",
+        "message": "Tenant requested lease extension",
+        "timestamp": "2026-05-23T08:00:00"
+      },
+      {
+        "role": "system",
+        "message": "AI collected duration preference",
+        "timestamp": "2026-05-23T08:00:00"
+      },
+      {
+        "role": "system",
+        "message": "Sent to owner for approval",
+        "timestamp": "2026-05-23T08:00:00"
+      }
     ],
     "created_at": "2026-05-23T08:00:00",
     "updated_at": "2026-05-23T08:00:00",
@@ -131,9 +175,21 @@
       "vendor_001"
     ],
     "conversation_history": [
-      {"role": "system", "message": "Tenant reported lockout", "timestamp": "2026-05-23T12:20:00"},
-      {"role": "system", "message": "AI confirmed no safety risk", "timestamp": "2026-05-23T12:20:00"},
-      {"role": "system", "message": "Locksmith dispatched", "timestamp": "2026-05-23T12:20:00"}
+      {
+        "role": "system",
+        "message": "Tenant reported lockout",
+        "timestamp": "2026-05-23T12:20:00"
+      },
+      {
+        "role": "system",
+        "message": "AI confirmed no safety risk",
+        "timestamp": "2026-05-23T12:20:00"
+      },
+      {
+        "role": "system",
+        "message": "Locksmith dispatched",
+        "timestamp": "2026-05-23T12:20:00"
+      }
     ],
     "created_at": "2026-05-23T12:20:00",
     "updated_at": "2026-05-23T12:20:00",
@@ -156,9 +212,21 @@
       "vendor_009"
     ],
     "conversation_history": [
-      {"role": "system", "message": "Tenant reported washing machine issue", "timestamp": "2026-05-23T13:10:00"},
-      {"role": "system", "message": "AI confirmed appliance is not leaking or hazardous", "timestamp": "2026-05-23T13:10:00"},
-      {"role": "system", "message": "Repair scheduled", "timestamp": "2026-05-23T13:10:00"}
+      {
+        "role": "system",
+        "message": "Tenant reported washing machine issue",
+        "timestamp": "2026-05-23T13:10:00"
+      },
+      {
+        "role": "system",
+        "message": "AI confirmed appliance is not leaking or hazardous",
+        "timestamp": "2026-05-23T13:10:00"
+      },
+      {
+        "role": "system",
+        "message": "Repair scheduled",
+        "timestamp": "2026-05-23T13:10:00"
+      }
     ],
     "created_at": "2026-05-23T13:10:00",
     "updated_at": "2026-05-23T13:10:00",
@@ -181,9 +249,21 @@
       "vendor_007"
     ],
     "conversation_history": [
-      {"role": "system", "message": "Tenant reported pest issue", "timestamp": "2026-05-23T14:05:00"},
-      {"role": "system", "message": "AI asked about severity and spread", "timestamp": "2026-05-23T14:05:00"},
-      {"role": "system", "message": "Pest control vendor assigned", "timestamp": "2026-05-23T14:05:00"}
+      {
+        "role": "system",
+        "message": "Tenant reported pest issue",
+        "timestamp": "2026-05-23T14:05:00"
+      },
+      {
+        "role": "system",
+        "message": "AI asked about severity and spread",
+        "timestamp": "2026-05-23T14:05:00"
+      },
+      {
+        "role": "system",
+        "message": "Pest control vendor assigned",
+        "timestamp": "2026-05-23T14:05:00"
+      }
     ],
     "created_at": "2026-05-23T14:05:00",
     "updated_at": "2026-05-23T14:05:00",
@@ -206,9 +286,21 @@
       "vendor_006"
     ],
     "conversation_history": [
-      {"role": "system", "message": "Tenant reported door alignment issue", "timestamp": "2026-05-23T15:00:00"},
-      {"role": "system", "message": "AI confirmed security risk is low", "timestamp": "2026-05-23T15:00:00"},
-      {"role": "system", "message": "Repair scheduled with door specialist", "timestamp": "2026-05-23T15:00:00"}
+      {
+        "role": "system",
+        "message": "Tenant reported door alignment issue",
+        "timestamp": "2026-05-23T15:00:00"
+      },
+      {
+        "role": "system",
+        "message": "AI confirmed security risk is low",
+        "timestamp": "2026-05-23T15:00:00"
+      },
+      {
+        "role": "system",
+        "message": "Repair scheduled with door specialist",
+        "timestamp": "2026-05-23T15:00:00"
+      }
     ],
     "created_at": "2026-05-23T15:00:00",
     "updated_at": "2026-05-23T15:00:00",
@@ -230,9 +322,21 @@
       "manager_001"
     ],
     "conversation_history": [
-      {"role": "system", "message": "Tenant reported noise disturbance", "timestamp": "2026-05-23T16:20:00"},
-      {"role": "system", "message": "AI asked frequency and timing", "timestamp": "2026-05-23T16:20:00"},
-      {"role": "system", "message": "Complaint forwarded to property manager", "timestamp": "2026-05-23T16:20:00"}
+      {
+        "role": "system",
+        "message": "Tenant reported noise disturbance",
+        "timestamp": "2026-05-23T16:20:00"
+      },
+      {
+        "role": "system",
+        "message": "AI asked frequency and timing",
+        "timestamp": "2026-05-23T16:20:00"
+      },
+      {
+        "role": "system",
+        "message": "Complaint forwarded to property manager",
+        "timestamp": "2026-05-23T16:20:00"
+      }
     ],
     "created_at": "2026-05-23T16:20:00",
     "updated_at": "2026-05-23T16:20:00",
@@ -255,9 +359,21 @@
       "vendor_010"
     ],
     "conversation_history": [
-      {"role": "system", "message": "Tenant reported security concern", "timestamp": "2026-05-23T17:45:00"},
-      {"role": "system", "message": "AI flagged potential risk", "timestamp": "2026-05-23T17:45:00"},
-      {"role": "system", "message": "Escalated to management and security provider", "timestamp": "2026-05-23T17:45:00"}
+      {
+        "role": "system",
+        "message": "Tenant reported security concern",
+        "timestamp": "2026-05-23T17:45:00"
+      },
+      {
+        "role": "system",
+        "message": "AI flagged potential risk",
+        "timestamp": "2026-05-23T17:45:00"
+      },
+      {
+        "role": "system",
+        "message": "Escalated to management and security provider",
+        "timestamp": "2026-05-23T17:45:00"
+      }
     ],
     "created_at": "2026-05-23T17:45:00",
     "updated_at": "2026-05-23T17:45:00",
@@ -265,6 +381,134 @@
     "sentiment": "angry",
     "confidence": 0.96,
     "vendor_id": "vendor_010",
+    "notifications_sent": []
+  },
+  {
+    "id": "request_95752421",
+    "requester_id": "tenant_001",
+    "type": "emergency",
+    "description": "There is a burning smell and no power",
+    "status": "pending",
+    "urgency": "high",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "tenant",
+        "message": "There is a burning smell and no power"
+      },
+      {
+        "role": "ai",
+        "message": "This is an emergency! Please evacuate immediately.",
+        "timestamp": "2026-05-23T14:09:55.341941+00:00"
+      }
+    ],
+    "created_at": "2026-05-23T14:09:55.341941+00:00",
+    "updated_at": "2026-05-23T14:09:55.341941+00:00",
+    "escalated": true,
+    "sentiment": "angry",
+    "confidence": 0.98,
+    "vendor_id": null,
+    "notifications_sent": []
+  },
+  {
+    "id": "request_86a96dff",
+    "requester_id": "tenant_001",
+    "type": "access",
+    "description": "I lost my key",
+    "status": "pending",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "tenant",
+        "message": "I lost my key"
+      },
+      {
+        "role": "ai",
+        "message": "I have logged your key replacement request.",
+        "timestamp": "2026-05-23T14:09:55.350077+00:00"
+      }
+    ],
+    "created_at": "2026-05-23T14:09:55.350631+00:00",
+    "updated_at": "2026-05-23T14:09:55.350631+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 0.92,
+    "vendor_id": null,
+    "notifications_sent": []
+  },
+  {
+    "id": "request_e6c7191b",
+    "requester_id": "tenant_002",
+    "type": "access",
+    "description": "Conversation started",
+    "status": "escalated",
+    "urgency": "high",
+    "involved_parties": [
+      "tenant_002"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Welcome John Hackathon to Sunset Apartments at 45 Oak Street Apt 2A! How can I assist you with your property operations needs today?",
+        "timestamp": "2026-05-23T14:11:22.685870+00:00"
+      },
+      {
+        "role": "tenant",
+        "message": "I lost my apartment front door key and cannot get in",
+        "timestamp": "2026-05-23T14:11:26.519980+00:00"
+      },
+      {
+        "role": "ai",
+        "message": "I understand you're locked out of your apartment. This is a high-priority issue, and we're escalating it immediately to get you back inside. The property manager will be in touch shortly to assist you.",
+        "timestamp": "2026-05-23T14:11:26.519980+00:00"
+      }
+    ],
+    "created_at": "2026-05-23T14:11:22.686866+00:00",
+    "updated_at": "2026-05-23T14:11:26.532569+00:00",
+    "escalated": true,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": "vendor_001",
+    "notifications_sent": []
+  },
+  {
+    "id": "request_ea4531d1",
+    "requester_id": "tenant_002",
+    "type": "emergency",
+    "description": "Conversation started",
+    "status": "escalated",
+    "urgency": "high",
+    "involved_parties": [
+      "tenant_002"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Welcome, John Hackathon, to Sunset Apartments, Apt 2A! How can I assist you today?",
+        "timestamp": "2026-05-23T14:11:29.176085+00:00"
+      },
+      {
+        "role": "tenant",
+        "message": "There is a heavy smell of gas and a smoke detector is going off!",
+        "timestamp": "2026-05-23T14:11:32.847625+00:00"
+      },
+      {
+        "role": "ai",
+        "message": "John, this is an urgent safety matter. Please evacuate your apartment immediately and call emergency services (like 112 in Germany) from a safe location. We are dispatching emergency personnel to your unit right away and will follow up with you as soon as possible.",
+        "timestamp": "2026-05-23T14:11:32.847625+00:00"
+      }
+    ],
+    "created_at": "2026-05-23T14:11:29.176085+00:00",
+    "updated_at": "2026-05-23T14:11:32.860035+00:00",
+    "escalated": true,
+    "sentiment": "frustrated",
+    "confidence": 1.0,
+    "vendor_id": null,
     "notifications_sent": []
   }
 ]

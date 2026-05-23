@@ -68,7 +68,12 @@ def update_request(request_id: str, updates: dict) -> dict:
     """
     Merge updates into an existing request record and persist.
 
-    Automatically stamps updated_at with the current UTC timestamp.
+    Automatically stamps updated_at with the current UTC timestamp
+    and applies request status state machine transitions:
+    - pending -> in_progress (first AI reply)
+    - in_progress -> pending_approval (lease/owner-approval requests)
+    - in_progress -> escalated (escalation triggered)
+    - in_progress -> resolved (workflow complete, no escalation)
 
     Parameters:
         request_id (str): The unique identifier of the request to update.
@@ -81,9 +86,49 @@ def update_request(request_id: str, updates: dict) -> dict:
         ValueError: If no request with request_id exists.
     """
     log_handler.debug(f"[request_mcp] Updating request_id='{request_id}'")
+
+    # Confirm the record exists and fetch current status
+    req = find_by_id("requests", request_id)
+    if not req:
+        raise ValueError(f"Request '{request_id}' not found")
+
+    current_status = req.get("status", "pending")
+    new_status = updates.get("status", current_status)
+
+    # Apply state transitions
+    if current_status == "pending":
+        # Transition to in_progress on the first update / AI reply
+        new_status = "in_progress"
+
+    if new_status == "in_progress":
+        is_escalated = updates.get("escalated", req.get("escalated", False))
+        is_complete = updates.get("is_complete", False)
+        req_type = updates.get("type", req.get("type", "general"))
+
+        if is_escalated or updates.get("status") == "escalated":
+            new_status = "escalated"
+            updates["escalated"] = True
+        elif is_complete:
+            if req_type == "rental_agreement":
+                new_status = "pending_approval"
+            else:
+                new_status = "resolved"
+
+    # Ensure escalated flag is set if status is escalated
+    if new_status == "escalated":
+        updates["escalated"] = True
+
+    updates["status"] = new_status
     updates["updated_at"] = datetime.now(timezone.utc).isoformat()
+
+    # Pop temporary is_complete helper if present so it is not persisted
+    updates.pop("is_complete", None)
+
     updated = update_record("requests", request_id, updates)
-    log_handler.info(f"[request_mcp] Request '{request_id}' updated successfully")
+    log_handler.info(
+        f"[request_mcp] Request '{request_id}' updated successfully. "
+        f"Status: {current_status} -> {new_status}"
+    )
     return updated
 
 
