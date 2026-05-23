@@ -11,7 +11,13 @@
       "manager_001"
     ],
     "conversation_history": [],
-    "created_at": "2026-05-23T12:00:00"
+    "created_at": "2026-05-23T12:00:00",
+    "updated_at": "2026-05-23T12:00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 0.82,
+    "vendor_id": null,
+    "notifications_sent": []
   },
   {
     "id": "request_002",
@@ -26,11 +32,17 @@
       "vendor_002"
     ],
     "conversation_history": [
-      "Tenant reported leak in kitchen sink",
-      "AI asked severity and leak rate",
-      "Plumber dispatched"
+      {"role": "system", "message": "Tenant reported leak in kitchen sink", "timestamp": "2026-05-23T09:15:00"},
+      {"role": "system", "message": "AI asked severity and leak rate", "timestamp": "2026-05-23T09:15:00"},
+      {"role": "system", "message": "Plumber dispatched", "timestamp": "2026-05-23T09:15:00"}
     ],
-    "created_at": "2026-05-23T09:15:00"
+    "created_at": "2026-05-23T09:15:00",
+    "updated_at": "2026-05-23T09:15:00",
+    "escalated": false,
+    "sentiment": "frustrated",
+    "confidence": 0.88,
+    "vendor_id": "vendor_002",
+    "notifications_sent": []
   },
   {
     "id": "request_003",
@@ -45,11 +57,17 @@
       "vendor_003"
     ],
     "conversation_history": [
-      "Tenant reported electrical failure",
-      "AI detected safety risk",
-      "Immediate escalation triggered"
+      {"role": "system", "message": "Tenant reported electrical failure", "timestamp": "2026-05-23T10:45:00"},
+      {"role": "system", "message": "AI detected safety risk", "timestamp": "2026-05-23T10:45:00"},
+      {"role": "system", "message": "Immediate escalation triggered", "timestamp": "2026-05-23T10:45:00"}
     ],
-    "created_at": "2026-05-23T10:45:00"
+    "created_at": "2026-05-23T10:45:00",
+    "updated_at": "2026-05-23T10:45:00",
+    "escalated": true,
+    "sentiment": "angry",
+    "confidence": 0.95,
+    "vendor_id": "vendor_003",
+    "notifications_sent": []
   },
   {
     "id": "request_004",
@@ -64,10 +82,16 @@
       "vendor_004"
     ],
     "conversation_history": [
-      "Tenant reported heating issue",
-      "AI confirmed no immediate emergency"
+      {"role": "system", "message": "Tenant reported heating issue", "timestamp": "2026-05-23T11:30:00"},
+      {"role": "system", "message": "AI confirmed no immediate emergency", "timestamp": "2026-05-23T11:30:00"}
     ],
-    "created_at": "2026-05-23T11:30:00"
+    "created_at": "2026-05-23T11:30:00",
+    "updated_at": "2026-05-23T11:30:00",
+    "escalated": false,
+    "sentiment": "frustrated",
+    "confidence": 0.79,
+    "vendor_id": "vendor_004",
+    "notifications_sent": []
   },
   {
     "id": "request_005",
@@ -82,11 +106,17 @@
       "owner_001"
     ],
     "conversation_history": [
-      "Tenant requested lease extension",
-      "AI collected duration preference",
-      "Sent to owner for approval"
+      {"role": "system", "message": "Tenant requested lease extension", "timestamp": "2026-05-23T08:00:00"},
+      {"role": "system", "message": "AI collected duration preference", "timestamp": "2026-05-23T08:00:00"},
+      {"role": "system", "message": "Sent to owner for approval", "timestamp": "2026-05-23T08:00:00"}
     ],
-    "created_at": "2026-05-23T08:00:00"
+    "created_at": "2026-05-23T08:00:00",
+    "updated_at": "2026-05-23T08:00:00",
+    "escalated": false,
+    "sentiment": "calm",
+    "confidence": 0.91,
+    "vendor_id": null,
+    "notifications_sent": []
   },
   {
     "id": "request_006",
@@ -101,11 +131,17 @@
       "vendor_001"
     ],
     "conversation_history": [
-      "Tenant reported lockout",
-      "AI confirmed no safety risk",
-      "Locksmith dispatched"
+      {"role": "system", "message": "Tenant reported lockout", "timestamp": "2026-05-23T12:20:00"},
+      {"role": "system", "message": "AI confirmed no safety risk", "timestamp": "2026-05-23T12:20:00"},
+      {"role": "system", "message": "Locksmith dispatched", "timestamp": "2026-05-23T12:20:00"}
     ],
-    "created_at": "2026-05-23T12:20:00"
+    "created_at": "2026-05-23T12:20:00",
+    "updated_at": "2026-05-23T12:20:00",
+    "escalated": false,
+    "sentiment": "frustrated",
+    "confidence": 0.87,
+    "vendor_id": "vendor_001",
+    "notifications_sent": []
   },
   {
     "id": "request_007",
@@ -120,11 +156,17 @@
       "vendor_009"
     ],
     "conversation_history": [
-      "Tenant reported washing machine issue",
-      "AI confirmed appliance is not leaking or hazardous",
-      "Repair scheduled"
+      {"role": "system", "message": "Tenant reported washing machine issue", "timestamp": "2026-05-23T13:10:00"},
+      {"role": "system", "message": "AI confirmed appliance is not leaking or hazardous", "timestamp": "2026-05-23T13:10:00"},
+      {"role": "system", "message": "Repair scheduled", "timestamp": "2026-05-23T13:10:00"}
     ],
-    "created_at": "2026-05-23T13:10:00"
+    "created_at": "2026-05-23T13:10:00",
+    "updated_at": "2026-05-23T13:10:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 0.84,
+    "vendor_id": "vendor_009",
+    "notifications_sent": []
   },
   {
     "id": "request_008",
@@ -139,11 +181,17 @@
       "vendor_007"
     ],
     "conversation_history": [
-      "Tenant reported pest issue",
-      "AI asked about severity and spread",
-      "Pest control vendor assigned"
+      {"role": "system", "message": "Tenant reported pest issue", "timestamp": "2026-05-23T14:05:00"},
+      {"role": "system", "message": "AI asked about severity and spread", "timestamp": "2026-05-23T14:05:00"},
+      {"role": "system", "message": "Pest control vendor assigned", "timestamp": "2026-05-23T14:05:00"}
     ],
-    "created_at": "2026-05-23T14:05:00"
+    "created_at": "2026-05-23T14:05:00",
+    "updated_at": "2026-05-23T14:05:00",
+    "escalated": false,
+    "sentiment": "frustrated",
+    "confidence": 0.76,
+    "vendor_id": "vendor_007",
+    "notifications_sent": []
   },
   {
     "id": "request_009",
@@ -158,11 +206,17 @@
       "vendor_006"
     ],
     "conversation_history": [
-      "Tenant reported door alignment issue",
-      "AI confirmed security risk is low",
-      "Repair scheduled with door specialist"
+      {"role": "system", "message": "Tenant reported door alignment issue", "timestamp": "2026-05-23T15:00:00"},
+      {"role": "system", "message": "AI confirmed security risk is low", "timestamp": "2026-05-23T15:00:00"},
+      {"role": "system", "message": "Repair scheduled with door specialist", "timestamp": "2026-05-23T15:00:00"}
     ],
-    "created_at": "2026-05-23T15:00:00"
+    "created_at": "2026-05-23T15:00:00",
+    "updated_at": "2026-05-23T15:00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 0.81,
+    "vendor_id": "vendor_006",
+    "notifications_sent": []
   },
   {
     "id": "request_010",
@@ -176,11 +230,17 @@
       "manager_001"
     ],
     "conversation_history": [
-      "Tenant reported noise disturbance",
-      "AI asked frequency and timing",
-      "Complaint forwarded to property manager"
+      {"role": "system", "message": "Tenant reported noise disturbance", "timestamp": "2026-05-23T16:20:00"},
+      {"role": "system", "message": "AI asked frequency and timing", "timestamp": "2026-05-23T16:20:00"},
+      {"role": "system", "message": "Complaint forwarded to property manager", "timestamp": "2026-05-23T16:20:00"}
     ],
-    "created_at": "2026-05-23T16:20:00"
+    "created_at": "2026-05-23T16:20:00",
+    "updated_at": "2026-05-23T16:20:00",
+    "escalated": false,
+    "sentiment": "frustrated",
+    "confidence": 0.73,
+    "vendor_id": null,
+    "notifications_sent": []
   },
   {
     "id": "request_011",
@@ -195,10 +255,16 @@
       "vendor_010"
     ],
     "conversation_history": [
-      "Tenant reported security concern",
-      "AI flagged potential risk",
-      "Escalated to management and security provider"
+      {"role": "system", "message": "Tenant reported security concern", "timestamp": "2026-05-23T17:45:00"},
+      {"role": "system", "message": "AI flagged potential risk", "timestamp": "2026-05-23T17:45:00"},
+      {"role": "system", "message": "Escalated to management and security provider", "timestamp": "2026-05-23T17:45:00"}
     ],
-    "created_at": "2026-05-23T17:45:00"
+    "created_at": "2026-05-23T17:45:00",
+    "updated_at": "2026-05-23T17:45:00",
+    "escalated": true,
+    "sentiment": "angry",
+    "confidence": 0.96,
+    "vendor_id": "vendor_010",
+    "notifications_sent": []
   }
 ]
