@@ -27,6 +27,7 @@ from src.core_specs.configuration.config_loader import config_loader
 from src.utils.json_store import (
     read_all, find_by_id, find_by_field, create_record, update_record
 )
+from src.ai.gemini_client import get_client
 
 """API ROUTER-----------------------------------------------------------"""
 #Get API router
@@ -123,6 +124,92 @@ async def get_request_notifications(request: Request, request_id: str):
     except Exception as e:
         log_handler.error(f"Unexpected error fetching notifications for '{request_id}': {e}")
         raise HTTPException(status_code=500, detail="Internal server error while fetching notifications")
+
+
+#Get AI plain-English summary for a request
+@router.get(config_loader['endpoints']['requests_endpoint']['summary_route'])
+@SlowLimiter.limit(
+    f"{config_loader['endpoints']['requests_endpoint']['request_limit']}/"
+    f"{config_loader['endpoints']['requests_endpoint']['unit_of_time_for_limit']}"
+)
+async def get_request_summary(request: Request, request_id: str):
+    """
+    Retrieve an AI-generated plain-English summary of the request's conversation.
+
+    Fetches the request's conversation history, formats it, and calls Gemini
+    to produce a clear, plain-English summary that is 2 to 3 sentences long.
+
+    Parameters:
+        request (Request): The incoming HTTP request for rate limit tracking.
+        request_id (str): The unique identifier of the request to summarize.
+
+    Returns:
+        dict: Containing a single 'summary' field.
+
+    Raises:
+        HTTPException 404: If no request with the given ID exists.
+        HTTPException 500: If an unexpected error occurs during summarization.
+    """
+    try:
+        log_handler.debug(f"Generating summary for request_id='{request_id}'")
+        req = find_by_id("requests", request_id)
+
+        if not req:
+            message = f"Request '{request_id}' not found"
+            log_handler.warning(message)
+            raise HTTPException(status_code=404, detail=message)
+
+        history = req.get("conversation_history", [])
+        if not history:
+            log_handler.info(f"No conversation history available for request '{request_id}'")
+            return {"summary": "No conversation history available to summarize."}
+
+        # Format history as readable text
+        history_text = ""
+        for turn in history:
+            role = turn.get("role", "unknown").upper()
+            msg = turn.get("message", "")
+            history_text += f"{role}: {msg}\n"
+
+        prompt = (
+            f"You are an AI assistant for a property operations platform.\n"
+            f"Please summarize the following conversation history between a tenant and our AI coordinator.\n"
+            f"Your summary must be extremely clear, plain-English, and exactly 2 to 3 sentences long.\n"
+            f"Focus on what the tenant's issue is and what the current status/conclusion is.\n"
+            f"Do not include any formatting, markdown, or headers. Just output the raw summary text.\n\n"
+            f"Conversation history:\n{history_text}"
+        )
+
+        summary = ""
+        try:
+            client = get_client()
+            response = client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=prompt,
+            )
+            if response and response.text:
+                summary = response.text.strip()
+        except Exception as ai_err:
+            log_handler.error(f"Failed to generate summary via Gemini: {ai_err}")
+
+        if not summary:
+            # Fallback simple programmatically generated summary if Gemini fails
+            desc = req.get("description", "No description provided.")
+            urgency = req.get("urgency", "low")
+            status = req.get("status", "pending")
+            summary = (
+                f"This request was submitted with the description: '{desc}'. "
+                f"It is currently classified as having a {urgency} urgency level and is in a {status} status."
+            )
+
+        log_handler.info(f"Successfully generated summary for request '{request_id}'")
+        return {"summary": summary}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        log_handler.error(f"Unexpected error generating request summary for '{request_id}': {e}")
+        raise HTTPException(status_code=500, detail="Internal server error while generating summary")
 
 
 #Get a single request by ID
