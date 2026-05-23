@@ -77,7 +77,18 @@
             "detail_route": "/{request_id}",
             "notifications_route": "/{request_id}/notifications",
             "create_route": "",
-            "update_route": "/{request_id}"
+            "update_route": "/{request_id}",
+            "summary_route": "/{request_id}/summary"
+        },
+
+        "conversation_endpoint": {
+            "request_limit": 30,
+            "unit_of_time_for_limit": "m",
+            "endpoint_prefix": "/conversation",
+            "endpoint_tag": "Conversation",
+            "start_route": "/start",
+            "message_route": "/message",
+            "history_route": "/{request_id}/history"
         },
 
         "mcp_endpoint": {
@@ -89,3 +100,4 @@
         }
     }
 }
+
