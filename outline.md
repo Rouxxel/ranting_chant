@@ -443,11 +443,14 @@ Later versions can migrate to PostgreSQL or Supabase.
 
     "owner_id": "owner_001",
     "manager_id": "manager_001",
+    "tenant_ids": ["tenant_001","tenant_002","tenant_009"],
 
     "representative": {
       "type": "property_manager",
       "id": "manager_001"
     },
+  }
+]
 ```
 
 ---
@@ -869,34 +872,6 @@ src/
 ├── types/
 ├── context/
 └── App.tsx
-```
-
----
-
-## Backend
-
-```txt
-backend/
-├── app/
-│   ├── api/
-│   ├── services/
-│   │   ├── transcription.py
-│   │   ├── classification.py
-│   │   ├── conversation_engine.py
-│   │   ├── workflows.py
-│   │   ├── notifications.py
-│   │   └── mcp/
-│   │       ├── tenant_mcp.py
-│   │       ├── vendor_mcp.py
-│   │       ├── property_mcp.py
-│   │       └── request_mcp.py
-│   ├── data/
-│   │   ├── tenants.json
-│   │   ├── vendors.json
-│   │   ├── owners.json
-│   │   ├── property_managers.json
-│   │   └── requests.json
-│   └── main.py
 ```
 
 ---
