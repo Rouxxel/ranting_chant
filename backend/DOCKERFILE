@@ -1,6 +1,7 @@
 #############################################################################
-### Multi-stage Dockerfile for Ranting chant backend
+### Multi-stage Dockerfile for Ranting Chant Backend
 ### FastAPI + Uvicorn + Python 3.12
+### Includes AI, Voice, and Notification services
 ### Optimized for production deployment
 #############################################################################
 

@@ -29,7 +29,7 @@ services:
   
   # redis:
   #   image: redis:7-alpine
-  #   container_name: rest_api_redis
+  #   container_name: ranting_chant_redis
   #   ports:
   #     - "6379:6379"
   #   restart: unless-stopped
@@ -39,7 +39,7 @@ services:
 
   # postgres:
   #   image: postgres:15-alpine
-  #   container_name: rest_api_postgres
+  #   container_name: ranting_chant_postgres
   #   environment:
   #     POSTGRES_DB: ${POSTGRES_DB:-api_db}
   #     POSTGRES_USER: ${POSTGRES_USER:-api_user}
