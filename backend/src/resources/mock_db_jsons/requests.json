@@ -510,5 +510,50 @@
     "confidence": 1.0,
     "vendor_id": null,
     "notifications_sent": []
+  },
+  {
+    "id": "request_dd1280eb",
+    "requester_id": "tenant_001",
+    "type": "access",
+    "description": "Conversation started",
+    "status": "escalated",
+    "urgency": "high",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Welcome, John Tenant, to Sunset Apartments! How can I assist you today?",
+        "timestamp": "2026-05-23T14:20:38.241782+00:00"
+      },
+      {
+        "role": "tenant",
+        "message": "I lost my key",
+        "timestamp": "2026-05-23T14:20:49.590570+00:00"
+      },
+      {
+        "role": "ai",
+        "message": "I understand you've lost your key. To help me determine the urgency, could you please let me know if you need immediate access to your apartment, or if this is something that can be addressed during business hours?",
+        "timestamp": "2026-05-23T14:20:49.590570+00:00"
+      },
+      {
+        "role": "tenant",
+        "message": "I need access right now, I am locked out of my apartment and it is late at night",
+        "timestamp": "2026-05-23T14:21:02.205405+00:00"
+      },
+      {
+        "role": "ai",
+        "message": "I understand this is an urgent situation, John. I've marked your request as high priority and we are dispatching assistance to help you regain access to your apartment immediately. Please stay safe.",
+        "timestamp": "2026-05-23T14:21:02.205405+00:00"
+      }
+    ],
+    "created_at": "2026-05-23T14:20:38.241782+00:00",
+    "updated_at": "2026-05-23T14:21:02.218434+00:00",
+    "escalated": true,
+    "sentiment": "frustrated",
+    "confidence": 1.0,
+    "vendor_id": "vendor_001",
+    "notifications_sent": []
   }
 ]
