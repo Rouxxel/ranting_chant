@@ -64,17 +64,17 @@ class TestConversationEngine(unittest.TestCase):
         """Create a fresh ConversationEngine instance for each test."""
         self.engine = ConversationEngine()
 
-    @patch("src.ai.conversation_engine.find_by_id")
+    @patch("src.ai.conversation_engine.property_mcp.lookup_property")
+    @patch("src.ai.conversation_engine.tenant_mcp.lookup_tenant")
     @patch("src.ai.conversation_engine.get_client")
-    def test_normal_flow(self, mock_get_client, mock_find_by_id):
+    def test_normal_flow(self, mock_get_client, mock_lookup_tenant, mock_lookup_property):
         """
         Normal flow: Gemini returns a complete, low-urgency response.
         Asserts that reply is returned, is_complete=True, escalate=False.
         """
         #Arrange
-        mock_find_by_id.side_effect = lambda col, id_: (
-            FAKE_TENANT if col == "tenants" else FAKE_PROPERTY
-        )
+        mock_lookup_tenant.return_value = FAKE_TENANT
+        mock_lookup_property.return_value = FAKE_PROPERTY
         mock_get_client.return_value = _make_gemini_client({
             "reply": "I have logged your key replacement request.",
             "is_complete": True,
@@ -97,17 +97,17 @@ class TestConversationEngine(unittest.TestCase):
         self.assertIn("reply", result)
         self.assertIsInstance(result["reply"], str)
 
-    @patch("src.ai.conversation_engine.find_by_id")
+    @patch("src.ai.conversation_engine.property_mcp.lookup_property")
+    @patch("src.ai.conversation_engine.tenant_mcp.lookup_tenant")
     @patch("src.ai.conversation_engine.get_client")
-    def test_emergency_detection(self, mock_get_client, mock_find_by_id):
+    def test_emergency_detection(self, mock_get_client, mock_lookup_tenant, mock_lookup_property):
         """
         Emergency detection: Gemini returns high urgency and escalate=True.
         Asserts that escalate=True is preserved in the result.
         """
         #Arrange
-        mock_find_by_id.side_effect = lambda col, id_: (
-            FAKE_TENANT if col == "tenants" else FAKE_PROPERTY
-        )
+        mock_lookup_tenant.return_value = FAKE_TENANT
+        mock_lookup_property.return_value = FAKE_PROPERTY
         mock_get_client.return_value = _make_gemini_client({
             "reply": "This is an emergency! Please evacuate immediately.",
             "is_complete": True,
@@ -130,17 +130,17 @@ class TestConversationEngine(unittest.TestCase):
         self.assertEqual(result["urgency"], "high")
         self.assertEqual(result["type"], "emergency")
 
-    @patch("src.ai.conversation_engine.find_by_id")
+    @patch("src.ai.conversation_engine.property_mcp.lookup_property")
+    @patch("src.ai.conversation_engine.tenant_mcp.lookup_tenant")
     @patch("src.ai.conversation_engine.get_client")
-    def test_follow_up_generation(self, mock_get_client, mock_find_by_id):
+    def test_follow_up_generation(self, mock_get_client, mock_lookup_tenant, mock_lookup_property):
         """
         Follow-up flow: Gemini returns is_complete=False with low confidence.
         Asserts is_complete=False and escalate=True (confidence < 0.7 triggers escalation).
         """
         #Arrange
-        mock_find_by_id.side_effect = lambda col, id_: (
-            FAKE_TENANT if col == "tenants" else FAKE_PROPERTY
-        )
+        mock_lookup_tenant.return_value = FAKE_TENANT
+        mock_lookup_property.return_value = FAKE_PROPERTY
         mock_get_client.return_value = _make_gemini_client({
             "reply": "Could you tell me more about the issue?",
             "is_complete": False,
@@ -161,17 +161,17 @@ class TestConversationEngine(unittest.TestCase):
         #confidence=0.5 < 0.7 triggers escalation in _should_escalate
         self.assertEqual(result["escalate"], True)
 
-    @patch("src.ai.conversation_engine.find_by_id")
+    @patch("src.ai.conversation_engine.property_mcp.lookup_property")
+    @patch("src.ai.conversation_engine.tenant_mcp.lookup_tenant")
     @patch("src.ai.conversation_engine.get_client")
-    def test_malformed_json_fallback(self, mock_get_client, mock_find_by_id):
+    def test_malformed_json_fallback(self, mock_get_client, mock_lookup_tenant, mock_lookup_property):
         """
         Malformed JSON fallback: Gemini returns a non-JSON string.
         Asserts the fallback reply is used and is_complete=False.
         """
         #Arrange
-        mock_find_by_id.side_effect = lambda col, id_: (
-            FAKE_TENANT if col == "tenants" else FAKE_PROPERTY
-        )
+        mock_lookup_tenant.return_value = FAKE_TENANT
+        mock_lookup_property.return_value = FAKE_PROPERTY
         mock_response = MagicMock()
         mock_response.text = "Sorry, I cannot help with that right now."
         mock_client = MagicMock()
@@ -186,15 +186,15 @@ class TestConversationEngine(unittest.TestCase):
         self.assertIn("reply", result)
         self.assertIn("trouble", result["reply"].lower())
 
-    @patch("src.ai.conversation_engine.find_by_id")
+    @patch("src.ai.conversation_engine.tenant_mcp.lookup_tenant")
     @patch("src.ai.conversation_engine.get_client")
-    def test_tenant_not_found(self, mock_get_client, mock_find_by_id):
+    def test_tenant_not_found(self, mock_get_client, mock_lookup_tenant):
         """
         Tenant not found: find_by_id returns None for the tenant lookup.
         Asserts that ValueError is raised.
         """
         #Arrange — tenant lookup returns None
-        mock_find_by_id.return_value = None
+        mock_lookup_tenant.return_value = None
 
         #Act & Assert
         with self.assertRaises(ValueError) as ctx:
