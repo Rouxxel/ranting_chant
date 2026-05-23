@@ -33,7 +33,8 @@ client = None
 if ELEVENLABS_API_KEY:
     try:
         client = ElevenLabs(api_key=ELEVENLABS_API_KEY)
-        log_handler.debug("ElevenLabs client initialized")
+        whisper_model = WhisperModel("base", device="cuda", compute_type="float16")
+        log_handler.debug("ElevenLabs client initialized, whisper model selected")
     except Exception as e:
         log_handler.warning(f"Failed to initialize ElevenLabs client: {e}")
 else:
@@ -60,15 +61,19 @@ def transcribe_elevenlabs(audio_bytes: bytes, language_code: str = "eng") -> str
     try:
         log_handler.debug("[stt_service] Transcribing audio with ElevenLabs")
         
+        if not audio_bytes:
+            raise ValueError("Audio bytes cannot be empty")
         audio_file = BytesIO(audio_bytes)
+        audio_file.name = "audio.mp3"
         
         result = client.speech_to_text.convert(
             file=audio_file,
             model_id="scribe_v2",
+            language_code=language_code,
             diarize=True
         )
         
-        transcript = result.text if hasattr(result, 'text') else str(result)
+        transcript = result.text
         log_handler.info(f"[stt_service] ElevenLabs transcription successful: {transcript[:50]}...")
         return transcript
         
@@ -93,10 +98,9 @@ def transcribe_whisper(audio_path: str) -> str:
     try:
         log_handler.debug(f"[stt_service] Transcribing audio with Whisper: {audio_path}")
         
-        model = WhisperModel("base")
-        segments, info = model.transcribe(audio_path)
+        segments, info = whisper_model.transcribe(audio_path)
         
-        transcript = " ".join([segment.text for segment in segments])
+        transcript = " ".join(segment.text.strip() for segment in segments)
         log_handler.info(f"[stt_service] Whisper transcription successful: {transcript[:50]}...")
         return transcript
         
@@ -124,16 +128,12 @@ def transcribe(audio_bytes: bytes) -> str:
     # Fallback to Whisper
     try:
         # Save bytes to temporary file for Whisper
-        with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as temp_file:
+        with tempfile.NamedTemporaryFile(suffix=".mp3", delete=True) as temp_file:
             temp_file.write(audio_bytes)
-            temp_path = temp_file.name
-        
-        try:
-            transcript = transcribe_whisper(temp_path)
+            temp_file.flush()
+
+            transcript = transcribe_whisper(temp_file.name)
             return transcript
-        finally:
-            # Clean up temp file
-            os.unlink(temp_path)
             
     except Exception as e:
         log_handler.error(f"[stt_service] Both transcription methods failed: {e}")

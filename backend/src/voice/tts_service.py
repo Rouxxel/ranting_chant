@@ -17,7 +17,6 @@ import os
 import base64
 
 #Third-party imports
-from elevenlabs import Voice, VoiceSettings
 from elevenlabs.client import ElevenLabs
 
 #Other files imports
@@ -55,6 +54,9 @@ def text_to_speech_bytes(text: str, voice_id: str | None = None) -> bytes:
     """
     if not client:
         raise RuntimeError("ElevenLabs client not configured")
+
+    if not text or not text.strip():
+        raise ValueError("Text cannot be empty")
 
     try:
         log_handler.debug(f"[tts_service] Converting text to speech: {text[:50]}...")
@@ -106,7 +108,7 @@ def text_to_speech_emergency(text: str, voice_id: str | None = None) -> bytes:
         bytes: The audio data as bytes (MP3 format) with urgency tone.
     """
     # Prepend urgency tone indicator
-    emergency_text = f"⚠️ Emergency. {text}"
+    emergency_text = f"Emergency. {text}"
     
     log_handler.info("[tts_service] Generating emergency TTS response")
     return text_to_speech_bytes(emergency_text, voice_id)
