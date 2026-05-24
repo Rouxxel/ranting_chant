@@ -2,15 +2,15 @@
 // Based on TASKS.md Phase 8.8
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import type { Tenant, Manager } from '../types';
+import type { Tenant, Manager, Owner } from '../types';
 
 interface AppContextType {
   currentTenant: Tenant | null;
-  currentManager: Manager | null;
-  userRole: 'tenant' | 'manager' | null;
+  currentManager: Manager | Owner | null;
+  userRole: 'tenant' | 'manager' | 'owner' | null;
   setCurrentTenant: (tenant: Tenant | null) => void;
-  setCurrentManager: (manager: Manager | null) => void;
-  setUserRole: (role: 'tenant' | 'manager' | null) => void;
+  setCurrentManager: (manager: Manager | Owner | null) => void;
+  setUserRole: (role: 'tenant' | 'manager' | 'owner' | null) => void;
   clearUser: () => void;
 }
 
@@ -18,8 +18,8 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [currentTenant, setCurrentTenant] = useState<Tenant | null>(null);
-  const [currentManager, setCurrentManager] = useState<Manager | null>(null);
-  const [userRole, setUserRole] = useState<'tenant' | 'manager' | null>(null);
+  const [currentManager, setCurrentManager] = useState<Manager | Owner | null>(null);
+  const [userRole, setUserRole] = useState<'tenant' | 'manager' | 'owner' | null>(null);
 
   // Load user data from localStorage on mount
   useEffect(() => {
@@ -34,7 +34,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setCurrentManager(JSON.parse(savedManager));
     }
     if (savedRole) {
-      setUserRole(savedRole as 'tenant' | 'manager');
+      setUserRole(savedRole as 'tenant' | 'manager' | 'owner');
     }
   }, []);
 

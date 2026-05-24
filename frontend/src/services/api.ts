@@ -196,6 +196,11 @@ export const getManagerById = async (managerId: string): Promise<Manager> => {
   return response.data;
 };
 
+export const getOwners = async (): Promise<Owner[]> => {
+  const response = await apiClient.get<Owner[]>('/owners');
+  return response.data;
+};
+
 // ==================== Requests ====================
 
 export const getRequests = async (): Promise<Request[]> => {

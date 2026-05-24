@@ -29,13 +29,18 @@ function ManagementPage() {
     const loadRequests = async () => {
       try {
         const allRequests = await getRequests();
-        // Filter requests for current manager by property_id
-        const managerRequests = allRequests.filter(r => {
-          // Get manager's managed properties from currentManager
-          if (!currentManager || !currentManager.managed_properties || !r.property_id) return false;
-          return currentManager.managed_properties.includes(r.property_id);
+        // Filter requests for current manager/owner by property_id
+        const filteredRequests = allRequests.filter(r => {
+          // Get properties from currentManager (could be manager or owner)
+          if (!currentManager || !r.property_id) return false;
+
+          // Handle both managers (managed_properties) and owners (owned_properties)
+          const properties = (currentManager as any).managed_properties || (currentManager as any).owned_properties;
+          if (!properties) return false;
+
+          return properties.includes(r.property_id);
         });
-        setRows(managerRequests);
+        setRows(filteredRequests);
       } catch (error) {
         console.error("Failed to load requests:", error);
         setRows([]);

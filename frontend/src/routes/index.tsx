@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Logo } from "@/components/Logo";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useApp } from "@/context/AppContext";
-import { getTenants, getManagers } from "@/services/api";
+import { getTenants, getManagers, getOwners } from "@/services/api";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [{ title: "Ranting Chant — Sign in" }] }),
@@ -55,22 +55,29 @@ function LoginPage() {
     setIsLoading(true);
 
     try {
-      // TODO: Wire to GET /managers API
-      const managers = await getManagers();
+      // Check both managers and owners
+      const [managers, owners] = await Promise.all([getManagers(), getOwners()]);
       const matchedManager = managers.find(
         m => m.name.toLowerCase() === mName.trim().toLowerCase()
+      );
+      const matchedOwner = owners.find(
+        o => o.name.toLowerCase() === mName.trim().toLowerCase()
       );
 
       if (matchedManager) {
         setCurrentManager(matchedManager);
         setUserRole('manager');
         navigate({ to: "/management" });
+      } else if (matchedOwner) {
+        setCurrentManager(matchedOwner);
+        setUserRole('owner');
+        navigate({ to: "/management" });
       } else {
-        setErr("No manager found with that name. Please check your information.");
+        setErr("No manager or owner found with that name. Please check your information.");
       }
     } catch (error) {
       setErr("Failed to connect to server. Please try again.");
-      console.error("Manager login error:", error);
+      console.error("Manager/Owner login error:", error);
     } finally {
       setIsLoading(false);
     }

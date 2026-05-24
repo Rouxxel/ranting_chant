@@ -38,6 +38,7 @@ from src.api_endpoints.routers.tenants_router import router as tenants_router
 from src.api_endpoints.routers.properties_router import router as properties_router
 from src.api_endpoints.routers.vendors_router import router as vendors_router
 from src.api_endpoints.routers.managers_router import router as managers_router
+from src.api_endpoints.routers.owners_router import router as owners_router
 from src.api_endpoints.routers.requests_router import router as requests_router
 from src.api_endpoints.routers.mcp_router import router as mcp_router
 from src.api_endpoints.routers.conversation_router import router as conversation_router
@@ -95,6 +96,7 @@ app.include_router(tenants_router)
 app.include_router(properties_router)
 app.include_router(vendors_router)
 app.include_router(managers_router)
+app.include_router(owners_router)
 app.include_router(requests_router)
 app.include_router(mcp_router)
 app.include_router(conversation_router)
