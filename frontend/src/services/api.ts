@@ -28,11 +28,18 @@ import type {
   ApiError
 } from '../types';
 
-// Create axios instance
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+// Fallback endpoints from environment variables
+const ENDPOINTS = [
+  import.meta.env.VITE_LOCAL_BACKEND || 'http://localhost:8000',
+  import.meta.env.VITE_PROD_BACKEND || 'https://ranting-chant.onrender.com'
+];
 
+let currentEndpointIndex = 0;
+let hasShownConnectionError = false;
+
+// Create axios instance with initial endpoint
 const apiClient: AxiosInstance = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: ENDPOINTS[0],
   headers: {
     'Content-Type': 'application/json',
   },
@@ -51,10 +58,59 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor for error handling
+// Response interceptor with fallback logic
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
+    const originalRequest = error.config;
+
+    // If the error is a network error or 5xx, try the next endpoint
+    if ((error.code === 'ERR_NETWORK' || !error.response) && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      // Try next endpoint
+      const nextIndex = (currentEndpointIndex + 1) % ENDPOINTS.length;
+      
+      if (nextIndex !== currentEndpointIndex) {
+        currentEndpointIndex = nextIndex;
+        originalRequest.baseURL = ENDPOINTS[currentEndpointIndex];
+        console.log(`Retrying with endpoint: ${ENDPOINTS[currentEndpointIndex]}`);
+        
+        try {
+          return await apiClient(originalRequest);
+        } catch (retryError) {
+          // If retry also fails, show error message
+          if (!hasShownConnectionError) {
+            hasShownConnectionError = true;
+            toast.error('Connection Error', {
+              description: 'We are having some troubles, please try again later',
+              duration: 10000,
+            });
+            
+            // Reset flag after 30 seconds to allow showing error again
+            setTimeout(() => {
+              hasShownConnectionError = false;
+            }, 30000);
+          }
+          return Promise.reject(retryError);
+        }
+      }
+    }
+
+    // If we've tried all endpoints or it's a different error, show error
+    if (!hasShownConnectionError && (error.code === 'ERR_NETWORK' || !error.response)) {
+      hasShownConnectionError = true;
+      toast.error('Connection Error', {
+        description: 'We are having some troubles, please try again later',
+        duration: 10000,
+      });
+      
+      // Reset flag after 30 seconds to allow showing error again
+      setTimeout(() => {
+        hasShownConnectionError = false;
+      }, 30000);
+    }
+
     const status = error.response?.status;
     
     if (status === 401) {
