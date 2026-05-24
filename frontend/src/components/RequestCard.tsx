@@ -25,13 +25,9 @@ export function RequestCard({ req, open, onToggle, tenantName = "Tenant" }: Requ
           <p className="mb-3 text-sm text-ranting-muted">{req.description}</p>
           <div className="flex flex-wrap items-center gap-3">
             <span className="text-[11px] text-ranting-muted">Created {createdDate}</span>
-            <div className="flex -space-x-2">
-              {req.parties.map((p) => (
-                <div key={p.id} title={`${p.name} · ${p.role}`}>
-                  <Avatar name={p.name} size={26} glow={false} />
-                </div>
-              ))}
-            </div>
+            {req.involved_parties && req.involved_parties.length > 0 && (
+              <span className="text-[11px] text-ranting-muted">{req.involved_parties.length} party(s) involved</span>
+            )}
           </div>
         </div>
         <ChevronDown className={`h-5 w-5 text-ranting-sky transition-transform ${open ? "rotate-180" : ""}`} />

@@ -69,25 +69,26 @@ export interface Party {
 }
 
 export interface ConversationMessage {
-  id: string;
+  id?: string;
   role: "ai" | "tenant" | "manager";
-  text: string;
+  message: string;
   timestamp: string;
 }
 
 export interface NotificationEvent {
-  id: string;
-  channel: "email" | "sms";
+  id?: string;
+  type: "email" | "sms";
   recipient: string;
+  status?: string;
   timestamp: string;
-  summary: string;
+  summary?: string;
 }
 
 export interface Request {
   id: string;
   type: string;
   description: string;
-  tenant_id: string;
+  requester_id: string;
   tenant_name?: string;
   property: string;
   property_id?: string;
@@ -95,12 +96,14 @@ export interface Request {
   status: Status;
   created_at: string;
   updated_at?: string;
-  parties: Party[];
-  conversation: ConversationMessage[];
-  notifications: NotificationEvent[];
+  involved_parties: string[];
+  conversation_history: ConversationMessage[];
+  notifications_sent: NotificationEvent[];
   vendor_id?: string;
   vendor_name?: string;
   escalated?: boolean;
+  sentiment?: string;
+  confidence?: number;
   is_complete?: boolean;
 }
 
@@ -112,7 +115,7 @@ export interface ConversationStartRequest {
 }
 
 export interface ConversationStartResponse {
-  request_id: string;
+  session_id: string;
   greeting: string;
   tenant_name: string;
   property_name: string;
@@ -125,6 +128,7 @@ export interface ConversationMessageRequest {
 }
 
 export interface ConversationMessageResponse {
+  request_id: string;
   reply: string;
   status: Status;
   urgency: Urgency;

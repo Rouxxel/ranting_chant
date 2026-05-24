@@ -24,14 +24,29 @@ function DashboardPage() {
   useEffect(() => {
     const loadRequests = async () => {
       try {
+        // Try to load from localStorage first
+        const cachedRequests = localStorage.getItem(`requests_${tenantId}`);
+        if (cachedRequests) {
+          setRequests(JSON.parse(cachedRequests));
+          setIsLoading(false);
+        }
+
+        // Fetch fresh data from API
         const allRequests = await getRequests();
         // Filter requests for current tenant
-        const tenantRequests = allRequests.filter(r => r.tenant_id === tenantId);
+        const tenantRequests = allRequests.filter(r => r.requester_id === tenantId);
         setRequests(tenantRequests);
+        // Cache in localStorage
+        localStorage.setItem(`requests_${tenantId}`, JSON.stringify(tenantRequests));
       } catch (error) {
         console.error("Failed to load requests:", error);
-        // Fallback to empty array if API fails
-        setRequests([]);
+        // Fallback to cached data if API fails
+        const cachedRequests = localStorage.getItem(`requests_${tenantId}`);
+        if (cachedRequests) {
+          setRequests(JSON.parse(cachedRequests));
+        } else {
+          setRequests([]);
+        }
       } finally {
         setIsLoading(false);
       }

@@ -10,8 +10,8 @@ interface RequestTimelineProps {
 export function RequestTimeline({ req, tenantName = "Tenant" }: RequestTimelineProps) {
   type Node = { kind: "msg"; data: ConversationMessage } | { kind: "notif"; data: NotificationEvent };
   const nodes: Node[] = [
-    ...req.conversation.map((m) => ({ kind: "msg" as const, data: m })),
-    ...req.notifications.map((n) => ({ kind: "notif" as const, data: n })),
+    ...(req.conversation_history || []).map((m) => ({ kind: "msg" as const, data: m })),
+    ...(req.notifications_sent || []).map((n) => ({ kind: "notif" as const, data: n })),
   ];
 
   return (
@@ -35,18 +35,18 @@ export function RequestTimeline({ req, tenantName = "Tenant" }: RequestTimelineP
                     <div className="mb-0.5 text-[10px] uppercase tracking-wider text-ranting-muted">
                       {n.data.role === "ai" ? "AI" : tenantName} · {new Date(n.data.timestamp).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
                     </div>
-                    {n.data.text}
+                    {n.data.message}
                   </div>
                 </div>
               ) : (
                 <div className="flex items-center gap-2 text-xs text-ranting-muted">
-                  {n.data.channel === "email" ? <Mail className="h-3.5 w-3.5" /> : <MessageCircle className="h-3.5 w-3.5" />}
-                  <span className="text-ranting-ice/80">{n.data.channel.toUpperCase()}</span>
+                  {n.data.type === "email" ? <Mail className="h-3.5 w-3.5" /> : <MessageCircle className="h-3.5 w-3.5" />}
+                  <span className="text-ranting-ice/80">{n.data.type.toUpperCase()}</span>
                   <span>·</span>
                   <span>to {n.data.recipient}</span>
                   <span>·</span>
                   <span>{new Date(n.data.timestamp).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</span>
-                  <span className="ml-1 text-ranting-ice/70">— {n.data.summary}</span>
+                  {n.data.summary && <span className="ml-1 text-ranting-ice/70">— {n.data.summary}</span>}
                 </div>
               )}
             </li>

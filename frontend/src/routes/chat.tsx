@@ -44,24 +44,25 @@ function ChatPage() {
           tenant_id: tenantId,
           message: "Hello, I need help with a property issue."
         });
-        setRequestId(response.request_id);
+        setRequestId(response.session_id); // Use session_id instead of request_id
         // Backend returns greeting, not conversation
         setMessages([{
           id: crypto.randomUUID(),
           role: "ai",
-          text: response.greeting || `Hello ${name}! I'm Ranting Chant, your property operations assistant. How can I help you today?`,
+          message: response.greeting || `Hello ${name}! I'm Ranting Chant, your property operations assistant. How can I help you today?`,
           timestamp: new Date().toISOString()
         }]);
         setStatus("pending");
         setUrgency("low");
         setEscalated(false);
+        // No request created yet, so no need to invalidate cache
       } catch (error) {
         console.error("Failed to start conversation:", error);
         // Fallback to mock greeting if API fails
         setMessages([{
           id: "1",
           role: "ai",
-          text: `Hello ${name}! I'm Ranting Chant, your property operations assistant. How can I help you today?`,
+          message: `Hello ${name}! I'm Ranting Chant, your property operations assistant. How can I help you today?`,
           timestamp: new Date().toISOString()
         }]);
       } finally {
@@ -81,7 +82,7 @@ function ChatPage() {
     if (!t || !requestId) return;
 
     const now = new Date().toISOString();
-    setMessages((m) => [...m, { id: crypto.randomUUID(), role: "tenant", text: t, timestamp: now }]);
+    setMessages((m) => [...m, { id: crypto.randomUUID(), role: "tenant", message: t, timestamp: now }]);
     setInput("");
     setTyping(true);
 
@@ -92,11 +93,18 @@ function ChatPage() {
         message: t
       });
 
+      // If this was the first message, update requestId with the actual request_id
+      if (response.request_id && requestId.startsWith("session_")) {
+        setRequestId(response.request_id);
+        // Invalidate requests cache since a new request was created
+        localStorage.removeItem(`requests_${tenantId}`);
+      }
+
       // Backend returns reply, not conversation array
       setMessages((m) => [...m, {
         id: crypto.randomUUID(),
         role: "ai",
-        text: response.reply,
+        message: response.reply,
         timestamp: new Date().toISOString()
       }]);
       setStatus(response.status);
@@ -107,7 +115,7 @@ function ChatPage() {
       setMessages((m) => [...m, {
         id: crypto.randomUUID(),
         role: "ai",
-        text: "Sorry, I'm having trouble connecting. Please try again.",
+        message: "Sorry, I'm having trouble connecting. Please try again.",
         timestamp: new Date().toISOString()
       }]);
     } finally {
@@ -149,7 +157,7 @@ function ChatPage() {
 
       // Add transcript as tenant message
       const now = new Date().toISOString();
-      setMessages((m) => [...m, { id: crypto.randomUUID(), role: "tenant", text: transcript, timestamp: now }]);
+      setMessages((m) => [...m, { id: crypto.randomUUID(), role: "tenant", message: transcript, timestamp: now }]);
 
       // Send to voice respond endpoint
       const voiceResponse = await respondToVoice({
@@ -162,7 +170,7 @@ function ChatPage() {
       setMessages((m) => [...m, {
         id: crypto.randomUUID(),
         role: "ai",
-        text: voiceResponse.reply_text,
+        message: voiceResponse.reply_text,
         timestamp: new Date().toISOString()
       }]);
 
@@ -181,7 +189,7 @@ function ChatPage() {
       setMessages((m) => [...m, {
         id: crypto.randomUUID(),
         role: "ai",
-        text: "Sorry, I couldn't process your voice message. Please try again.",
+        message: "Sorry, I couldn't process your voice message. Please try again.",
         timestamp: new Date().toISOString()
       }]);
     } finally {
