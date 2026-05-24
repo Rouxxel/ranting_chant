@@ -24,10 +24,12 @@ from src.utils.custom_logger import log_handler
 from src.mcp import tenant_mcp, property_mcp, vendor_mcp, request_mcp
 from src.ai.gemini_client import get_client
 from src.ai.system_prompt import SYSTEM_PROMPT
+from src.core_specs.configuration.config_loader import config_loader
+
 
 """VARIABLES-----------------------------------------------------------"""
 #Gemini model to use for conversation
-GEMINI_MODEL = "gemini-2.5-flash"
+GEMINI_MODEL = config_loader["llm_model"]["default_model"]
 
 """CLASS-----------------------------------------------------------"""
 class ConversationEngine:

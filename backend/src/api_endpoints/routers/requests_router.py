@@ -207,7 +207,7 @@ async def get_request_summary(request: Request, request_id: str):
         try:
             client = get_client()
             response = client.models.generate_content(
-                model="gemini-2.5-flash",
+                model=config_loader["llm_model"]["default_model"],
                 contents=prompt,
             )
             if response and response.text:

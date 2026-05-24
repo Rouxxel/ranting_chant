@@ -5,6 +5,7 @@
     "email": "john@example.com",
     "phone": "+1-555-1234",
     "address": "123 Main St Apt 4B",
+    "unit": "4B",
     "property_id": "property_001"
   },
   {
@@ -13,6 +14,7 @@
     "email": "hckthnspecific@gmail.com",
     "phone": "+1-555-2345",
     "address": "45 Oak Street Apt 2A",
+    "unit": "2A",
     "property_id": "property_001"
   },
   {
@@ -21,6 +23,7 @@
     "email": "michael.brown@example.com",
     "phone": "+1-555-3456",
     "address": "78 Pine Avenue Apt 10C",
+    "unit": "10C",
     "property_id": "property_002"
   },
   {
@@ -29,6 +32,7 @@
     "email": "sophia.williams@example.com",
     "phone": "+1-555-4567",
     "address": "12 Maple Drive Apt 5B",
+    "unit": "5B",
     "property_id": "property_002"
   },
   {
@@ -37,6 +41,7 @@
     "email": "daniel.johnson@example.com",
     "phone": "+1-555-5678",
     "address": "99 Cedar Lane Apt 3D",
+    "unit": "3D",
     "property_id": "property_003"
   },
   {
@@ -45,6 +50,7 @@
     "email": "olivia.martinez@example.com",
     "phone": "+1-555-6789",
     "address": "21 Birch Road Apt 7A",
+    "unit": "7A",
     "property_id": "property_004"
   },
   {
@@ -53,6 +59,7 @@
     "email": "james.wilson@example.com",
     "phone": "+1-555-7890",
     "address": "33 Elm Street Apt 1F",
+    "unit": "1F",
     "property_id": "property_004"
   },
   {
@@ -61,6 +68,7 @@
     "email": "isabella.anderson@example.com",
     "phone": "+1-555-8901",
     "address": "56 Willow Court Apt 8B",
+    "unit": "8B",
     "property_id": "property_004"
   },
   {
@@ -69,6 +77,7 @@
     "email": "ethan.thomas@example.com",
     "phone": "+1-555-9012",
     "address": "14 Aspen Way Apt 6C",
+    "unit": "6C",
     "property_id": "property_001"
   },
   {
@@ -77,6 +86,7 @@
     "email": "ava.taylor@example.com",
     "phone": "+1-555-0123",
     "address": "88 Poplar Street Apt 4D",
+    "unit": "4D",
     "property_id": "property_005"
   }
 ]

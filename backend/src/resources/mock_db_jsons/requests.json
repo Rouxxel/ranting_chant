@@ -715,5 +715,1231 @@
         "timestamp": "2026-05-23T16:57:51.415170+00:00"
       }
     ]
+  },
+  {
+    "id": "request_f8a075e9",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello John Tenant! Welcome to Sunset Apartments at 123 Main St Apt 4B. How can I assist you today?",
+        "timestamp": "2026-05-24T09:47:37.183904+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:47:37.183904+00:00",
+    "updated_at": "2026-05-24T09:47:39.010024+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:47:38.969058+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_1086dcab",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Welcome to Sunset Apartments, John Tenant at 123 Main St Apt 4B! How can I help you today?",
+        "timestamp": "2026-05-24T09:47:40.919066+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:47:40.919066+00:00",
+    "updated_at": "2026-05-24T09:47:41.939759+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:47:41.920926+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_fb256ac7",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello John Tenant, welcome to Sunset Apartments! How may I assist you today?",
+        "timestamp": "2026-05-24T09:47:47.470777+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:47:47.471780+00:00",
+    "updated_at": "2026-05-24T09:47:48.666963+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:47:48.629871+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_758dab95",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Welcome John Tenant to Sunset Apartments! How can I assist you today?",
+        "timestamp": "2026-05-24T09:47:49.659772+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:47:49.660880+00:00",
+    "updated_at": "2026-05-24T09:47:50.524961+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:47:50.500519+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_bc03c18f",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Welcome to Sunset Apartments, John Tenant! How may I assist you today?",
+        "timestamp": "2026-05-24T09:47:51.788633+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:47:51.788633+00:00",
+    "updated_at": "2026-05-24T09:47:52.418414+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:47:52.397564+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_5d810a82",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Welcome, John Tenant, to Sunset Apartments! How can I assist you today?",
+        "timestamp": "2026-05-24T09:47:53.968932+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:47:53.968932+00:00",
+    "updated_at": "2026-05-24T09:47:54.624769+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:47:54.594535+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_24fb7184",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello John Tenant, welcome to Ranting Chant. How can I assist you with your home at Sunset Apartments today?",
+        "timestamp": "2026-05-24T09:47:54.727263+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:47:54.728264+00:00",
+    "updated_at": "2026-05-24T09:47:55.500512+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:47:55.478747+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_b4e31684",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello John Tenant, welcome to Ranting Chant. How can I assist you with your home at Sunset Apartments today?",
+        "timestamp": "2026-05-24T09:48:12.468991+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:48:12.470013+00:00",
+    "updated_at": "2026-05-24T09:48:13.981396+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:48:13.962399+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_0cd017cf",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello John Tenant, welcome to Ranting Chant. How can I assist you with your home at Sunset Apartments today?",
+        "timestamp": "2026-05-24T09:48:14.149575+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:48:14.149575+00:00",
+    "updated_at": "2026-05-24T09:48:14.798360+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:48:14.778507+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_d734ed22",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Welcome, John Tenant, to Sunset Apartments at 123 Main St Apt 4B! How can I assist you today?",
+        "timestamp": "2026-05-24T09:51:16.810943+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:51:16.810943+00:00",
+    "updated_at": "2026-05-24T09:51:17.493648+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:51:17.490607+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_1b0ab8cf",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello John Tenant, welcome to Sunset Apartments! How can I help you today?",
+        "timestamp": "2026-05-24T09:51:18.673938+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:51:18.673938+00:00",
+    "updated_at": "2026-05-24T09:51:19.208135+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:51:19.207179+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_5a4a4bb8",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello John Tenant! Welcome to Sunset Apartments. How can I assist you today?",
+        "timestamp": "2026-05-24T09:52:46.087195+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:52:46.087195+00:00",
+    "updated_at": "2026-05-24T09:52:47.632513+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:52:47.630567+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_2fa0b978",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello John Tenant, welcome to Sunset Apartments! How can I assist you today?",
+        "timestamp": "2026-05-24T09:52:49.275996+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:52:49.276995+00:00",
+    "updated_at": "2026-05-24T09:52:49.821634+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:52:49.819337+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_1dc45297",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Welcome John Tenant to Sunset Apartments! How can I assist you with your property operations needs today?",
+        "timestamp": "2026-05-24T09:52:51.136255+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:52:51.137786+00:00",
+    "updated_at": "2026-05-24T09:52:51.953910+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:52:51.952921+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_d2fd45ff",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Welcome, John Tenant, to Sunset Apartments! How may I assist you today?",
+        "timestamp": "2026-05-24T09:52:59.804547+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:52:59.805750+00:00",
+    "updated_at": "2026-05-24T09:53:01.137711+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:53:01.122081+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_f316c351",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Welcome John Tenant to Sunset Apartments! How can I assist you with your property operations today?",
+        "timestamp": "2026-05-24T09:53:02.172154+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:53:02.172154+00:00",
+    "updated_at": "2026-05-24T09:53:03.190790+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:53:03.187776+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_9ce8c6c6",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Welcome John Tenant to Sunset Apartments at 123 Main St Apt 4B. How can I assist you today?",
+        "timestamp": "2026-05-24T09:53:48.575389+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:53:48.575389+00:00",
+    "updated_at": "2026-05-24T09:53:49.212374+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:53:49.210247+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_aaa99b0e",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Welcome to Sunset Apartments, John Tenant! How can I assist you today?",
+        "timestamp": "2026-05-24T09:53:50.831973+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:53:50.833381+00:00",
+    "updated_at": "2026-05-24T09:53:51.512316+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:53:51.510314+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_affb98a2",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Welcome John Tenant to Sunset Apartments! How can I assist you with your property operations today?",
+        "timestamp": "2026-05-24T09:53:53.324603+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:53:53.324603+00:00",
+    "updated_at": "2026-05-24T09:53:53.851361+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:53:53.848656+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_149516ab",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello John Tenant, welcome to Sunset Apartments! How can I help you today?",
+        "timestamp": "2026-05-24T09:53:55.540498+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:53:55.540498+00:00",
+    "updated_at": "2026-05-24T09:53:56.070342+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:53:56.066909+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_b3a6f263",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello John Tenant! Welcome to Sunset Apartments. How can I assist you today?",
+        "timestamp": "2026-05-24T09:53:58.766951+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:53:58.766951+00:00",
+    "updated_at": "2026-05-24T09:53:59.317133+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:53:59.316138+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_a427cb1c",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Welcome, John Tenant, to Sunset Apartments at 123 Main St Apt 4B! How can I assist you today?",
+        "timestamp": "2026-05-24T09:54:01.000675+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:54:01.000675+00:00",
+    "updated_at": "2026-05-24T09:54:01.635693+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:54:01.629965+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_11064c1c",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello John Tenant, welcome to Ranting Chant. How can I assist you with your home at Sunset Apartments today?",
+        "timestamp": "2026-05-24T09:54:03.661325+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:54:03.662348+00:00",
+    "updated_at": "2026-05-24T09:54:04.188500+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:54:04.188500+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_39a068e8",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello John Tenant, welcome to Ranting Chant. How can I assist you with your home at Sunset Apartments today?",
+        "timestamp": "2026-05-24T09:54:04.281128+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:54:04.282141+00:00",
+    "updated_at": "2026-05-24T09:54:04.900082+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:54:04.899084+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_ae3e2fdf",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello John Tenant, welcome to Ranting Chant. How can I assist you with your home at Sunset Apartments today?",
+        "timestamp": "2026-05-24T09:54:05.006854+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:54:05.007454+00:00",
+    "updated_at": "2026-05-24T09:54:05.618569+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:54:05.615695+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_d102a9c6",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello John Tenant, welcome to Ranting Chant. How can I assist you with your home at Sunset Apartments today?",
+        "timestamp": "2026-05-24T09:54:09.717777+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:54:09.719016+00:00",
+    "updated_at": "2026-05-24T09:54:10.434075+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:54:10.434075+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_fada46ac",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello John Tenant, welcome to Ranting Chant. How can I assist you with your home at Sunset Apartments today?",
+        "timestamp": "2026-05-24T09:54:10.564367+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:54:10.564367+00:00",
+    "updated_at": "2026-05-24T09:54:11.231916+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:54:11.230872+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_cc6d0b90",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello John Tenant, welcome to Ranting Chant. How can I assist you with your home at Sunset Apartments today?",
+        "timestamp": "2026-05-24T09:54:11.329944+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:54:11.329944+00:00",
+    "updated_at": "2026-05-24T09:54:11.951631+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:54:11.949629+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_d9c576bb",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello John Tenant, welcome to Ranting Chant. How can I assist you with your home at Sunset Apartments today?",
+        "timestamp": "2026-05-24T09:54:14.616049+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:54:14.617028+00:00",
+    "updated_at": "2026-05-24T09:54:15.348126+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:54:15.345457+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_1b70afcf",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello John Tenant, welcome to Ranting Chant. How can I assist you with your home at Sunset Apartments today?",
+        "timestamp": "2026-05-24T09:54:15.466823+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:54:15.466823+00:00",
+    "updated_at": "2026-05-24T09:54:16.111384+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:54:16.108262+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_4bb1af45",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello John Tenant, welcome to Ranting Chant. How can I assist you with your home at Sunset Apartments today?",
+        "timestamp": "2026-05-24T09:54:16.235853+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:54:16.236477+00:00",
+    "updated_at": "2026-05-24T09:54:17.086686+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:54:17.084687+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_ad59da43",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello John Tenant, welcome to Ranting Chant. How can I assist you with your home at Sunset Apartments today?",
+        "timestamp": "2026-05-24T09:54:20.706610+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:54:20.708633+00:00",
+    "updated_at": "2026-05-24T09:54:21.418686+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:54:21.416862+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_18ed311a",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello John Tenant, welcome to Ranting Chant. How can I assist you with your home at Sunset Apartments today?",
+        "timestamp": "2026-05-24T09:54:21.538192+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:54:21.538192+00:00",
+    "updated_at": "2026-05-24T09:54:22.209709+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:54:22.207454+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_0cd041e4",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello John Tenant, welcome to Ranting Chant. How can I assist you with your home at Sunset Apartments today?",
+        "timestamp": "2026-05-24T09:54:22.330909+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:54:22.331456+00:00",
+    "updated_at": "2026-05-24T09:54:23.145994+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:54:23.144012+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_1373f1e4",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Welcome, John Tenant, to Sunset Apartments at 123 Main St Apt 4B! How may I assist you today?",
+        "timestamp": "2026-05-24T09:55:21.453407+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:55:21.455413+00:00",
+    "updated_at": "2026-05-24T09:55:22.688717+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:55:22.684281+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_a9ef2e84",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Welcome to Sunset Apartments, John Tenant! As your AI property operations coordinator for Ranting Chant, how can I help you today?",
+        "timestamp": "2026-05-24T09:55:24.564111+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:55:24.565110+00:00",
+    "updated_at": "2026-05-24T09:55:25.574030+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:55:25.572078+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_3b95fc5b",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello John Tenant, welcome to Ranting Chant. How can I assist you with your home at Sunset Apartments today?",
+        "timestamp": "2026-05-24T09:55:35.159324+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:55:35.159324+00:00",
+    "updated_at": "2026-05-24T09:55:36.327918+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 1.0,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:55:36.310485+00:00"
+      }
+    ]
+  },
+  {
+    "id": "request_5abd5f11",
+    "requester_id": "tenant_001",
+    "type": "access",
+    "description": "Conversation started",
+    "status": "in_progress",
+    "urgency": "medium",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello John Tenant, welcome to Ranting Chant. How can I assist you with your home at Sunset Apartments today?",
+        "timestamp": "2026-05-24T09:55:36.476001+00:00"
+      },
+      {
+        "role": "tenant",
+        "message": "I lost my key",
+        "timestamp": "2026-05-24T09:55:44.843733+00:00"
+      },
+      {
+        "role": "ai",
+        "message": "I understand you've lost your key. Are you currently locked out of your apartment?",
+        "timestamp": "2026-05-24T09:55:44.843733+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:55:36.476999+00:00",
+    "updated_at": "2026-05-24T09:55:44.843733+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 0.9,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sarah@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:55:37.667452+00:00"
+      }
+    ]
   }
 ]

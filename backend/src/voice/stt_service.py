@@ -24,6 +24,7 @@ from faster_whisper import WhisperModel
 
 #Other files imports
 from src.utils.custom_logger import log_handler
+from src.core_specs.configuration.config_loader import config_loader
 
 """VARIABLES-----------------------------------------------------------"""
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "")
@@ -33,7 +34,13 @@ client = None
 if ELEVENLABS_API_KEY:
     try:
         client = ElevenLabs(api_key=ELEVENLABS_API_KEY)
-        whisper_model = WhisperModel("base", device="auto", compute_type="auto")
+        whisper_model = WhisperModel(
+            config_loader["elevenlabs_model"]["stt"]["default_model"], 
+            device=config_loader["elevenlabs_model"]["stt"]["device"], 
+            compute_type=config_loader["elevenlabs_model"]["stt"]["compute_type"],
+            cpu_threads=config_loader["elevenlabs_model"]["stt"]["cpu_threads"],
+            num_workers=config_loader["elevenlabs_model"]["stt"]["num_workers"]
+            )
         log_handler.debug("ElevenLabs client initialized, whisper model selected")
     except Exception as e:
         log_handler.warning(f"Failed to initialize ElevenLabs client: {e}")
@@ -68,9 +75,9 @@ def transcribe_elevenlabs(audio_bytes: bytes, language_code: str = "eng") -> str
         
         result = client.speech_to_text.convert(
             file=audio_file,
-            model_id="scribe_v2",
-            language_code=language_code,
-            diarize=True
+            model_id=config_loader["elevenlabs_model"]["stt"]["model_id"],
+            language_code=config_loader["elevenlabs_model"]["stt"]["language_code"],
+            diarize=config_loader["elevenlabs_model"]["stt"]["diarize"]
         )
         
         transcript = result.text

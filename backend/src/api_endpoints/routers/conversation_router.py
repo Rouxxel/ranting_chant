@@ -108,7 +108,7 @@ async def start_conversation(request: Request, body: ConversationStartPayload):
                 f"Do not include any placeholders, markdown, or extra formatting. Just the greeting text."
             )
             response = client.models.generate_content(
-                model="gemini-2.5-flash",
+                model=config_loader["llm_model"]["default_model"],
                 contents=prompt,
             )
             if response and response.text:

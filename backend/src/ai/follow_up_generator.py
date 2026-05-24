@@ -17,10 +17,12 @@ from google.genai import types
 #Other files imports
 from src.utils.custom_logger import log_handler
 from src.ai.gemini_client import get_client
+from src.core_specs.configuration.config_loader import config_loader
+
 
 """VARIABLES-----------------------------------------------------------"""
 #Gemini model to use for follow-up generation
-GEMINI_MODEL = "gemini-2.5-flash"
+GEMINI_MODEL = config_loader["llm_model"]["default_model"]
 
 #Maximum number of conversation turns before forcing completion
 MAX_TURNS = 5
