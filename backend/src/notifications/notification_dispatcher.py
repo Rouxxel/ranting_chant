@@ -30,7 +30,8 @@ from src.notifications.sms_service import send_emergency_sms
 def _build_notification_event(
     notification_type: str,
     recipient: str,
-    status: str
+    status: str,
+    recipient_type: str = None
 ) -> dict:
     """
     Build a notification event dict for appending to notifications_sent.
@@ -39,16 +40,20 @@ def _build_notification_event(
         notification_type (str): The type of notification — "email" or "sms".
         recipient (str): The recipient email or phone number.
         status (str): "sent" or "failed".
+        recipient_type (str, optional): The type of recipient — "manager", "owner", "vendor".
 
     Returns:
-        dict: A notification event record with type, recipient, status, timestamp.
+        dict: A notification event record with type, recipient, status, timestamp, recipient_type.
     """
-    return {
+    event = {
         "type": notification_type,
         "recipient": recipient,
         "status": status,
         "timestamp": datetime.now(timezone.utc).isoformat()
     }
+    if recipient_type:
+        event["recipient_type"] = recipient_type
+    return event
 
 
 def dispatch_on_create(request: dict) -> list[dict]:
@@ -115,7 +120,7 @@ def dispatch_on_create(request: dict) -> list[dict]:
             summary=description
         )
         status = "sent" if success else "failed"
-        events.append(_build_notification_event("email", manager_email, status))
+        events.append(_build_notification_event("email", manager_email, status, "manager"))
         log_handler.info(
             f"[notification_dispatcher] create notification to manager "
             f"'{manager_email}': {status}"
@@ -190,7 +195,7 @@ def dispatch_on_escalate(request: dict) -> list[dict]:
                 manager_email, tenant_name, urgency, description
             )
             events.append(
-                _build_notification_event("email", manager_email, "sent" if email_ok else "failed")
+                _build_notification_event("email", manager_email, "sent" if email_ok else "failed", "manager")
             )
 
             if urgency == "high" and manager_phone:
@@ -199,7 +204,7 @@ def dispatch_on_escalate(request: dict) -> list[dict]:
                     f"Escalated request from {tenant_name}: {description}"
                 )
                 events.append(
-                    _build_notification_event("sms", manager_phone, "sent" if sms_ok else "failed")
+                    _build_notification_event("sms", manager_phone, "sent" if sms_ok else "failed", "manager")
                 )
 
         #Notify owner via email + SMS
@@ -213,7 +218,7 @@ def dispatch_on_escalate(request: dict) -> list[dict]:
                 owner_email, tenant_name, urgency, description
             )
             events.append(
-                _build_notification_event("email", owner_email, "sent" if email_ok else "failed")
+                _build_notification_event("email", owner_email, "sent" if email_ok else "failed", "owner")
             )
 
             if urgency == "high" and owner_phone:
@@ -222,7 +227,7 @@ def dispatch_on_escalate(request: dict) -> list[dict]:
                     f"Escalated request from {tenant_name}: {description}"
                 )
                 events.append(
-                    _build_notification_event("sms", owner_phone, "sent" if sms_ok else "failed")
+                    _build_notification_event("sms", owner_phone, "sent" if sms_ok else "failed", "owner")
                 )
 
         #For emergencies with an assigned vendor, also notify the vendor
@@ -286,7 +291,7 @@ def dispatch_vendor_dispatch(request: dict, vendor: dict) -> list[dict]:
             request_details=request
         )
         status = "sent" if success else "failed"
-        events.append(_build_notification_event("email", vendor_email, status))
+        events.append(_build_notification_event("email", vendor_email, status, "vendor"))
         log_handler.info(
             f"[notification_dispatcher] vendor_dispatch to '{vendor_email}': {status}"
         )

@@ -29,10 +29,12 @@ function ManagementPage() {
     const loadRequests = async () => {
       try {
         const allRequests = await getRequests();
-        // Filter requests for current manager (client-side as per TASKS.md)
-        const managerRequests = allRequests.filter(r => 
-          r.parties.some(p => p.id === managerId)
-        );
+        // Filter requests for current manager by property_id
+        const managerRequests = allRequests.filter(r => {
+          // Get manager's managed properties from currentManager
+          if (!currentManager || !currentManager.managed_properties || !r.property_id) return false;
+          return currentManager.managed_properties.includes(r.property_id);
+        });
         setRows(managerRequests);
       } catch (error) {
         console.error("Failed to load requests:", error);
@@ -43,7 +45,7 @@ function ManagementPage() {
     };
 
     loadRequests();
-  }, [managerId]);
+  }, [currentManager]);
 
   const properties = useMemo(() => Array.from(new Set(rows.map((r) => r.property))), [rows]);
 

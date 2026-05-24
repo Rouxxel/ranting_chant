@@ -343,7 +343,8 @@ async def save_conversation(request: Request, body: dict):
             "sentiment": metadata.get("sentiment", "neutral"),
             "confidence": metadata.get("confidence", 1.0),
             "vendor_id": metadata.get("vendor_id"),
-            "notification_pending": True  # Notifications still need to be sent
+            "notification_pending": True,  # Notifications still need to be sent
+            "property_id": prop.get("id") if prop else None  # Add property_id
         }
 
         req = request_mcp.create_request(request_data)

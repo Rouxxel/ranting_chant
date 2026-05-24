@@ -257,6 +257,7 @@ export const saveConversation = async (data: {
     sentiment?: string;
     confidence?: number;
     vendor_id?: string;
+    property_id?: string;
   };
 }): Promise<Request> => {
   const response = await apiClient.post<Request>('/conversation/save-conversation', data);

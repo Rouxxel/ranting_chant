@@ -82,6 +82,7 @@ export interface NotificationEvent {
   status?: string;
   timestamp: string;
   summary?: string;
+  recipient_type?: string;
 }
 
 export interface Request {

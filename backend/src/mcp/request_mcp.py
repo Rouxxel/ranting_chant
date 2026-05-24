@@ -57,7 +57,8 @@ def create_request(data: dict) -> dict:
         "confidence": data.get("confidence", 0.0),
         "vendor_id": data.get("vendor_id", None),
         "notifications_sent": [],
-        "notification_pending": True
+        "notification_pending": True,
+        "property_id": data.get("property_id", None)
     }
 
     created = create_record("requests", record)

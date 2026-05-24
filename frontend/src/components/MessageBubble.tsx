@@ -24,7 +24,7 @@ export function MessageBubble({ msg, tenantName = "Tenant" }: MessageBubbleProps
             boxShadow: "0 4px 14px rgba(45,106,159,0.4), inset 0 1px 0 rgba(255,255,255,0.18)",
           } : undefined}
         >
-          {msg.text}
+          {msg.message}
         </div>
         <span className={`px-1 text-[10px] text-ranting-muted ${isTenant ? "text-right" : "text-left"}`}>{timestamp}</span>
       </div>

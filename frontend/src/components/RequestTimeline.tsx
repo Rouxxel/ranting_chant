@@ -7,6 +7,23 @@ interface RequestTimelineProps {
   tenantName?: string;
 }
 
+function getRecipientType(recipient: string, recipientType?: string): string {
+  if (recipientType) {
+    return recipientType.charAt(0).toUpperCase() + recipientType.slice(1);
+  }
+
+  // Fallback: determine type from email pattern
+  if (recipient.includes("@management.com")) {
+    return "Manager";
+  } else if (recipient.includes("owner@") || recipient.includes("sterling@")) {
+    return "Owner";
+  } else if (recipient.includes("vendor") || recipient.includes("service")) {
+    return "Vendor";
+  }
+
+  return "";
+}
+
 export function RequestTimeline({ req, tenantName = "Tenant" }: RequestTimelineProps) {
   type Node = { kind: "msg"; data: ConversationMessage } | { kind: "notif"; data: NotificationEvent };
   const nodes: Node[] = [
@@ -43,7 +60,9 @@ export function RequestTimeline({ req, tenantName = "Tenant" }: RequestTimelineP
                   {n.data.type === "email" ? <Mail className="h-3.5 w-3.5" /> : <MessageCircle className="h-3.5 w-3.5" />}
                   <span className="text-ranting-ice/80">{n.data.type.toUpperCase()}</span>
                   <span>·</span>
-                  <span>to {n.data.recipient}</span>
+                  <span>{getRecipientType(n.data.recipient, n.data.recipient_type)}</span>
+                  <span>·</span>
+                  <span>{n.data.recipient}</span>
                   <span>·</span>
                   <span>{new Date(n.data.timestamp).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</span>
                   {n.data.summary && <span className="ml-1 text-ranting-ice/70">— {n.data.summary}</span>}

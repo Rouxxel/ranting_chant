@@ -138,7 +138,8 @@ function ChatPage() {
           urgency: urgency,
           escalated: escalated,
           sentiment: "neutral",
-          confidence: 1.0
+          confidence: 1.0,
+          property_id: currentTenant?.property_id
         }
       });
 
