@@ -108,7 +108,8 @@
         "status": "failed",
         "timestamp": "2026-05-24T10:22:46.411768+00:00"
       }
-    ]
+    ],
+    "summary": "The tenant is currently locked out of their apartment after their keys were stolen during a robbery. The AI coordinator has escalated the situation to the property manager to arrange for an emergency locksmith."
   },
   {
     "id": "request_6faa1922",
