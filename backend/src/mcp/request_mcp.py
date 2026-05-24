@@ -56,18 +56,19 @@ def create_request(data: dict) -> dict:
         "sentiment": data.get("sentiment", "neutral"),
         "confidence": data.get("confidence", 0.0),
         "vendor_id": data.get("vendor_id", None),
-        "notifications_sent": []
+        "notifications_sent": [],
+        "notification_pending": True
     }
 
     created = create_record("requests", record)
     log_handler.info(f"[request_mcp] Request created with id='{created['id']}'")
 
-    #Fire create notifications after record is saved
-    try:
-        from src.notifications.notification_dispatcher import dispatch_on_create
-        dispatch_on_create(created)
-    except Exception as notify_err:
-        log_handler.error(f"[request_mcp] dispatch_on_create failed: {notify_err}")
+    # Notifications will be sent on user confirmation, not automatically
+    # try:
+    #     from src.notifications.notification_dispatcher import dispatch_on_create
+    #     dispatch_on_create(created)
+    # except Exception as notify_err:
+    #     log_handler.error(f"[request_mcp] dispatch_on_create failed: {notify_err}")
 
     return created
 
@@ -235,12 +236,12 @@ def escalate_request(request_id: str, reason: str) -> dict:
     updated = update_record("requests", request_id, updates)
     log_handler.info(f"[request_mcp] Request '{request_id}' escalated successfully")
 
-    #Fire escalation notifications after status update
-    try:
-        from src.notifications.notification_dispatcher import dispatch_on_escalate
-        dispatch_on_escalate(updated)
-    except Exception as notify_err:
-        log_handler.error(f"[request_mcp] dispatch_on_escalate failed: {notify_err}")
+    # Notifications will be sent on user confirmation, not automatically
+    # try:
+    #     from src.notifications.notification_dispatcher import dispatch_on_escalate
+    #     dispatch_on_escalate(updated)
+    # except Exception as notify_err:
+    #     log_handler.error(f"[request_mcp] dispatch_on_escalate failed: {notify_err}")
 
     return updated
 

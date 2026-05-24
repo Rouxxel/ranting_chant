@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { AlertTriangle, MessageSquareText } from "lucide-react";
+import { AlertTriangle, MessageSquareText, Send, Save } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Avatar } from "@/components/Avatar";
 import { StatusBadge } from "@/components/Badges";
@@ -8,7 +8,7 @@ import { MessageBubble } from "@/components/MessageBubble";
 import { ChatInput } from "@/components/ChatInput";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useApp } from "@/context/AppContext";
-import { startConversation, sendMessage, transcribeAudio, respondToVoice } from "@/services/api";
+import { startConversation, sendMessage, transcribeAudio, respondToVoice, saveConversation, sendRequestNotifications } from "@/services/api";
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
 import type { ConversationMessage, Status, Urgency } from "@/types";
 
@@ -31,6 +31,7 @@ function ChatPage() {
   const [status, setStatus] = useState<Status>("pending");
   const [urgency, setUrgency] = useState<Urgency>("low");
   const [escalated, setEscalated] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const scrollerRef = useRef<HTMLDivElement>(null);
 
   const { isRecording, audioBlob, startRecording, stopRecording, resetRecording } = useVoiceRecorder();
@@ -120,6 +121,51 @@ function ChatPage() {
       }]);
     } finally {
       setTyping(false);
+    }
+  }
+
+  async function handleSaveConversation() {
+    if (!requestId || isSaved) return;
+
+    try {
+      const savedRequest = await saveConversation({
+        session_id: requestId,
+        tenant_id: tenantId,
+        conversation_history: messages,
+        metadata: {
+          type: status === "pending" ? "general" : status,
+          description: messages.find(m => m.role === "tenant")?.message || "Conversation saved by user",
+          urgency: urgency,
+          escalated: escalated,
+          sentiment: "neutral",
+          confidence: 1.0
+        }
+      });
+
+      setRequestId(savedRequest.id);
+      setIsSaved(true);
+      // Invalidate requests cache since a new request was created
+      localStorage.removeItem(`requests_${tenantId}`);
+
+      alert("Conversation saved successfully!");
+    } catch (error) {
+      console.error("Failed to save conversation:", error);
+      alert("Failed to save conversation. Please try again.");
+    }
+  }
+
+  async function handleSendNotifications() {
+    if (!requestId || !isSaved) {
+      alert("Please save the conversation first before sending notifications.");
+      return;
+    }
+
+    try {
+      await sendRequestNotifications(requestId);
+      alert("Notifications sent successfully!");
+    } catch (error) {
+      console.error("Failed to send notifications:", error);
+      alert("Failed to send notifications. Please try again.");
     }
   }
 
@@ -217,7 +263,23 @@ function ChatPage() {
         <StatusBadge status={status} className="self-start" />
         {requestId && <div className="mt-2 text-[11px] text-ranting-muted">ID · {requestId}</div>}
 
-        <div className="mt-auto pt-4">
+        <div className="mt-auto pt-4 space-y-2">
+          <button
+            onClick={handleSaveConversation}
+            disabled={isSaved || !requestId}
+            className="glossy-btn flex items-center justify-center gap-2 w-full px-3 py-2 text-sm disabled:opacity-50"
+          >
+            <Save className="h-4 w-4" />
+            {isSaved ? "Saved" : "End & Save"}
+          </button>
+          <button
+            onClick={handleSendNotifications}
+            disabled={!isSaved}
+            className="glossy-btn flex items-center justify-center gap-2 w-full px-3 py-2 text-sm disabled:opacity-50"
+          >
+            <Send className="h-4 w-4" />
+            Send Notifications
+          </button>
           <Link to="/dashboard" className="glossy-btn-ghost flex items-center justify-center gap-2 px-3 py-2 text-sm">
             <MessageSquareText className="h-4 w-4" /> View My Requests
           </Link>

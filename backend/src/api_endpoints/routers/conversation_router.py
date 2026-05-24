@@ -161,10 +161,10 @@ async def send_message(request: Request, body: ConversationMessagePayload):
         is_first_message = request_id_or_session_id.startswith("session_")
 
         if is_first_message:
-            # First message: create a new request
-            log_handler.info(f"First message in session '{request_id_or_session_id}', creating new request")
+            # First message: process with AI but don't create request yet
+            log_handler.info(f"First message in session '{request_id_or_session_id}', processing without creating request")
 
-            # Fetch tenant and property for request creation
+            # Fetch tenant and property for AI processing
             tenant = tenant_mcp.lookup_tenant(tenant_id)
             if not tenant:
                 err_msg = f"Tenant '{tenant_id}' not found"
@@ -174,31 +174,40 @@ async def send_message(request: Request, body: ConversationMessagePayload):
             prop = tenant_mcp.get_tenant_property(tenant_id)
             prop_name = prop.get("name", "Unknown Property") if prop else "Unknown Property"
 
-            # Create the request with the first message
-            now = datetime.now(timezone.utc).isoformat()
-            request_data = {
-                "requester_id": tenant_id,
-                "type": "general",
-                "description": message[:100],  # Use first message as description
-                "urgency": "low",
-                "involved_parties": [tenant_id],
-                "conversation_history": [
-                    {
-                        "role": "tenant",
-                        "message": message,
-                        "timestamp": now
-                    }
-                ],
-                "escalated": False,
-                "sentiment": "neutral",
-                "confidence": 1.0,
-                "vendor_id": None
-            }
-            req = request_mcp.create_request(request_data)
-            request_id = req["id"]
-            history = req.get("conversation_history", [])
+            # Build conversation history from session (just this message)
+            history = [
+                {
+                    "role": "tenant",
+                    "message": message,
+                    "timestamp": datetime.now(timezone.utc).isoformat()
+                }
+            ]
 
-            log_handler.info(f"Created request '{request_id}' for first message in session")
+            # Call conversation engine to get AI response
+            parsed_response = conversation_engine.process_message(
+                tenant_id=tenant_id,
+                request_id=request_id_or_session_id,  # Use session_id
+                message=message,
+                conversation_history=history
+            )
+
+            # Append AI response to history
+            history.append({
+                "role": "ai",
+                "message": parsed_response.get("reply", ""),
+                "timestamp": datetime.now(timezone.utc).isoformat()
+            })
+
+            # Return AI response without creating request
+            return {
+                "session_id": request_id_or_session_id,
+                "reply": parsed_response.get("reply"),
+                "status": parsed_response.get("status", "pending"),
+                "urgency": parsed_response.get("urgency", "low"),
+                "escalated": parsed_response.get("escalate", False),
+                "is_complete": parsed_response.get("is_complete", False),
+                "conversation_history": history
+            }
         else:
             # Subsequent message: fetch existing request
             request_id = request_id_or_session_id
@@ -277,6 +286,76 @@ async def send_message(request: Request, body: ConversationMessagePayload):
     except Exception as e:
         log_handler.error(f"Unexpected error processing conversation message: {e}")
         raise HTTPException(status_code=500, detail="Internal server error while processing message")
+
+
+# Save conversation and create request
+@router.post("/save-conversation")
+@SlowLimiter.limit(
+    f"{config_loader['endpoints']['conversation_endpoint']['request_limit']}/"
+    f"{config_loader['endpoints']['conversation_endpoint']['unit_of_time_for_limit']}"
+)
+async def save_conversation(request: Request, body: dict):
+    """
+    Save a conversation and create a request record.
+
+    This endpoint is called when the user explicitly chooses to save the conversation.
+    It creates a request record with the conversation history and metadata.
+
+    Parameters:
+        request (Request): The incoming HTTP request for rate limit tracking.
+        body (dict): Contains session_id, tenant_id, conversation_history, and metadata.
+
+    Returns:
+        dict: The newly created request record.
+
+    Raises:
+        HTTPException 404: If the tenant does not exist.
+        HTTPException 500: If an unexpected error occurs during creation.
+    """
+    try:
+        session_id = body.get("session_id", "").strip()
+        tenant_id = body.get("tenant_id", "").strip()
+        conversation_history = body.get("conversation_history", [])
+        metadata = body.get("metadata", {})
+
+        log_handler.info(f"Saving conversation for session '{session_id}', tenant '{tenant_id}'")
+
+        # Fetch tenant and property
+        tenant = tenant_mcp.lookup_tenant(tenant_id)
+        if not tenant:
+            err_msg = f"Tenant '{tenant_id}' not found"
+            log_handler.warning(err_msg)
+            raise HTTPException(status_code=404, detail=err_msg)
+
+        prop = tenant_mcp.get_tenant_property(tenant_id)
+        prop_name = prop.get("name", "Unknown Property") if prop else "Unknown Property"
+
+        # Create request with conversation history
+        now = datetime.now(timezone.utc).isoformat()
+        request_data = {
+            "requester_id": tenant_id,
+            "type": metadata.get("type", "general"),
+            "description": metadata.get("description", "Conversation saved by user"),
+            "urgency": metadata.get("urgency", "low"),
+            "involved_parties": [tenant_id],
+            "conversation_history": conversation_history,
+            "escalated": metadata.get("escalated", False),
+            "sentiment": metadata.get("sentiment", "neutral"),
+            "confidence": metadata.get("confidence", 1.0),
+            "vendor_id": metadata.get("vendor_id"),
+            "notification_pending": True  # Notifications still need to be sent
+        }
+
+        req = request_mcp.create_request(request_data)
+        log_handler.info(f"Created request '{req['id']}' from saved conversation")
+
+        return req
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        log_handler.error(f"Unexpected error saving conversation: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error while saving conversation")
 
 
 # Get conversation history for a request

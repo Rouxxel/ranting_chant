@@ -245,6 +245,29 @@ export const getConversationHistory = async (requestId: string): Promise<Convers
   return response.data;
 };
 
+export const saveConversation = async (data: {
+  session_id: string;
+  tenant_id: string;
+  conversation_history: any[];
+  metadata: {
+    type?: string;
+    description?: string;
+    urgency?: string;
+    escalated?: boolean;
+    sentiment?: string;
+    confidence?: number;
+    vendor_id?: string;
+  };
+}): Promise<Request> => {
+  const response = await apiClient.post<Request>('/conversation/save-conversation', data);
+  return response.data;
+};
+
+export const sendRequestNotifications = async (requestId: string): Promise<Request> => {
+  const response = await apiClient.post<Request>(`/requests/${requestId}/send-notifications`);
+  return response.data;
+};
+
 // ==================== Voice ====================
 
 export const transcribeAudio = async (audioFile: File): Promise<VoiceTranscribeResponse> => {

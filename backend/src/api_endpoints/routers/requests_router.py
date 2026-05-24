@@ -406,3 +406,77 @@ async def update_request(request: Request, request_id: str, body: RequestUpdateP
     except Exception as e:
         log_handler.error(f"Unexpected error updating request '{request_id}': {e}")
         raise HTTPException(status_code=500, detail="Internal server error while updating request")
+
+
+#Send notifications for a request (user confirmation)
+@router.post("/{request_id}/send-notifications")
+@SlowLimiter.limit(
+    f"{config_loader['endpoints']['requests_endpoint']['request_limit']}/"
+    f"{config_loader['endpoints']['requests_endpoint']['unit_of_time_for_limit']}"
+)
+async def send_notifications(request: Request, request_id: str):
+    """
+    Send notifications for a request after user confirmation.
+
+    This endpoint is called when the user confirms they want to send notifications
+    to the relevant parties (manager, owner, vendor). It checks if notifications
+    are pending and sends the appropriate notifications based on the request's
+    status and urgency.
+
+    Parameters:
+        request (Request): The incoming HTTP request for rate limit tracking.
+        request_id (str): The unique identifier of the request.
+
+    Returns:
+        dict: The updated request record with notification events appended.
+
+    Raises:
+        HTTPException 404: If no request with the given ID exists.
+        HTTPException 400: If notifications are not pending or already sent.
+        HTTPException 500: If an unexpected error occurs during notification dispatch.
+
+    Note:
+        If the rate limit is exceeded, the rate_limit_handler() handles the response.
+    """
+    try:
+        log_handler.debug(f"Sending notifications for request_id='{request_id}'")
+
+        #Fetch the request
+        req = find_by_id("requests", request_id)
+        if not req:
+            message = f"Request '{request_id}' not found"
+            log_handler.warning(message)
+            raise HTTPException(status_code=404, detail=message)
+
+        #Check if notifications are pending
+        if not req.get("notification_pending", False):
+            message = f"Notifications are not pending for request '{request_id}'"
+            log_handler.warning(message)
+            raise HTTPException(status_code=400, detail=message)
+
+        #Dispatch notifications based on request status
+        from src.notifications.notification_dispatcher import dispatch_on_create, dispatch_on_escalate
+
+        if req.get("escalated", False):
+            #Send escalation notifications (email + SMS for high urgency)
+            events = dispatch_on_escalate(req)
+        else:
+            #Send create notifications (email to manager)
+            events = dispatch_on_create(req)
+
+        #Mark notifications as no longer pending
+        updated = update_record("requests", request_id, {
+            "notification_pending": False,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        })
+
+        log_handler.info(
+            f"Successfully sent {len(events)} notification(s) for request '{request_id}'"
+        )
+        return updated
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        log_handler.error(f"Unexpected error sending notifications for '{request_id}': {e}")
+        raise HTTPException(status_code=500, detail="Internal server error while sending notifications")
