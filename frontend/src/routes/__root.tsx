@@ -10,6 +10,7 @@ import {
 
 import appCss from "../styles.css?url";
 import { AeroBackground } from "@/components/AeroBackground";
+import { AppProvider } from "@/context/AppContext";
 
 function NotFoundComponent() {
   return (
@@ -115,8 +116,10 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AeroBackground />
-      <Outlet />
+      <AppProvider>
+        <AeroBackground />
+        <Outlet />
+      </AppProvider>
     </QueryClientProvider>
   );
 }

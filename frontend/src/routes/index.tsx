@@ -2,7 +2,8 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Logo } from "@/components/Logo";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { setSession } from "@/lib/session";
+import { useApp } from "@/context/AppContext";
+import { getTenants, getManagers } from "@/services/api";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [{ title: "Ranting Chant — Sign in" }] }),
@@ -11,24 +12,68 @@ export const Route = createFileRoute("/")({
 
 function LoginPage() {
   const navigate = useNavigate();
+  const { setCurrentTenant, setCurrentManager, setUserRole } = useApp();
   const [tName, setTName] = useState("");
   const [tUnit, setTUnit] = useState("");
   const [mName, setMName] = useState("");
   const [err, setErr] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  function tenantSubmit(e: React.FormEvent) {
+  async function tenantSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!tName.trim() || !tUnit.trim()) return setErr("Please enter your name and unit.");
     setErr(null);
-    setSession({ role: "tenant", name: tName.trim(), unit: tUnit.trim() });
-    navigate({ to: "/chat" });
+    setIsLoading(true);
+
+    try {
+      // TODO: Wire to GET /tenants API
+      const tenants = await getTenants();
+      const matchedTenant = tenants.find(
+        t => t.name.toLowerCase() === tName.trim().toLowerCase() && 
+             t.unit.toLowerCase() === tUnit.trim().toLowerCase()
+      );
+
+      if (matchedTenant) {
+        setCurrentTenant(matchedTenant);
+        setUserRole('tenant');
+        navigate({ to: "/chat" });
+      } else {
+        setErr("No tenant found with that name and unit. Please check your information.");
+      }
+    } catch (error) {
+      setErr("Failed to connect to server. Please try again.");
+      console.error("Tenant login error:", error);
+    } finally {
+      setIsLoading(false);
+    }
   }
-  function managerSubmit(e: React.FormEvent) {
+
+  async function managerSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!mName.trim()) return setErr("Please enter your name.");
     setErr(null);
-    setSession({ role: "manager", name: mName.trim() });
-    navigate({ to: "/management" });
+    setIsLoading(true);
+
+    try {
+      // TODO: Wire to GET /managers API
+      const managers = await getManagers();
+      const matchedManager = managers.find(
+        m => m.name.toLowerCase() === mName.trim().toLowerCase()
+      );
+
+      if (matchedManager) {
+        setCurrentManager(matchedManager);
+        setUserRole('manager');
+        navigate({ to: "/management" });
+      } else {
+        setErr("No manager found with that name. Please check your information.");
+      }
+    } catch (error) {
+      setErr("Failed to connect to server. Please try again.");
+      console.error("Manager login error:", error);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -51,25 +96,25 @@ function LoginPage() {
 
           <TabsContent value="tenant">
             <form onSubmit={tenantSubmit} className="flex flex-col gap-3">
-              <input className="aero-input px-3.5 py-2.5 text-sm" placeholder="Full name" value={tName} onChange={(e) => setTName(e.target.value)} />
-              <input className="aero-input px-3.5 py-2.5 text-sm" placeholder="Unit / Apartment #" value={tUnit} onChange={(e) => setTUnit(e.target.value)} />
+              <input className="aero-input px-3.5 py-2.5 text-sm" placeholder="Full name" value={tName} onChange={(e) => setTName(e.target.value)} disabled={isLoading} />
+              <input className="aero-input px-3.5 py-2.5 text-sm" placeholder="Unit / Apartment #" value={tUnit} onChange={(e) => setTUnit(e.target.value)} disabled={isLoading} />
               {err && <p className="text-xs text-red-300">{err}</p>}
-              <button type="submit" className="glossy-btn mt-2 px-4 py-2.5 text-sm">Enter Ranting Chant</button>
+              <button type="submit" className="glossy-btn mt-2 px-4 py-2.5 text-sm" disabled={isLoading}>
+                {isLoading ? "Signing in..." : "Enter Ranting Chant"}
+              </button>
             </form>
           </TabsContent>
 
           <TabsContent value="manager">
             <form onSubmit={managerSubmit} className="flex flex-col gap-3">
-              <input className="aero-input px-3.5 py-2.5 text-sm" placeholder="Full name" value={mName} onChange={(e) => setMName(e.target.value)} />
+              <input className="aero-input px-3.5 py-2.5 text-sm" placeholder="Full name" value={mName} onChange={(e) => setMName(e.target.value)} disabled={isLoading} />
               {err && <p className="text-xs text-red-300">{err}</p>}
-              <button type="submit" className="glossy-btn mt-2 px-4 py-2.5 text-sm">Enter Dashboard</button>
+              <button type="submit" className="glossy-btn mt-2 px-4 py-2.5 text-sm" disabled={isLoading}>
+                {isLoading ? "Signing in..." : "Enter Dashboard"}
+              </button>
             </form>
           </TabsContent>
         </Tabs>
-
-        <p className="mt-6 text-center text-[11px] text-ranting-muted">
-          Demo · no real authentication
-        </p>
       </div>
     </main>
   );
