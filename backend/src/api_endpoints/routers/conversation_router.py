@@ -93,64 +93,20 @@ async def start_conversation(request: Request, body: ConversationStartPayload):
         # 2. Fetch associated property
         prop = tenant_mcp.get_tenant_property(tenant_id)
         prop_name = prop.get("name", "Unknown Property") if prop else "Unknown Property"
+        address = tenant.get("address", "your home")
 
-        # 3. Build personalized greeting using Gemini
-        greeting = ""
-        try:
-            client = get_client()
-            prompt = (
-                f"You are the AI property operations coordinator for Ranting Chant.\n"
-                f"Generate a warm, professional, and concise greeting for the following tenant:\n"
-                f"Tenant Name: {tenant.get('name')}\n"
-                f"Property: {prop_name}\n"
-                f"Address: {tenant.get('address', 'N/A')}\n\n"
-                f"The greeting should be short (1-2 sentences), welcome the tenant, and ask how you can help them today.\n"
-                f"Do not include any placeholders, markdown, or extra formatting. Just the greeting text."
-            )
-            response = client.models.generate_content(
-                model=config_loader["llm_model"]["default_model"],
-                contents=prompt,
-            )
-            if response and response.text:
-                greeting = response.text.strip()
-        except Exception as ai_err:
-            log_handler.error(f"Failed to generate greeting via Gemini: {ai_err}")
+        # 3. Build hardcoded greeting (no LLM call)
+        greeting = f"Hello {tenant.get('name')}. We are delighted to have you at {address}. How can I assist you today?"
 
-        # Fallback greeting if Gemini fails or is empty
-        if not greeting:
-            greeting = (
-                f"Hello {tenant.get('name')}, welcome to Ranting Chant. "
-                f"How can I assist you with your home at {prop_name} today?"
-            )
-
-        # 4. Create a stub request record with status 'pending'
-        now = datetime.now(timezone.utc).isoformat()
-        request_data = {
-            "requester_id": tenant_id,
-            "type": "general",
-            "description": "Conversation started",
-            "urgency": "low",
-            "involved_parties": [tenant_id],
-            "conversation_history": [
-                {
-                    "role": "ai",
-                    "message": greeting,
-                    "timestamp": now
-                }
-            ],
-            "escalated": False,
-            "sentiment": "neutral",
-            "confidence": 1.0,
-            "vendor_id": None
-        }
-        stub_request = request_mcp.create_request(request_data)
+        # 4. Generate a temporary session ID (no request created yet)
+        session_id = f"session_{uuid.uuid4().hex[:8]}"
 
         log_handler.info(
             f"Successfully started conversation session for tenant '{tenant_id}'. "
-            f"Stub request record created with id='{stub_request['id']}'"
+            f"Session ID: {session_id} (no request created until first message)"
         )
         return {
-            "request_id": stub_request["id"],
+            "session_id": session_id,
             "greeting": greeting,
             "tenant_name": tenant.get("name"),
             "property_name": prop_name
@@ -173,6 +129,9 @@ async def send_message(request: Request, body: ConversationMessagePayload):
     """
     Send a message within an existing conversation session.
 
+    If a session_id is provided (first message), creates a new request.
+    If a request_id is provided (subsequent messages), updates the existing request.
+
     Calls the ConversationEngine to process the message and generate a reply.
     Appends the tenant's turn and the AI's reply to the request's history,
     updates request metadata (type, urgency, sentiment, confidence, escalated),
@@ -182,30 +141,74 @@ async def send_message(request: Request, body: ConversationMessagePayload):
     Parameters:
         request (Request): The incoming HTTP request for rate limit tracking.
         body (ConversationMessagePayload): Request details containing
-            request_id, tenant_id, and the message text.
+            request_id (or session_id for first message), tenant_id, and the message text.
 
     Returns:
         dict: AI reply and updated session/request status.
 
     Raises:
-        HTTPException 404: If the request_id or tenant_id does not exist.
+        HTTPException 404: If the tenant_id does not exist.
         HTTPException 500: If an unexpected error occurs during processing.
     """
     try:
-        request_id = body.request_id.strip()
+        request_id_or_session_id = body.request_id.strip()
         tenant_id = body.tenant_id.strip()
         message = body.message.strip()
 
-        log_handler.debug(f"Processing message in session='{request_id}' from tenant='{tenant_id}'")
+        log_handler.debug(f"Processing message from tenant='{tenant_id}' with id='{request_id_or_session_id}'")
 
-        # 1. Fetch existing request record
-        req = request_mcp.get_request(request_id)
-        if not req:
-            err_msg = f"Request '{request_id}' not found"
-            log_handler.warning(err_msg)
-            raise HTTPException(status_code=404, detail=err_msg)
+        # Check if this is a session_id (first message) or request_id (subsequent message)
+        is_first_message = request_id_or_session_id.startswith("session_")
 
-        history = req.get("conversation_history", [])
+        if is_first_message:
+            # First message: create a new request
+            log_handler.info(f"First message in session '{request_id_or_session_id}', creating new request")
+
+            # Fetch tenant and property for request creation
+            tenant = tenant_mcp.lookup_tenant(tenant_id)
+            if not tenant:
+                err_msg = f"Tenant '{tenant_id}' not found"
+                log_handler.warning(err_msg)
+                raise HTTPException(status_code=404, detail=err_msg)
+
+            prop = tenant_mcp.get_tenant_property(tenant_id)
+            prop_name = prop.get("name", "Unknown Property") if prop else "Unknown Property"
+
+            # Create the request with the first message
+            now = datetime.now(timezone.utc).isoformat()
+            request_data = {
+                "requester_id": tenant_id,
+                "type": "general",
+                "description": message[:100],  # Use first message as description
+                "urgency": "low",
+                "involved_parties": [tenant_id],
+                "conversation_history": [
+                    {
+                        "role": "tenant",
+                        "message": message,
+                        "timestamp": now
+                    }
+                ],
+                "escalated": False,
+                "sentiment": "neutral",
+                "confidence": 1.0,
+                "vendor_id": None
+            }
+            req = request_mcp.create_request(request_data)
+            request_id = req["id"]
+            history = req.get("conversation_history", [])
+
+            log_handler.info(f"Created request '{request_id}' for first message in session")
+        else:
+            # Subsequent message: fetch existing request
+            request_id = request_id_or_session_id
+            req = request_mcp.get_request(request_id)
+            if not req:
+                err_msg = f"Request '{request_id}' not found"
+                log_handler.warning(err_msg)
+                raise HTTPException(status_code=404, detail=err_msg)
+
+            history = req.get("conversation_history", [])
 
         # 2. Call conversation engine
         parsed_response = conversation_engine.process_message(
@@ -261,6 +264,7 @@ async def send_message(request: Request, body: ConversationMessagePayload):
         )
 
         return {
+            "request_id": request_id,
             "reply": parsed_response.get("reply"),
             "status": updated_request.get("status"),
             "urgency": updated_request.get("urgency"),
