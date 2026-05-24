@@ -4,59 +4,171 @@ import { Mic, Send, AlertTriangle, MessageSquareText } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Avatar } from "@/components/Avatar";
 import { StatusBadge } from "@/components/Badges";
-import { getSession } from "@/lib/session";
-import { requests } from "@/data/mockData";
+import { useApp } from "@/context/AppContext";
+import { startConversation, sendMessage, transcribeAudio, respondToVoice } from "@/services/api";
+import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
+import type { ConversationMessage, Status, Urgency } from "@/types";
 
 export const Route = createFileRoute("/chat")({
   head: () => ({ meta: [{ title: "Chat — Ranting Chant" }] }),
   component: ChatPage,
 });
 
-type Msg = { id: string; role: "ai" | "tenant"; text: string; timestamp: string };
-
-const seed: Msg[] = [
-  { id: "1", role: "ai", text: "Hello John! I'm Ranting Chant, your property operations assistant. How can I help you today?", timestamp: "10:02 AM" },
-  { id: "2", role: "tenant", text: "I lost my apartment key", timestamp: "10:03 AM" },
-  { id: "3", role: "ai", text: "I'm sorry to hear that. Was the key lost or stolen?", timestamp: "10:03 AM" },
-  { id: "4", role: "tenant", text: "Lost", timestamp: "10:04 AM" },
-  { id: "5", role: "ai", text: "Do you still have access to your apartment?", timestamp: "10:04 AM" },
-];
-
 function ChatPage() {
-  const session = getSession();
-  const name = session?.name ?? "John Carter";
-  const unit = session?.unit ?? "3B";
+  const { currentTenant } = useApp();
+  const name = currentTenant?.name ?? "John Carter";
+  const unit = currentTenant?.unit ?? "3B";
+  const tenantId = currentTenant?.id ?? "tenant_001";
 
-  const [messages, setMessages] = useState<Msg[]>(seed);
+  const [messages, setMessages] = useState<ConversationMessage[]>([]);
   const [input, setInput] = useState("");
-  const [recording, setRecording] = useState(false);
   const [typing, setTyping] = useState(false);
-  const [escalated] = useState(false);
+  const [requestId, setRequestId] = useState<string | null>(null);
+  const [status, setStatus] = useState<Status>("pending");
+  const [urgency, setUrgency] = useState<Urgency>("low");
+  const [escalated, setEscalated] = useState(false);
   const scrollerRef = useRef<HTMLDivElement>(null);
+
+  const { isRecording, audioBlob, startRecording, stopRecording, resetRecording } = useVoiceRecorder();
+
+  // On mount: start conversation
+  useEffect(() => {
+    const initConversation = async () => {
+      try {
+        const response = await startConversation({
+          tenant_id: tenantId,
+          message: "Hello, I need help with a property issue."
+        });
+        setRequestId(response.request_id);
+        setMessages(response.conversation);
+        setStatus(response.request_status || "pending");
+        setUrgency(response.urgency || "low");
+        setEscalated(response.escalated || false);
+      } catch (error) {
+        console.error("Failed to start conversation:", error);
+        // Fallback to mock greeting if API fails
+        setMessages([{
+          id: "1",
+          role: "ai",
+          text: `Hello ${name}! I'm Ranting Chant, your property operations assistant. How can I help you today?`,
+          timestamp: new Date().toISOString()
+        }]);
+      }
+    };
+
+    initConversation();
+  }, [tenantId, name]);
 
   useEffect(() => {
     scrollerRef.current?.scrollTo({ top: scrollerRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, typing]);
 
-  function send() {
+  async function send() {
     const t = input.trim();
-    if (!t) return;
-    const now = new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+    if (!t || !requestId) return;
+
+    const now = new Date().toISOString();
     setMessages((m) => [...m, { id: crypto.randomUUID(), role: "tenant", text: t, timestamp: now }]);
     setInput("");
     setTyping(true);
-    setTimeout(() => {
+
+    try {
+      const response = await sendMessage({
+        request_id: requestId,
+        tenant_id: tenantId,
+        message: t
+      });
+
+      setMessages((m) => [...m, ...response.conversation]);
+      setStatus(response.request_status || status);
+      setUrgency(response.urgency || urgency);
+      setEscalated(response.escalated || false);
+    } catch (error) {
+      console.error("Failed to send message:", error);
+      setMessages((m) => [...m, {
+        id: crypto.randomUUID(),
+        role: "ai",
+        text: "Sorry, I'm having trouble connecting. Please try again.",
+        timestamp: new Date().toISOString()
+      }]);
+    } finally {
       setTyping(false);
-      setMessages((m) => [
-        ...m,
-        {
-          id: crypto.randomUUID(),
-          role: "ai",
-          text: "Thanks — I've noted that. I'll loop in your property manager and follow up shortly.",
-          timestamp: new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }),
-        },
-      ]);
-    }, 1100);
+    }
+  }
+
+  async function handleVoiceToggle() {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      try {
+        await startRecording();
+      } catch (error) {
+        console.error("Failed to start recording:", error);
+      }
+    }
+  }
+
+  // Handle voice recording completion
+  useEffect(() => {
+    if (audioBlob && !isRecording) {
+      handleVoiceSubmit();
+    }
+  }, [audioBlob, isRecording]);
+
+  async function handleVoiceSubmit() {
+    if (!audioBlob || !requestId) return;
+
+    setTyping(true);
+
+    try {
+      // Convert Blob to File for API
+      const audioFile = new File([audioBlob], "recording.webm", { type: audioBlob.type });
+
+      // Transcribe audio
+      const transcribeResponse = await transcribeAudio(audioFile);
+      const transcript = transcribeResponse.transcript;
+
+      // Add transcript as tenant message
+      const now = new Date().toISOString();
+      setMessages((m) => [...m, { id: crypto.randomUUID(), role: "tenant", text: transcript, timestamp: now }]);
+
+      // Send to voice respond endpoint
+      const voiceResponse = await respondToVoice({
+        request_id: requestId,
+        tenant_id: tenantId,
+        transcript
+      });
+
+      // Add AI response
+      setMessages((m) => [...m, {
+        id: crypto.randomUUID(),
+        role: "ai",
+        text: voiceResponse.reply_text,
+        timestamp: new Date().toISOString()
+      }]);
+
+      // Play audio response if available
+      if (voiceResponse.audio_base64) {
+        const audio = new Audio(`data:audio/mp3;base64,${voiceResponse.audio_base64}`);
+        audio.play();
+      }
+
+      // Update status
+      setStatus(voiceResponse.status);
+      setUrgency(voiceResponse.urgency);
+      setEscalated(voiceResponse.escalated);
+    } catch (error) {
+      console.error("Failed to process voice:", error);
+      setMessages((m) => [...m, {
+        id: crypto.randomUUID(),
+        role: "ai",
+        text: "Sorry, I couldn't process your voice message. Please try again.",
+        timestamp: new Date().toISOString()
+      }]);
+    } finally {
+      setTyping(false);
+      resetRecording();
+    }
   }
 
   return (
@@ -74,9 +186,9 @@ function ChatPage() {
         </div>
 
         <div className="mb-2 text-[10px] uppercase tracking-wider text-ranting-muted">Current request</div>
-        <div className="mb-1 text-sm text-ranting-ice">Key Replacement</div>
-        <StatusBadge status="in_progress" className="self-start" />
-        <div className="mt-2 text-[11px] text-ranting-muted">ID · REQ-1001</div>
+        <div className="mb-1 text-sm text-ranting-ice">Property Issue</div>
+        <StatusBadge status={status} className="self-start" />
+        {requestId && <div className="mt-2 text-[11px] text-ranting-muted">ID · {requestId}</div>}
 
         <div className="mt-auto pt-4">
           <Link to="/dashboard" className="glossy-btn-ghost flex items-center justify-center gap-2 px-3 py-2 text-sm">
@@ -90,7 +202,7 @@ function ChatPage() {
         {escalated && (
           <div className="flex items-center gap-2 border-b border-red-400/30 bg-red-500/10 px-5 py-3 text-sm text-red-200" style={{ boxShadow: "inset 0 0 24px rgba(239,68,68,0.25)" }}>
             <AlertTriangle className="h-4 w-4" />
-            This request has been escalated — urgency: HIGH
+            This request has been escalated — urgency: {urgency.toUpperCase()}
           </div>
         )}
 
@@ -122,9 +234,10 @@ function ChatPage() {
               className="aero-input flex-1 resize-none px-3.5 py-2.5 text-sm"
             />
             <button
-              onClick={() => setRecording((r) => !r)}
-              className={recording ? "mic-pulse rounded-[10px] p-2.5 text-white" : "glossy-btn p-2.5"}
+              onClick={handleVoiceToggle}
+              className={isRecording ? "mic-pulse rounded-[10px] p-2.5 text-white" : "glossy-btn p-2.5"}
               aria-label="Toggle mic"
+              disabled={typing}
             >
               <Mic className="h-4 w-4" />
             </button>
@@ -133,7 +246,7 @@ function ChatPage() {
             </button>
           </div>
           <div className="mt-1.5 text-[11px] text-ranting-muted">
-            {recording ? "Recording… tap mic to stop" : "Press Enter to send · Shift+Enter for newline"}
+            {isRecording ? "Recording… tap mic to stop" : typing ? "Processing…" : "Press Enter to send · Shift+Enter for newline"}
           </div>
         </div>
       </section>
@@ -141,8 +254,10 @@ function ChatPage() {
   );
 }
 
-function Bubble({ msg }: { msg: Msg }) {
+function Bubble({ msg }: { msg: ConversationMessage }) {
   const isTenant = msg.role === "tenant";
+  const timestamp = new Date(msg.timestamp).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  
   return (
     <div className={`flex items-end gap-2 ${isTenant ? "justify-end" : "justify-start"}`}>
       {!isTenant && <Avatar name="Ranting Chant" size={28} />}
@@ -159,11 +274,8 @@ function Bubble({ msg }: { msg: Msg }) {
         >
           {msg.text}
         </div>
-        <span className={`px-1 text-[10px] text-ranting-muted ${isTenant ? "text-right" : "text-left"}`}>{msg.timestamp}</span>
+        <span className={`px-1 text-[10px] text-ranting-muted ${isTenant ? "text-right" : "text-left"}`}>{timestamp}</span>
       </div>
     </div>
   );
 }
-
-// Suppress unused-import lint
-void requests;

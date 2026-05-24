@@ -115,6 +115,10 @@ export interface ConversationStartResponse {
   request_id: string;
   ai_response: string;
   conversation: ConversationMessage[];
+  request_status?: Status;
+  urgency?: Urgency;
+  escalated?: boolean;
+  is_complete?: boolean;
 }
 
 export interface ConversationMessageRequest {
