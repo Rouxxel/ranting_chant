@@ -113,12 +113,9 @@ export interface ConversationStartRequest {
 
 export interface ConversationStartResponse {
   request_id: string;
-  ai_response: string;
-  conversation: ConversationMessage[];
-  request_status?: Status;
-  urgency?: Urgency;
-  escalated?: boolean;
-  is_complete?: boolean;
+  greeting: string;
+  tenant_name: string;
+  property_name: string;
 }
 
 export interface ConversationMessageRequest {
@@ -128,12 +125,11 @@ export interface ConversationMessageRequest {
 }
 
 export interface ConversationMessageResponse {
-  ai_response: string;
-  conversation: ConversationMessage[];
-  request_status?: Status;
-  urgency?: Urgency;
-  escalated?: boolean;
-  is_complete?: boolean;
+  reply: string;
+  status: Status;
+  urgency: Urgency;
+  escalated: boolean;
+  is_complete: boolean;
 }
 
 export interface ConversationHistoryResponse {

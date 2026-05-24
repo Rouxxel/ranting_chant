@@ -45,10 +45,16 @@ function ChatPage() {
           message: "Hello, I need help with a property issue."
         });
         setRequestId(response.request_id);
-        setMessages(response.conversation);
-        setStatus(response.request_status || "pending");
-        setUrgency(response.urgency || "low");
-        setEscalated(response.escalated || false);
+        // Backend returns greeting, not conversation
+        setMessages([{
+          id: crypto.randomUUID(),
+          role: "ai",
+          text: response.greeting || `Hello ${name}! I'm Ranting Chant, your property operations assistant. How can I help you today?`,
+          timestamp: new Date().toISOString()
+        }]);
+        setStatus("pending");
+        setUrgency("low");
+        setEscalated(false);
       } catch (error) {
         console.error("Failed to start conversation:", error);
         // Fallback to mock greeting if API fails
@@ -86,10 +92,16 @@ function ChatPage() {
         message: t
       });
 
-      setMessages((m) => [...m, ...response.conversation]);
-      setStatus(response.request_status || status);
-      setUrgency(response.urgency || urgency);
-      setEscalated(response.escalated || false);
+      // Backend returns reply, not conversation array
+      setMessages((m) => [...m, {
+        id: crypto.randomUUID(),
+        role: "ai",
+        text: response.reply,
+        timestamp: new Date().toISOString()
+      }]);
+      setStatus(response.status);
+      setUrgency(response.urgency);
+      setEscalated(response.escalated);
     } catch (error) {
       console.error("Failed to send message:", error);
       setMessages((m) => [...m, {
