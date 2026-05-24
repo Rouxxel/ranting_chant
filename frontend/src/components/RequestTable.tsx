@@ -1,4 +1,5 @@
-import { Check } from "lucide-react";
+import { Check, ArrowUpDown } from "lucide-react";
+import { useState, useMemo } from "react";
 import { Avatar } from "@/components/Avatar";
 import { StatusBadge, UrgencyBadge } from "@/components/Badges";
 import type { Request } from "@/types";
