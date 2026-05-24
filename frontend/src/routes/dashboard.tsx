@@ -4,6 +4,7 @@ import { Plus } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { RequestCard } from "@/components/RequestCard";
 import { RequestTimeline } from "@/components/RequestTimeline";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useApp } from "@/context/AppContext";
 import { getRequests } from "@/services/api";
 import type { Request } from "@/types";
@@ -52,7 +53,18 @@ function DashboardPage() {
       </header>
 
       {isLoading ? (
-        <div className="glass-panel p-8 text-center text-ranting-muted">Loading requests...</div>
+        <div className="space-y-4">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="glass-panel p-4 space-y-3">
+              <div className="flex items-start justify-between">
+                <Skeleton className="h-5 w-32" />
+                <Skeleton className="h-6 w-20 rounded-full" />
+              </div>
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-3/4" />
+            </div>
+          ))}
+        </div>
       ) : requests.length === 0 ? (
         <div className="glass-panel p-8 text-center text-ranting-muted">
           <p>No requests found. Click "New Request" to create one.</p>

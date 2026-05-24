@@ -3,6 +3,7 @@
 // Base URL: http://localhost:8000
 
 import axios, { AxiosInstance } from 'axios';
+import { toast } from 'sonner';
 import type {
   Tenant,
   Property,
@@ -54,11 +55,22 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const status = error.response?.status;
+    
+    if (status === 401) {
       // Unauthorized - clear token and redirect to login
       localStorage.removeItem('auth_token');
       window.location.href = '/';
+    } else if (status && status >= 400 && status < 600) {
+      // Show toast for 4xx/5xx errors
+      const message = error.response?.data?.detail || error.message || 'An error occurred';
+      console.error(`API Error ${status}:`, message);
+      
+      toast.error(status >= 500 ? 'Server Error' : 'Request Error', {
+        description: message,
+      });
     }
+    
     return Promise.reject(error);
   }
 );

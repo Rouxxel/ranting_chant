@@ -6,6 +6,7 @@ import { Avatar } from "@/components/Avatar";
 import { StatusBadge } from "@/components/Badges";
 import { MessageBubble } from "@/components/MessageBubble";
 import { ChatInput } from "@/components/ChatInput";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useApp } from "@/context/AppContext";
 import { startConversation, sendMessage, transcribeAudio, respondToVoice } from "@/services/api";
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
@@ -25,6 +26,7 @@ function ChatPage() {
   const [messages, setMessages] = useState<ConversationMessage[]>([]);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [requestId, setRequestId] = useState<string | null>(null);
   const [status, setStatus] = useState<Status>("pending");
   const [urgency, setUrgency] = useState<Urgency>("low");
@@ -36,6 +38,7 @@ function ChatPage() {
   // On mount: start conversation
   useEffect(() => {
     const initConversation = async () => {
+      setIsLoading(true);
       try {
         const response = await startConversation({
           tenant_id: tenantId,
@@ -55,6 +58,8 @@ function ChatPage() {
           text: `Hello ${name}! I'm Ranting Chant, your property operations assistant. How can I help you today?`,
           timestamp: new Date().toISOString()
         }]);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -209,7 +214,17 @@ function ChatPage() {
         )}
 
         <div ref={scrollerRef} className="flex-1 overflow-y-auto px-5 py-6 space-y-4">
-          {messages.map((m) => (
+          {isLoading ? (
+            <div className="space-y-4">
+              <div className="flex gap-3">
+                <Skeleton className="h-10 w-10 rounded-full" />
+                <div className="space-y-2 flex-1">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-16 w-3/4 rounded-2xl" />
+                </div>
+              </div>
+            </div>
+          ) : messages.map((m) => (
             <MessageBubble key={m.id} msg={m} tenantName={name} />
           ))}
           {typing && (
