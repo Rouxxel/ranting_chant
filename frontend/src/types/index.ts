@@ -141,6 +141,13 @@ export interface ConversationHistoryResponse {
   conversation: ConversationMessage[];
 }
 
+export interface RequestSummary {
+  request_id: string;
+  summary: string;
+  key_points: string[];
+  recommended_actions: string[];
+}
+
 // ==================== Voice ====================
 
 export interface VoiceTranscribeRequest {

@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Mic, Send, AlertTriangle, MessageSquareText } from "lucide-react";
+import { AlertTriangle, MessageSquareText } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Avatar } from "@/components/Avatar";
 import { StatusBadge } from "@/components/Badges";
+import { MessageBubble } from "@/components/MessageBubble";
+import { ChatInput } from "@/components/ChatInput";
 import { useApp } from "@/context/AppContext";
 import { startConversation, sendMessage, transcribeAudio, respondToVoice } from "@/services/api";
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
@@ -208,7 +210,7 @@ function ChatPage() {
 
         <div ref={scrollerRef} className="flex-1 overflow-y-auto px-5 py-6 space-y-4">
           {messages.map((m) => (
-            <Bubble key={m.id} msg={m} />
+            <MessageBubble key={m.id} msg={m} tenantName={name} />
           ))}
           {typing && (
             <div className="flex items-end gap-2">
@@ -223,59 +225,15 @@ function ChatPage() {
         </div>
 
         {/* Input */}
-        <div className="border-t border-white/10 p-4">
-          <div className="flex items-end gap-2">
-            <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
-              rows={1}
-              placeholder="Type your message…"
-              className="aero-input flex-1 resize-none px-3.5 py-2.5 text-sm"
-            />
-            <button
-              onClick={handleVoiceToggle}
-              className={isRecording ? "mic-pulse rounded-[10px] p-2.5 text-white" : "glossy-btn p-2.5"}
-              aria-label="Toggle mic"
-              disabled={typing}
-            >
-              <Mic className="h-4 w-4" />
-            </button>
-            <button onClick={send} className="glossy-btn p-2.5" aria-label="Send">
-              <Send className="h-4 w-4" />
-            </button>
-          </div>
-          <div className="mt-1.5 text-[11px] text-ranting-muted">
-            {isRecording ? "Recording… tap mic to stop" : typing ? "Processing…" : "Press Enter to send · Shift+Enter for newline"}
-          </div>
-        </div>
+        <ChatInput
+          value={input}
+          onChange={setInput}
+          onSend={send}
+          onVoiceToggle={handleVoiceToggle}
+          isRecording={isRecording}
+          isTyping={typing}
+        />
       </section>
     </main>
-  );
-}
-
-function Bubble({ msg }: { msg: ConversationMessage }) {
-  const isTenant = msg.role === "tenant";
-  const timestamp = new Date(msg.timestamp).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-  
-  return (
-    <div className={`flex items-end gap-2 ${isTenant ? "justify-end" : "justify-start"}`}>
-      {!isTenant && <Avatar name="Ranting Chant" size={28} />}
-      <div className={`max-w-[72%] ${isTenant ? "items-end" : "items-start"} flex flex-col gap-1`}>
-        <div
-          className={isTenant
-            ? "rounded-2xl rounded-br-md px-4 py-2.5 text-sm text-ranting-ice"
-            : "glass-panel px-4 py-2.5 text-sm text-ranting-ice"}
-          style={isTenant ? {
-            background: "linear-gradient(180deg, rgba(45,106,159,0.95), rgba(26,58,92,0.95))",
-            border: "1px solid rgba(126,200,227,0.3)",
-            boxShadow: "0 4px 14px rgba(45,106,159,0.4), inset 0 1px 0 rgba(255,255,255,0.18)",
-          } : undefined}
-        >
-          {msg.text}
-        </div>
-        <span className={`px-1 text-[10px] text-ranting-muted ${isTenant ? "text-right" : "text-left"}`}>{timestamp}</span>
-      </div>
-    </div>
   );
 }
