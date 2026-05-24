@@ -10,7 +10,7 @@ class Owner(BaseModel):
     name: str
     email: str
     phone: str
-    property_id: str
+    owned_properties: list[str]
 
 
 class OwnerResponse(Owner):

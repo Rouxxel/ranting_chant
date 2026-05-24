@@ -9,6 +9,7 @@
     "involved_parties": [
       "tenant_001"
     ],
+    "property": "Sunset Apartments",
     "conversation_history": [
       {
         "role": "ai",
@@ -28,6 +29,7 @@
     ],
     "created_at": "2026-05-24T09:55:36.476999+00:00",
     "updated_at": "2026-05-24T09:55:44.843733+00:00",
+    "property_id": "property_001",
     "escalated": false,
     "sentiment": "neutral",
     "confidence": 0.9,
@@ -39,7 +41,8 @@
         "status": "sent",
         "timestamp": "2026-05-24T09:55:37.667452+00:00"
       }
-    ]
+    ],
+    "summary": "The tenant has reported losing the key to their apartment at Sunset Apartments. The AI coordinator is currently confirming whether the tenant is locked out of their home to determine the next steps."
   },
   {
     "id": "request_5a64c091",
@@ -51,6 +54,8 @@
     "involved_parties": [
       "tenant_001"
     ],
+    "property": "Sunset Apartments",
+    "property_id": "property_001",
     "conversation_history": [
       {
         "role": "ai",
@@ -115,6 +120,8 @@
     "involved_parties": [
       "tenant_001"
     ],
+    "property": "Sunset Apartments",
+    "property_id": "property_001",
     "conversation_history": [
       {
         "id": "a3c3738a-713c-4707-9f36-c9e5345a8f28",
@@ -198,6 +205,7 @@
         "recipient_type": "manager"
       }
     ],
-    "notification_pending": false
+    "notification_pending": false,
+    "summary": "The tenant is experiencing extremely low water pressure exclusively at their kitchen sink. A maintenance request has been logged, and the property manager will be notified to arrange for a plumber to inspect and repair the issue."
   }
 ]

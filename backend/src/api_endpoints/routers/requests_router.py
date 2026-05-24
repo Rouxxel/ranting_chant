@@ -182,6 +182,12 @@ async def get_request_summary(request: Request, request_id: str):
             log_handler.warning(message)
             raise HTTPException(status_code=404, detail=message)
 
+        # Check if summary is already cached
+        existing_summary = req.get("summary")
+        if existing_summary:
+            log_handler.info(f"Returning cached summary for request '{request_id}'")
+            return {"summary": existing_summary}
+
         history = req.get("conversation_history", [])
         if not history:
             log_handler.info(f"No conversation history available for request '{request_id}'")
@@ -225,7 +231,9 @@ async def get_request_summary(request: Request, request_id: str):
                 f"It is currently classified as having a {urgency} urgency level and is in a {status} status."
             )
 
-        log_handler.info(f"Successfully generated summary for request '{request_id}'")
+        # Cache the summary in the request
+        update_record("requests", request_id, {"summary": summary})
+        log_handler.info(f"Successfully generated and cached summary for request '{request_id}'")
         return {"summary": summary}
 
     except HTTPException:

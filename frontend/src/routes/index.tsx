@@ -90,7 +90,7 @@ function LoginPage() {
               I'm a Tenant
             </TabsTrigger>
             <TabsTrigger value="manager" className="rounded-lg data-[state=active]:bg-ranting-accent/60 data-[state=active]:text-white">
-              I'm a Manager
+              I'm a Manager/Owner
             </TabsTrigger>
           </TabsList>
 

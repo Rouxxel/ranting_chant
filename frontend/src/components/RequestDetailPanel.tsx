@@ -12,13 +12,24 @@ interface RequestDetailPanelProps {
 }
 
 export function RequestDetailPanel({ req, onClose, onApprove }: RequestDetailPanelProps) {
-  const [summary, setSummary] = useState<string | null>(null);
+  const [summary, setSummary] = useState<string | null>(req.summary || null);
   const [loadingSummary, setLoadingSummary] = useState(false);
 
   useEffect(() => {
     const loadSummary = async () => {
+      // Use cached summary if available
+      if (req.summary) {
+        setSummary(req.summary);
+        return;
+      }
+
       setLoadingSummary(true);
       try {
+        // Only load summary if this is a valid request ID (not a session_id)
+        if (!req.id || req.id.startsWith("session_")) {
+          setSummary("Summary not available for unsaved conversations.");
+          return;
+        }
         const response = await getRequestSummary(req.id);
         setSummary(response.summary);
       } catch (error) {
@@ -61,22 +72,22 @@ export function RequestDetailPanel({ req, onClose, onApprove }: RequestDetailPan
           <section>
             <SectionTitle>Involved parties</SectionTitle>
             <div className="flex flex-wrap gap-2">
-              {req.parties.map((p) => (
-                <div key={p.id} className="glass-panel flex items-center gap-2 px-2.5 py-1.5">
-                  <Avatar name={p.name} size={22} glow={false} />
-                  <div className="text-xs">
-                    <div className="text-ranting-ice">{p.name}</div>
-                    <div className="text-ranting-muted text-[10px]">{p.role}</div>
+              {req.involved_parties && req.involved_parties.length > 0 ? (
+                req.involved_parties.map((p) => (
+                  <div key={p} className="glass-panel flex items-center gap-2 px-2.5 py-1.5">
+                    <div className="text-xs text-ranting-ice">{p}</div>
                   </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <div className="text-xs text-ranting-muted">No involved parties</div>
+              )}
             </div>
           </section>
 
           <section>
             <SectionTitle>Conversation</SectionTitle>
             <div className="space-y-2">
-              {req.conversation.map((m) => (
+              {req.conversation_history && req.conversation_history.map((m: any) => (
                 <div key={m.id} className={`flex ${m.role === "tenant" ? "justify-end" : "justify-start"}`}>
                   <div
                     className={m.role === "tenant"
@@ -87,7 +98,7 @@ export function RequestDetailPanel({ req, onClose, onApprove }: RequestDetailPan
                       border: "1px solid rgba(126,200,227,0.3)",
                     } : undefined}
                   >
-                    {m.text}
+                    {m.message}
                     <div className="mt-0.5 text-[9px] text-ranting-muted">{new Date(m.timestamp).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</div>
                   </div>
                 </div>
@@ -98,10 +109,10 @@ export function RequestDetailPanel({ req, onClose, onApprove }: RequestDetailPan
           <section>
             <SectionTitle>Notifications</SectionTitle>
             <ul className="space-y-1.5">
-              {req.notifications.map((n) => (
+              {req.notifications_sent && req.notifications_sent.map((n: any) => (
                 <li key={n.id} className="flex items-center gap-2 text-xs text-ranting-ice/85">
-                  {n.channel === "email" ? <Mail className="h-3.5 w-3.5 text-ranting-sky" /> : <MessageCircle className="h-3.5 w-3.5 text-ranting-sky" />}
-                  <span className="font-medium">{n.channel.toUpperCase()}</span>
+                  {n.type === "email" ? <Mail className="h-3.5 w-3.5 text-ranting-sky" /> : <MessageCircle className="h-3.5 w-3.5 text-ranting-sky" />}
+                  <span className="font-medium">{n.type.toUpperCase()}</span>
                   <span className="text-ranting-muted">→ {n.recipient}</span>
                   <span className="text-ranting-muted">· {new Date(n.timestamp).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</span>
                 </li>

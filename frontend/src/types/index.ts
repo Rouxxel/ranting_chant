@@ -60,6 +60,16 @@ export interface Manager {
   start_date?: string;
 }
 
+// ==================== Owner ====================
+
+export interface Owner {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  owned_properties: string[];
+}
+
 // ==================== Request ====================
 
 export interface Party {
@@ -106,6 +116,7 @@ export interface Request {
   sentiment?: string;
   confidence?: number;
   is_complete?: boolean;
+  summary?: string;
 }
 
 // ==================== Conversation ====================
