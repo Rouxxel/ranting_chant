@@ -208,5 +208,400 @@
     ],
     "notification_pending": false,
     "summary": "The tenant is experiencing extremely low water pressure exclusively at their kitchen sink. A maintenance request has been logged, and the property manager will be notified to arrange for a plumber to inspect and repair the issue."
+  },
+  {
+    "id": "request_1001",
+    "requester_id": "tenant_003",
+    "type": "maintenance",
+    "description": "Heating system not working in apartment",
+    "status": "in_progress",
+    "urgency": "high",
+    "involved_parties": ["tenant_003"],
+    "property": "Riverside Residences",
+    "property_id": "property_002",
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello Michael Brown, how can I assist you today?",
+        "timestamp": "2026-05-24T08:10:00+00:00"
+      },
+      {
+        "role": "tenant",
+        "message": "My heating is not working at all.",
+        "timestamp": "2026-05-24T08:10:30+00:00"
+      },
+      {
+        "role": "ai",
+        "message": "I'm sorry to hear that. Is the issue affecting all rooms?",
+        "timestamp": "2026-05-24T08:10:45+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T08:10:00+00:00",
+    "updated_at": "2026-05-24T08:10:45+00:00",
+    "escalated": false,
+    "sentiment": "negative",
+    "confidence": 0.92,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "david.reynolds@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T08:10:05+00:00"
+      }
+    ],
+    "summary": "Tenant reports complete heating failure in the apartment. Issue is being assessed for maintenance dispatch."
+  },
+  {
+    "id": "request_1002",
+    "requester_id": "tenant_004",
+    "type": "complaint",
+    "description": "Loud noise from neighboring unit at night",
+    "status": "in_progress",
+    "urgency": "medium",
+    "involved_parties": ["tenant_004"],
+    "property": "Riverside Residences",
+    "property_id": "property_002",
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello Sophia Williams, how can I help you?",
+        "timestamp": "2026-05-24T08:20:00+00:00"
+      },
+      {
+        "role": "tenant",
+        "message": "There is loud music every night from next door.",
+        "timestamp": "2026-05-24T08:20:20+00:00"
+      },
+      {
+        "role": "ai",
+        "message": "I understand. Would you like us to contact the neighbor or management?",
+        "timestamp": "2026-05-24T08:20:40+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T08:20:00+00:00",
+    "updated_at": "2026-05-24T08:20:40+00:00",
+    "escalated": false,
+    "sentiment": "frustrated",
+    "confidence": 0.88,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "david.reynolds@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T08:20:05+00:00"
+      }
+    ],
+    "summary": "Tenant reports recurring noise disturbance from neighboring unit during nighttime hours."
+  },
+  {
+    "id": "request_1003",
+    "requester_id": "tenant_005",
+    "type": "billing",
+    "description": "Question about rent increase notice",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": ["tenant_005"],
+    "property": "Oak Heights",
+    "property_id": "property_003",
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello Daniel Johnson, how can I assist you?",
+        "timestamp": "2026-05-24T08:30:00+00:00"
+      },
+      {
+        "role": "tenant",
+        "message": "I received a notice about rent increase, is this correct?",
+        "timestamp": "2026-05-24T08:30:25+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T08:30:00+00:00",
+    "updated_at": "2026-05-24T08:30:25+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 0.85,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "laura.mitchell@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T08:30:05+00:00"
+      }
+    ],
+    "summary": "Tenant is requesting clarification regarding a rent increase notice."
+  },
+  {
+    "id": "request_1004",
+    "requester_id": "tenant_005",
+    "type": "access",
+    "description": "Locked out of apartment after forgetting keys",
+    "status": "escalated",
+    "urgency": "high",
+    "involved_parties": ["tenant_005"],
+    "property": "Oak Heights",
+    "property_id": "property_003",
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello Daniel Johnson, are you experiencing an access issue?",
+        "timestamp": "2026-05-24T08:40:00+00:00"
+      },
+      {
+        "role": "tenant",
+        "message": "Yes, I'm locked out.",
+        "timestamp": "2026-05-24T08:40:15+00:00"
+      },
+      {
+        "role": "ai",
+        "message": "We are escalating this to your property manager for immediate assistance.",
+        "timestamp": "2026-05-24T08:40:30+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T08:40:00+00:00",
+    "updated_at": "2026-05-24T08:40:30+00:00",
+    "escalated": true,
+    "sentiment": "frustrated",
+    "confidence": 0.93,
+    "vendor_id": "vendor_002",
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "laura.mitchell@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T08:40:05+00:00"
+      }
+    ],
+    "summary": "Tenant locked out of apartment; request escalated for urgent locksmith assistance."
+  },
+  {
+    "id": "request_1005",
+    "requester_id": "tenant_006",
+    "type": "maintenance",
+    "description": "Water leak under kitchen sink",
+    "status": "in_progress",
+    "urgency": "high",
+    "involved_parties": ["tenant_006"],
+    "property": "Greenfield Apartments",
+    "property_id": "property_004",
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello Olivia Martinez, how can I help you?",
+        "timestamp": "2026-05-24T09:00:00+00:00"
+      },
+      {
+        "role": "tenant",
+        "message": "There is water leaking under my kitchen sink.",
+        "timestamp": "2026-05-24T09:00:25+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:00:00+00:00",
+    "updated_at": "2026-05-24T09:00:25+00:00",
+    "escalated": false,
+    "sentiment": "concerned",
+    "confidence": 0.94,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "kevin.thompson@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:00:05+00:00"
+      }
+    ],
+    "summary": "Tenant reports active water leak under kitchen sink requiring plumbing intervention."
+  },
+  {
+    "id": "request_1006",
+    "requester_id": "tenant_007",
+    "type": "general",
+    "description": "No electricity in living room outlets",
+    "status": "in_progress",
+    "urgency": "high",
+    "involved_parties": ["tenant_007"],
+    "property": "Greenfield Apartments",
+    "property_id": "property_004",
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello James Wilson, how can I assist you?",
+        "timestamp": "2026-05-24T09:10:00+00:00"
+      },
+      {
+        "role": "tenant",
+        "message": "My living room has no power in the outlets.",
+        "timestamp": "2026-05-24T09:10:20+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:10:00+00:00",
+    "updated_at": "2026-05-24T09:10:20+00:00",
+    "escalated": false,
+    "sentiment": "negative",
+    "confidence": 0.9,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "kevin.thompson@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:10:05+00:00"
+      }
+    ],
+    "summary": "Electrical outage affecting living room outlets; likely requires inspection."
+  },
+  {
+    "id": "request_1007",
+    "requester_id": "tenant_008",
+    "type": "complaint",
+    "description": "Suspected pest infestation in kitchen",
+    "status": "in_progress",
+    "urgency": "medium",
+    "involved_parties": ["tenant_008"],
+    "property": "Greenfield Apartments",
+    "property_id": "property_004",
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello Isabella Anderson, how can I assist you?",
+        "timestamp": "2026-05-24T09:20:00+00:00"
+      },
+      {
+        "role": "tenant",
+        "message": "I think I have pests in my kitchen.",
+        "timestamp": "2026-05-24T09:20:30+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:20:00+00:00",
+    "updated_at": "2026-05-24T09:20:30+00:00",
+    "escalated": false,
+    "sentiment": "concerned",
+    "confidence": 0.87,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "kevin.thompson@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:20:05+00:00"
+      }
+    ],
+    "summary": "Tenant reports possible pest infestation requiring inspection and pest control assessment."
+  },
+  {
+    "id": "request_1008",
+    "requester_id": "tenant_010",
+    "type": "maintenance",
+    "description": "Air conditioning not cooling properly",
+    "status": "in_progress",
+    "urgency": "medium",
+    "involved_parties": ["tenant_010"],
+    "property": "Sunrise Lofts",
+    "property_id": "property_005",
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello Ava Taylor, how can I help you?",
+        "timestamp": "2026-05-24T09:30:00+00:00"
+      },
+      {
+        "role": "tenant",
+        "message": "My AC is blowing warm air.",
+        "timestamp": "2026-05-24T09:30:20+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:30:00+00:00",
+    "updated_at": "2026-05-24T09:30:20+00:00",
+    "escalated": false,
+    "sentiment": "frustrated",
+    "confidence": 0.91,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sophia.reynolds@example.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:30:05+00:00"
+      }
+    ],
+    "summary": "Tenant reports AC malfunction causing warm air instead of cooling."
+  },
+  {
+    "id": "request_1009",
+    "requester_id": "tenant_003",
+    "type": "access",
+    "description": "Unable to access building after hours",
+    "status": "in_progress",
+    "urgency": "medium",
+    "involved_parties": ["tenant_003"],
+    "property": "Riverside Residences",
+    "property_id": "property_002",
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello Michael Brown, do you need access assistance?",
+        "timestamp": "2026-05-24T09:40:00+00:00"
+      },
+      {
+        "role": "tenant",
+        "message": "I can't get into the building late at night.",
+        "timestamp": "2026-05-24T09:40:25+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:40:00+00:00",
+    "updated_at": "2026-05-24T09:40:25+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 0.89,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "david.reynolds@management.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:40:05+00:00"
+      }
+    ],
+    "summary": "Tenant experiencing intermittent building access issues outside normal hours."
+  },
+  {
+    "id": "request_1010",
+    "requester_id": "tenant_010",
+    "type": "billing",
+    "description": "Question about utility charges on latest bill",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": ["tenant_010"],
+    "property": "Sunrise Lofts",
+    "property_id": "property_005",
+    "conversation_history": [
+      {
+        "role": "ai",
+        "message": "Hello Ava Taylor, I can help with your billing question.",
+        "timestamp": "2026-05-24T09:50:00+00:00"
+      },
+      {
+        "role": "tenant",
+        "message": "Why are my utility charges higher this month?",
+        "timestamp": "2026-05-24T09:50:30+00:00"
+      }
+    ],
+    "created_at": "2026-05-24T09:50:00+00:00",
+    "updated_at": "2026-05-24T09:50:30+00:00",
+    "escalated": false,
+    "sentiment": "confused",
+    "confidence": 0.86,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "type": "email",
+        "recipient": "sophia.reynolds@example.com",
+        "status": "sent",
+        "timestamp": "2026-05-24T09:50:05+00:00"
+      }
+    ],
+    "summary": "Tenant is questioning increased utility charges on their latest bill."
   }
 ]
