@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState, useEffect } from "react";
 import { Logo } from "@/components/Logo";
 import { Avatar } from "@/components/Avatar";
@@ -14,6 +14,7 @@ export const Route = createFileRoute("/management")({
 });
 
 function ManagementPage() {
+  const navigate = useNavigate();
   const { currentManager } = useApp();
   const managerName = currentManager?.name ?? "Alex Morgan";
   const managerId = currentManager?.id ?? "manager_001";
@@ -83,6 +84,12 @@ function ManagementPage() {
       <header className="glass-panel mb-5 flex items-center justify-between px-5 py-4">
         <Logo size="sm" />
         <div className="flex items-center gap-3">
+          <button
+            onClick={() => navigate({ to: "/vendors" })}
+            className="glossy-btn-ghost px-4 py-2 text-xs"
+          >
+            Vendor List
+          </button>
           <div className="text-right">
             <div className="text-sm font-semibold text-ranting-ice">{managerName}</div>
             <div className="text-[11px] text-ranting-muted">Property Manager</div>
