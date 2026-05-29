@@ -9,10 +9,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useApp } from "@/context/AppContext";
 import { requireAuthenticatedUser } from "@/lib/auth";
-import { getVendors } from "@/services/api";
-import type { Vendor } from "@/types";
+import { getVendors, createVendor, updateVendor, deleteVendor } from "@/services/api";
+import type { Vendor, VendorCreateRequest, VendorUpdateRequest } from "@/types";
 
 const SERVICE_LABELS: Record<string, string> = {
   access_control: "Access Control",
@@ -50,6 +61,20 @@ function VendorListPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [serviceFilter, setServiceFilter] = useState<string>("all");
+  const [selected, setSelected] = useState<Vendor | null>(null);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [createForm, setCreateForm] = useState<VendorCreateRequest>({
+    name: "",
+    email: "",
+    phone: "",
+    services: [],
+    emergency_available: false,
+  });
+  const [editForm, setEditForm] = useState<VendorUpdateRequest>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const isManagerOrOwner = userRole === "manager" || userRole === "owner";
 
   useEffect(() => {
     const loadVendors = async () => {
@@ -90,6 +115,86 @@ function VendorListPage() {
     });
   }, [vendors, searchTerm, serviceFilter]);
 
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      const newVendor = await createVendor(createForm);
+      setVendors([...vendors, newVendor]);
+      localStorage.setItem('vendors', JSON.stringify([...vendors, newVendor]));
+      setIsCreateDialogOpen(false);
+      setCreateForm({
+        name: "",
+        email: "",
+        phone: "",
+        services: [],
+        emergency_available: false,
+      });
+    } catch (error) {
+      console.error("Failed to create vendor:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selected) return;
+    setIsSubmitting(true);
+    try {
+      const updatedVendor = await updateVendor(selected.id, editForm);
+      setVendors(vendors.map(v => v.id === selected.id ? updatedVendor : v));
+      localStorage.setItem('vendors', JSON.stringify(vendors.map(v => v.id === selected.id ? updatedVendor : v)));
+      setSelected(updatedVendor);
+      setIsEditDialogOpen(false);
+      setEditForm({});
+    } catch (error) {
+      console.error("Failed to update vendor:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (vendorId: string) => {
+    if (!confirm("Are you sure you want to delete this vendor?")) return;
+    try {
+      await deleteVendor(vendorId);
+      setVendors(vendors.filter(v => v.id !== vendorId));
+      localStorage.setItem('vendors', JSON.stringify(vendors.filter(v => v.id !== vendorId)));
+      if (selected?.id === vendorId) setSelected(null);
+    } catch (error) {
+      console.error("Failed to delete vendor:", error);
+    }
+  };
+
+  const openEditDialog = () => {
+    if (!selected) return;
+    setEditForm({
+      name: selected.name,
+      email: selected.email,
+      phone: selected.phone,
+      services: selected.services,
+      emergency_available: selected.emergency_available,
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleServiceToggle = (service: string, isCreate: boolean) => {
+    if (isCreate) {
+      const currentServices = createForm.services || [];
+      const newServices = currentServices.includes(service)
+        ? currentServices.filter(s => s !== service)
+        : [...currentServices, service];
+      setCreateForm({ ...createForm, services: newServices });
+    } else {
+      const currentServices = editForm.services || [];
+      const newServices = currentServices.includes(service)
+        ? currentServices.filter(s => s !== service)
+        : [...currentServices, service];
+      setEditForm({ ...editForm, services: newServices });
+    }
+  };
+
   return (
     <AuthenticatedLayout>
       <main className="mx-auto min-h-[calc(100vh-130px)] max-w-[1400px]">
@@ -98,6 +203,89 @@ function VendorListPage() {
           <div className="text-sm font-semibold text-ranting-ice">Vendor Directory</div>
           <div className="text-[11px] text-ranting-muted">Third-party service providers</div>
         </div>
+        {isManagerOrOwner && (
+          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="glossy-btn">Add Vendor</Button>
+            </DialogTrigger>
+            <DialogContent className="border-ranting-sky/30 bg-ranting-navy text-ranting-ice max-w-lg">
+              <DialogHeader>
+                <DialogTitle>Create New Vendor</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleCreate} className="space-y-4">
+                <div>
+                  <Label htmlFor="create-name">Name</Label>
+                  <Input
+                    id="create-name"
+                    value={createForm.name}
+                    onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
+                    required
+                    className="aero-input"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="create-email">Email</Label>
+                  <Input
+                    id="create-email"
+                    type="email"
+                    value={createForm.email}
+                    onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })}
+                    required
+                    className="aero-input"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="create-phone">Phone</Label>
+                  <Input
+                    id="create-phone"
+                    type="tel"
+                    value={createForm.phone}
+                    onChange={(e) => setCreateForm({ ...createForm, phone: e.target.value })}
+                    required
+                    className="aero-input"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="create-emergency">Emergency Available</Label>
+                  <select
+                    id="create-emergency"
+                    value={createForm.emergency_available ? "true" : "false"}
+                    onChange={(e) => setCreateForm({ ...createForm, emergency_available: e.target.value === "true" })}
+                    className="aero-input w-full"
+                    style={{ colorScheme: "dark" }}
+                  >
+                    <option value="false" className="bg-ranting-deep text-ranting-ice">No</option>
+                    <option value="true" className="bg-ranting-deep text-ranting-ice">Yes</option>
+                  </select>
+                </div>
+                <div>
+                  <Label>Services</Label>
+                  <div className="mt-2 grid grid-cols-2 gap-2">
+                    {Object.entries(SERVICE_LABELS).map(([key, label]) => (
+                      <label key={key} className="flex items-center gap-2 text-sm text-ranting-ice">
+                        <input
+                          type="checkbox"
+                          checked={createForm.services?.includes(key)}
+                          onChange={() => handleServiceToggle(key, true)}
+                          className="rounded border-ranting-sky/30 bg-ranting-deep text-ranting-accent focus:ring-ranting-accent"
+                        />
+                        {label}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button type="button" variant="ghost" onClick={() => setIsCreateDialogOpen(false)} className="glossy-btn-ghost">
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={isSubmitting} className="glossy-btn">
+                    {isSubmitting ? "Creating..." : "Create"}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
+        )}
       </header>
 
       {/* Filters */}
@@ -137,14 +325,15 @@ function VendorListPage() {
         <div className="glass-panel p-8 text-center text-ranting-muted">No vendors found</div>
       ) : (
         <div className="glass-panel overflow-hidden">
-          <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_0.8fr] gap-3 border-b border-white/10 bg-white/[0.03] px-4 py-2.5 text-[10px] uppercase tracking-wider text-ranting-muted">
+          <div className={`grid gap-3 border-b border-white/10 bg-white/[0.03] px-4 py-2.5 text-[10px] uppercase tracking-wider text-ranting-muted ${isManagerOrOwner ? 'grid-cols-[1fr_1fr_1fr_1fr_1fr_0.8fr_0.5fr]' : 'grid-cols-[1fr_1fr_1fr_1fr_1fr_0.8fr]'}`}>
             <div>Name</div><div>Email</div><div>Phone</div><div>Services</div><div>Emergency</div><div>Rating</div>
+            {isManagerOrOwner && <div>Actions</div>}
           </div>
           <ul className="max-h-[60vh] overflow-y-auto">
             {filteredVendors.map((v) => (
               <li
                 key={v.id}
-                className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_0.8fr] items-center gap-3 border-b border-white/5 px-4 py-3 text-sm transition hover:bg-white/[0.05]"
+                className={`grid ${isManagerOrOwner ? 'grid-cols-[1fr_1fr_1fr_1fr_1fr_0.8fr_0.5fr]' : 'grid-cols-[1fr_1fr_1fr_1fr_1fr_0.8fr]'} items-center gap-3 border-b border-white/5 px-4 py-3 text-sm transition hover:bg-white/[0.05]`}
               >
                 <div className="flex items-center gap-2">
                   <Avatar name={v.name} size={22} glow={false} />
@@ -169,11 +358,106 @@ function VendorListPage() {
                 <div className="text-xs text-ranting-ice/85">
                   {v.rating ? `${v.rating} ★` : "N/A"}
                 </div>
+                {isManagerOrOwner && (
+                  <div className="flex gap-1">
+                    <Button
+                      onClick={() => { setSelected(v); openEditDialog(); }}
+                      variant="ghost"
+                      className="glossy-btn-ghost px-2 py-1 text-xs"
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      onClick={() => handleDelete(v.id)}
+                      variant="ghost"
+                      className="glossy-btn-ghost px-2 py-1 text-xs text-red-400 hover:text-red-300"
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                )}
               </li>
             ))}
           </ul>
         </div>
       )}
+
+      {/* Edit Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="border-ranting-sky/30 bg-ranting-navy text-ranting-ice max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Edit Vendor</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleUpdate} className="space-y-4">
+            <div>
+              <Label htmlFor="edit-name">Name</Label>
+              <Input
+                id="edit-name"
+                value={editForm.name || ""}
+                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                className="aero-input"
+              />
+            </div>
+            <div>
+              <Label htmlFor="edit-email">Email</Label>
+              <Input
+                id="edit-email"
+                type="email"
+                value={editForm.email || ""}
+                onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                className="aero-input"
+              />
+            </div>
+            <div>
+              <Label htmlFor="edit-phone">Phone</Label>
+              <Input
+                id="edit-phone"
+                type="tel"
+                value={editForm.phone || ""}
+                onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                className="aero-input"
+              />
+            </div>
+            <div>
+              <Label htmlFor="edit-emergency">Emergency Available</Label>
+              <select
+                id="edit-emergency"
+                value={editForm.emergency_available ? "true" : "false"}
+                onChange={(e) => setEditForm({ ...editForm, emergency_available: e.target.value === "true" })}
+                className="aero-input w-full"
+                style={{ colorScheme: "dark" }}
+              >
+                <option value="false" className="bg-ranting-deep text-ranting-ice">No</option>
+                <option value="true" className="bg-ranting-deep text-ranting-ice">Yes</option>
+              </select>
+            </div>
+            <div>
+              <Label>Services</Label>
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                {Object.entries(SERVICE_LABELS).map(([key, label]) => (
+                  <label key={key} className="flex items-center gap-2 text-sm text-ranting-ice">
+                    <input
+                      type="checkbox"
+                      checked={editForm.services?.includes(key)}
+                      onChange={() => handleServiceToggle(key, false)}
+                      className="rounded border-ranting-sky/30 bg-ranting-deep text-ranting-accent focus:ring-ranting-accent"
+                    />
+                    {label}
+                  </label>
+                ))}
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="ghost" onClick={() => setIsEditDialogOpen(false)} className="glossy-btn-ghost">
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSubmitting} className="glossy-btn">
+                {isSubmitting ? "Saving..." : "Save"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
       </main>
     </AuthenticatedLayout>
   );

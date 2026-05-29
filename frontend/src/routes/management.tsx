@@ -8,6 +8,9 @@ import { requireManagerOrOwnerAuth } from "@/lib/auth";
 import { getRequests, updateRequest } from "@/services/api";
 import { getRequestTypeLabel, REQUEST_TYPES } from "@/types";
 import type { Request, RequestType, Status, Urgency } from "@/types";
+import { ManagementProperties } from "@/components/ManagementProperties";
+import { ManagementTenants } from "@/components/ManagementTenants";
+import { ManagementProfile } from "@/components/ManagementProfile";
 
 export const Route = createFileRoute("/management")({
   head: () => ({ meta: [{ title: "Management — Ranting Chant" }] }),
@@ -19,6 +22,7 @@ function ManagementPage() {
   const navigate = useNavigate();
   const { currentManager } = useApp();
 
+  const [activeTab, setActiveTab] = useState<"requests" | "properties" | "tenants" | "vendors" | "profile">("requests");
   const [rows, setRows] = useState<Request[]>([]);
   const [typeF, setTypeF] = useState<RequestType | "all">("all");
   const [statusF, setStatusF] = useState<Status | "all">("all");
@@ -87,46 +91,89 @@ function ManagementPage() {
         <h1 className="underline-glow text-3xl font-semibold tracking-tight text-ranting-ice">Management</h1>
       </div>
 
-      {/* Stats */}
-      <div className="mb-5 grid grid-cols-2 gap-4 md:grid-cols-4">
-        <StatCard label="Total Requests" value={stats.total} accent="sky" />
-        <StatCard label="Escalated" value={stats.escalated} accent="red" />
-        <StatCard label="Pending Approval" value={stats.pendingApproval} accent="purple" />
-        <StatCard label="Resolved" value={stats.resolved} accent="green" />
+      {/* Tabs */}
+      <div className="glass-panel mb-5 flex gap-2 px-4 py-3">
+        {[
+          { id: "requests" as const, label: "Requests" },
+          { id: "properties" as const, label: "Properties" },
+          { id: "tenants" as const, label: "Tenants" },
+          { id: "vendors" as const, label: "Vendors" },
+          { id: "profile" as const, label: "Profile" },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`px-4 py-2 text-xs ${
+              activeTab === tab.id
+                ? "glossy-btn"
+                : "glossy-btn-ghost"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
-      {/* Filters */}
-      <div className="glass-panel mb-4 flex flex-wrap items-center gap-3 px-4 py-3">
-        <span className="text-xs uppercase tracking-wider text-ranting-muted">Filter</span>
-        <Select value={typeF} onChange={(v) => setTypeF(v as RequestType | "all")} options={[
-          ["all", "All types"], ...REQUEST_TYPES.map((type) => [type, getRequestTypeLabel(type)] as [string, string]),
-        ]} />
-        <Select value={statusF} onChange={(v) => setStatusF(v as Status | "all")} options={[
-          ["all", "All statuses"], ["pending", "Pending"], ["in_progress", "In Progress"], ["escalated", "Escalated"],
-          ["pending_approval", "Pending Approval"], ["pending_review", "Pending Review"], ["resolved", "Resolved"],
-        ]} />
-        <Select value={urgencyF} onChange={(v) => setUrgencyF(v as Urgency | "all")} options={[
-          ["all", "All urgencies"], ["low", "Low"], ["medium", "Medium"], ["high", "High"],
-        ]} />
-        <Select value={propertyF} onChange={(v) => setPropertyF(v)} options={[
-          ["all", "All properties"], ...properties.map((p) => [p, p] as [string, string]),
-        ]} />
-        <span className="ml-auto text-xs text-ranting-muted">{filtered.length} of {rows.length}</span>
-      </div>
+      {/* Tab Content */}
+      {activeTab === "requests" && (
+        <>
+          {/* Stats */}
+          <div className="mb-5 grid grid-cols-2 gap-4 md:grid-cols-4">
+            <StatCard label="Total Requests" value={stats.total} accent="sky" />
+            <StatCard label="Escalated" value={stats.escalated} accent="red" />
+            <StatCard label="Pending Approval" value={stats.pendingApproval} accent="purple" />
+            <StatCard label="Resolved" value={stats.resolved} accent="green" />
+          </div>
 
-      {/* Table */}
-      {isLoading ? (
-        <div className="glass-panel p-8 text-center text-ranting-muted">Loading requests...</div>
-      ) : (
-        <RequestTable 
-          requests={filtered} 
-          onRowClick={setSelected} 
-          onApprove={approve} 
-        />
+          {/* Filters */}
+          <div className="glass-panel mb-4 flex flex-wrap items-center gap-3 px-4 py-3">
+            <span className="text-xs uppercase tracking-wider text-ranting-muted">Filter</span>
+            <Select value={typeF} onChange={(v) => setTypeF(v as RequestType | "all")} options={[
+              ["all", "All types"], ...REQUEST_TYPES.map((type) => [type, getRequestTypeLabel(type)] as [string, string]),
+            ]} />
+            <Select value={statusF} onChange={(v) => setStatusF(v as Status | "all")} options={[
+              ["all", "All statuses"], ["pending", "Pending"], ["in_progress", "In Progress"], ["escalated", "Escalated"],
+              ["pending_approval", "Pending Approval"], ["pending_review", "Pending Review"], ["resolved", "Resolved"], ["cancelled", "Cancelled"],
+            ]} />
+            <Select value={urgencyF} onChange={(v) => setUrgencyF(v as Urgency | "all")} options={[
+              ["all", "All urgencies"], ["low", "Low"], ["medium", "Medium"], ["high", "High"],
+            ]} />
+            <Select value={propertyF} onChange={(v) => setPropertyF(v)} options={[
+              ["all", "All properties"], ...properties.map((p) => [p, p] as [string, string]),
+            ]} />
+            <span className="ml-auto text-xs text-ranting-muted">{filtered.length} of {rows.length}</span>
+          </div>
+
+          {/* Table */}
+          {isLoading ? (
+            <div className="glass-panel p-8 text-center text-ranting-muted">Loading requests...</div>
+          ) : (
+            <RequestTable
+              requests={filtered}
+              onRowClick={setSelected}
+              onApprove={approve}
+            />
+          )}
+
+          {/* Detail panel */}
+          {selected && <RequestDetailPanel req={selected} onClose={() => setSelected(null)} onApprove={() => approve(selected.id)} />}
+        </>
       )}
 
-      {/* Detail panel */}
-      {selected && <RequestDetailPanel req={selected} onClose={() => setSelected(null)} onApprove={() => approve(selected.id)} />}
+      {activeTab === "properties" && <ManagementProperties />}
+      {activeTab === "tenants" && <ManagementTenants />}
+      {activeTab === "vendors" && (
+        <div className="glass-panel p-8 text-center text-ranting-muted">
+          <p>Vendors management - coming soon</p>
+          <button
+            onClick={() => navigate({ to: "/vendors" })}
+            className="glossy-btn mt-4 px-4 py-2 text-xs"
+          >
+            Go to Vendors Directory
+          </button>
+        </div>
+      )}
+      {activeTab === "profile" && <ManagementProfile />}
       </main>
     </AuthenticatedLayout>
   );
