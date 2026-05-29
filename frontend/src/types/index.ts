@@ -118,6 +118,7 @@ export interface ConversationMessage {
   role: "ai" | "tenant" | "manager";
   message: string;
   timestamp: string;
+  web_results?: WebSearchResponse;
 }
 
 export interface NotificationEvent {

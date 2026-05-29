@@ -138,7 +138,8 @@ function ChatPage() {
         id: crypto.randomUUID(),
         role: "ai",
         message: response.reply,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        web_results: response.web_results
       }]);
       setStatus(response.status);
       setRequestType(response.type ?? "general");
