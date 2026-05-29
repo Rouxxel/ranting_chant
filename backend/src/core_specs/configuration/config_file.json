@@ -26,22 +26,30 @@
             "gemini-2.5-flash"
         ]
     },
-
-    "elevenlabs_model":{
-        "stt":{
-            "model_id":"scribe_v2",
-            "language_code":"en",
-            "diarize":true,
-            "default_model":"base",
-            "compute_type":"default",
-            "device":"auto",
-            "cpu_threads":1,
-            "num_workers":1
+    "voice_provider":{
+        "default_provider":"elevenlabs",
+        "gradium":{
+            "api_base_url":"https://api.gradium.ai/api",
+            "voice_id":"YTpq7expH9539ERJ",
+            "tts_model":"default",
+            "output_format":"wav"
         },
-        "tts":{
-            "model_id":"eleven_multilingual_v2",
-            "output_format":"mp3_44100_128",
-            "voice_id":"21m00Tcm4TlvDq8ikWAM"
+        "elevenlabs":{
+            "stt":{
+                "model_id":"scribe_v2",
+                "language_code":"en",
+                "diarize":true,
+                "default_model":"base",
+                "compute_type":"default",
+                "device":"auto",
+                "cpu_threads":1,
+                "num_workers":1
+            },
+            "tts":{
+                "model_id":"eleven_multilingual_v2",
+                "output_format":"mp3_44100_128",
+                "voice_id":"21m00Tcm4TlvDq8ikWAM"
+            }
         }
     },
 
