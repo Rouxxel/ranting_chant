@@ -2,10 +2,40 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useMemo } from "react";
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { Avatar } from "@/components/Avatar";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useApp } from "@/context/AppContext";
 import { requireAuthenticatedUser } from "@/lib/auth";
 import { getVendors } from "@/services/api";
 import type { Vendor } from "@/types";
+
+const SERVICE_LABELS: Record<string, string> = {
+  access_control: "Access Control",
+  appliance_repair: "Appliance Repair",
+  door_repair: "Door Repair",
+  drain_cleaning: "Drain Cleaning",
+  electrical: "Electrical",
+  general_repair: "General Repair",
+  glass_repair: "Glass Repair",
+  handyman: "Handyman",
+  hvac: "HVAC",
+  locksmith: "Locksmith",
+  pest_control: "Pest Control",
+  plumbing: "Plumbing",
+  security_systems: "Security Systems",
+};
+
+function getServiceLabel(service: string) {
+  return SERVICE_LABELS[service] ?? service
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
 
 export const Route = createFileRoute("/vendors")({
   head: () => ({ meta: [{ title: "Ranting Chant — Vendor List" }] }),
@@ -68,12 +98,6 @@ function VendorListPage() {
           <div className="text-sm font-semibold text-ranting-ice">Vendor Directory</div>
           <div className="text-[11px] text-ranting-muted">Third-party service providers</div>
         </div>
-        <button
-          onClick={() => navigate({ to: userRole === "tenant" ? "/dashboard" : "/management" })}
-          className="glossy-btn-ghost px-4 py-2 text-xs"
-        >
-          Back
-        </button>
       </header>
 
       {/* Filters */}
@@ -85,16 +109,24 @@ function VendorListPage() {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="aero-input px-3 py-2 text-sm flex-1 min-w-[200px]"
         />
-        <select
+        <Select
           value={serviceFilter}
-          onChange={(e) => setServiceFilter(e.target.value)}
-          className="aero-input px-3 py-2 text-sm"
+          onValueChange={setServiceFilter}
         >
-          <option value="all">All Services</option>
-          {allServices.map(service => (
-            <option key={service} value={service}>{service}</option>
-          ))}
-        </select>
+          <SelectTrigger className="h-10 min-w-[210px] border-ranting-sky/35 bg-ranting-deep text-ranting-ice shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_0_14px_rgba(45,106,159,0.22)]">
+            <SelectValue placeholder="All Services" />
+          </SelectTrigger>
+          <SelectContent className="border-ranting-sky/35 bg-ranting-navy text-ranting-ice shadow-[0_16px_34px_rgba(0,0,0,0.45)]">
+            <SelectItem value="all" className="focus:bg-ranting-accent focus:text-white">
+              All Services
+            </SelectItem>
+            {allServices.map(service => (
+              <SelectItem key={service} value={service} className="focus:bg-ranting-accent focus:text-white">
+                {getServiceLabel(service)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <span className="ml-auto text-xs text-ranting-muted">{filteredVendors.length} of {vendors.length}</span>
       </div>
 
@@ -123,7 +155,7 @@ function VendorListPage() {
                 <div className="flex flex-wrap gap-1">
                   {v.services.map((s) => (
                     <span key={s} className="rounded bg-white/5 px-2 py-0.5 text-[10px] text-ranting-ice/80">
-                      {s}
+                      {getServiceLabel(s)}
                     </span>
                   ))}
                 </div>
@@ -146,5 +178,3 @@ function VendorListPage() {
     </AuthenticatedLayout>
   );
 }
-
-

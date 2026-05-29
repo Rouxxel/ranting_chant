@@ -62,12 +62,12 @@ export function ChatInput({
             onValueChange={(value) => onVoiceProviderChange(value as VoiceProviderId)}
             disabled={disabled || isRecording}
           >
-            <SelectTrigger className="h-9 border-white/15 bg-white/8 text-ranting-ice shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+            <SelectTrigger className="h-9 border-ranting-sky/35 bg-ranting-deep text-ranting-ice shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_0_14px_rgba(45,106,159,0.22)]">
               <SelectValue placeholder="Select provider" />
             </SelectTrigger>
-            <SelectContent className="border-white/15 bg-ranting-ink text-ranting-ice">
+            <SelectContent className="border-ranting-sky/35 bg-ranting-navy text-ranting-ice shadow-[0_16px_34px_rgba(0,0,0,0.45)]">
               {providerOptions.map((provider) => (
-                <SelectItem key={provider.id} value={provider.id} disabled={!provider.enabled}>
+                <SelectItem key={provider.id} value={provider.id} disabled={!provider.enabled} className="focus:bg-ranting-accent focus:text-white">
                   {provider.display_name}{provider.enabled ? "" : " (not configured)"}
                 </SelectItem>
               ))}
@@ -83,12 +83,12 @@ export function ChatInput({
             onValueChange={onVoiceChange}
             disabled={disabled || isRecording || voices.length === 0}
           >
-            <SelectTrigger className="h-9 border-white/15 bg-white/8 text-ranting-ice shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+            <SelectTrigger className="h-9 border-ranting-sky/35 bg-ranting-deep text-ranting-ice shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_0_14px_rgba(45,106,159,0.22)]">
               <SelectValue placeholder={voices.length ? "Select voice" : "No voices"} />
             </SelectTrigger>
-            <SelectContent className="border-white/15 bg-ranting-ink text-ranting-ice">
+            <SelectContent className="border-ranting-sky/35 bg-ranting-navy text-ranting-ice shadow-[0_16px_34px_rgba(0,0,0,0.45)]">
               {voices.map((voice) => (
-                <SelectItem key={voice.id} value={voice.id}>
+                <SelectItem key={voice.id} value={voice.id} className="focus:bg-ranting-accent focus:text-white">
                   {voice.name}
                 </SelectItem>
               ))}

@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { AlertTriangle, MessageSquareText, Send, Save } from "lucide-react";
-import { Logo } from "@/components/Logo";
 import { Avatar } from "@/components/Avatar";
 import { StatusBadge } from "@/components/Badges";
 import { MessageBubble } from "@/components/MessageBubble";
@@ -287,8 +286,6 @@ function ChatPage() {
       <main className="mx-auto flex min-h-[calc(100vh-130px)] max-w-[1400px] gap-5">
       {/* Sidebar */}
       <aside className="glass-panel hidden w-[280px] shrink-0 flex-col p-5 md:flex">
-        <Logo size="sm" className="mb-6" />
-
         <div className="flex items-center gap-3 mb-5">
           <Avatar name={name} size={48} />
           <div className="min-w-0">
