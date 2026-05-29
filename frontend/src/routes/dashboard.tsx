@@ -1,16 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
-import { Logo } from "@/components/Logo";
+import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { RequestCard } from "@/components/RequestCard";
 import { RequestTimeline } from "@/components/RequestTimeline";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useApp } from "@/context/AppContext";
+import { requireTenantAuth } from "@/lib/auth";
 import { getRequests } from "@/services/api";
 import type { Request } from "@/types";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({ meta: [{ title: "My Requests — Ranting Chant" }] }),
+  beforeLoad: () => requireTenantAuth(),
   component: DashboardPage,
 });
 
@@ -56,10 +58,10 @@ function DashboardPage() {
   }, [tenantId]);
 
   return (
-    <main className="mx-auto min-h-screen max-w-[960px] px-5 py-8">
+    <AuthenticatedLayout>
+      <main className="mx-auto min-h-[calc(100vh-130px)] max-w-[960px] py-3">
       <header className="mb-8 flex items-end justify-between">
         <div>
-          <Logo size="sm" className="mb-3" />
           <h1 className="underline-glow text-3xl font-semibold tracking-tight text-ranting-ice">My Requests</h1>
         </div>
         <Link to="/chat" className="glossy-btn inline-flex items-center gap-2 px-4 py-2.5 text-sm">
@@ -99,6 +101,9 @@ function DashboardPage() {
           ))}
         </div>
       )}
-    </main>
+      </main>
+    </AuthenticatedLayout>
   );
 }
+
+

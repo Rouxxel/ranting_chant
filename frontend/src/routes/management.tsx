@@ -1,23 +1,22 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState, useEffect } from "react";
-import { Logo } from "@/components/Logo";
-import { Avatar } from "@/components/Avatar";
+import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { RequestTable } from "@/components/RequestTable";
 import { RequestDetailPanel } from "@/components/RequestDetailPanel";
 import { useApp } from "@/context/AppContext";
+import { requireManagerOrOwnerAuth } from "@/lib/auth";
 import { getRequests, updateRequest } from "@/services/api";
 import type { Request, Status, Urgency } from "@/types";
 
 export const Route = createFileRoute("/management")({
   head: () => ({ meta: [{ title: "Management — Ranting Chant" }] }),
+  beforeLoad: () => requireManagerOrOwnerAuth(),
   component: ManagementPage,
 });
 
 function ManagementPage() {
   const navigate = useNavigate();
   const { currentManager } = useApp();
-  const managerName = currentManager?.name ?? "Alex Morgan";
-  const managerId = currentManager?.id ?? "manager_001";
 
   const [rows, setRows] = useState<Request[]>([]);
   const [statusF, setStatusF] = useState<Status | "all">("all");
@@ -79,24 +78,17 @@ function ManagementPage() {
   }
 
   return (
-    <main className="mx-auto min-h-screen max-w-[1400px] px-5 py-6">
-      {/* Header */}
-      <header className="glass-panel mb-5 flex items-center justify-between px-5 py-4">
-        <Logo size="sm" />
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate({ to: "/vendors" })}
-            className="glossy-btn-ghost px-4 py-2 text-xs"
-          >
-            Vendor List
-          </button>
-          <div className="text-right">
-            <div className="text-sm font-semibold text-ranting-ice">{managerName}</div>
-            <div className="text-[11px] text-ranting-muted">Property Manager</div>
-          </div>
-          <Avatar name={managerName} size={40} />
-        </div>
-      </header>
+    <AuthenticatedLayout>
+      <main className="mx-auto min-h-[calc(100vh-130px)] max-w-[1400px]">
+      <div className="mb-5 flex items-center justify-between">
+        <h1 className="underline-glow text-3xl font-semibold tracking-tight text-ranting-ice">Management</h1>
+        <button
+          onClick={() => navigate({ to: "/vendors" })}
+          className="glossy-btn-ghost px-4 py-2 text-xs"
+        >
+          Vendor List
+        </button>
+      </div>
 
       {/* Stats */}
       <div className="mb-5 grid grid-cols-2 gap-4 md:grid-cols-4">
@@ -135,7 +127,8 @@ function ManagementPage() {
 
       {/* Detail panel */}
       {selected && <RequestDetailPanel req={selected} onClose={() => setSelected(null)} onApprove={() => approve(selected.id)} />}
-    </main>
+      </main>
+    </AuthenticatedLayout>
   );
 }
 
@@ -169,3 +162,5 @@ function Select({ value, onChange, options }: { value: string; onChange: (v: str
     </select>
   );
 }
+
+

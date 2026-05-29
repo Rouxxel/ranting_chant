@@ -6,14 +6,17 @@ import { Avatar } from "@/components/Avatar";
 import { StatusBadge } from "@/components/Badges";
 import { MessageBubble } from "@/components/MessageBubble";
 import { ChatInput } from "@/components/ChatInput";
+import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useApp } from "@/context/AppContext";
+import { requireTenantAuth } from "@/lib/auth";
 import { startConversation, sendMessage, transcribeAudio, respondToVoice, saveConversation, sendRequestNotifications } from "@/services/api";
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
 import type { ConversationMessage, Status, Urgency } from "@/types";
 
 export const Route = createFileRoute("/chat")({
   head: () => ({ meta: [{ title: "Chat — Ranting Chant" }] }),
+  beforeLoad: () => requireTenantAuth(),
   component: ChatPage,
 });
 
@@ -246,7 +249,8 @@ function ChatPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-[1400px] gap-5 p-5">
+    <AuthenticatedLayout>
+      <main className="mx-auto flex min-h-[calc(100vh-130px)] max-w-[1400px] gap-5">
       {/* Sidebar */}
       <aside className="glass-panel hidden w-[280px] shrink-0 flex-col p-5 md:flex">
         <Logo size="sm" className="mb-6" />
@@ -332,6 +336,9 @@ function ChatPage() {
           isTyping={typing}
         />
       </section>
-    </main>
+      </main>
+    </AuthenticatedLayout>
   );
 }
+
+

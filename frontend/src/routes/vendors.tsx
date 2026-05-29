@@ -1,17 +1,21 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useMemo } from "react";
-import { Logo } from "@/components/Logo";
+import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { Avatar } from "@/components/Avatar";
+import { useApp } from "@/context/AppContext";
+import { requireAuthenticatedUser } from "@/lib/auth";
 import { getVendors } from "@/services/api";
 import type { Vendor } from "@/types";
 
 export const Route = createFileRoute("/vendors")({
   head: () => ({ meta: [{ title: "Ranting Chant — Vendor List" }] }),
+  beforeLoad: () => requireAuthenticatedUser(),
   component: VendorListPage,
 });
 
 function VendorListPage() {
   const navigate = useNavigate();
+  const { userRole } = useApp();
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -57,21 +61,18 @@ function VendorListPage() {
   }, [vendors, searchTerm, serviceFilter]);
 
   return (
-    <main className="mx-auto min-h-screen max-w-[1400px] px-5 py-6">
-      {/* Header */}
-      <header className="glass-panel mb-5 flex items-center justify-between px-5 py-4">
-        <div className="flex items-center gap-3">
-          <Logo size="sm" />
-          <div>
-            <div className="text-sm font-semibold text-ranting-ice">Vendor Directory</div>
-            <div className="text-[11px] text-ranting-muted">Third-party service providers</div>
-          </div>
+    <AuthenticatedLayout>
+      <main className="mx-auto min-h-[calc(100vh-130px)] max-w-[1400px]">
+      <header className="mb-5 flex items-center justify-between">
+        <div>
+          <div className="text-sm font-semibold text-ranting-ice">Vendor Directory</div>
+          <div className="text-[11px] text-ranting-muted">Third-party service providers</div>
         </div>
         <button
-          onClick={() => navigate({ to: "/management" })}
+          onClick={() => navigate({ to: userRole === "tenant" ? "/dashboard" : "/management" })}
           className="glossy-btn-ghost px-4 py-2 text-xs"
         >
-          Back to Dashboard
+          Back
         </button>
       </header>
 
@@ -141,6 +142,9 @@ function VendorListPage() {
           </ul>
         </div>
       )}
-    </main>
+      </main>
+    </AuthenticatedLayout>
   );
 }
+
+
