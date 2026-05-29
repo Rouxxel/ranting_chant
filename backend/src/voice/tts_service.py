@@ -21,9 +21,11 @@ from elevenlabs.client import ElevenLabs
 
 #Other files imports
 from src.utils.custom_logger import log_handler
+from src.core_specs.configuration.config_loader import config_loader
 
 """VARIABLES-----------------------------------------------------------"""
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "")
+ELEVENLABS_CONFIG = config_loader["voice_provider"]["elevenlabs"]
 
 # Initialize ElevenLabs client
 client = None
@@ -37,7 +39,7 @@ else:
     log_handler.warning("ELEVENLABS_API_KEY not set — TTS will be disabled")
 
 """METHODS-----------------------------------------------------------"""
-def text_to_speech_bytes(text: str) -> bytes:
+def text_to_speech_bytes(text: str, voice_id: str | None = None) -> bytes:
     """
     Convert text to speech audio using ElevenLabs.
 
@@ -61,10 +63,10 @@ def text_to_speech_bytes(text: str) -> bytes:
         log_handler.debug(f"[tts_service] Converting text to speech: {text[:50]}...")
         
         audio_stream = client.text_to_speech.convert(
-            voice_id=config_loader["elevenlabs_model"]["tts"]["voice_id"],
+            voice_id=voice_id or ELEVENLABS_CONFIG["tts"]["voice_id"],
             text=text,
-            model_id=config_loader["elevenlabs_model"]["tts"]["model_id"],
-            output_format=config_loader["elevenlabs_model"]["tts"]["output_format"]
+            model_id=ELEVENLABS_CONFIG["tts"]["model_id"],
+            output_format=ELEVENLABS_CONFIG["tts"]["output_format"]
         )
         audio_bytes = b"".join(chunk for chunk in audio_stream)
         

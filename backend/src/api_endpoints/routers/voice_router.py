@@ -13,27 +13,34 @@ greetings, and processing voice messages with audio responses.
 """
 
 # Native imports
+import base64
 from datetime import datetime, timezone
 from typing import Optional
 
 # Third-party imports
-from fastapi import APIRouter, HTTPException, Request, UploadFile
+from fastapi import APIRouter, Form, HTTPException, Request, UploadFile
 from pydantic import BaseModel
 
 # Other files imports
 from src.utils.custom_logger import log_handler
 from src.utils.limiter import limiter as SlowLimiter
 from src.core_specs.configuration.config_loader import config_loader
-from src.mcp import tenant_mcp, property_mcp, request_mcp
+from src.mcp import tenant_mcp, request_mcp
 from src.ai.conversation_engine import ConversationEngine
 from src.ai.gemini_client import get_client
-from src.voice.stt_service import transcribe
-from src.voice.tts_service import text_to_speech_base64, text_to_speech_emergency_base64
+from src.voice.providers import (
+    InvalidVoiceRequestError,
+    ProviderUnavailableError,
+    VoiceProviderError,
+    get_voice_provider,
+    list_voice_providers,
+)
 
 """PYDANTIC MODELS-----------------------------------------------------------"""
 class VoiceStartPayload(BaseModel):
     """Payload accepted when starting a voice session."""
     tenant_id: str
+    provider: Optional[str] = None
 
 
 class VoiceRespondPayload(BaseModel):
@@ -41,6 +48,7 @@ class VoiceRespondPayload(BaseModel):
     request_id: str
     tenant_id: str
     transcript: str
+    provider: Optional[str] = None
 
 
 """API ROUTER-----------------------------------------------------------"""
@@ -54,42 +62,57 @@ router = APIRouter(
 conversation_engine = ConversationEngine()
 
 
+def _provider_exception_to_http(exc: VoiceProviderError) -> HTTPException:
+    """Map provider-layer errors to stable HTTP responses."""
+    if isinstance(exc, InvalidVoiceRequestError):
+        return HTTPException(status_code=400, detail=str(exc))
+    if isinstance(exc, ProviderUnavailableError):
+        return HTTPException(status_code=503, detail=str(exc))
+    return HTTPException(status_code=502, detail=str(exc))
+
+
 """ENDPOINTS-----------------------------------------------------------"""
+@router.get("/providers")
+@SlowLimiter.limit("30/minute")
+async def get_voice_providers(request: Request):
+    """Return supported voice providers and configuration/capability metadata."""
+    return list_voice_providers()
+
+
 # Transcribe audio to text
 @router.post("/transcribe")
 @SlowLimiter.limit("10/minute")
-async def transcribe_audio(request: Request, audio: UploadFile):
+async def transcribe_audio(request: Request, audio: UploadFile, provider: Optional[str] = Form(None)):
     """
-    Transcribe uploaded audio file to text using ElevenLabs (primary) or Whisper (fallback).
+    Transcribe uploaded audio file to text using the selected voice provider.
 
     Parameters:
         request (Request): The incoming HTTP request for rate limit tracking.
         audio (UploadFile): The audio file to transcribe.
+        provider (str | None): Optional provider override, e.g. elevenlabs or gradium.
 
     Returns:
         dict: The transcribed text.
-
-    Raises:
-        HTTPException 400: If the audio file is invalid or transcription fails.
-        HTTPException 500: If an unexpected error occurs during transcription.
     """
     try:
         log_handler.debug(f"Transcribing audio file: {audio.filename}")
-        
-        # Read audio bytes
+
         audio_bytes = await audio.read()
-        
         if not audio_bytes:
             raise HTTPException(status_code=400, detail="Audio file is empty")
-        
-        # Transcribe audio
-        transcript = transcribe(audio_bytes)
-        
-        log_handler.info(f"Audio transcribed successfully: {transcript[:50]}...")
-        return {"transcript": transcript}
-        
+
+        voice_provider = get_voice_provider(provider)
+        log_handler.info(f"Using voice provider '{voice_provider.provider_id}' for transcription")
+        result = voice_provider.transcribe(audio_bytes, mime_type=audio.content_type or "audio/wav")
+
+        log_handler.info(f"Audio transcribed successfully: {result.transcript[:50]}...")
+        return {"transcript": result.transcript}
+
     except HTTPException:
         raise
+    except VoiceProviderError as e:
+        log_handler.error(f"Voice provider error transcribing audio: {e}")
+        raise _provider_exception_to_http(e)
     except Exception as e:
         log_handler.error(f"Unexpected error transcribing audio: {e}")
         raise HTTPException(status_code=500, detail="Internal server error while transcribing audio")
@@ -102,21 +125,8 @@ async def start_voice_session(request: Request, body: VoiceStartPayload):
     """
     Start a new voice session with an audio greeting.
 
-    Fetches the tenant and their associated property, generates a warm,
-    personalized greeting via Gemini, creates a stub request record,
-    converts the greeting to audio, and returns the session details with audio.
-
-    Parameters:
-        request (Request): The incoming HTTP request for rate limit tracking.
-        body (VoiceStartPayload): The tenant_id of the initiating tenant.
-
-    Returns:
-        dict: Session details including request_id, greeting_text, greeting_audio_base64,
-              tenant_name, property_name.
-
-    Raises:
-        HTTPException 404: If the tenant with tenant_id does not exist.
-        HTTPException 500: If an unexpected error occurs during startup.
+    This endpoint is provider-aware: if body.provider is supplied it uses that
+    provider for greeting audio; otherwise it uses VOICE_PROVIDER_DEFAULT.
     """
     try:
         tenant_id = body.tenant_id.strip()
@@ -184,8 +194,11 @@ async def start_voice_session(request: Request, body: VoiceStartPayload):
         }
         stub_request = request_mcp.create_request(request_data)
 
-        # 5. Convert greeting to audio
-        greeting_audio_base64 = text_to_speech_base64(greeting)
+        # 5. Convert greeting to audio through selected provider
+        voice_provider = get_voice_provider(body.provider)
+        log_handler.info(f"Using voice provider '{voice_provider.provider_id}' for session greeting")
+        greeting_audio = voice_provider.tts(greeting)
+        greeting_audio_base64 = base64.b64encode(greeting_audio.audio_bytes).decode("utf-8")
 
         log_handler.info(
             f"Successfully started voice session for tenant '{tenant_id}'. "
@@ -201,6 +214,9 @@ async def start_voice_session(request: Request, body: VoiceStartPayload):
 
     except HTTPException:
         raise
+    except VoiceProviderError as e:
+        log_handler.error(f"Voice provider error starting voice session: {e}")
+        raise _provider_exception_to_http(e)
     except Exception as e:
         log_handler.error(f"Unexpected error starting voice session: {e}")
         raise HTTPException(status_code=500, detail="Internal server error while starting voice session")
@@ -212,23 +228,6 @@ async def start_voice_session(request: Request, body: VoiceStartPayload):
 async def respond_to_voice_message(request: Request, body: VoiceRespondPayload):
     """
     Process a voice message transcript and return audio response.
-
-    Calls the ConversationEngine to process the transcript and generate a reply.
-    Appends the tenant's turn and the AI's reply to the request's history,
-    updates request metadata, triggers state machine transitions, and converts
-    the AI reply to audio. If escalated, uses emergency TTS.
-
-    Parameters:
-        request (Request): The incoming HTTP request for rate limit tracking.
-        body (VoiceRespondPayload): Request details containing request_id, tenant_id,
-            and the transcribed message text.
-
-    Returns:
-        dict: AI reply text, audio response (base64), and updated session/request status.
-
-    Raises:
-        HTTPException 404: If the request_id or tenant_id does not exist.
-        HTTPException 500: If an unexpected error occurs during processing.
     """
     try:
         request_id = body.request_id.strip()
@@ -285,12 +284,13 @@ async def respond_to_voice_message(request: Request, body: VoiceRespondPayload):
         # 6. Convert AI reply to audio (use emergency TTS if escalated)
         reply_text = parsed_response.get("reply", "")
         is_escalated = updated_request.get("escalated", False)
-        
+
+        voice_provider = get_voice_provider(body.provider)
+        log_handler.info(f"Using voice provider '{voice_provider.provider_id}' for voice response")
         if is_escalated:
             log_handler.info(f"Request '{request_id}' is escalated, using emergency TTS")
-            audio_base64 = text_to_speech_emergency_base64(reply_text)
-        else:
-            audio_base64 = text_to_speech_base64(reply_text)
+        audio_result = voice_provider.tts(reply_text, emergency=is_escalated)
+        audio_base64 = base64.b64encode(audio_result.audio_bytes).decode("utf-8")
 
         log_handler.info(
             f"Voice message processed successfully in session '{request_id}'. "
@@ -311,6 +311,9 @@ async def respond_to_voice_message(request: Request, body: VoiceRespondPayload):
 
     except HTTPException:
         raise
+    except VoiceProviderError as e:
+        log_handler.error(f"Voice provider error processing voice message: {e}")
+        raise _provider_exception_to_http(e)
     except Exception as e:
         log_handler.error(f"Unexpected error processing voice message: {e}")
         raise HTTPException(status_code=500, detail="Internal server error while processing voice message")
