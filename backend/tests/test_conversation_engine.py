@@ -252,6 +252,44 @@ class TestConversationEngine(unittest.TestCase):
         self.assertIn("https://example.com/docs", result["reply"])
         self.assertIn("web_results", result)
 
+    @patch("src.ai.conversation_engine.tavily_search")
+    @patch("src.ai.conversation_engine.is_tavily_enabled", return_value=False)
+    @patch("src.ai.conversation_engine.property_mcp.lookup_property")
+    @patch("src.ai.conversation_engine.tenant_mcp.lookup_tenant")
+    @patch("src.ai.conversation_engine.get_client")
+    def test_web_search_disabled_gracefully_without_key(
+        self,
+        mock_get_client,
+        mock_lookup_tenant,
+        mock_lookup_property,
+        mock_is_tavily_enabled,
+        mock_tavily_search,
+    ):
+        """Source-seeking messages still work when Tavily is disabled."""
+        mock_lookup_tenant.return_value = FAKE_TENANT
+        mock_lookup_property.return_value = FAKE_PROPERTY
+        mock_get_client.return_value = _make_gemini_client({
+            "reply": "I can still help without web search.",
+            "is_complete": False,
+            "type": "general",
+            "urgency": "low",
+            "sentiment": "neutral",
+            "confidence": 0.95,
+            "escalate": False,
+            "involved_party_types": ["manager"],
+            "vendor_service_needed": None
+        })
+
+        result = self.engine.process_message(
+            "tenant_001",
+            None,
+            "Can you share an official source link?",
+        )
+
+        self.assertEqual(result["reply"], "I can still help without web search.")
+        self.assertNotIn("web_results", result)
+        mock_tavily_search.assert_not_called()
+
 
 """ENTRY POINT-----------------------------------------------------------"""
 if __name__ == "__main__":

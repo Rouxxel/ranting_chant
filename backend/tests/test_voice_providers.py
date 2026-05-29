@@ -36,6 +36,22 @@ class TestVoiceProviderSelection(unittest.TestCase):
         self.assertIn("elevenlabs", provider_ids)
         self.assertIn("gradium", provider_ids)
 
+    @patch.dict("os.environ", {"ELEVENLABS_API_KEY": "eleven-key", "GRADIUM_API_KEY": ""}, clear=False)
+    def test_capabilities_with_elevenlabs_key_only(self):
+        response = list_voice_providers()
+        providers = {provider["id"]: provider for provider in response["providers"]}
+
+        self.assertTrue(providers["elevenlabs"]["enabled"])
+        self.assertFalse(providers["gradium"]["enabled"])
+
+    @patch.dict("os.environ", {"ELEVENLABS_API_KEY": "", "GRADIUM_API_KEY": "gradium-key"}, clear=False)
+    def test_capabilities_with_gradium_key_only(self):
+        response = list_voice_providers()
+        providers = {provider["id"]: provider for provider in response["providers"]}
+
+        self.assertFalse(providers["elevenlabs"]["enabled"])
+        self.assertTrue(providers["gradium"]["enabled"])
+
     @patch.dict("os.environ", {"GRADIUM_API_KEY": "gradium-key"}, clear=False)
     def test_list_provider_voices_returns_voice_metadata(self):
         response = list_voice_provider_voices("gradium")
