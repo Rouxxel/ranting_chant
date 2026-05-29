@@ -14,7 +14,7 @@ execute_tool() entry point for dispatching tool calls by name.
 
 #Other files imports
 from src.utils.custom_logger import log_handler
-from src.mcp import tenant_mcp, property_mcp, vendor_mcp, request_mcp
+from src.mcp import tenant_mcp, property_mcp, vendor_mcp, request_mcp, tavily_mcp
 
 """REGISTRY-----------------------------------------------------------"""
 #Map of tool name -> callable
@@ -90,6 +90,20 @@ TOOL_REGISTRY: dict[str, dict] = {
     "append_conversation_turn": {
         "description": "Append a conversation message to a request's history",
         "fn": request_mcp.append_conversation_turn
+    },
+
+    # Web tools
+    "web.search": {
+        "description": "Search the web with Tavily and return source snippets",
+        "fn": tavily_mcp.web_search
+    },
+    "web.extract": {
+        "description": "Extract cleaned content from HTTPS URLs with Tavily",
+        "fn": tavily_mcp.web_extract
+    },
+    "web.map": {
+        "description": "Discover a lightweight site map for an HTTPS URL with Tavily",
+        "fn": tavily_mcp.web_map
     },
 }
 
