@@ -18,6 +18,7 @@ from unittest.mock import MagicMock, patch
 
 #Other files imports
 from src.ai.conversation_engine import ConversationEngine
+from src.ai.tools.schemas import WebSearchResponse, WebSearchResultItem
 
 """HELPERS-----------------------------------------------------------"""
 #Fake tenant and property records used across tests
@@ -201,6 +202,55 @@ class TestConversationEngine(unittest.TestCase):
             self.engine.process_message("nonexistent_tenant", None, "Hello")
 
         self.assertIn("nonexistent_tenant", str(ctx.exception))
+
+    @patch("src.ai.conversation_engine.tavily_search")
+    @patch("src.ai.conversation_engine.is_tavily_enabled", return_value=True)
+    @patch("src.ai.conversation_engine.property_mcp.lookup_property")
+    @patch("src.ai.conversation_engine.tenant_mcp.lookup_tenant")
+    @patch("src.ai.conversation_engine.get_client")
+    def test_web_search_results_are_appended_to_reply(
+        self,
+        mock_get_client,
+        mock_lookup_tenant,
+        mock_lookup_property,
+        mock_is_tavily_enabled,
+        mock_tavily_search,
+    ):
+        """Source-seeking messages get deterministic Relevant links in reply."""
+        mock_lookup_tenant.return_value = FAKE_TENANT
+        mock_lookup_property.return_value = FAKE_PROPERTY
+        mock_tavily_search.return_value = WebSearchResponse(
+            query="official documentation link",
+            results=[
+                WebSearchResultItem(
+                    title="Official Docs",
+                    url="https://example.com/docs",
+                    content_snippet="Official source snippet",
+                    score=0.9,
+                )
+            ],
+        )
+        mock_get_client.return_value = _make_gemini_client({
+            "reply": "Here is what I found.",
+            "is_complete": False,
+            "type": "general",
+            "urgency": "low",
+            "sentiment": "neutral",
+            "confidence": 0.95,
+            "escalate": False,
+            "involved_party_types": ["manager"],
+            "vendor_service_needed": None
+        })
+
+        result = self.engine.process_message(
+            "tenant_001",
+            None,
+            "Can you share the official documentation link?",
+        )
+
+        self.assertIn("Relevant links", result["reply"])
+        self.assertIn("https://example.com/docs", result["reply"])
+        self.assertIn("web_results", result)
 
 
 """ENTRY POINT-----------------------------------------------------------"""
