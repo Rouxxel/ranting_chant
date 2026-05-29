@@ -26,6 +26,30 @@
             "gemini-2.5-flash"
         ]
     },
+    "tavily":{
+        "enabled":true,
+        "base_url":"https://api.tavily.com",
+        "max_results":5,
+        "search_depth":"basic",
+        "include_answer":false,
+        "include_images":false,
+        "timeout_seconds":30,
+        "trigger_keywords":[
+            "link",
+            "source",
+            "where did you find",
+            "official",
+            "documentation",
+            "docs",
+            "website",
+            "web",
+            "search",
+            "latest",
+            "current",
+            "today",
+            "news"
+        ]
+    },
     "voice_provider":{
         "default_provider":"elevenlabs",
         "gradium":{
