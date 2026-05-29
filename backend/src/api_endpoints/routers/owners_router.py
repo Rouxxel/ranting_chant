@@ -12,14 +12,25 @@ It exposes a list endpoint for all owners and a single-record
 lookup by owner ID.
 """
 
+#Native imports
+from typing import Optional
+
 #Third-party imports
 from fastapi import APIRouter, HTTPException, Request
+from pydantic import BaseModel
 
 #Other files imports
 from src.utils.custom_logger import log_handler
 from src.utils.limiter import limiter as SlowLimiter
 from src.core_specs.configuration.config_loader import config_loader
-from src.utils.json_store import read_all, find_by_id
+from src.utils.json_store import read_all, find_by_id, update_record
+
+"""PYDANTIC MODELS-----------------------------------------------------------"""
+class OwnerProfileUpdatePayload(BaseModel):
+    """Payload accepted for owner-owned profile edits."""
+
+    email: Optional[str] = None
+    phone: Optional[str] = None
 
 """API ROUTER-----------------------------------------------------------"""
 #Get API router
@@ -58,6 +69,36 @@ async def list_owners(request: Request):
     except Exception as e:
         log_handler.error(f"Unexpected error listing owners: {e}")
         raise HTTPException(status_code=500, detail="Internal server error while fetching owners")
+
+
+#Update owner-owned editable profile fields
+@router.patch("/{owner_id}/profile")
+@SlowLimiter.limit(
+    f"{config_loader['endpoints']['owners_endpoint']['request_limit']}/"
+    f"{config_loader['endpoints']['owners_endpoint']['unit_of_time_for_limit']}"
+)
+async def update_owner_profile(request: Request, owner_id: str, body: OwnerProfileUpdatePayload):
+    """Update owner profile fields without changing owned properties."""
+    try:
+        existing = find_by_id("owners", owner_id)
+        if not existing:
+            message = f"Owner '{owner_id}' not found"
+            log_handler.warning(message)
+            raise HTTPException(status_code=404, detail=message)
+
+        updates = body.model_dump(exclude_none=True)
+        if not updates:
+            raise HTTPException(status_code=400, detail="No owner profile updates provided")
+
+        updated = update_record("owners", owner_id, updates)
+        log_handler.info(f"Owner profile '{owner_id}' updated successfully")
+        return updated
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        log_handler.error(f"Unexpected error updating owner profile '{owner_id}': {e}")
+        raise HTTPException(status_code=500, detail="Internal server error while updating owner profile")
 
 
 #Get a single property owner by ID

@@ -164,6 +164,50 @@ def update_record(collection: str, record_id: str, updates: dict) -> dict:
     return updated_record
 
 
+def delete_record(collection: str, record_id: str) -> dict:
+    """Remove a record by id from *collection* and persist the change.
+
+    Args:
+        collection: Name of the collection.
+        record_id:  The id of the record to delete.
+
+    Returns:
+        The deleted record dict.
+
+    Raises:
+        ValueError: If no record with *record_id* exists in *collection*.
+    """
+    lock = _get_lock(collection)
+    path = _collection_path(collection)
+
+    with lock:
+        if not path.exists():
+            raise ValueError(
+                f"Record with id '{record_id}' not found in collection '{collection}'."
+            )
+
+        with path.open("r", encoding="utf-8") as fh:
+            data = json.load(fh)
+
+        deleted_record = None
+        remaining_records = []
+        for record in data:
+            if record.get("id") == record_id:
+                deleted_record = record
+            else:
+                remaining_records.append(record)
+
+        if deleted_record is None:
+            raise ValueError(
+                f"Record with id '{record_id}' not found in collection '{collection}'."
+            )
+
+        with path.open("w", encoding="utf-8") as fh:
+            json.dump(remaining_records, fh, indent=2, ensure_ascii=False)
+
+    return deleted_record
+
+
 def save_all(collection: str, data: list) -> None:
     """Overwrite *collection* with *data* (full replacement).
 

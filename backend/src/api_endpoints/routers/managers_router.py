@@ -12,14 +12,26 @@ It exposes a list endpoint for all managers and a single-record
 lookup by manager ID.
 """
 
+#Native imports
+from typing import Optional
+
 #Third-party imports
 from fastapi import APIRouter, HTTPException, Request
+from pydantic import BaseModel
 
 #Other files imports
 from src.utils.custom_logger import log_handler
 from src.utils.limiter import limiter as SlowLimiter
 from src.core_specs.configuration.config_loader import config_loader
-from src.utils.json_store import read_all, find_by_id
+from src.utils.json_store import read_all, find_by_id, update_record
+
+"""PYDANTIC MODELS-----------------------------------------------------------"""
+class ManagerProfileUpdatePayload(BaseModel):
+    """Payload accepted for manager-owned profile edits."""
+
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    department: Optional[str] = None
 
 """API ROUTER-----------------------------------------------------------"""
 #Get API router
@@ -58,6 +70,36 @@ async def list_managers(request: Request):
     except Exception as e:
         log_handler.error(f"Unexpected error listing managers: {e}")
         raise HTTPException(status_code=500, detail="Internal server error while fetching managers")
+
+
+#Update manager-owned editable profile fields
+@router.patch("/{manager_id}/profile")
+@SlowLimiter.limit(
+    f"{config_loader['endpoints']['managers_endpoint']['request_limit']}/"
+    f"{config_loader['endpoints']['managers_endpoint']['unit_of_time_for_limit']}"
+)
+async def update_manager_profile(request: Request, manager_id: str, body: ManagerProfileUpdatePayload):
+    """Update manager profile fields without changing managed properties."""
+    try:
+        existing = find_by_id("property_magament", manager_id)
+        if not existing:
+            message = f"Manager '{manager_id}' not found"
+            log_handler.warning(message)
+            raise HTTPException(status_code=404, detail=message)
+
+        updates = body.model_dump(exclude_none=True)
+        if not updates:
+            raise HTTPException(status_code=400, detail="No manager profile updates provided")
+
+        updated = update_record("property_magament", manager_id, updates)
+        log_handler.info(f"Manager profile '{manager_id}' updated successfully")
+        return updated
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        log_handler.error(f"Unexpected error updating manager profile '{manager_id}': {e}")
+        raise HTTPException(status_code=500, detail="Internal server error while updating manager profile")
 
 
 #Get a single property manager by ID

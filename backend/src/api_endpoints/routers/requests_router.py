@@ -53,6 +53,23 @@ class RequestUpdatePayload(BaseModel):
     confidence: Optional[float] = Field(None, description="AI confidence score")
     vendor_id: Optional[str] = Field(None, description="ID of assigned vendor")
 
+
+class RequestCancelPayload(BaseModel):
+    """Payload accepted when a tenant cancels a request."""
+
+    cancelled_by: str = Field(..., description="ID of the tenant cancelling the request")
+    cancellation_reason: Optional[str] = Field(None, description="Optional cancellation reason")
+
+
+class RequestCompletePayload(BaseModel):
+    """Payload accepted when a manager or owner completes a request."""
+
+    resolved_by: str = Field(..., description="ID of the manager or owner resolving the request")
+    resolution_note: Optional[str] = Field(None, description="Optional resolution note")
+
+
+TERMINAL_STATUSES = {"cancelled", "resolved"}
+
 """API ROUTER-----------------------------------------------------------"""
 #Get API router
 router = APIRouter(
@@ -417,6 +434,93 @@ async def update_request(request: Request, request_id: str, body: RequestUpdateP
     except Exception as e:
         log_handler.error(f"Unexpected error updating request '{request_id}': {e}")
         raise HTTPException(status_code=500, detail="Internal server error while updating request")
+
+
+#Cancel a tenant-owned request
+@router.post("/{request_id}/cancel")
+@SlowLimiter.limit(
+    f"{config_loader['endpoints']['requests_endpoint']['request_limit']}/"
+    f"{config_loader['endpoints']['requests_endpoint']['unit_of_time_for_limit']}"
+)
+async def cancel_request(request: Request, request_id: str, body: RequestCancelPayload):
+    """Cancel a request by status update rather than physical deletion."""
+    try:
+        req = find_by_id("requests", request_id)
+        if not req:
+            message = f"Request '{request_id}' not found"
+            log_handler.warning(message)
+            raise HTTPException(status_code=404, detail=message)
+
+        if req.get("requester_id") != body.cancelled_by:
+            raise HTTPException(status_code=403, detail="Only the requesting tenant can cancel this request")
+
+        if req.get("status") in TERMINAL_STATUSES:
+            raise HTTPException(
+                status_code=409,
+                detail=f"Request '{request_id}' is already {req.get('status')}",
+            )
+
+        now = datetime.now(timezone.utc).isoformat()
+        updates = {
+            "status": "cancelled",
+            "cancelled_at": now,
+            "cancelled_by": body.cancelled_by,
+            "updated_at": now,
+        }
+        if body.cancellation_reason is not None:
+            updates["cancellation_reason"] = body.cancellation_reason
+
+        updated = update_record("requests", request_id, updates)
+        log_handler.info(f"Request '{request_id}' cancelled successfully")
+        return updated
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        log_handler.error(f"Unexpected error cancelling request '{request_id}': {e}")
+        raise HTTPException(status_code=500, detail="Internal server error while cancelling request")
+
+
+#Mark a request as complete/resolved
+@router.post("/{request_id}/complete")
+@SlowLimiter.limit(
+    f"{config_loader['endpoints']['requests_endpoint']['request_limit']}/"
+    f"{config_loader['endpoints']['requests_endpoint']['unit_of_time_for_limit']}"
+)
+async def complete_request(request: Request, request_id: str, body: RequestCompletePayload):
+    """Mark a request resolved and capture who completed it."""
+    try:
+        req = find_by_id("requests", request_id)
+        if not req:
+            message = f"Request '{request_id}' not found"
+            log_handler.warning(message)
+            raise HTTPException(status_code=404, detail=message)
+
+        if req.get("status") in TERMINAL_STATUSES:
+            raise HTTPException(
+                status_code=409,
+                detail=f"Request '{request_id}' is already {req.get('status')}",
+            )
+
+        now = datetime.now(timezone.utc).isoformat()
+        updates = {
+            "status": "resolved",
+            "resolved_at": now,
+            "resolved_by": body.resolved_by,
+            "updated_at": now,
+        }
+        if body.resolution_note is not None:
+            updates["resolution_note"] = body.resolution_note
+
+        updated = update_record("requests", request_id, updates)
+        log_handler.info(f"Request '{request_id}' completed successfully")
+        return updated
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        log_handler.error(f"Unexpected error completing request '{request_id}': {e}")
+        raise HTTPException(status_code=500, detail="Internal server error while completing request")
 
 
 #Send notifications for a request (user confirmation)
