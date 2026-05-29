@@ -212,10 +212,10 @@ function VendorListPage() {
   return (
     <AuthenticatedLayout>
       <main className="mx-auto min-h-[calc(100vh-130px)] max-w-[1400px]">
-      <header className="flex items-center justify-between">
-        <div className="mb-8 pl-5">
-          <h1 className="underline-glow text-3xl font-semibold tracking-tight text-ranting-ice">Vendors List</h1>
-        </div>
+        <header className="flex items-center justify-between">
+          <div className="mb-8 pl-5">
+            <h1 className="underline-glow text-3xl font-semibold tracking-tight text-ranting-ice">Vendors List</h1>
+          </div>
         {isManagerOrOwner && (
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>

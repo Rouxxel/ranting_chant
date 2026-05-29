@@ -63,7 +63,7 @@ export function AuthenticatedLayout({ children }: { children: ReactNode }) {
               key={link.to}
               to={link.to}
               className="glossy-btn-ghost px-3 py-1.5 text-xs"
-              activeProps={{ className: "glossy-btn px-3 py-1.5 text-xs" }}
+              activeProps={{ className: "glossy-btn-ghost-active px-3 py-1.5 text-xs" }}
             >
               {link.label}
             </Link>
