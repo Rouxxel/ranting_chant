@@ -12,7 +12,7 @@ import { useApp } from "@/context/AppContext";
 import { requireTenantAuth } from "@/lib/auth";
 import { startConversation, sendMessage, transcribeAudio, respondToVoice, saveConversation, sendRequestNotifications } from "@/services/api";
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
-import type { ConversationMessage, Status, Urgency } from "@/types";
+import type { ConversationMessage, RequestType, Status, Urgency } from "@/types";
 
 export const Route = createFileRoute("/chat")({
   head: () => ({ meta: [{ title: "Chat — Ranting Chant" }] }),
@@ -32,6 +32,7 @@ function ChatPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [requestId, setRequestId] = useState<string | null>(null);
   const [status, setStatus] = useState<Status>("pending");
+  const [requestType, setRequestType] = useState<RequestType>("general");
   const [urgency, setUrgency] = useState<Urgency>("low");
   const [escalated, setEscalated] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
@@ -112,6 +113,7 @@ function ChatPage() {
         timestamp: new Date().toISOString()
       }]);
       setStatus(response.status);
+      setRequestType(response.type ?? "general");
       setUrgency(response.urgency);
       setEscalated(response.escalated);
     } catch (error) {
@@ -136,7 +138,7 @@ function ChatPage() {
         tenant_id: tenantId,
         conversation_history: messages,
         metadata: {
-          type: status === "pending" ? "general" : status,
+          type: requestType,
           description: messages.find(m => m.role === "tenant")?.message || "Conversation saved by user",
           urgency: urgency,
           escalated: escalated,
@@ -232,6 +234,7 @@ function ChatPage() {
 
       // Update status
       setStatus(voiceResponse.status);
+      setRequestType(voiceResponse.type ?? "general");
       setUrgency(voiceResponse.urgency);
       setEscalated(voiceResponse.escalated);
     } catch (error) {

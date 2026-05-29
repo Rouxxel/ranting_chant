@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
-import type { Status, Urgency } from "@/data/mockData";
+import { getRequestTypeLabel } from "@/types";
+import type { RequestType, Status, Urgency } from "@/types";
 
 const statusLabel: Record<Status, string> = {
   pending: "Pending",
@@ -35,6 +36,19 @@ export function UrgencyBadge({ urgency, className }: { urgency: Urgency; classNa
       )}
     >
       {urgency}
+    </span>
+  );
+}
+
+export function RequestTypeBadge({ type, className }: { type: RequestType | string; className?: string }) {
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center rounded-full border border-ranting-sky/25 bg-ranting-sky/10 px-2.5 py-0.5 text-[10px] font-semibold text-ranting-ice",
+        className
+      )}
+    >
+      {getRequestTypeLabel(type)}
     </span>
   );
 }

@@ -6,7 +6,8 @@ import { RequestDetailPanel } from "@/components/RequestDetailPanel";
 import { useApp } from "@/context/AppContext";
 import { requireManagerOrOwnerAuth } from "@/lib/auth";
 import { getRequests, updateRequest } from "@/services/api";
-import type { Request, Status, Urgency } from "@/types";
+import { getRequestTypeLabel, REQUEST_TYPES } from "@/types";
+import type { Request, RequestType, Status, Urgency } from "@/types";
 
 export const Route = createFileRoute("/management")({
   head: () => ({ meta: [{ title: "Management — Ranting Chant" }] }),
@@ -19,6 +20,7 @@ function ManagementPage() {
   const { currentManager } = useApp();
 
   const [rows, setRows] = useState<Request[]>([]);
+  const [typeF, setTypeF] = useState<RequestType | "all">("all");
   const [statusF, setStatusF] = useState<Status | "all">("all");
   const [urgencyF, setUrgencyF] = useState<Urgency | "all">("all");
   const [propertyF, setPropertyF] = useState<string>("all");
@@ -55,6 +57,7 @@ function ManagementPage() {
   const properties = useMemo(() => Array.from(new Set(rows.map((r) => r.property))), [rows]);
 
   const filtered = rows.filter((r) =>
+    (typeF === "all" || r.type === typeF) &&
     (statusF === "all" || r.status === statusF) &&
     (urgencyF === "all" || r.urgency === urgencyF) &&
     (propertyF === "all" || r.property === propertyF)
@@ -101,6 +104,9 @@ function ManagementPage() {
       {/* Filters */}
       <div className="glass-panel mb-4 flex flex-wrap items-center gap-3 px-4 py-3">
         <span className="text-xs uppercase tracking-wider text-ranting-muted">Filter</span>
+        <Select value={typeF} onChange={(v) => setTypeF(v as RequestType | "all")} options={[
+          ["all", "All types"], ...REQUEST_TYPES.map((type) => [type, getRequestTypeLabel(type)] as [string, string]),
+        ]} />
         <Select value={statusF} onChange={(v) => setStatusF(v as Status | "all")} options={[
           ["all", "All statuses"], ["pending", "Pending"], ["in_progress", "In Progress"], ["escalated", "Escalated"],
           ["pending_approval", "Pending Approval"], ["pending_review", "Pending Review"], ["resolved", "Resolved"],

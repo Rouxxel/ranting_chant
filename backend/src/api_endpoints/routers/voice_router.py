@@ -303,6 +303,7 @@ async def respond_to_voice_message(request: Request, body: VoiceRespondPayload):
             "reply_text": reply_text,
             "audio_base64": audio_base64,
             "status": updated_request.get("status"),
+            "type": updated_request.get("type"),
             "urgency": updated_request.get("urgency"),
             "escalated": is_escalated,
             "is_complete": parsed_response.get("is_complete")

@@ -28,6 +28,7 @@ from src.core_specs.configuration.config_loader import config_loader
 from src.mcp import tenant_mcp, property_mcp, vendor_mcp, request_mcp
 from src.ai.conversation_engine import ConversationEngine
 from src.ai.gemini_client import get_client
+from src.models.request import normalize_request_type
 
 """PYDANTIC MODELS-----------------------------------------------------------"""
 class ConversationStartPayload(BaseModel):
@@ -203,6 +204,7 @@ async def send_message(request: Request, body: ConversationMessagePayload):
                 "session_id": request_id_or_session_id,
                 "reply": parsed_response.get("reply"),
                 "status": parsed_response.get("status", "pending"),
+                "type": parsed_response.get("type", "general"),
                 "urgency": parsed_response.get("urgency", "low"),
                 "escalated": parsed_response.get("escalate", False),
                 "is_complete": parsed_response.get("is_complete", False),
@@ -276,6 +278,7 @@ async def send_message(request: Request, body: ConversationMessagePayload):
             "request_id": request_id,
             "reply": parsed_response.get("reply"),
             "status": updated_request.get("status"),
+            "type": updated_request.get("type"),
             "urgency": updated_request.get("urgency"),
             "escalated": updated_request.get("escalated"),
             "is_complete": parsed_response.get("is_complete")
@@ -334,7 +337,7 @@ async def save_conversation(request: Request, body: dict):
         now = datetime.now(timezone.utc).isoformat()
         request_data = {
             "requester_id": tenant_id,
-            "type": metadata.get("type", "general"),
+            "type": normalize_request_type(metadata.get("type")),
             "description": metadata.get("description", "Conversation saved by user"),
             "urgency": metadata.get("urgency", "low"),
             "involved_parties": [tenant_id],

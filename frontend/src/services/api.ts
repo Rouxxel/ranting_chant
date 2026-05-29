@@ -9,7 +9,9 @@ import type {
   Property,
   Vendor,
   Manager,
+  Owner,
   Request,
+  RequestType,
   RequestSummary,
   ConversationStartRequest,
   ConversationStartResponse,
@@ -255,7 +257,7 @@ export const saveConversation = async (data: {
   tenant_id: string;
   conversation_history: any[];
   metadata: {
-    type?: string;
+    type?: RequestType;
     description?: string;
     urgency?: string;
     escalated?: boolean;

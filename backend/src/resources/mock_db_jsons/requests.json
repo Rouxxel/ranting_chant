@@ -2,7 +2,7 @@
   {
     "id": "request_5abd5f11",
     "requester_id": "tenant_001",
-    "type": "access",
+    "type": "access_control",
     "description": "Conversation started",
     "status": "in_progress",
     "urgency": "medium",
@@ -47,7 +47,7 @@
   {
     "id": "request_5a64c091",
     "requester_id": "tenant_001",
-    "type": "access",
+    "type": "lockout",
     "description": "Conversation started",
     "status": "escalated",
     "urgency": "high",
@@ -114,7 +114,7 @@
   {
     "id": "request_6faa1922",
     "requester_id": "tenant_001",
-    "type": "general",
+    "type": "plumbing",
     "description": "I have a plumbing problem, i dont have pressure on my faucet",
     "status": "in_progress",
     "urgency": "medium",
@@ -212,11 +212,13 @@
   {
     "id": "request_1001",
     "requester_id": "tenant_003",
-    "type": "maintenance",
+    "type": "hvac",
     "description": "Heating system not working in apartment",
     "status": "in_progress",
     "urgency": "high",
-    "involved_parties": ["tenant_003"],
+    "involved_parties": [
+      "tenant_003"
+    ],
     "property": "Riverside Residences",
     "property_id": "property_002",
     "conversation_history": [
@@ -255,11 +257,13 @@
   {
     "id": "request_1002",
     "requester_id": "tenant_004",
-    "type": "complaint",
+    "type": "noise",
     "description": "Loud noise from neighboring unit at night",
     "status": "in_progress",
     "urgency": "medium",
-    "involved_parties": ["tenant_004"],
+    "involved_parties": [
+      "tenant_004"
+    ],
     "property": "Riverside Residences",
     "property_id": "property_002",
     "conversation_history": [
@@ -298,11 +302,13 @@
   {
     "id": "request_1003",
     "requester_id": "tenant_005",
-    "type": "billing",
+    "type": "rent_payment",
     "description": "Question about rent increase notice",
     "status": "in_progress",
     "urgency": "low",
-    "involved_parties": ["tenant_005"],
+    "involved_parties": [
+      "tenant_005"
+    ],
     "property": "Oak Heights",
     "property_id": "property_003",
     "conversation_history": [
@@ -336,11 +342,13 @@
   {
     "id": "request_1004",
     "requester_id": "tenant_005",
-    "type": "access",
+    "type": "lockout",
     "description": "Locked out of apartment after forgetting keys",
     "status": "escalated",
     "urgency": "high",
-    "involved_parties": ["tenant_005"],
+    "involved_parties": [
+      "tenant_005"
+    ],
     "property": "Oak Heights",
     "property_id": "property_003",
     "conversation_history": [
@@ -379,11 +387,13 @@
   {
     "id": "request_1005",
     "requester_id": "tenant_006",
-    "type": "maintenance",
+    "type": "plumbing",
     "description": "Water leak under kitchen sink",
     "status": "in_progress",
     "urgency": "high",
-    "involved_parties": ["tenant_006"],
+    "involved_parties": [
+      "tenant_006"
+    ],
     "property": "Greenfield Apartments",
     "property_id": "property_004",
     "conversation_history": [
@@ -417,11 +427,13 @@
   {
     "id": "request_1006",
     "requester_id": "tenant_007",
-    "type": "general",
+    "type": "electrical",
     "description": "No electricity in living room outlets",
     "status": "in_progress",
     "urgency": "high",
-    "involved_parties": ["tenant_007"],
+    "involved_parties": [
+      "tenant_007"
+    ],
     "property": "Greenfield Apartments",
     "property_id": "property_004",
     "conversation_history": [
@@ -455,11 +467,13 @@
   {
     "id": "request_1007",
     "requester_id": "tenant_008",
-    "type": "complaint",
+    "type": "pest_control",
     "description": "Suspected pest infestation in kitchen",
     "status": "in_progress",
     "urgency": "medium",
-    "involved_parties": ["tenant_008"],
+    "involved_parties": [
+      "tenant_008"
+    ],
     "property": "Greenfield Apartments",
     "property_id": "property_004",
     "conversation_history": [
@@ -493,11 +507,13 @@
   {
     "id": "request_1008",
     "requester_id": "tenant_010",
-    "type": "maintenance",
+    "type": "hvac",
     "description": "Air conditioning not cooling properly",
     "status": "in_progress",
     "urgency": "medium",
-    "involved_parties": ["tenant_010"],
+    "involved_parties": [
+      "tenant_010"
+    ],
     "property": "Sunrise Lofts",
     "property_id": "property_005",
     "conversation_history": [
@@ -531,11 +547,13 @@
   {
     "id": "request_1009",
     "requester_id": "tenant_003",
-    "type": "access",
+    "type": "access_control",
     "description": "Unable to access building after hours",
     "status": "in_progress",
     "urgency": "medium",
-    "involved_parties": ["tenant_003"],
+    "involved_parties": [
+      "tenant_003"
+    ],
     "property": "Riverside Residences",
     "property_id": "property_002",
     "conversation_history": [
@@ -569,11 +587,13 @@
   {
     "id": "request_1010",
     "requester_id": "tenant_010",
-    "type": "billing",
+    "type": "rent_payment",
     "description": "Question about utility charges on latest bill",
     "status": "in_progress",
     "urgency": "low",
-    "involved_parties": ["tenant_010"],
+    "involved_parties": [
+      "tenant_010"
+    ],
     "property": "Sunrise Lofts",
     "property_id": "property_005",
     "conversation_history": [
@@ -603,5 +623,104 @@
       }
     ],
     "summary": "Tenant is questioning increased utility charges on their latest bill."
+  },
+  {
+    "id": "request_01121d80",
+    "requester_id": "tenant_001",
+    "type": "emergency",
+    "description": "There is a burning smell and no power",
+    "status": "pending",
+    "urgency": "high",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "tenant",
+        "message": "There is a burning smell and no power"
+      },
+      {
+        "role": "ai",
+        "message": "This is an emergency! Please evacuate immediately.",
+        "timestamp": "2026-05-29T09:47:43.019331+00:00"
+      }
+    ],
+    "created_at": "2026-05-29T09:47:43.019331+00:00",
+    "updated_at": "2026-05-29T09:47:43.019331+00:00",
+    "escalated": true,
+    "sentiment": "angry",
+    "confidence": 0.98,
+    "vendor_id": null,
+    "notifications_sent": [],
+    "notification_pending": true,
+    "property_id": null,
+    "property": null,
+    "summary": null
+  },
+  {
+    "id": "request_b408868a",
+    "requester_id": "tenant_001",
+    "type": "emergency",
+    "description": "There is a burning smell and no power",
+    "status": "pending",
+    "urgency": "high",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "tenant",
+        "message": "There is a burning smell and no power"
+      },
+      {
+        "role": "ai",
+        "message": "This is an emergency! Please evacuate immediately.",
+        "timestamp": "2026-05-29T09:49:25.056113+00:00"
+      }
+    ],
+    "created_at": "2026-05-29T09:49:25.056113+00:00",
+    "updated_at": "2026-05-29T09:49:25.056113+00:00",
+    "escalated": true,
+    "sentiment": "angry",
+    "confidence": 0.98,
+    "vendor_id": null,
+    "notifications_sent": [],
+    "notification_pending": true,
+    "property_id": null,
+    "property": null,
+    "summary": null
+  },
+  {
+    "id": "request_96edcdbe",
+    "requester_id": "tenant_001",
+    "type": "access_control",
+    "description": "I lost my key",
+    "status": "pending",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "tenant",
+        "message": "I lost my key"
+      },
+      {
+        "role": "ai",
+        "message": "I have logged your key replacement request.",
+        "timestamp": "2026-05-29T09:49:25.080364+00:00"
+      }
+    ],
+    "created_at": "2026-05-29T09:49:25.080364+00:00",
+    "updated_at": "2026-05-29T09:49:25.080364+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 0.92,
+    "vendor_id": null,
+    "notifications_sent": [],
+    "notification_pending": true,
+    "property_id": null,
+    "property": null,
+    "summary": null
   }
 ]

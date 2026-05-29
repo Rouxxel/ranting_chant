@@ -1,4 +1,5 @@
 import { FileText, Clock, AlertTriangle, CheckCircle, User, Building2 } from 'lucide-react'
+import { getRequestTypeLabel } from '@/types'
 
 interface RequestSummaryProps {
   requestId: string
@@ -9,7 +10,7 @@ export function RequestSummary({ requestId, className = '' }: RequestSummaryProp
   // TODO: Wire to GET /requests/{request_id}/summary endpoint
   const summary = {
     id: requestId,
-    type: 'maintenance',
+    type: 'plumbing',
     description: 'Kitchen sink is leaking and causing water damage',
     status: 'in_progress',
     urgency: 'high',
@@ -59,7 +60,7 @@ export function RequestSummary({ requestId, className = '' }: RequestSummaryProp
         </div>
         <div className="glass-panel-strong p-4 rounded-lg">
           <p className="text-ranting-muted text-xs mb-1">Type</p>
-          <p className="text-ranting-ice text-sm capitalize">{summary.type}</p>
+          <p className="text-ranting-ice text-sm">{getRequestTypeLabel(summary.type)}</p>
         </div>
       </div>
 

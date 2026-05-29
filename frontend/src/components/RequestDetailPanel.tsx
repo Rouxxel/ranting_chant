@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { X, Mail, MessageCircle, Check } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
-import { StatusBadge, UrgencyBadge } from "@/components/Badges";
+import { RequestTypeBadge, StatusBadge, UrgencyBadge } from "@/components/Badges";
 import { getRequestSummary } from "@/services/api";
-import type { Request, RequestSummary } from "@/types";
+import { getRequestTypeLabel } from "@/types";
+import type { Request } from "@/types";
 
 interface RequestDetailPanelProps {
   req: Request;
@@ -54,8 +55,9 @@ export function RequestDetailPanel({ req, onClose, onApprove }: RequestDetailPan
         <header className="flex items-start justify-between border-b border-white/10 px-5 py-4">
           <div className="min-w-0">
             <div className="text-[11px] text-ranting-muted">{req.id}</div>
-            <h2 className="truncate text-lg font-semibold text-ranting-ice">{req.type}</h2>
+            <h2 className="truncate text-lg font-semibold text-ranting-ice">{getRequestTypeLabel(req.type)}</h2>
             <div className="mt-2 flex items-center gap-2">
+              <RequestTypeBadge type={req.type} />
               <StatusBadge status={req.status} />
               <UrgencyBadge urgency={req.urgency} />
             </div>

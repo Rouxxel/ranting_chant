@@ -20,6 +20,7 @@ import resend
 
 #Other files imports
 from src.utils.custom_logger import log_handler
+from src.models.request import get_request_type_label
 
 """VARIABLES-----------------------------------------------------------"""
 #Initialize Resend with API key from environment
@@ -58,10 +59,11 @@ def send_request_created(
     try:
         log_handler.debug(f"[email_service] Sending request_created email to '{manager_email}'")
 
+        request_type_label = get_request_type_label(request_type)
         html_body = f"""
         <h2>New Tenant Request — Ranting Chant</h2>
         <p><strong>Tenant:</strong> {tenant_name}</p>
-        <p><strong>Request Type:</strong> {request_type}</p>
+        <p><strong>Request Type:</strong> {request_type_label}</p>
         <p><strong>Summary:</strong> {summary}</p>
         <hr>
         <p style="color: #666; font-size: 12px;">This is an automated notification from Ranting Chant.</p>
@@ -70,7 +72,7 @@ def send_request_created(
         params = {
             "from": RESEND_FROM_EMAIL,
             "to": [manager_email],
-            "subject": f"New Request from {tenant_name} — {request_type}",
+            "subject": f"New Request from {tenant_name} - {request_type_label}",
             "html": html_body,
         }
 

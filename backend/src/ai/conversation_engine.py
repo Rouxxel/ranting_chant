@@ -25,6 +25,7 @@ from src.mcp import tenant_mcp, property_mcp, vendor_mcp, request_mcp
 from src.ai.gemini_client import get_client
 from src.ai.system_prompt import SYSTEM_PROMPT
 from src.core_specs.configuration.config_loader import config_loader
+from src.models.request import normalize_request_type
 
 
 """VARIABLES-----------------------------------------------------------"""
@@ -278,6 +279,7 @@ class ConversationEngine:
 
             parsed = json.loads(cleaned)
             log_handler.debug("Gemini response parsed successfully")
+            parsed["type"] = normalize_request_type(parsed.get("type"))
             return parsed
 
         except (json.JSONDecodeError, IndexError) as e:

@@ -29,12 +29,13 @@ from src.utils.json_store import (
     read_all, find_by_id, find_by_field, create_record, update_record
 )
 from src.ai.gemini_client import get_client
+from src.models.request import RequestType, normalize_request_type
 
 """PYDANTIC MODELS-----------------------------------------------------------"""
 class RequestCreatePayload(BaseModel):
     """Payload accepted when creating a new request directly."""
     requester_id: str = Field(..., description="ID of the tenant submitting the request")
-    type: str = Field(default="general", description="Category of the request")
+    type: RequestType = Field(default="general", description="Category of the request")
     description: str = Field(..., description="Human-readable description of the issue")
     urgency: str = Field(default="low", description="Urgency level: low / medium / high")
     involved_parties: list = Field(default_factory=list, description="IDs of parties involved")
@@ -45,7 +46,7 @@ class RequestUpdatePayload(BaseModel):
     """Payload accepted when updating an existing request."""
     status: Optional[str] = Field(None, description="New status value")
     urgency: Optional[str] = Field(None, description="New urgency level")
-    type: Optional[str] = Field(None, description="New request type")
+    type: Optional[RequestType] = Field(None, description="New request type")
     description: Optional[str] = Field(None, description="Updated description")
     escalated: Optional[bool] = Field(None, description="Escalation flag")
     sentiment: Optional[str] = Field(None, description="Sentiment classification")
@@ -328,7 +329,7 @@ async def create_request(request: Request, body: RequestCreatePayload):
         record = {
             "id": f"request_{uuid.uuid4().hex[:8]}",
             "requester_id": body.requester_id.strip(),
-            "type": body.type,
+            "type": normalize_request_type(body.type),
             "description": body.description.strip(),
             "status": "pending",
             "urgency": body.urgency,
@@ -403,6 +404,8 @@ async def update_request(request: Request, request_id: str, body: RequestUpdateP
 
         #Filter out None values from Pydantic model and stamp updated_at
         updates = body.model_dump(exclude_none=True)
+        if "type" in updates:
+            updates["type"] = normalize_request_type(updates["type"])
         updates["updated_at"] = datetime.now(timezone.utc).isoformat()
 
         updated = update_record("requests", request_id, updates)

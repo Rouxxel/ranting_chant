@@ -1,3 +1,5 @@
+import type { RequestType } from "@/types";
+
 export type Status = "pending" | "in_progress" | "escalated" | "resolved" | "pending_approval" | "pending_review";
 export type Urgency = "low" | "medium" | "high";
 
@@ -31,7 +33,7 @@ export interface Party {
 
 export interface RequestItem {
   id: string;
-  type: string;
+  type: RequestType;
   description: string;
   tenantId: string;
   tenantName: string;
@@ -69,7 +71,7 @@ const mkNotif = (items: Array<[NotificationEvent["channel"], string, string, str
 export const requests: RequestItem[] = [
   {
     id: "REQ-1001",
-    type: "Key Replacement",
+    type: "access_control",
     description: "Tenant lost apartment key, needs replacement.",
     tenantId: "tenant_001",
     tenantName: "John Carter",
@@ -95,7 +97,7 @@ export const requests: RequestItem[] = [
   },
   {
     id: "REQ-1002",
-    type: "Plumbing Issue",
+    type: "plumbing",
     description: "Leak under kitchen sink, slow drip.",
     tenantId: "tenant_003",
     tenantName: "David Kim",
@@ -120,7 +122,7 @@ export const requests: RequestItem[] = [
   },
   {
     id: "REQ-1003",
-    type: "Emergency Electrical",
+    type: "emergency",
     description: "Sparking outlet in bedroom — possible fire risk.",
     tenantId: "tenant_006",
     tenantName: "Sara Nguyen",
@@ -145,7 +147,7 @@ export const requests: RequestItem[] = [
   },
   {
     id: "REQ-1004",
-    type: "HVAC Repair",
+    type: "hvac",
     description: "AC unit not cooling, blowing warm air.",
     tenantId: "tenant_009",
     tenantName: "Tom Becker",
@@ -168,7 +170,7 @@ export const requests: RequestItem[] = [
   },
   {
     id: "REQ-1005",
-    type: "Lease Extension",
+    type: "lease_question",
     description: "Request to extend lease by 6 months.",
     tenantId: "tenant_002",
     tenantName: "Maria Lopez",
@@ -191,7 +193,7 @@ export const requests: RequestItem[] = [
   },
   {
     id: "REQ-1006",
-    type: "Lockout Assistance",
+    type: "lockout",
     description: "Locked out, needs immediate entry.",
     tenantId: "tenant_008",
     tenantName: "Elena Rossi",
@@ -214,7 +216,7 @@ export const requests: RequestItem[] = [
   },
   {
     id: "REQ-1007",
-    type: "Appliance Repair",
+    type: "appliance",
     description: "Dishwasher won't drain.",
     tenantId: "tenant_004",
     tenantName: "Aisha Patel",
@@ -237,7 +239,7 @@ export const requests: RequestItem[] = [
   },
   {
     id: "REQ-1008",
-    type: "Pest Control",
+    type: "pest_control",
     description: "Reports of ants in kitchen.",
     tenantId: "tenant_005",
     tenantName: "Liam O'Brien",
@@ -260,7 +262,7 @@ export const requests: RequestItem[] = [
   },
   {
     id: "REQ-1009",
-    type: "Door Repair",
+    type: "access_control",
     description: "Front door handle is loose.",
     tenantId: "tenant_007",
     tenantName: "Marcus Reed",
@@ -283,7 +285,7 @@ export const requests: RequestItem[] = [
   },
   {
     id: "REQ-1010",
-    type: "Noise Complaint",
+    type: "noise",
     description: "Loud music from upstairs neighbor at night.",
     tenantId: "tenant_001",
     tenantName: "John Carter",
@@ -306,7 +308,7 @@ export const requests: RequestItem[] = [
   },
   {
     id: "REQ-1011",
-    type: "Security Concern",
+    type: "emergency",
     description: "Stranger seen attempting to enter building.",
     tenantId: "tenant_010",
     tenantName: "Priya Shah",

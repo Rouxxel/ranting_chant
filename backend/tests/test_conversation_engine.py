@@ -78,7 +78,7 @@ class TestConversationEngine(unittest.TestCase):
         mock_get_client.return_value = _make_gemini_client({
             "reply": "I have logged your key replacement request.",
             "is_complete": True,
-            "type": "access",
+            "type": "access_control",
             "urgency": "low",
             "sentiment": "neutral",
             "confidence": 0.92,

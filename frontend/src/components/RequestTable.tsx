@@ -1,7 +1,7 @@
 import { Check, ArrowUpDown } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Avatar } from "@/components/Avatar";
-import { StatusBadge, UrgencyBadge } from "@/components/Badges";
+import { RequestTypeBadge, StatusBadge, UrgencyBadge } from "@/components/Badges";
 import type { Request } from "@/types";
 
 interface RequestTableProps {
@@ -25,7 +25,7 @@ export function RequestTable({ requests, onRowClick, onApprove }: RequestTablePr
               r.status === "escalated" ? "left-glow-escalated" : r.urgency === "high" ? "left-glow-high" : ""
             }`}
           >
-            <div className="font-medium text-ranting-ice">{r.type}</div>
+            <div><RequestTypeBadge type={r.type} /></div>
             <div className="flex items-center gap-2 text-ranting-ice/85">
               <Avatar name={r.tenant_name || "Tenant"} size={22} glow={false} />
               <span className="truncate">{r.tenant_name || "Tenant"}</span>

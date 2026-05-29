@@ -5,6 +5,41 @@
 
 export type Status = "pending" | "in_progress" | "escalated" | "resolved" | "pending_approval" | "pending_review";
 export type Urgency = "low" | "medium" | "high";
+export const REQUEST_TYPES = [
+  "plumbing",
+  "electrical",
+  "hvac",
+  "appliance",
+  "pest_control",
+  "lockout",
+  "access_control",
+  "noise",
+  "lease_question",
+  "rent_payment",
+  "emergency",
+  "general",
+] as const;
+
+export type RequestType = (typeof REQUEST_TYPES)[number];
+
+export const requestTypeLabels: Record<RequestType, string> = {
+  plumbing: "Plumbing",
+  electrical: "Electrical",
+  hvac: "HVAC",
+  appliance: "Appliance",
+  pest_control: "Pest Control",
+  lockout: "Lockout",
+  access_control: "Access Control",
+  noise: "Noise",
+  lease_question: "Lease Question",
+  rent_payment: "Rent Payment",
+  emergency: "Emergency",
+  general: "General",
+};
+
+export function getRequestTypeLabel(type: RequestType | string) {
+  return requestTypeLabels[type as RequestType] ?? type.replace(/_/g, " ");
+}
 
 // ==================== Tenant ====================
 
@@ -97,7 +132,7 @@ export interface NotificationEvent {
 
 export interface Request {
   id: string;
-  type: string;
+  type: RequestType;
   description: string;
   requester_id: string;
   tenant_name?: string;
@@ -143,6 +178,7 @@ export interface ConversationMessageResponse {
   request_id: string;
   reply: string;
   status: Status;
+  type?: RequestType;
   urgency: Urgency;
   escalated: boolean;
   is_complete: boolean;
@@ -192,6 +228,7 @@ export interface VoiceRespondResponse {
   reply_text: string;
   audio_base64: string;
   status: Status;
+  type?: RequestType;
   urgency: Urgency;
   escalated: boolean;
   is_complete: boolean;
@@ -225,7 +262,7 @@ export interface ApiError {
 
 export interface RequestSummary {
   id: string;
-  type: string;
+  type: RequestType;
   description: string;
   status: Status;
   urgency: Urgency;

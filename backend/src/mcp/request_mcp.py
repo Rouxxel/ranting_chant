@@ -21,6 +21,7 @@ from src.utils.custom_logger import log_handler
 from src.utils.json_store import (
     find_by_id, find_by_field, read_all, create_record, update_record
 )
+from src.models.request import normalize_request_type
 
 """TOOLS-----------------------------------------------------------"""
 def create_request(data: dict) -> dict:
@@ -44,7 +45,7 @@ def create_request(data: dict) -> dict:
     record = {
         "id": f"request_{uuid.uuid4().hex[:8]}",
         "requester_id": data.get("requester_id", ""),
-        "type": data.get("type", "general"),
+        "type": normalize_request_type(data.get("type")),
         "description": data.get("description", ""),
         "status": "pending",
         "urgency": data.get("urgency", "low"),
@@ -107,6 +108,9 @@ def update_request(request_id: str, updates: dict) -> dict:
     current_status = req.get("status", "pending")
     new_status = updates.get("status", current_status)
 
+    if "type" in updates:
+        updates["type"] = normalize_request_type(updates.get("type"))
+
     # Apply state transitions
     if current_status == "pending":
         # Transition to in_progress on the first update / AI reply
@@ -121,7 +125,7 @@ def update_request(request_id: str, updates: dict) -> dict:
             new_status = "escalated"
             updates["escalated"] = True
         elif is_complete:
-            if req_type == "rental_agreement":
+            if req_type == "lease_question":
                 new_status = "pending_approval"
             else:
                 new_status = "resolved"

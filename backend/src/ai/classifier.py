@@ -22,27 +22,36 @@ from google.genai import types
 from src.utils.custom_logger import log_handler
 from src.ai.gemini_client import get_client
 from src.core_specs.configuration.config_loader import config_loader
+from src.models.request import REQUEST_TYPE_DESCRIPTIONS, normalize_request_type
 
 
 """VARIABLES-----------------------------------------------------------"""
 #Gemini model to use for classification
 GEMINI_MODEL = config_loader["llm_model"]["default_model"]
+REQUEST_TYPE_PROMPT = "\n".join(
+    f"- {name}: {description}"
+    for name, description in REQUEST_TYPE_DESCRIPTIONS.items()
+)
+REQUEST_TYPE_VALUES = ", ".join(REQUEST_TYPE_DESCRIPTIONS.keys())
 
 #Classification-only system prompt
-CLASSIFICATION_PROMPT = """
+CLASSIFICATION_PROMPT = f"""
 You are a request classification engine for a property management system.
 Given a conversation history between a tenant and an AI assistant, classify the request.
 
+Supported request types:
+{REQUEST_TYPE_PROMPT}
+
 Respond with ONLY a valid JSON object containing these fields:
-{
-  "type": "<one of: maintenance, access, rental_agreement, emergency, general>",
+{{
+  "type": "<one of: {REQUEST_TYPE_VALUES}>",
   "urgency": "<one of: low, medium, high>",
   "sentiment": "<one of: neutral, calm, frustrated, angry>",
   "escalate": <true or false>,
   "confidence": <float between 0.0 and 1.0>,
   "vendor_service_needed": "<service category string or null>",
   "involved_party_types": ["<manager|owner|vendor>"]
-}
+}}
 No markdown, no extra text. JSON only.
 """
 
@@ -122,6 +131,7 @@ def _parse_classification(raw: str) -> dict:
         cleaned = cleaned.strip()
 
         parsed = json.loads(cleaned)
+        parsed["type"] = normalize_request_type(parsed.get("type"))
         log_handler.debug("Classification parsed successfully")
         return parsed
 

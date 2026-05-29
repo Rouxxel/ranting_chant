@@ -1,6 +1,7 @@
 import { ChevronDown } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
-import { StatusBadge, UrgencyBadge } from "@/components/Badges";
+import { RequestTypeBadge, StatusBadge, UrgencyBadge } from "@/components/Badges";
+import { getRequestTypeLabel } from "@/types";
 import type { Request } from "@/types";
 
 interface RequestCardProps {
@@ -18,7 +19,8 @@ export function RequestCard({ req, open, onToggle, tenantName = "Tenant" }: Requ
       <button onClick={onToggle} className="flex w-full items-start gap-4 p-5 text-left">
         <div className="flex-1">
           <div className="mb-1 flex items-center gap-2 flex-wrap">
-            <h2 className="text-lg font-semibold text-ranting-ice">{req.type}</h2>
+            <h2 className="text-lg font-semibold text-ranting-ice">{getRequestTypeLabel(req.type)}</h2>
+            <RequestTypeBadge type={req.type} />
             <StatusBadge status={req.status} />
             <UrgencyBadge urgency={req.urgency} />
           </div>
