@@ -20,6 +20,8 @@ import type {
   ConversationHistoryResponse,
   VoiceTranscribeRequest,
   VoiceTranscribeResponse,
+  VoiceProviderId,
+  VoiceProvidersResponse,
   VoiceStartRequest,
   VoiceStartResponse,
   VoiceRespondRequest,
@@ -278,9 +280,17 @@ export const sendRequestNotifications = async (requestId: string): Promise<Reque
 
 // ==================== Voice ====================
 
-export const transcribeAudio = async (audioFile: File): Promise<VoiceTranscribeResponse> => {
+export const getVoiceProviders = async (): Promise<VoiceProvidersResponse> => {
+  const response = await apiClient.get<VoiceProvidersResponse>('/voice/providers');
+  return response.data;
+};
+
+export const transcribeAudio = async (audioFile: File, provider?: VoiceProviderId): Promise<VoiceTranscribeResponse> => {
   const formData = new FormData();
   formData.append('audio', audioFile);
+  if (provider) {
+    formData.append('provider', provider);
+  }
   
   const response = await apiClient.post<VoiceTranscribeResponse>('/voice/transcribe', formData, {
     headers: {

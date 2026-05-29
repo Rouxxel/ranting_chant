@@ -21,7 +21,7 @@ export const Route = createFileRoute("/chat")({
 });
 
 function ChatPage() {
-  const { currentTenant } = useApp();
+  const { currentTenant, voiceProvider, voiceProviders, setVoiceProvider } = useApp();
   const name = currentTenant?.name ?? "John Carter";
   const unit = currentTenant?.unit ?? "3B";
   const tenantId = currentTenant?.id ?? "tenant_001";
@@ -204,7 +204,7 @@ function ChatPage() {
       const audioFile = new File([audioBlob], "recording.webm", { type: audioBlob.type });
 
       // Transcribe audio
-      const transcribeResponse = await transcribeAudio(audioFile);
+      const transcribeResponse = await transcribeAudio(audioFile, voiceProvider);
       const transcript = transcribeResponse.transcript;
 
       // Add transcript as tenant message
@@ -215,7 +215,8 @@ function ChatPage() {
       const voiceResponse = await respondToVoice({
         request_id: requestId,
         tenant_id: tenantId,
-        transcript
+        transcript,
+        provider: voiceProvider
       });
 
       // Add AI response
@@ -335,6 +336,9 @@ function ChatPage() {
           onChange={setInput}
           onSend={send}
           onVoiceToggle={handleVoiceToggle}
+          voiceProvider={voiceProvider}
+          voiceProviders={voiceProviders}
+          onVoiceProviderChange={setVoiceProvider}
           isRecording={isRecording}
           isTyping={typing}
         />

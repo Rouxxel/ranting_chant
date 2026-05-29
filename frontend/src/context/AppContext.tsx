@@ -2,15 +2,20 @@
 // Based on TASKS.md Phase 8.8
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import type { Tenant, Manager, Owner } from '../types';
+import { getVoiceProviders } from '../services/api';
+import type { Tenant, Manager, Owner, VoiceProviderCapability, VoiceProviderId } from '../types';
 
 interface AppContextType {
   currentTenant: Tenant | null;
   currentManager: Manager | Owner | null;
   userRole: 'tenant' | 'manager' | 'owner' | null;
+  voiceProvider: VoiceProviderId;
+  voiceProviders: VoiceProviderCapability[];
   setCurrentTenant: (tenant: Tenant | null) => void;
   setCurrentManager: (manager: Manager | Owner | null) => void;
   setUserRole: (role: 'tenant' | 'manager' | 'owner' | null) => void;
+  setVoiceProvider: (provider: VoiceProviderId) => void;
+  refreshVoiceProviders: () => Promise<void>;
   clearUser: () => void;
 }
 
@@ -20,12 +25,32 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [currentTenant, setCurrentTenant] = useState<Tenant | null>(null);
   const [currentManager, setCurrentManager] = useState<Manager | Owner | null>(null);
   const [userRole, setUserRole] = useState<'tenant' | 'manager' | 'owner' | null>(null);
+  const [voiceProvider, setVoiceProvider] = useState<VoiceProviderId>('elevenlabs');
+  const [voiceProviders, setVoiceProviders] = useState<VoiceProviderCapability[]>([]);
+
+  const refreshVoiceProviders = async () => {
+    try {
+      const response = await getVoiceProviders();
+      const enabledProviders = response.providers.filter((provider) => provider.enabled);
+      const savedProvider = localStorage.getItem('voice_provider') as VoiceProviderId | null;
+      const selectedProvider = enabledProviders.find((provider) => provider.id === savedProvider)
+        ? savedProvider
+        : enabledProviders[0]?.id ?? response.default_provider;
+
+      setVoiceProviders(response.providers);
+      setVoiceProvider(selectedProvider);
+    } catch (error) {
+      console.error('Failed to load voice providers:', error);
+      setVoiceProvider('elevenlabs');
+    }
+  };
 
   // Load user data from localStorage on mount
   useEffect(() => {
     const savedTenant = localStorage.getItem('current_tenant');
     const savedManager = localStorage.getItem('current_manager');
     const savedRole = localStorage.getItem('user_role');
+    const savedVoiceProvider = localStorage.getItem('voice_provider') as VoiceProviderId | null;
 
     if (savedTenant) {
       setCurrentTenant(JSON.parse(savedTenant));
@@ -36,6 +61,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (savedRole) {
       setUserRole(savedRole as 'tenant' | 'manager' | 'owner');
     }
+    if (savedVoiceProvider) {
+      setVoiceProvider(savedVoiceProvider);
+    }
+
+    refreshVoiceProviders();
   }, []);
 
   // Save user data to localStorage when it changes
@@ -63,6 +93,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [userRole]);
 
+  useEffect(() => {
+    localStorage.setItem('voice_provider', voiceProvider);
+  }, [voiceProvider]);
+
   const clearUser = () => {
     setCurrentTenant(null);
     setCurrentManager(null);
@@ -78,9 +112,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
         currentTenant,
         currentManager,
         userRole,
+        voiceProvider,
+        voiceProviders,
         setCurrentTenant,
         setCurrentManager,
         setUserRole,
+        setVoiceProvider,
+        refreshVoiceProviders,
         clearUser
       }}
     >
