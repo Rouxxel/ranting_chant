@@ -21,6 +21,8 @@ function getNavLinks(role: AppRole) {
   if (role === "tenant") {
     return [
       { to: "/chat", label: "Chat" },
+      { to: "/dashboard", label: "Dashboard" },
+      { to: "/profile", label: "Profile" },
       { to: "/vendors", label: "Vendors" },
     ] as const;
   }
