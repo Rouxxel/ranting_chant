@@ -13,6 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import type { Property, PropertyCreateRequest, PropertyUpdateRequest } from "@/types";
+import { getPropertyTypeLabel } from "@/types";
 
 export function ManagementProperties() {
   const { currentManager } = useApp();
@@ -185,7 +186,7 @@ export function ManagementProperties() {
                 >
                   <td className="px-4 py-3 text-sm text-ranting-ice">{property.name}</td>
                   <td className="px-4 py-3 text-sm text-ranting-muted">{property.address}</td>
-                  <td className="px-4 py-3 text-sm text-ranting-muted">{property.property_type || "-"}</td>
+                  <td className="px-4 py-3 text-sm text-ranting-muted">{property.property_type ? getPropertyTypeLabel(property.property_type) : "-"}</td>
                   <td className="px-4 py-3 text-sm text-ranting-muted">{property.unit_count || "-"}</td>
                 </tr>
               ))}
@@ -196,6 +197,7 @@ export function ManagementProperties() {
 
       {selected && (
         <div className="glass-panel mt-4 p-6">
+          <label className="block text-xs uppercase tracking-wider text-ranting-muted mb-1">Property Name</label>
           <div className="mb-4 flex items-center justify-between">
             <h3 className="text-lg font-semibold text-ranting-ice">{selected.name}</h3>
             <div className="flex gap-2">
@@ -213,7 +215,7 @@ export function ManagementProperties() {
           </div>
           <div className="space-y-2 text-sm">
             <div><span className="text-ranting-muted">Address:</span> {selected.address}</div>
-            <div><span className="text-ranting-muted">Type:</span> {selected.property_type || "-"}</div>
+            <div><span className="text-ranting-muted">Type:</span> {selected.property_type ? getPropertyTypeLabel(selected.property_type) : "-"}</div>
             <div><span className="text-ranting-muted">Units:</span> {selected.unit_count || "-"}</div>
             <div><span className="text-ranting-muted">Year Built:</span> {selected.year_built || "-"}</div>
           </div>

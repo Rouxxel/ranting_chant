@@ -39,12 +39,21 @@ export function ManagementProfile() {
       </div>
 
       <div className="glass-panel p-6">
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold text-ranting-ice">{displayName}</h3>
-          <p className="text-sm text-ranting-muted">{isOwner ? "Owner" : "Manager"}</p>
-        </div>
-
         <div className="space-y-4">
+          <div>
+          <label className="block text-xs uppercase tracking-wider text-ranting-muted mb-1">{isOwner ? "Owner" : "Manager"}</label>
+            {isEditing ? (
+              <input
+                type="text"
+                defaultValue={displayName}
+                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                className="aero-input w-full px-3 py-2 text-sm"
+              />
+            ) : (
+              <div className="text-sm text-ranting-ice">{displayName}</div>
+            )}
+          </div>
+
           <div>
             <label className="block text-xs uppercase tracking-wider text-ranting-muted mb-1">Email</label>
             {isEditing ? (

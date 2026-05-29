@@ -103,9 +103,6 @@ export function ManagementTenants() {
   const openEditDialog = () => {
     if (!selected) return;
     setEditForm({
-      name: selected.name,
-      email: selected.email,
-      phone: selected.phone,
       unit: selected.unit,
       property_id: selected.property_id,
     });
@@ -238,7 +235,7 @@ export function ManagementTenants() {
                 >
                   <td className="px-4 py-3 text-sm text-ranting-ice">{tenant.name}</td>
                   <td className="px-4 py-3 text-sm text-ranting-muted">{tenant.unit}</td>
-                  <td className="px-4 py-3 text-sm text-ranting-muted">{tenant.property}</td>
+                  <td className="px-4 py-3 text-sm text-ranting-muted">{tenant.property_id ? properties.find(p => p.id === tenant.property_id)?.name || "-" : "-"}</td>
                   <td className="px-4 py-3 text-sm text-ranting-muted">{tenant.email || "-"}</td>
                   <td className="px-4 py-3 text-sm text-ranting-muted">{tenant.phone || "-"}</td>
                 </tr>
@@ -250,6 +247,7 @@ export function ManagementTenants() {
 
       {selected && (
         <div className="glass-panel mt-4 p-6">
+          <label className="block text-xs uppercase tracking-wider text-ranting-muted mb-1">Tenant's Name</label>
           <div className="mb-4 flex items-center justify-between">
             <h3 className="text-lg font-semibold text-ranting-ice">{selected.name}</h3>
             <div className="flex gap-2">
@@ -263,18 +261,11 @@ export function ManagementTenants() {
               >
                 Delete
               </Button>
-              <Button
-                onClick={() => setSelected(null)}
-                variant="ghost"
-                className="glossy-btn-ghost px-3 py-1.5 text-xs"
-              >
-                Close
-              </Button>
             </div>
           </div>
           <div className="space-y-2 text-sm">
             <div><span className="text-ranting-muted">Unit:</span> {selected.unit}</div>
-            <div><span className="text-ranting-muted">Property:</span> {selected.property}</div>
+            <div><span className="text-ranting-muted">Property:</span> {selected.property_id ? properties.find(p => p.id === selected.property_id)?.name || "-" : "-"}</div>
             <div><span className="text-ranting-muted">Email:</span> {selected.email || "-"}</div>
             <div><span className="text-ranting-muted">Phone:</span> {selected.phone || "-"}</div>
           </div>
@@ -287,15 +278,6 @@ export function ManagementTenants() {
             <DialogTitle>Edit Tenant</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleUpdate} className="space-y-4">
-            <div>
-              <Label htmlFor="edit-name">Name</Label>
-              <Input
-                id="edit-name"
-                value={editForm.name || ""}
-                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                className="aero-input"
-              />
-            </div>
             <div>
               <Label htmlFor="edit-unit">Unit</Label>
               <Input
@@ -321,26 +303,6 @@ export function ManagementTenants() {
                   </option>
                 ))}
               </select>
-            </div>
-            <div>
-              <Label htmlFor="edit-email">Email</Label>
-              <Input
-                id="edit-email"
-                type="email"
-                value={editForm.email || ""}
-                onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                className="aero-input"
-              />
-            </div>
-            <div>
-              <Label htmlFor="edit-phone">Phone</Label>
-              <Input
-                id="edit-phone"
-                type="tel"
-                value={editForm.phone || ""}
-                onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
-                className="aero-input"
-              />
             </div>
             <DialogFooter>
               <Button type="button" variant="ghost" onClick={() => setIsEditDialogOpen(false)} className="glossy-btn-ghost">
