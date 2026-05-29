@@ -85,12 +85,6 @@ function ManagementPage() {
       <main className="mx-auto min-h-[calc(100vh-130px)] max-w-[1400px]">
       <div className="mb-5 flex items-center justify-between">
         <h1 className="underline-glow text-3xl font-semibold tracking-tight text-ranting-ice">Management</h1>
-        <button
-          onClick={() => navigate({ to: "/vendors" })}
-          className="glossy-btn-ghost px-4 py-2 text-xs"
-        >
-          Vendor List
-        </button>
       </div>
 
       {/* Stats */}
