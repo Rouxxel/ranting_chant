@@ -10,13 +10,13 @@ import { requireTenantAuth } from "@/lib/auth";
 import { getRequests, cancelRequest } from "@/services/api";
 import type { Request } from "@/types";
 
-export const Route = createFileRoute("/dashboard")({
+export const Route = createFileRoute("/requests")({
   head: () => ({ meta: [{ title: "My Requests — Ranting Chant" }] }),
   beforeLoad: () => requireTenantAuth(),
-  component: DashboardPage,
+  component: RequestsPage,
 });
 
-function DashboardPage() {
+function RequestsPage() {
   const { currentTenant } = useApp();
   const tenantId = currentTenant?.id ?? "tenant_001";
   const [requests, setRequests] = useState<Request[]>([]);
@@ -68,15 +68,15 @@ function DashboardPage() {
 
   return (
     <AuthenticatedLayout>
-      <main className="mx-auto min-h-[calc(100vh-130px)] max-w-[960px] py-3">
-      <header className="mb-8 flex items-end justify-between">
-        <div>
-          <h1 className="underline-glow text-3xl font-semibold tracking-tight text-ranting-ice">Request List</h1>
-        </div>
-        <Link to="/chat" className="glossy-btn inline-flex items-center gap-2 px-4 py-2.5 text-sm">
-          <Plus className="h-4 w-4" /> New Request
-        </Link>
-      </header>
+      <main className="mx-auto min-h-[calc(100vh-130px)] max-w-[1400px]">
+        <header className="flex items-center justify-between">
+          <div className="mb-8 pl-5">
+            <h1 className="underline-glow text-3xl font-semibold tracking-tight text-ranting-ice">Request List</h1>
+          </div>
+          <Link to="/chat" className="glossy-btn inline-flex items-center gap-2 px-4 py-2.5 text-sm">
+            <Plus className="h-4 w-4" /> New Request
+          </Link>
+        </header>
 
       {isLoading ? (
         <div className="space-y-4">
@@ -115,5 +115,3 @@ function DashboardPage() {
     </AuthenticatedLayout>
   );
 }
-
-

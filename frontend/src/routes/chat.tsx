@@ -316,7 +316,7 @@ function ChatPage() {
             <Send className="h-4 w-4" />
             Send Notifications
           </button>
-          <Link to="/dashboard" className="glossy-btn-ghost flex items-center justify-center gap-2 px-3 py-2 text-sm">
+          <Link to="/requests" className="glossy-btn-ghost flex items-center justify-center gap-2 px-3 py-2 text-sm">
             <MessageSquareText className="h-4 w-4" /> View My Requests
           </Link>
         </div>

@@ -11,7 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ManagementRouteImport } from './routes/management'
 import { Route as VendorsRouteImport } from './routes/vendors'
-import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as RequestsRouteImport } from './routes/requests'
 import { Route as ChatRouteImport } from './routes/chat'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProfileRouteImport } from './routes/profile'
@@ -35,9 +35,9 @@ const VendorsRoute = VendorsRouteImport.update({
   path: '/vendors',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
+const RequestsRoute = RequestsRouteImport.update({
+  id: '/requests',
+  path: '/requests',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChatRoute = ChatRouteImport.update({
@@ -59,42 +59,42 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/chat': typeof ChatRoute
-  '/dashboard': typeof DashboardRoute
   '/management': typeof ManagementRoute
   '/profile': typeof ProfileRoute
+  '/requests': typeof RequestsRoute
   '/vendors': typeof VendorsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/chat': typeof ChatRoute
-  '/dashboard': typeof DashboardRoute
   '/management': typeof ManagementRoute
   '/profile': typeof ProfileRoute
+  '/requests': typeof RequestsRoute
   '/vendors': typeof VendorsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/chat': typeof ChatRoute
-  '/dashboard': typeof DashboardRoute
   '/management': typeof ManagementRoute
   '/profile': typeof ProfileRoute
+  '/requests': typeof RequestsRoute
   '/vendors': typeof VendorsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/chat' | '/dashboard' | '/management' | '/profile' | '/vendors'
+  fullPaths: '/' | '/chat' | '/management' | '/profile' | '/requests' | '/vendors'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/chat' | '/dashboard' | '/management' | '/profile' | '/vendors'
-  id: '__root__' | '/' | '/chat' | '/dashboard' | '/management' | '/profile' | '/vendors'
+  to: '/' | '/chat' | '/management' | '/profile' | '/requests' | '/vendors'
+  id: '__root__' | '/' | '/chat' | '/management' | '/profile' | '/requests' | '/vendors'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ChatRoute: typeof ChatRoute
-  DashboardRoute: typeof DashboardRoute
   ManagementRoute: typeof ManagementRoute
   ProfileRoute: typeof ProfileRoute
+  RequestsRoute: typeof RequestsRoute
   VendorsRoute: typeof VendorsRoute
 }
 
@@ -105,6 +105,13 @@ declare module '@tanstack/react-router' {
       path: '/vendors'
       fullPath: '/vendors'
       preLoaderRoute: typeof VendorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/requests': {
+      id: '/requests'
+      path: '/requests'
+      fullPath: '/requests'
+      preLoaderRoute: typeof RequestsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -119,13 +126,6 @@ declare module '@tanstack/react-router' {
       path: '/management'
       fullPath: '/management'
       preLoaderRoute: typeof ManagementRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/chat': {
@@ -148,9 +148,9 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ChatRoute: ChatRoute,
-  DashboardRoute: DashboardRoute,
   ManagementRoute: ManagementRoute,
   ProfileRoute: ProfileRoute,
+  RequestsRoute: RequestsRoute,
   VendorsRoute: VendorsRoute,
 }
 export const routeTree = rootRouteImport
