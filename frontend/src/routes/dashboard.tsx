@@ -71,7 +71,7 @@ function DashboardPage() {
       <main className="mx-auto min-h-[calc(100vh-130px)] max-w-[960px] py-3">
       <header className="mb-8 flex items-end justify-between">
         <div>
-          <h1 className="underline-glow text-3xl font-semibold tracking-tight text-ranting-ice">My Requests</h1>
+          <h1 className="underline-glow text-3xl font-semibold tracking-tight text-ranting-ice">Request List</h1>
         </div>
         <Link to="/chat" className="glossy-btn inline-flex items-center gap-2 px-4 py-2.5 text-sm">
           <Plus className="h-4 w-4" /> New Request

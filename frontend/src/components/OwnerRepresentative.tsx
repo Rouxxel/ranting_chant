@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 import { useApp } from "@/context/AppContext";
-import { getProperties, getManagers } from "@/services/api";
-import type { Property, Manager } from "@/types";
+import { getProperties, getOwners } from "@/services/api";
+import type { Property, Owner } from "@/types";
 
-export function PropertyRepresentative() {
+export function OwnerRepresentative() {
   const { currentTenant } = useApp();
   const [property, setProperty] = useState<Property | null>(null);
-  const [manager, setManager] = useState<Manager | null>(null);
+  const [owner, setOwner] = useState<Owner | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const loadManager = async () => {
+    const loadOwner = async () => {
       if (!currentTenant?.property_id) {
         setIsLoading(false);
         return;
@@ -22,43 +22,43 @@ export function PropertyRepresentative() {
         const tenantProperty = properties.find(p => p.id === currentTenant.property_id);
         setProperty(tenantProperty || null);
 
-        if (!tenantProperty?.manager_id) {
+        if (!tenantProperty?.owner_id) {
           setIsLoading(false);
           return;
         }
 
-        // Load the manager
-        const managers = await getManagers();
-        const propertyManager = managers.find(m => m.id === tenantProperty.manager_id);
-        setManager(propertyManager || null);
+        // Load the owner
+        const owners = await getOwners();
+        const propertyOwner = owners.find(o => o.id === tenantProperty.owner_id);
+        setOwner(propertyOwner || null);
       } catch (error) {
-        console.error("Failed to load property manager:", error);
+        console.error("Failed to load property owner:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadManager();
+    loadOwner();
   }, [currentTenant]);
 
   if (isLoading) {
     return (
       <div className="glass-panel p-6">
         <div className="mb-4">
-          <h3 className="text-lg font-semibold text-ranting-ice">Property Manager</h3>
+          <h3 className="text-lg font-semibold text-ranting-ice">Property Owner</h3>
         </div>
         <div className="text-sm text-ranting-muted">Loading...</div>
       </div>
     );
   }
 
-  if (!manager) {
+  if (!owner) {
     return (
       <div className="glass-panel p-6">
         <div className="mb-4">
-          <h3 className="text-lg font-semibold text-ranting-ice">Property Manager</h3>
+          <h3 className="text-lg font-semibold text-ranting-ice">Property Owner</h3>
         </div>
-        <div className="text-sm text-ranting-muted">No property manager assigned to this property.</div>
+        <div className="text-sm text-ranting-muted">No property owner information available.</div>
       </div>
     );
   }
@@ -66,23 +66,23 @@ export function PropertyRepresentative() {
   return (
     <div className="glass-panel p-6">
       <div className="mb-4">
-        <h3 className="text-lg font-semibold text-ranting-ice">Property Manager</h3>
+        <h3 className="text-lg font-semibold text-ranting-ice">Property Owner</h3>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
           <div className="text-xs uppercase tracking-wider text-ranting-muted mb-1">Name</div>
-          <div className="text-sm text-ranting-ice">{manager.name}</div>
+          <div className="text-sm text-ranting-ice">{owner.name}</div>
         </div>
 
         <div>
           <div className="text-xs uppercase tracking-wider text-ranting-muted mb-1">Email</div>
-          <div className="text-sm text-ranting-ice">{manager.email || "-"}</div>
+          <div className="text-sm text-ranting-ice">{owner.email || "-"}</div>
         </div>
 
         <div>
           <div className="text-xs uppercase tracking-wider text-ranting-muted mb-1">Phone</div>
-          <div className="text-sm text-ranting-ice">{manager.phone || "-"}</div>
+          <div className="text-sm text-ranting-ice">{owner.phone || "-"}</div>
         </div>
 
         {property && (

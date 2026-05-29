@@ -68,10 +68,9 @@ export function TenantProfile() {
     <div className="glass-panel p-6">
       <div className="mb-6">
         <h3 className="text-lg font-semibold text-ranting-ice">My Profile</h3>
-        <p className="text-sm text-ranting-muted">Tenant Information</p>
       </div>
 
-      <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
         <div>
           <Label className="text-ranting-muted">Name</Label>
           <div className="text-sm text-ranting-ice">{displayName}</div>
@@ -114,37 +113,37 @@ export function TenantProfile() {
             <div className="text-sm text-ranting-ice">{phone || "-"}</div>
           )}
         </div>
+      </div>
 
-        <div className="flex gap-2 pt-4">
-          {isEditing ? (
-            <>
-              <Button
-                onClick={handleSave}
-                disabled={isSubmitting}
-                className="glossy-btn"
-              >
-                {isSubmitting ? "Saving..." : "Save"}
-              </Button>
-              <Button
-                onClick={() => {
-                  setIsEditing(false);
-                  setEditForm({});
-                }}
-                variant="ghost"
-                className="glossy-btn-ghost"
-              >
-                Cancel
-              </Button>
-            </>
-          ) : (
+      <div className="flex gap-2 pt-4">
+        {isEditing ? (
+          <>
             <Button
-              onClick={() => setIsEditing(true)}
+              onClick={handleSave}
+              disabled={isSubmitting}
               className="glossy-btn"
             >
-              Edit Profile
+              {isSubmitting ? "Saving..." : "Save"}
             </Button>
-          )}
-        </div>
+            <Button
+              onClick={() => {
+                setIsEditing(false);
+                setEditForm({});
+              }}
+              variant="ghost"
+              className="glossy-btn-ghost"
+            >
+              Cancel
+            </Button>
+          </>
+        ) : (
+          <Button
+            onClick={() => setIsEditing(true)}
+            className="glossy-btn"
+          >
+            Edit Profile
+          </Button>
+        )}
       </div>
     </div>
   );

@@ -214,8 +214,7 @@ function VendorListPage() {
       <main className="mx-auto min-h-[calc(100vh-130px)] max-w-[1400px]">
       <header className="mb-5 flex items-center justify-between">
         <div>
-          <div className="text-sm font-semibold text-ranting-ice">Vendor Directory</div>
-          <div className="text-[11px] text-ranting-muted">Third-party service providers</div>
+          <h1 className="underline-glow text-3xl font-semibold tracking-tight text-ranting-ice">Vendors List</h1>
         </div>
         {isManagerOrOwner && (
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
