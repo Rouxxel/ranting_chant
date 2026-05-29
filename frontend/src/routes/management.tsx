@@ -5,7 +5,7 @@ import { RequestTable } from "@/components/RequestTable";
 import { RequestDetailPanel } from "@/components/RequestDetailPanel";
 import { useApp } from "@/context/AppContext";
 import { requireManagerOrOwnerAuth } from "@/lib/auth";
-import { getRequests, updateRequest } from "@/services/api";
+import { getRequests, updateRequest, completeRequest } from "@/services/api";
 import { getRequestTypeLabel, REQUEST_TYPES } from "@/types";
 import type { Request, RequestType, Status, Urgency } from "@/types";
 import { ManagementProperties } from "@/components/ManagementProperties";
@@ -84,6 +84,18 @@ function ManagementPage() {
     }
   }
 
+  async function handleComplete(id: string) {
+    const resolutionNote = prompt("Enter resolution note (optional):");
+    if (resolutionNote === null) return; // User cancelled
+    try {
+      await completeRequest(id, { resolution_note: resolutionNote || undefined });
+      setRows((rs) => rs.map((r) => (r.id === id ? { ...r, status: "resolved" } : r)));
+      if (selected?.id === id) setSelected({ ...selected, status: "resolved" });
+    } catch (error) {
+      console.error("Failed to complete request:", error);
+    }
+  }
+
   return (
     <AuthenticatedLayout>
       <main className="mx-auto min-h-[calc(100vh-130px)] max-w-[1400px]">
@@ -156,7 +168,7 @@ function ManagementPage() {
           )}
 
           {/* Detail panel */}
-          {selected && <RequestDetailPanel req={selected} onClose={() => setSelected(null)} onApprove={() => approve(selected.id)} />}
+          {selected && <RequestDetailPanel req={selected} onClose={() => setSelected(null)} onApprove={() => approve(selected.id)} onComplete={() => handleComplete(selected.id)} />}
         </>
       )}
 

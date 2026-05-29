@@ -7,7 +7,7 @@ import { RequestTimeline } from "@/components/RequestTimeline";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useApp } from "@/context/AppContext";
 import { requireTenantAuth } from "@/lib/auth";
-import { getRequests } from "@/services/api";
+import { getRequests, cancelRequest } from "@/services/api";
 import type { Request } from "@/types";
 
 export const Route = createFileRoute("/dashboard")({
@@ -57,6 +57,15 @@ function DashboardPage() {
     loadRequests();
   }, [tenantId]);
 
+  const handleCancel = async (requestId: string) => {
+    try {
+      await cancelRequest(requestId, {});
+      setRequests(requests.filter(r => r.id !== requestId));
+    } catch (error) {
+      console.error("Failed to cancel request:", error);
+    }
+  };
+
   return (
     <AuthenticatedLayout>
       <main className="mx-auto min-h-[calc(100vh-130px)] max-w-[960px] py-3">
@@ -95,6 +104,7 @@ function DashboardPage() {
                 open={expanded === r.id} 
                 onToggle={() => setExpanded(expanded === r.id ? null : r.id)} 
                 tenantName={currentTenant?.name}
+                onCancel={handleCancel}
               />
               {expanded === r.id && <RequestTimeline req={r} tenantName={currentTenant?.name} />}
             </div>

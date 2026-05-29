@@ -10,9 +10,10 @@ interface RequestDetailPanelProps {
   req: Request;
   onClose: () => void;
   onApprove: () => void;
+  onComplete?: () => void;
 }
 
-export function RequestDetailPanel({ req, onClose, onApprove }: RequestDetailPanelProps) {
+export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: RequestDetailPanelProps) {
   const [summary, setSummary] = useState<string | null>(req.summary || null);
   const [loadingSummary, setLoadingSummary] = useState(false);
 
@@ -143,6 +144,14 @@ export function RequestDetailPanel({ req, onClose, onApprove }: RequestDetailPan
           <footer className="border-t border-white/10 p-4">
             <button onClick={onApprove} className="glossy-btn-green inline-flex w-full items-center justify-center gap-2 px-4 py-2.5 text-sm">
               <Check className="h-4 w-4" /> Approve Request
+            </button>
+          </footer>
+        )}
+
+        {(req.status === "in_progress" || req.status === "escalated") && onComplete && (
+          <footer className="border-t border-white/10 p-4">
+            <button onClick={onComplete} className="glossy-btn inline-flex w-full items-center justify-center gap-2 px-4 py-2.5 text-sm">
+              <Check className="h-4 w-4" /> Complete Request
             </button>
           </footer>
         )}
