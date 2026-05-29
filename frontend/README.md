@@ -61,12 +61,13 @@ Backend authentication is not implemented yet, so protected frontend routes rely
 | `index.tsx` | `/` | Tenant and manager/owner login |
 | `chat.tsx` | `/chat` | Tenant AI conversation with text and voice input |
 | `dashboard.tsx` | `/dashboard` | Tenant request list and timelines |
-| `management.tsx` | `/management` | Manager/owner dashboard with stats, filters, table, and detail panel |
+| `profile.tsx` | `/profile` | Tenant profile with editable email/phone and property representative contact |
+| `management.tsx` | `/management` | Manager/owner dashboard with tabs for Requests, Properties, Tenants, Vendors, and Profile |
 | `vendors.tsx` | `/vendors` | Vendor directory with search and service filtering |
 
 Protected route behavior:
 
-- `/chat` and `/dashboard` require a tenant session.
+- `/chat`, `/dashboard`, and `/profile` require a tenant session.
 - `/management` requires a manager or owner session.
 - `/vendors` requires any authenticated session.
 
@@ -81,10 +82,15 @@ The Vite router plugin regenerates `src/routeTree.gen.ts`; do not edit it manual
 - `Badges.tsx` - status, urgency, and request type badges
 - `MessageBubble.tsx` - tenant/AI chat messages
 - `ChatInput.tsx` - text input, send button, voice toggle
-- `RequestCard.tsx` - tenant request card
+- `RequestCard.tsx` - tenant request card with cancel button
 - `RequestTimeline.tsx` - conversation/notification timeline
 - `RequestTable.tsx` - management request table
-- `RequestDetailPanel.tsx` - slide-in request details and AI summary
+- `RequestDetailPanel.tsx` - slide-in request details, AI summary, and complete button
+- `TenantProfile.tsx` - tenant profile with editable email/phone
+- `PropertyRepresentative.tsx` - property manager/owner contact info for tenants
+- `ManagementProperties.tsx` - properties management with create/edit forms
+- `ManagementTenants.tsx` - tenant management with create/edit forms
+- `ManagementProfile.tsx` - manager/owner profile with editable email/phone
 - `ui/*` - shadcn/ui primitives
 
 ### API Service
@@ -93,8 +99,9 @@ The Vite router plugin regenerates `src/routeTree.gen.ts`; do not edit it manual
 
 It includes typed helpers for:
 
-- tenants, properties, vendors, managers, owners
-- requests
+- tenants, properties, vendors, managers, owners (CRUD operations)
+- requests (create, update, cancel, complete)
+- profile updates for tenants, managers, and owners
 - conversation start/message/history/save
 - voice transcription/start/respond
 - MCP tools
@@ -190,6 +197,11 @@ src/
 |   |-- RequestDetailPanel.tsx
 |   |-- RequestTable.tsx
 |   |-- RequestTimeline.tsx
+|   |-- TenantProfile.tsx
+|   |-- PropertyRepresentative.tsx
+|   |-- ManagementProperties.tsx
+|   |-- ManagementTenants.tsx
+|   |-- ManagementProfile.tsx
 |   `-- ui/
 |-- context/
 |   `-- AppContext.tsx
@@ -203,6 +215,7 @@ src/
 |   |-- index.tsx
 |   |-- chat.tsx
 |   |-- dashboard.tsx
+|   |-- profile.tsx
 |   |-- management.tsx
 |   `-- vendors.tsx
 |-- services/
@@ -236,15 +249,29 @@ src/
 - Lists current tenant requests from `GET /requests`
 - Caches tenant request lists under `requests_{tenantId}`
 - Shows request cards, status/urgency/type information, and expandable timelines
+- Allows tenants to cancel pending or in-progress requests with confirmation dialog
+
+### Tenant Profile (`/profile`)
+
+- Guarded tenant route
+- Displays tenant's profile information (name, unit, property, email, phone)
+- Allows tenants to edit their email and phone
+- Shows property representative contact information (manager/owner name, role, email, phone)
 
 ### Management Dashboard (`/management`)
 
 - Guarded manager/owner route
-- Filters requests by managed or owned property IDs
+- Tabbed interface for Requests, Properties, Tenants, Vendors, and Profile
+- Requests tab filters by managed or owned property IDs
 - Displays stats for total, escalated, pending approval, and resolved requests
 - Filters by request type, status, urgency, and property
 - Opens a request detail panel with summary, conversation, and notifications
 - Approves pending approval requests with `PATCH /requests/{id}`
+- Completes in-progress or escalated requests with resolution note using `POST /requests/{id}/complete`
+- Properties tab with create/edit forms and tenant listings
+- Tenants tab with create/edit forms and request history
+- Vendors tab with role-aware CRUD for managers/owners
+- Profile tab with editable email/phone and managed/owned properties
 
 ### Vendor Directory (`/vendors`)
 
@@ -252,6 +279,8 @@ src/
 - Available to tenants, managers, and owners
 - Uses cached `vendors` data and refreshes from `GET /vendors`
 - Supports text search and service filtering
+- Managers/owners can create, edit, and delete vendors
+- Tenants have read-only access
 
 ## Build
 

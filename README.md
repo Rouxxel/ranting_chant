@@ -132,13 +132,20 @@ VITE_PROD_BACKEND=https://your-production-backend.example.com
 
 - Login flow for tenants, managers, and owners.
 - Authenticated layout with shared header, role-aware navigation, avatar, and client-side logout.
-- Route guards for `/chat`, `/dashboard`, `/management`, and `/vendors`.
+- Route guards for `/chat`, `/dashboard`, `/management`, `/vendors`, and `/profile`.
 - Tenant chat flow with text and voice input.
-- Tenant request dashboard with expandable timelines.
+- Tenant request dashboard with expandable timelines and cancel request functionality.
+- Tenant profile page with editable email/phone and property representative contact info.
 - Management dashboard with stats, filters, sortable table, AI summaries, and request approval.
-- Vendor directory with search and service filtering.
+- Management tabs for Requests, Properties, Tenants, Vendors, and Profile.
+- Properties management with create/edit forms and tenant listings.
+- Tenant management with create/edit forms and request history.
+- Vendor directory with search, service filtering, and role-aware CRUD for managers/owners.
+- Vendor management with create/edit/delete capabilities for managers/owners.
+- Manager/owner profile page with editable email/phone and managed/owned properties.
+- Request cancellation for tenants and request completion for managers/owners with resolution notes.
 - Canonical request type labels, badges, and management filtering.
-- API service with typed request, conversation, voice, and directory calls.
+- API service with typed request, conversation, voice, CRUD, and directory calls.
 
 ## Request Types
 

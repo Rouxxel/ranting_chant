@@ -117,12 +117,12 @@ Legacy values are normalized by `normalize_request_type()`:
 The backend includes routers for:
 
 - **Root**: health and basic API status
-- **Tenants**: tenant reads
-- **Properties**: property reads
-- **Vendors**: vendor reads and service-category lookup
-- **Managers**: manager reads
-- **Owners**: owner reads
-- **Requests**: request listing, detail, summary, create, update, and notification dispatch
+- **Tenants**: tenant reads, create, update, and profile update
+- **Properties**: property reads, create, and update
+- **Vendors**: vendor reads, create, update, delete, and service-category lookup
+- **Managers**: manager reads and profile update
+- **Owners**: owner reads and profile update
+- **Requests**: request listing, detail, summary, create, update, cancel, complete, and notification dispatch
 - **Conversation**: AI-powered chat sessions, message processing, history, and save-conversation
 - **Voice**: transcription, voice session start, and voice response
 - **MCP**: tool discovery and MCP-style operations
@@ -196,6 +196,60 @@ async def example_endpoint(request: Request):
 - The conversation and classifier prompts are generated from the backend request type definitions.
 - The JSON mock data in `src/resources/mock_db_jsons/requests.json` should always use canonical request type values.
 - Backend authentication is not implemented yet; frontend logout is currently client-side only.
+
+## Google Cloud OAuth Setup (Future)
+
+When implementing Google Cloud OAuth for authentication, follow this checklist:
+
+### Google Cloud Console Setup
+
+1. **Create OAuth 2.0 Client ID**
+   - Go to Google Cloud Console → APIs & Services → Credentials
+   - Create credentials → OAuth client ID
+   - Application type: Web application
+   - Name: Ranting Chant Backend
+
+2. **Configure Authorized Redirect URIs**
+   - Add your backend callback URL: `https://your-backend-domain.com/auth/callback`
+   - Add local development URL: `http://localhost:8000/auth/callback`
+
+3. **Configure Authorized JavaScript Origins**
+   - Add your frontend domain: `https://your-frontend-domain.com`
+   - Add local development URL: `http://localhost:5173`
+
+4. **Copy Client ID and Client Secret**
+   - Store these securely in environment variables
+
+### Environment Variables
+
+Add to `backend/.env`:
+
+```bash
+# Google Cloud OAuth
+GOOGLE_OAUTH_CLIENT_ID=your_oauth_client_id
+GOOGLE_OAUTH_CLIENT_SECRET=your_oauth_client_secret
+GOOGLE_OAUTH_REDIRECT_URI=https://your-backend-domain.com/auth/callback
+```
+
+### Frontend Environment Variables
+
+Add to `frontend/.env`:
+
+```bash
+# OAuth Configuration
+VITE_GOOGLE_OAUTH_CLIENT_ID=your_oauth_client_id
+VITE_GOOGLE_OAUTH_REDIRECT_URI=https://your-frontend-domain.com/auth/callback
+```
+
+### Required Redirect URIs
+
+For production deployment:
+- Backend callback: `https://your-backend-domain.com/auth/callback`
+- Frontend origin: `https://your-frontend-domain.com`
+
+For local development:
+- Backend callback: `http://localhost:8000/auth/callback`
+- Frontend origin: `http://localhost:5173`
 
 ## License
 
