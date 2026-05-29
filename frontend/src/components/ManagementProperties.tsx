@@ -106,7 +106,7 @@ export function ManagementProperties() {
           <DialogTrigger asChild>
             <Button className="glossy-btn">Add Property</Button>
           </DialogTrigger>
-          <DialogContent className="border-ranting-sky/30 bg-ranting-navy text-ranting-ice">
+          <DialogContent className="border-ranting-sky/30 bg-ranting-navy text-ranting-ice max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Create New Property</DialogTitle>
             </DialogHeader>
@@ -221,7 +221,7 @@ export function ManagementProperties() {
       )}
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="border-ranting-sky/30 bg-ranting-navy text-ranting-ice">
+        <DialogContent className="border-ranting-sky/30 bg-ranting-navy text-ranting-ice max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Property</DialogTitle>
           </DialogHeader>

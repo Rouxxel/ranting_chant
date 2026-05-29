@@ -20,6 +20,7 @@ import {
   DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { useApp } from "@/context/AppContext";
 import { requireAuthenticatedUser } from "@/lib/auth";
 import { getVendors, createVendor, updateVendor, deleteVendor } from "@/services/api";
@@ -64,6 +65,8 @@ function VendorListPage() {
   const [selected, setSelected] = useState<Vendor | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [vendorToDelete, setVendorToDelete] = useState<string | null>(null);
   const [createForm, setCreateForm] = useState<VendorCreateRequest>({
     name: "",
     email: "",
@@ -73,6 +76,7 @@ function VendorListPage() {
   });
   const [editForm, setEditForm] = useState<VendorUpdateRequest>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const isManagerOrOwner = userRole === "manager" || userRole === "owner";
 
@@ -208,7 +212,7 @@ function VendorListPage() {
             <DialogTrigger asChild>
               <Button className="glossy-btn">Add Vendor</Button>
             </DialogTrigger>
-            <DialogContent className="border-ranting-sky/30 bg-ranting-navy text-ranting-ice max-w-lg">
+            <DialogContent className="border-ranting-sky/30 bg-ranting-navy text-ranting-ice max-w-lg max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Create New Vendor</DialogTitle>
               </DialogHeader>
@@ -251,7 +255,7 @@ function VendorListPage() {
                     id="create-emergency"
                     value={createForm.emergency_available ? "true" : "false"}
                     onChange={(e) => setCreateForm({ ...createForm, emergency_available: e.target.value === "true" })}
-                    className="aero-input w-full"
+                    className="aero-input w-full px-3 py-2"
                     style={{ colorScheme: "dark" }}
                   >
                     <option value="false" className="bg-ranting-deep text-ranting-ice">No</option>
@@ -384,7 +388,7 @@ function VendorListPage() {
 
       {/* Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="border-ranting-sky/30 bg-ranting-navy text-ranting-ice max-w-lg">
+        <DialogContent className="border-ranting-sky/30 bg-ranting-navy text-ranting-ice max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Vendor</DialogTitle>
           </DialogHeader>
@@ -424,7 +428,7 @@ function VendorListPage() {
                 id="edit-emergency"
                 value={editForm.emergency_available ? "true" : "false"}
                 onChange={(e) => setEditForm({ ...editForm, emergency_available: e.target.value === "true" })}
-                className="aero-input w-full"
+                className="aero-input w-full px-3 py-2"
                 style={{ colorScheme: "dark" }}
               >
                 <option value="false" className="bg-ranting-deep text-ranting-ice">No</option>

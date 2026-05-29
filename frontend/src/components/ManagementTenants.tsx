@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useApp } from "@/context/AppContext";
-import { getTenants, createTenant, updateTenant, getProperties } from "@/services/api";
+import { getTenants, createTenant, updateTenant, deleteTenant, getProperties } from "@/services/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +12,7 @@ import {
   DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import type { Tenant, TenantCreateRequest, TenantUpdateRequest, Property } from "@/types";
 
 export function ManagementTenants() {
@@ -22,6 +23,7 @@ export function ManagementTenants() {
   const [selected, setSelected] = useState<Tenant | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [createForm, setCreateForm] = useState<TenantCreateRequest>({
     name: "",
     unit: "",
@@ -29,6 +31,7 @@ export function ManagementTenants() {
   });
   const [editForm, setEditForm] = useState<TenantUpdateRequest>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -109,6 +112,21 @@ export function ManagementTenants() {
     setIsEditDialogOpen(true);
   };
 
+  const handleDelete = async () => {
+    if (!selected) return;
+    setIsDeleting(true);
+    try {
+      await deleteTenant(selected.id);
+      setTenants(tenants.filter(t => t.id !== selected.id));
+      setSelected(null);
+      setIsDeleteDialogOpen(false);
+    } catch (error) {
+      console.error("Failed to delete tenant:", error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   if (isLoading) {
     return <div className="glass-panel p-8 text-center text-ranting-muted">Loading tenants...</div>;
   }
@@ -121,7 +139,7 @@ export function ManagementTenants() {
           <DialogTrigger asChild>
             <Button className="glossy-btn">Add Tenant</Button>
           </DialogTrigger>
-          <DialogContent className="border-ranting-sky/30 bg-ranting-navy text-ranting-ice">
+          <DialogContent className="border-ranting-sky/30 bg-ranting-navy text-ranting-ice max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Create New Tenant</DialogTitle>
             </DialogHeader>
@@ -153,7 +171,7 @@ export function ManagementTenants() {
                   value={createForm.property_id}
                   onChange={(e) => setCreateForm({ ...createForm, property_id: e.target.value })}
                   required
-                  className="aero-input w-full"
+                  className="aero-input w-full px-3 py-2"
                   style={{ colorScheme: "dark" }}
                 >
                   <option value="">Select a property</option>
@@ -239,6 +257,13 @@ export function ManagementTenants() {
                 Edit
               </Button>
               <Button
+                onClick={() => setIsDeleteDialogOpen(true)}
+                variant="ghost"
+                className="glossy-btn-ghost px-3 py-1.5 text-xs text-red-400 hover:text-red-300"
+              >
+                Delete
+              </Button>
+              <Button
                 onClick={() => setSelected(null)}
                 variant="ghost"
                 className="glossy-btn-ghost px-3 py-1.5 text-xs"
@@ -257,7 +282,7 @@ export function ManagementTenants() {
       )}
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="border-ranting-sky/30 bg-ranting-navy text-ranting-ice">
+        <DialogContent className="border-ranting-sky/30 bg-ranting-navy text-ranting-ice max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Tenant</DialogTitle>
           </DialogHeader>
@@ -286,7 +311,7 @@ export function ManagementTenants() {
                 id="edit-property"
                 value={editForm.property_id || ""}
                 onChange={(e) => setEditForm({ ...editForm, property_id: e.target.value })}
-                className="aero-input w-full"
+                className="aero-input w-full px-3 py-2"
                 style={{ colorScheme: "dark" }}
               >
                 <option value="">Select a property</option>
@@ -328,6 +353,15 @@ export function ManagementTenants() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        title="Delete Tenant"
+        message={`Are you sure you want to delete ${selected?.name}? This action cannot be undone.`}
+        onConfirm={handleDelete}
+        isDeleting={isDeleting}
+      />
     </div>
   );
 }
