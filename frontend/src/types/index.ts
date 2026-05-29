@@ -172,6 +172,7 @@ export interface ConversationMessageRequest {
   request_id: string;
   tenant_id: string;
   message: string;
+  enable_web?: boolean;
 }
 
 export interface ConversationMessageResponse {
@@ -182,6 +183,7 @@ export interface ConversationMessageResponse {
   urgency: Urgency;
   escalated: boolean;
   is_complete: boolean;
+  web_results?: WebSearchResponse;
 }
 
 export interface ConversationHistoryResponse {
@@ -194,6 +196,19 @@ export interface RequestSummary {
   summary: string;
   key_points: string[];
   recommended_actions: string[];
+}
+
+export interface WebSearchResultItem {
+  title: string;
+  url: string;
+  content_snippet: string;
+  score?: number | null;
+}
+
+export interface WebSearchResponse {
+  query: string;
+  answer?: string | null;
+  results: WebSearchResultItem[];
 }
 
 // ==================== Voice ====================

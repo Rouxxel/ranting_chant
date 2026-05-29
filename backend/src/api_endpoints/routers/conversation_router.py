@@ -41,6 +41,7 @@ class ConversationMessagePayload(BaseModel):
     request_id: str
     tenant_id: str
     message: str
+    enable_web: bool = True
 
 
 """API ROUTER-----------------------------------------------------------"""
@@ -189,7 +190,8 @@ async def send_message(request: Request, body: ConversationMessagePayload):
                 tenant_id=tenant_id,
                 request_id=request_id_or_session_id,  # Use session_id
                 message=message,
-                conversation_history=history
+                conversation_history=history,
+                enable_web=body.enable_web
             )
 
             # Append AI response to history
@@ -200,7 +202,7 @@ async def send_message(request: Request, body: ConversationMessagePayload):
             })
 
             # Return AI response without creating request
-            return {
+            response_payload = {
                 "session_id": request_id_or_session_id,
                 "reply": parsed_response.get("reply"),
                 "status": parsed_response.get("status", "pending"),
@@ -210,6 +212,9 @@ async def send_message(request: Request, body: ConversationMessagePayload):
                 "is_complete": parsed_response.get("is_complete", False),
                 "conversation_history": history
             }
+            if parsed_response.get("web_results"):
+                response_payload["web_results"] = parsed_response.get("web_results")
+            return response_payload
         else:
             # Subsequent message: fetch existing request
             request_id = request_id_or_session_id
@@ -226,7 +231,8 @@ async def send_message(request: Request, body: ConversationMessagePayload):
             tenant_id=tenant_id,
             request_id=request_id,
             message=message,
-            conversation_history=history
+            conversation_history=history,
+            enable_web=body.enable_web
         )
 
         # 3. Append turns to conversation history
@@ -274,7 +280,7 @@ async def send_message(request: Request, body: ConversationMessagePayload):
             f"Is Complete: {parsed_response.get('is_complete')}"
         )
 
-        return {
+        response_payload = {
             "request_id": request_id,
             "reply": parsed_response.get("reply"),
             "status": updated_request.get("status"),
@@ -283,6 +289,9 @@ async def send_message(request: Request, body: ConversationMessagePayload):
             "escalated": updated_request.get("escalated"),
             "is_complete": parsed_response.get("is_complete")
         }
+        if parsed_response.get("web_results"):
+            response_payload["web_results"] = parsed_response.get("web_results")
+        return response_payload
 
     except HTTPException:
         raise
