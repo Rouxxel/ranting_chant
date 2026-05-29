@@ -216,90 +216,90 @@ function VendorListPage() {
           <div className="mb-8 pl-5">
             <h1 className="underline-glow text-3xl font-semibold tracking-tight text-ranting-ice">Vendors List</h1>
           </div>
-        {isManagerOrOwner && (
-          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="glossy-btn">Add Vendor</Button>
-            </DialogTrigger>
-            <DialogContent className="border-ranting-sky/30 bg-ranting-navy text-ranting-ice max-w-lg max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Create New Vendor</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleCreate} className="space-y-4">
-                <div>
-                  <Label htmlFor="create-name">Name</Label>
-                  <Input
-                    id="create-name"
-                    value={createForm.name}
-                    onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
-                    required
-                    className="aero-input"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="create-email">Email</Label>
-                  <Input
-                    id="create-email"
-                    type="email"
-                    value={createForm.email}
-                    onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })}
-                    required
-                    className="aero-input"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="create-phone">Phone</Label>
-                  <Input
-                    id="create-phone"
-                    type="tel"
-                    value={createForm.phone}
-                    onChange={(e) => setCreateForm({ ...createForm, phone: e.target.value })}
-                    required
-                    className="aero-input"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="create-emergency">Emergency Available</Label>
-                  <select
-                    id="create-emergency"
-                    value={createForm.emergency_available ? "true" : "false"}
-                    onChange={(e) => setCreateForm({ ...createForm, emergency_available: e.target.value === "true" })}
-                    className="aero-input w-full px-3 py-2"
-                    style={{ colorScheme: "dark" }}
-                  >
-                    <option value="false" className="bg-ranting-deep text-ranting-ice">No</option>
-                    <option value="true" className="bg-ranting-deep text-ranting-ice">Yes</option>
-                  </select>
-                </div>
-                <div>
-                  <Label>Services</Label>
-                  <div className="mt-2 grid grid-cols-2 gap-2">
-                    {Object.entries(SERVICE_LABELS).map(([key, label]) => (
-                      <label key={key} className="flex items-center gap-2 text-sm text-ranting-ice">
-                        <input
-                          type="checkbox"
-                          checked={createForm.services?.includes(key)}
-                          onChange={() => handleServiceToggle(key, true)}
-                          className="rounded border-ranting-sky/30 bg-ranting-deep text-ranting-accent focus:ring-ranting-accent"
-                        />
-                        {label}
-                      </label>
-                    ))}
+          {isManagerOrOwner && (
+            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="glossy-btn">Add Vendor</Button>
+              </DialogTrigger>
+              <DialogContent className="border-ranting-sky/30 bg-ranting-navy text-ranting-ice max-w-lg max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Create New Vendor</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleCreate} className="space-y-4">
+                  <div>
+                    <Label htmlFor="create-name">Name</Label>
+                    <Input
+                      id="create-name"
+                      value={createForm.name}
+                      onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
+                      required
+                      className="aero-input"
+                    />
                   </div>
-                </div>
-                <DialogFooter>
-                  <Button type="button" variant="ghost" onClick={() => setIsCreateDialogOpen(false)} className="glossy-btn-ghost">
-                    Cancel
-                  </Button>
-                  <Button type="submit" disabled={isSubmitting} className="glossy-btn">
-                    {isSubmitting ? "Creating..." : "Create"}
-                  </Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
-        )}
-      </header>
+                  <div>
+                    <Label htmlFor="create-email">Email</Label>
+                    <Input
+                      id="create-email"
+                      type="email"
+                      value={createForm.email}
+                      onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })}
+                      required
+                      className="aero-input"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="create-phone">Phone</Label>
+                    <Input
+                      id="create-phone"
+                      type="tel"
+                      value={createForm.phone}
+                      onChange={(e) => setCreateForm({ ...createForm, phone: e.target.value })}
+                      required
+                      className="aero-input"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="create-emergency">Emergency Available</Label>
+                    <select
+                      id="create-emergency"
+                      value={createForm.emergency_available ? "true" : "false"}
+                      onChange={(e) => setCreateForm({ ...createForm, emergency_available: e.target.value === "true" })}
+                      className="aero-input w-full px-3 py-2"
+                      style={{ colorScheme: "dark" }}
+                    >
+                      <option value="false" className="bg-ranting-deep text-ranting-ice">No</option>
+                      <option value="true" className="bg-ranting-deep text-ranting-ice">Yes</option>
+                    </select>
+                  </div>
+                  <div>
+                    <Label>Services</Label>
+                    <div className="mt-2 grid grid-cols-2 gap-2">
+                      {Object.entries(SERVICE_LABELS).map(([key, label]) => (
+                        <label key={key} className="flex items-center gap-2 text-sm text-ranting-ice">
+                          <input
+                            type="checkbox"
+                            checked={createForm.services?.includes(key)}
+                            onChange={() => handleServiceToggle(key, true)}
+                            className="rounded border-ranting-sky/30 bg-ranting-deep text-ranting-accent focus:ring-ranting-accent"
+                          />
+                          {label}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button type="button" variant="ghost" onClick={() => setIsCreateDialogOpen(false)} className="glossy-btn-ghost">
+                      Cancel
+                    </Button>
+                    <Button type="submit" disabled={isSubmitting} className="glossy-btn">
+                      {isSubmitting ? "Creating..." : "Create"}
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+          )}
+        </header>
 
       {/* Filters */}
       <div className="glass-panel mb-4 flex flex-wrap items-center gap-3 px-4 py-3">
