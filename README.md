@@ -19,6 +19,58 @@ The project has two main applications:
 - **Backend** (`/backend`) - FastAPI REST API with AI classification, conversation orchestration, voice services, JSON-backed mock data, MCP-style tools, and notifications.
 - **Frontend** (`/frontend`) - React 19 + TypeScript app using Vite, TanStack Router, Tailwind v4, shadcn/ui, and a Frutiger Aero design system.
 
+## Data Flow Workflow
+
+This is the high-level flow of data through the app, from login to request resolution.
+
+```text
+User login
+  -> Frontend AppContext stores tenant / manager / owner session
+  -> Route guards allow access to role-specific screens
+
+Tenant starts chat
+  -> POST /conversation/start
+  -> Backend looks up tenant + property context
+  -> Frontend receives a session_id and greeting
+
+Tenant sends message
+  -> POST /conversation/message
+  -> ConversationEngine builds tenant/property/request context
+  -> Gemini returns structured JSON:
+       reply, is_complete, type, urgency, sentiment, confidence, escalate,
+       involved_party_types, vendor_service_needed
+  -> Backend normalizes type to the canonical request taxonomy
+  -> Backend returns AI reply + request metadata to the frontend
+
+Request is saved or updated
+  -> If the user chooses End & Save, frontend calls POST /conversation/save-conversation
+  -> Backend creates a request record in mock JSON storage
+  -> Request stores conversation history, type, urgency, status, escalation state,
+     property_id, involved parties, vendor_id, notifications, and summary data
+  -> Frontend clears cached tenant request data so dashboards refresh
+
+Notifications and vendor routing
+  -> User can trigger request notifications from the chat flow
+  -> Backend dispatches manager/owner/vendor notifications through email/SMS services
+  -> Vendor matching uses vendor service categories when vendor_service_needed is present
+
+Manager or owner reviews requests
+  -> Frontend calls GET /requests
+  -> Management dashboard filters requests by managed_properties or owned_properties
+  -> Manager/owner filters by type, status, urgency, and property
+  -> Detail panel can fetch GET /requests/{id}/summary for an AI summary
+  -> Pending approval requests can be approved with PATCH /requests/{id}
+```
+
+Voice follows the same request flow with two extra steps:
+
+```text
+Tenant records audio
+  -> POST /voice/transcribe converts audio to text
+  -> POST /voice/respond sends transcript through ConversationEngine
+  -> Backend returns text reply, audio reply, status, type, urgency, and escalation state
+```
+
 ## Quick Start
 
 ### Prerequisites
