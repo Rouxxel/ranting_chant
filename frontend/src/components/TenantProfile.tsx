@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useApp } from "@/context/AppContext";
-import { updateTenantProfile } from "@/services/api";
+import { updateTenantProfile, getProperties } from "@/services/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,19 +12,40 @@ import {
   DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import type { ProfileUpdateRequest } from "@/types";
+import type { ProfileUpdateRequest, Property } from "@/types";
 
 export function TenantProfile() {
   const { currentTenant } = useApp();
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState<ProfileUpdateRequest>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [isLoadingProperties, setIsLoadingProperties] = useState(true);
+
+  useEffect(() => {
+    const loadProperties = async () => {
+      try {
+        const props = await getProperties();
+        setProperties(props);
+      } catch (error) {
+        console.error("Failed to load properties:", error);
+      } finally {
+        setIsLoadingProperties(false);
+      }
+    };
+
+    loadProperties();
+  }, []);
 
   const displayName = currentTenant?.name || "User";
   const email = currentTenant?.email || "";
   const phone = currentTenant?.phone || "";
   const unit = currentTenant?.unit || "-";
-  const property = currentTenant?.property || "-";
+
+  // Find property name by property_id
+  const property = currentTenant?.property_id
+    ? properties.find(p => p.id === currentTenant.property_id)?.name || currentTenant.property || "-"
+    : currentTenant?.property || "-";
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -14,6 +14,7 @@ import { Route as VendorsRouteImport } from './routes/vendors'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ChatRouteImport } from './routes/chat'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProfileRouteImport } from './routes/profile'
 import type { getRouter } from './router.tsx'
 import type { startInstance } from './start.ts'
 declare module '@tanstack/react-start' {
@@ -44,6 +45,11 @@ const ChatRoute = ChatRouteImport.update({
   path: '/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -55,6 +61,7 @@ export interface FileRoutesByFullPath {
   '/chat': typeof ChatRoute
   '/dashboard': typeof DashboardRoute
   '/management': typeof ManagementRoute
+  '/profile': typeof ProfileRoute
   '/vendors': typeof VendorsRoute
 }
 export interface FileRoutesByTo {
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   '/chat': typeof ChatRoute
   '/dashboard': typeof DashboardRoute
   '/management': typeof ManagementRoute
+  '/profile': typeof ProfileRoute
   '/vendors': typeof VendorsRoute
 }
 export interface FileRoutesById {
@@ -70,14 +78,15 @@ export interface FileRoutesById {
   '/chat': typeof ChatRoute
   '/dashboard': typeof DashboardRoute
   '/management': typeof ManagementRoute
+  '/profile': typeof ProfileRoute
   '/vendors': typeof VendorsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/chat' | '/dashboard' | '/management' | '/vendors'
+  fullPaths: '/' | '/chat' | '/dashboard' | '/management' | '/profile' | '/vendors'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/chat' | '/dashboard' | '/management' | '/vendors'
-  id: '__root__' | '/' | '/chat' | '/dashboard' | '/management' | '/vendors'
+  to: '/' | '/chat' | '/dashboard' | '/management' | '/profile' | '/vendors'
+  id: '__root__' | '/' | '/chat' | '/dashboard' | '/management' | '/profile' | '/vendors'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -85,6 +94,7 @@ export interface RootRouteChildren {
   ChatRoute: typeof ChatRoute
   DashboardRoute: typeof DashboardRoute
   ManagementRoute: typeof ManagementRoute
+  ProfileRoute: typeof ProfileRoute
   VendorsRoute: typeof VendorsRoute
 }
 
@@ -95,6 +105,13 @@ declare module '@tanstack/react-router' {
       path: '/vendors'
       fullPath: '/vendors'
       preLoaderRoute: typeof VendorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/management': {
@@ -133,6 +150,7 @@ const rootRouteChildren: RootRouteChildren = {
   ChatRoute: ChatRoute,
   DashboardRoute: DashboardRoute,
   ManagementRoute: ManagementRoute,
+  ProfileRoute: ProfileRoute,
   VendorsRoute: VendorsRoute,
 }
 export const routeTree = rootRouteImport
