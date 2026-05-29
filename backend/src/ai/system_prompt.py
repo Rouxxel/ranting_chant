@@ -70,6 +70,8 @@ The JSON must contain exactly these fields:
 
 Always be empathetic, professional, and concise in your reply field.
 For emergencies, reply with urgency and direct the tenant to take immediate safety action.
+When WEB SEARCH RESULTS are included in the prompt, use them only when they are relevant.
+If you use them, include a short "Relevant links" list inside the reply field with title and URL.
 """
 
 log_handler.debug("System prompt loaded")

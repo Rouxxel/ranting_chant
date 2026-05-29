@@ -24,6 +24,13 @@ from src.utils.custom_logger import log_handler
 from src.mcp import tenant_mcp, property_mcp, vendor_mcp, request_mcp
 from src.ai.gemini_client import get_client
 from src.ai.system_prompt import SYSTEM_PROMPT
+from src.ai.tools.tavily_client import (
+    append_relevant_links,
+    format_search_results_for_prompt,
+    is_tavily_enabled,
+    should_trigger_tavily_search,
+    tavily_search,
+)
 from src.core_specs.configuration.config_loader import config_loader
 from src.models.request import normalize_request_type
 
@@ -47,7 +54,8 @@ class ConversationEngine:
         tenant_id: str,
         request_id: str | None,
         message: str,
-        conversation_history: list | None = None
+        conversation_history: list | None = None,
+        enable_web: bool = True
     ) -> dict:
         """
         Process a single tenant message and return the AI response.
@@ -99,14 +107,56 @@ class ConversationEngine:
         history = conversation_history or []
         history_with_new = history + [{"role": "tenant", "message": message}]
 
+        #Optionally add one bounded Tavily search as context for source/link-seeking messages.
+        web_search_response = None
+        web_context = ""
+        if enable_web and is_tavily_enabled() and should_trigger_tavily_search(message):
+            try:
+                web_search_response = tavily_search(
+                    message,
+                    max_results=config_loader["tavily"].get("max_results", 5),
+                )
+                web_context = format_search_results_for_prompt(
+                    web_search_response,
+                    max_results=config_loader["tavily"].get("max_results", 5),
+                )
+                log_handler.info(
+                    f"Tavily search added {len(web_search_response.results)} result(s) "
+                    f"for tenant message"
+                )
+            except Exception as e:
+                log_handler.warning(f"Tavily search skipped after error: {e}")
+
         #Call Gemini
-        raw_response = self._call_gemini(context, history_with_new)
+        raw_response = self._call_gemini(context, history_with_new, web_context=web_context)
 
         #Parse response
         parsed = self._parse_response(raw_response)
 
+        if (
+            enable_web
+            and not web_search_response
+            and is_tavily_enabled()
+            and parsed.get("confidence", 1.0) < 0.7
+        ):
+            try:
+                web_search_response = tavily_search(
+                    message,
+                    max_results=config_loader["tavily"].get("max_results", 5),
+                )
+                log_handler.info(
+                    f"Tavily search added {len(web_search_response.results)} result(s) "
+                    f"after low-confidence Gemini response"
+                )
+            except Exception as e:
+                log_handler.warning(f"Tavily low-confidence search skipped after error: {e}")
+
         #Check escalation
         parsed["escalate"] = self._should_escalate(parsed)
+
+        if web_search_response:
+            parsed["reply"] = append_relevant_links(parsed.get("reply", ""), web_search_response)
+            parsed["web_results"] = web_search_response.model_dump()
 
         #On first message (no request_id): create a stub request record
         if not request_id and parsed.get("is_complete"):
@@ -207,7 +257,7 @@ class ConversationEngine:
         log_handler.debug(f"Context built ({len(context)} chars)")
         return context
 
-    def _call_gemini(self, context: str, conversation_history: list) -> str:
+    def _call_gemini(self, context: str, conversation_history: list, web_context: str = "") -> str:
         """
         Call the Gemini API with the system prompt, context, and conversation history.
 
@@ -234,6 +284,7 @@ class ConversationEngine:
 
         prompt = (
             f"Tenant/property context:\n{context}\n\n"
+            f"{web_context + chr(10) + chr(10) if web_context else ''}"
             f"Conversation history:\n{history_text}\n\n"
             f"Respond with the JSON object as instructed."
         )
