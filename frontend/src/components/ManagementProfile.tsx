@@ -35,7 +35,7 @@ export function ManagementProfile() {
   return (
     <div>
       <div className="mb-4">
-        <h2 className="text-xl font-semibold text-ranting-ice">Profile</h2>
+        <h2 className="pl-5 text-xl font-semibold text-ranting-ice">Profile</h2>
       </div>
 
       <div className="glass-panel p-6">

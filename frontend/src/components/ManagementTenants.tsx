@@ -134,7 +134,7 @@ export function ManagementTenants() {
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-ranting-ice">Tenants</h2>
+        <h2 className="pl-5 text-xl font-semibold text-ranting-ice">Tenants</h2>
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
             <Button className="glossy-btn">Add Tenant</Button>
