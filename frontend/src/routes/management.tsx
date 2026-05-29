@@ -22,7 +22,7 @@ function ManagementPage() {
   const navigate = useNavigate();
   const { currentManager } = useApp();
 
-  const [activeTab, setActiveTab] = useState<"requests" | "properties" | "tenants" | "vendors" | "profile">("requests");
+  const [activeTab, setActiveTab] = useState<"requests" | "properties" | "tenants" | "profile">("requests");
   const [rows, setRows] = useState<Request[]>([]);
   const [typeF, setTypeF] = useState<RequestType | "all">("all");
   const [statusF, setStatusF] = useState<Status | "all">("all");
@@ -109,7 +109,6 @@ function ManagementPage() {
           { id: "requests" as const, label: "Requests" },
           { id: "properties" as const, label: "Properties" },
           { id: "tenants" as const, label: "Tenants" },
-          { id: "vendors" as const, label: "Vendors" },
           { id: "profile" as const, label: "Profile" },
         ].map((tab) => (
           <button
