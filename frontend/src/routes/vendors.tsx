@@ -159,16 +159,26 @@ function VendorListPage() {
     }
   };
 
-  const handleDelete = async (vendorId: string) => {
-    if (!confirm("Are you sure you want to delete this vendor?")) return;
+  const handleDelete = async () => {
+    if (!vendorToDelete) return;
+    setIsDeleting(true);
     try {
-      await deleteVendor(vendorId);
-      setVendors(vendors.filter(v => v.id !== vendorId));
-      localStorage.setItem('vendors', JSON.stringify(vendors.filter(v => v.id !== vendorId)));
-      if (selected?.id === vendorId) setSelected(null);
+      await deleteVendor(vendorToDelete);
+      setVendors(vendors.filter(v => v.id !== vendorToDelete));
+      localStorage.setItem('vendors', JSON.stringify(vendors.filter(v => v.id !== vendorToDelete)));
+      if (selected?.id === vendorToDelete) setSelected(null);
+      setIsDeleteDialogOpen(false);
+      setVendorToDelete(null);
     } catch (error) {
       console.error("Failed to delete vendor:", error);
+    } finally {
+      setIsDeleting(false);
     }
+  };
+
+  const openDeleteDialog = (vendorId: string) => {
+    setVendorToDelete(vendorId);
+    setIsDeleteDialogOpen(true);
   };
 
   const openEditDialog = () => {
@@ -372,7 +382,7 @@ function VendorListPage() {
                       Edit
                     </Button>
                     <Button
-                      onClick={() => handleDelete(v.id)}
+                      onClick={() => openDeleteDialog(v.id)}
                       variant="ghost"
                       className="glossy-btn-ghost px-2 py-1 text-xs text-red-400 hover:text-red-300"
                     >
@@ -462,6 +472,15 @@ function VendorListPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        title="Delete Vendor"
+        message={`Are you sure you want to delete this vendor? This action cannot be undone.`}
+        onConfirm={handleDelete}
+        isDeleting={isDeleting}
+      />
       </main>
     </AuthenticatedLayout>
   );
