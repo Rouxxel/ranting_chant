@@ -34,6 +34,10 @@
         "include_answer":false,
         "include_images":false,
         "timeout_seconds":30,
+        "rate_limit_per_minute":10,
+        "max_extract_chars":12000,
+        "prompt_snippet_chars":500,
+        "reply_snippet_chars":140,
         "trigger_keywords":[
             "link",
             "source",
