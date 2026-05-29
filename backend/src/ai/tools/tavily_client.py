@@ -5,6 +5,8 @@ Tavily REST client used by AI orchestration and MCP-style web tools.
 from __future__ import annotations
 
 import os
+import time
+from collections import deque
 from urllib.parse import urlparse
 
 import requests
@@ -21,10 +23,15 @@ from src.core_specs.configuration.config_loader import config_loader
 from src.utils.custom_logger import log_handler
 
 TAVILY_CONFIG = config_loader.get("tavily", {})
+_REQUEST_TIMESTAMPS: deque[float] = deque()
 
 
 class TavilyError(Exception):
     """Raised when a Tavily request cannot be completed."""
+
+
+class TavilyRateLimitError(TavilyError):
+    """Raised when local Tavily rate limits are exceeded."""
 
 
 def is_tavily_enabled() -> bool:
@@ -46,7 +53,24 @@ def _headers() -> dict[str, str]:
     }
 
 
-def _post(endpoint: str, payload: dict) -> dict:
+def _enforce_rate_limit() -> None:
+    """Apply a small in-process Tavily limit tighter than normal chat limits."""
+    now = time.monotonic()
+    window_seconds = 60
+    limit = int(TAVILY_CONFIG.get("rate_limit_per_minute", 10))
+
+    while _REQUEST_TIMESTAMPS and now - _REQUEST_TIMESTAMPS[0] >= window_seconds:
+        _REQUEST_TIMESTAMPS.popleft()
+
+    if len(_REQUEST_TIMESTAMPS) >= limit:
+        raise TavilyRateLimitError("Tavily rate limit exceeded")
+
+    _REQUEST_TIMESTAMPS.append(now)
+
+
+def _post(endpoint: str, payload: dict) -> tuple[dict, float]:
+    _enforce_rate_limit()
+    started_at = time.perf_counter()
     try:
         response = requests.post(
             f"{_base_url()}/{endpoint.lstrip('/')}",
@@ -55,7 +79,7 @@ def _post(endpoint: str, payload: dict) -> dict:
             timeout=TAVILY_CONFIG.get("timeout_seconds", 30),
         )
         response.raise_for_status()
-        return response.json()
+        return response.json(), (time.perf_counter() - started_at) * 1000
     except TavilyError:
         raise
     except Exception as exc:
@@ -67,6 +91,12 @@ def _require_https_url(url: str) -> str:
     if parsed.scheme != "https":
         raise TavilyError("Only https URLs are allowed for Tavily extract/map")
     return url
+
+
+def _truncate_text(text: str, max_chars: int) -> str:
+    if len(text) <= max_chars:
+        return text
+    return f"{text[: max_chars - 3]}..."
 
 
 def tavily_search(
@@ -88,7 +118,7 @@ def tavily_search(
         "include_images": include_images if include_images is not None else TAVILY_CONFIG.get("include_images", False),
         "search_depth": search_depth or TAVILY_CONFIG.get("search_depth", "basic"),
     }
-    data = _post("search", payload)
+    data, elapsed_ms = _post("search", payload)
     results = [
         WebSearchResultItem(
             title=item.get("title") or item.get("url", "Untitled result"),
@@ -99,6 +129,10 @@ def tavily_search(
         for item in data.get("results", [])
         if item.get("url")
     ]
+    log_handler.info(
+        "Tavily search metadata: "
+        f"query='{payload['query']}', elapsed_ms={elapsed_ms:.2f}, result_count={len(results)}"
+    )
     return WebSearchResponse(query=data.get("query", query), answer=data.get("answer"), results=results)
 
 
@@ -106,25 +140,35 @@ def tavily_extract(urls: list[str] | str, *, include_images: bool = False) -> We
     """Extract cleaned content for one or more HTTPS URLs."""
     url_list = [urls] if isinstance(urls, str) else urls
     safe_urls = [_require_https_url(url) for url in url_list]
-    data = _post("extract", {"urls": safe_urls, "include_images": include_images})
+    data, elapsed_ms = _post("extract", {"urls": safe_urls, "include_images": include_images})
+    max_extract_chars = int(TAVILY_CONFIG.get("max_extract_chars", 12000))
     results = [
         WebExtractItem(
             url=item.get("url", ""),
             title=item.get("title"),
-            content=item.get("raw_content") or item.get("content") or "",
+            content=_truncate_text(item.get("raw_content") or item.get("content") or "", max_extract_chars),
             metadata={key: value for key, value in item.items() if key not in {"url", "title", "raw_content", "content"}},
         )
         for item in data.get("results", [])
         if item.get("url")
     ]
+    log_handler.info(
+        "Tavily extract metadata: "
+        f"url_count={len(safe_urls)}, elapsed_ms={elapsed_ms:.2f}, result_count={len(results)}, "
+        f"failed_count={len(data.get('failed_results', []))}"
+    )
     return WebExtractResponse(results=results, failed_results=data.get("failed_results", []))
 
 
 def tavily_map(url: str, *, max_depth: int = 1, limit: int = 50) -> WebMapResponse:
     """Discover a lightweight site map for an HTTPS URL."""
     safe_url = _require_https_url(url)
-    data = _post("map", {"url": safe_url, "max_depth": max_depth, "limit": limit})
+    data, elapsed_ms = _post("map", {"url": safe_url, "max_depth": max_depth, "limit": limit})
     nodes = [WebMapNode(url=result_url) for result_url in data.get("results", [])]
+    log_handler.info(
+        "Tavily map metadata: "
+        f"url='{safe_url}', elapsed_ms={elapsed_ms:.2f}, result_count={len(nodes)}"
+    )
     return WebMapResponse(base_url=data.get("base_url", safe_url), results=nodes)
 
 
@@ -136,8 +180,8 @@ def format_search_results_for_prompt(search_response: WebSearchResponse, max_res
     lines = [f"WEB SEARCH RESULTS for query: {search_response.query}"]
     for index, item in enumerate(search_response.results[:max_results], start=1):
         snippet = item.content_snippet.replace("\n", " ").strip()
-        if len(snippet) > 500:
-            snippet = f"{snippet[:497]}..."
+        prompt_snippet_chars = int(TAVILY_CONFIG.get("prompt_snippet_chars", 500))
+        snippet = _truncate_text(snippet, prompt_snippet_chars)
         lines.append(f"{index}. {item.title}\nURL: {item.url}\nSnippet: {snippet}")
     return "\n".join(lines)
 
@@ -150,8 +194,8 @@ def append_relevant_links(reply: str, search_response: WebSearchResponse, max_re
     link_lines = ["", "Relevant links:"]
     for item in search_response.results[:max_results]:
         snippet = item.content_snippet.replace("\n", " ").strip()
-        if len(snippet) > 140:
-            snippet = f"{snippet[:137]}..."
+        reply_snippet_chars = int(TAVILY_CONFIG.get("reply_snippet_chars", 140))
+        snippet = _truncate_text(snippet, reply_snippet_chars)
         reason = f" - {snippet}" if snippet else ""
         link_lines.append(f"- {item.title}: {item.url}{reason}")
     return f"{reply}\n" + "\n".join(link_lines)
