@@ -165,6 +165,37 @@
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
   }
 
+  .glossy-btn-ghost-active {
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.05) 50%, rgba(0,0,0,0.1) 100%),
+      rgba(126, 200, 227, 0.15);
+    border: 1px solid rgba(126, 200, 227, 0.5);
+    border-radius: 10px;
+    color: #ffffff;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.3),
+      0 0 20px rgba(126, 200, 227, 0.4),
+      0 0 40px rgba(126, 200, 227, 0.2);
+    animation: navGlow 3s ease-in-out infinite;
+  }
+
+  @keyframes navGlow {
+    0%, 100% {
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.3),
+        0 0 20px rgba(126, 200, 227, 0.4),
+        0 0 40px rgba(126, 200, 227, 0.2);
+      filter: brightness(1.1);
+    }
+    50% {
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.3),
+        0 0 30px rgba(126, 200, 227, 0.6),
+        0 0 60px rgba(126, 200, 227, 0.3);
+      filter: brightness(1.25);
+    }
+  }
+
   .aero-input {
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.16);
