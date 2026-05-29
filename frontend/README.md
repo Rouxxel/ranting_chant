@@ -1,287 +1,277 @@
-# Ranting Chant — Frontend
+# Ranting Chant Frontend
 
-AI-powered property operations platform. This frontend is fully wired to the FastAPI backend with real API integration for tenants, managers, requests, conversations, and voice services.
+React 19 + TypeScript frontend for Ranting Chant, an AI-powered property operations platform. The app is wired to the FastAPI backend for tenants, managers, owners, vendors, requests, conversations, and voice services.
 
-The visual language is **Frutiger Aero** — glassmorphism, glossy buttons, sky-blue glows on a deep-navy radial-gradient background.
+The visual language is Frutiger Aero: glass panels, glossy controls, sky-blue glows, and a deep-navy radial background.
 
----
-
-## 1. Tech stack
+## Tech Stack
 
 | Layer | Choice |
 |---|---|
-| Framework | **React 19 + TypeScript** |
-| Build / dev server | **Vite 7** |
-| Routing | **TanStack Router** (file-based, `src/routes/`) |
-| Data fetching | **Axios** with typed API service |
-| Styling | **Tailwind CSS v4** via `src/styles.css` (`@theme inline`) |
-| Components | **shadcn/ui** (Radix primitives in `src/components/ui/`) |
-| Icons | **lucide-react** |
-| Toast notifications | **Sonner** |
-| Package manager | **bun** |
+| Framework | React 19 + TypeScript |
+| Build/dev server | Vite 7 |
+| Routing | TanStack Router file routes in `src/routes/` |
+| Data fetching | Axios through `src/services/api.ts` |
+| Styling | Tailwind CSS v4 via `src/styles.css` |
+| Components | shadcn/ui Radix primitives in `src/components/ui/` |
+| Icons | lucide-react |
+| Toasts | Sonner |
+| Package manager | bun |
 
-There is no React Router DOM. Use `Link` / `useNavigate` from `@tanstack/react-router`.
+Use `Link`, `useNavigate`, and route APIs from `@tanstack/react-router`. This app does not use React Router DOM.
 
----
+## Quick Start
 
-## 2. Quick Start
-
-### Prerequisites
-
-- Node.js 18+ or bun
-- Backend API running on `http://localhost:8000` (or configured via `VITE_API_URL`)
-
-### Setup
-
-1. **Install dependencies**:
-   ```bash
-   cd frontend
-   bun install
-   ```
-
-2. **Configure environment**:
-   ```bash
-   cp .env.example .env
-   # Edit .env with your backend API URL
-   VITE_API_URL=http://localhost:8000
-   ```
-
-3. **Run the development server**:
-   ```bash
-   bun run dev
-   ```
-
-4. **Access the application**:
-   - Frontend: http://localhost:5173 (or whichever port Vite picks)
-   - Backend API: http://localhost:8000
-   - API docs: http://localhost:8000/docs
-
----
-
-## 3. What's in place
-
-### 3.1 Design system — `src/styles.css`
-
-Custom Frutiger Aero tokens layered on top of shadcn's semantic tokens:
-
-```
---ranting-navy   #0a1628   page background
---ranting-deep   #1a3a5c   secondary surface
---ranting-accent #2d6a9f   primary action
---ranting-sky    #7ec8e3   highlights / glows
---ranting-ice    #c8e6f5   primary text
---ranting-muted  #8a9bb0   secondary text
+```bash
+cd frontend
+bun install
+bun run dev
 ```
 
-Reusable utility classes (all in `@layer utilities`):
+The dev server usually runs at `http://localhost:5173`.
 
-| Class | Purpose |
-|---|---|
-| `.aero-bg` | Radial-gradient page background |
-| `.glass-panel` / `.glass-panel-strong` | Glassmorphic cards / modals |
-| `.glossy-btn` / `.glossy-btn-green` / `.glossy-btn-ghost` | Glossy button variants |
-| `.aero-input` | Themed input/textarea |
-| `.glow-{status}` | Status pill glow (`pending`, `in_progress`, `escalated`, `resolved`, `pending_approval`, `pending_review`) |
-| `.urg-{level}` | Urgency pill (`low`, `medium`, `high`) |
-| `.left-glow-escalated` / `.left-glow-high` | Table-row left border glow |
-| `.mic-pulse` | Red pulsing recording state |
-| `.typing-dot` | Animated 3-dot typing indicator |
-| `.shimmer` | Loading shimmer placeholder |
-| `.underline-glow` | Sky-blue glow underline for headings |
-| `.text-glow-sky` | Glowing brand text |
+The API service defaults to:
 
-Themed scrollbars (Webkit + Firefox + Radix `ScrollArea`) are applied globally.
+- `VITE_LOCAL_BACKEND` or `http://localhost:8000`
+- `VITE_PROD_BACKEND` or `https://ranting-chant.onrender.com`
 
-### 3.2 API Service — `src/services/api.ts`
+Create `frontend/.env` when you need custom URLs:
 
-Typed Axios-based API service with:
-- All backend endpoints (tenants, properties, vendors, managers, requests, conversation, voice, MCP)
-- Request/response interceptors for auth and error handling
-- Toast notifications on 4xx/5xx errors via Sonner
-- Environment-based API URL configuration
+```bash
+VITE_LOCAL_BACKEND=http://localhost:8000
+VITE_PROD_BACKEND=https://your-production-backend.example.com
+```
 
-### 3.3 Shared components — `src/components/`
+## What's In Place
 
-- `AeroBackground.tsx` — fixed radial gradient + bokeh blobs (mounted in `__root.tsx`)
-- `Logo.tsx` — "Ranting Chant" wordmark with sky-blue glow
-- `Avatar.tsx` — initials circle with glowing ring
-- `Badges.tsx` — `StatusBadge` and `UrgencyBadge`
-- `MessageBubble.tsx` — Tenant/AI message bubbles with timestamps
-- `ChatInput.tsx` — Text input with send button and voice toggle
-- `RequestCard.tsx` — Request summary card with status/urgency badges
-- `RequestTimeline.tsx` — Vertical timeline for conversation history
-- `RequestTable.tsx` — Sortable table for management dashboard
-- `RequestDetailPanel.tsx` — Slide-in detail panel with AI summary
-- `ui/*` — full shadcn/ui library (button, card, sheet, tabs, select, dialog, scroll-area, table, skeleton, sonner, etc.)
+### App Shell and Auth State
 
-### 3.4 Context — `src/context/AppContext.tsx`
+- `src/routes/__root.tsx` mounts the app shell, `AeroBackground`, `AppProvider`, and route outlet.
+- `src/context/AppContext.tsx` stores `currentTenant`, `currentManager`, and `userRole` in localStorage.
+- `src/components/AuthenticatedLayout.tsx` provides the shared authenticated header with logo, role-aware navigation, avatar, and logout.
+- `src/lib/auth.ts` provides route guards for tenant-only, manager/owner-only, and any-authenticated-user routes.
+- Logout is client-side: it clears the current user plus cached request/vendor keys, then navigates to `/`.
 
-Global application state:
-- `currentTenant` — Logged-in tenant
-- `currentManager` — Logged-in manager
-- `userRole` — 'tenant' or 'manager'
-- localStorage persistence
+Backend authentication is not implemented yet, so protected frontend routes rely on persisted app context.
 
-### 3.5 Routes — `src/routes/`
+### Routes
 
 | File | URL | Purpose |
 |---|---|---|
-| `__root.tsx` | — | HTML shell, Inter font, `<AeroBackground />`, `<Outlet />`, `<AppProvider />` |
-| `index.tsx` | `/` | Login (shadcn `Tabs` for Tenant vs Manager) |
-| `chat.tsx` | `/chat` | Tenant ⇄ AI conversation, mic + send, typing indicator, voice mode |
-| `dashboard.tsx` | `/dashboard` | Tenant's request list with expandable timeline |
-| `management.tsx` | `/management` | Manager dashboard: stats, filters, sortable table, slide-in detail panel |
+| `index.tsx` | `/` | Tenant and manager/owner login |
+| `chat.tsx` | `/chat` | Tenant AI conversation with text and voice input |
+| `dashboard.tsx` | `/dashboard` | Tenant request list and timelines |
+| `management.tsx` | `/management` | Manager/owner dashboard with stats, filters, table, and detail panel |
+| `vendors.tsx` | `/vendors` | Vendor directory with search and service filtering |
 
-The Vite plugin regenerates `src/routeTree.gen.ts` automatically — never edit it manually.
+Protected route behavior:
 
-### 3.6 Hooks — `src/hooks/`
+- `/chat` and `/dashboard` require a tenant session.
+- `/management` requires a manager or owner session.
+- `/vendors` requires any authenticated session.
 
-- `useVoiceRecorder.ts` — Custom hook wrapping MediaRecorder API for audio recording
+The Vite router plugin regenerates `src/routeTree.gen.ts`; do not edit it manually.
 
----
+### Shared Components
 
-## 4. Project layout
+- `AeroBackground.tsx` - fixed page background
+- `AuthenticatedLayout.tsx` - authenticated app header, nav, avatar, logout
+- `Logo.tsx` - Ranting Chant wordmark
+- `Avatar.tsx` - initials avatar
+- `Badges.tsx` - status, urgency, and request type badges
+- `MessageBubble.tsx` - tenant/AI chat messages
+- `ChatInput.tsx` - text input, send button, voice toggle
+- `RequestCard.tsx` - tenant request card
+- `RequestTimeline.tsx` - conversation/notification timeline
+- `RequestTable.tsx` - management request table
+- `RequestDetailPanel.tsx` - slide-in request details and AI summary
+- `ui/*` - shadcn/ui primitives
 
+### API Service
+
+`src/services/api.ts` is the only place route components should call backend HTTP endpoints directly.
+
+It includes typed helpers for:
+
+- tenants, properties, vendors, managers, owners
+- requests
+- conversation start/message/history/save
+- voice transcription/start/respond
+- MCP tools
+
+The Axios interceptor:
+
+- adds `auth_token` when present
+- retries against the fallback backend URL on network failures
+- shows Sonner toasts for connection and request errors
+- clears `auth_token` and redirects to `/` on `401`
+
+### Request Types
+
+Canonical request types live in `src/types/index.ts` and mirror `backend/src/models/request.py`.
+
+```ts
+export const REQUEST_TYPES = [
+  "plumbing",
+  "electrical",
+  "hvac",
+  "appliance",
+  "pest_control",
+  "lockout",
+  "access_control",
+  "noise",
+  "lease_question",
+  "rent_payment",
+  "emergency",
+  "general",
+] as const;
 ```
+
+Use:
+
+- `RequestType` for request type fields
+- `requestTypeLabels` for display labels
+- `getRequestTypeLabel(type)` for UI text
+- `RequestTypeBadge` for compact category display
+
+Current request type UI support:
+
+- request cards display readable type labels
+- request detail panels display type badges
+- management table displays type badges
+- management filters include all canonical request types
+- chat/save metadata sends a canonical type instead of deriving type from status
+
+## Design System
+
+Design tokens and utilities live in `src/styles.css`.
+
+Core tokens:
+
+```text
+--ranting-navy   #0a1628
+--ranting-deep   #1a3a5c
+--ranting-accent #2d6a9f
+--ranting-sky    #7ec8e3
+--ranting-ice    #c8e6f5
+--ranting-muted  #8a9bb0
+```
+
+Reusable utility classes:
+
+| Class | Purpose |
+|---|---|
+| `.aero-bg` | Page background |
+| `.glass-panel` / `.glass-panel-strong` | Glass surfaces |
+| `.glossy-btn` / `.glossy-btn-green` / `.glossy-btn-ghost` | Button variants |
+| `.aero-input` | Themed inputs and selects |
+| `.glow-{status}` | Status badge glow |
+| `.urg-{level}` | Urgency badge colors |
+| `.left-glow-escalated` / `.left-glow-high` | Table row urgency accents |
+| `.mic-pulse` | Recording state |
+| `.typing-dot` | Chat typing indicator |
+| `.shimmer` | Loading placeholders |
+| `.underline-glow` | Heading underline |
+| `.text-glow-sky` | Brand text glow |
+
+## Project Layout
+
+```text
 src/
-├── routes/              file-based routes (TanStack Router)
-│   ├── __root.tsx
-│   ├── index.tsx        /        Login
-│   ├── chat.tsx         /chat
-│   ├── dashboard.tsx    /dashboard
-│   └── management.tsx   /management
-├── components/
-│   ├── AeroBackground.tsx
-│   ├── Avatar.tsx
-│   ├── Badges.tsx
-│   ├── Logo.tsx
-│   ├── MessageBubble.tsx
-│   ├── ChatInput.tsx
-│   ├── RequestCard.tsx
-│   ├── RequestTimeline.tsx
-│   ├── RequestTable.tsx
-│   ├── RequestDetailPanel.tsx
-│   └── ui/              shadcn/ui primitives
-├── context/
-│   └── AppContext.tsx   Global app state
-├── hooks/
-│   └── useVoiceRecorder.ts
-├── services/
-│   └── api.ts           Axios API service
-├── types/
-│   └── index.ts         TypeScript interfaces
-├── lib/
-│   └── utils.ts         cn() helper
-└── styles.css           Tailwind v4 + design tokens + utilities
+|-- components/
+|   |-- AuthenticatedLayout.tsx
+|   |-- AeroBackground.tsx
+|   |-- Avatar.tsx
+|   |-- Badges.tsx
+|   |-- ChatInput.tsx
+|   |-- Logo.tsx
+|   |-- MessageBubble.tsx
+|   |-- RequestCard.tsx
+|   |-- RequestDetailPanel.tsx
+|   |-- RequestTable.tsx
+|   |-- RequestTimeline.tsx
+|   `-- ui/
+|-- context/
+|   `-- AppContext.tsx
+|-- hooks/
+|   `-- useVoiceRecorder.ts
+|-- lib/
+|   |-- auth.ts
+|   `-- utils.ts
+|-- routes/
+|   |-- __root.tsx
+|   |-- index.tsx
+|   |-- chat.tsx
+|   |-- dashboard.tsx
+|   |-- management.tsx
+|   `-- vendors.tsx
+|-- services/
+|   `-- api.ts
+|-- types/
+|   `-- index.ts
+`-- styles.css
 ```
 
----
+## Features
 
-## 5. Environment Variables
+### Login (`/`)
 
-Create a `.env` file in the frontend root:
+- Tenant login: name + unit matched against `GET /tenants`
+- Manager/owner login: name matched against `GET /managers` and `GET /owners`
+- Stores current user and role in `AppContext`
 
-```bash
-VITE_API_URL=http://localhost:8000
-```
+### Chat (`/chat`)
 
-For production deployment, set `VITE_API_URL` to your backend URL (e.g., Render backend URL).
+- Guarded tenant route
+- Starts a conversation through `POST /conversation/start`
+- Sends messages through `POST /conversation/message`
+- Supports voice transcription through `POST /voice/transcribe`
+- Supports voice response through `POST /voice/respond`
+- Saves conversations through `POST /conversation/save-conversation`
+- Invalidates cached tenant requests when new requests are created
 
----
+### Tenant Dashboard (`/dashboard`)
 
-## 6. Features
+- Guarded tenant route
+- Lists current tenant requests from `GET /requests`
+- Caches tenant request lists under `requests_{tenantId}`
+- Shows request cards, status/urgency/type information, and expandable timelines
 
-### 6.1 Login Page (`/`)
-- Two-tab layout: Tenant / Manager
-- Tenant login: name + unit → matches against backend via `GET /tenants`
-- Manager login: name → matches against backend via `GET /managers`
-- Inline error handling for failed authentication
-- Stores user in AppContext with localStorage persistence
+### Management Dashboard (`/management`)
 
-### 6.2 Chat Page (`/chat`)
-- AI-powered conversation interface
-- Text input with send button
-- Voice mode with microphone toggle (uses MediaRecorder API)
-- Real-time typing indicator
-- Status badge and urgency display
-- Escalation banner for urgent requests
-- Loading skeleton during conversation start
-- Wired to:
-  - `POST /conversation/start` — initialize conversation
-  - `POST /conversation/message` — send messages
-  - `POST /voice/transcribe` — speech-to-text
-  - `POST /voice/respond` — AI voice response
+- Guarded manager/owner route
+- Filters requests by managed or owned property IDs
+- Displays stats for total, escalated, pending approval, and resolved requests
+- Filters by request type, status, urgency, and property
+- Opens a request detail panel with summary, conversation, and notifications
+- Approves pending approval requests with `PATCH /requests/{id}`
 
-### 6.3 Tenant Dashboard (`/dashboard`)
-- Request list filtered by current tenant
-- Expandable request cards with timeline
-- Status and urgency badges
-- "New Request" button navigates to chat
-- Loading skeletons during data fetch
-- Wired to `GET /requests` filtered by tenant_id
+### Vendor Directory (`/vendors`)
 
-### 6.4 Management Dashboard (`/management`)
-- Stats bar: total, escalated, pending approval, resolved
-- Filter bar: status, urgency, property
-- Sortable table (click headers to sort)
-- Escalated rows highlighted red
-- Slide-in detail panel with:
-  - Full request details
-  - Conversation timeline
-  - Notification history
-  - AI summary (fetched from `GET /requests/{id}/summary`)
-- Approve button for pending_approval requests
-- Loading skeletons during data fetch
-- Wired to:
-  - `GET /requests` (filtered client-side by manager ID)
-  - `PATCH /requests/{id}` — approve requests
-  - `GET /requests/{id}/summary` — AI summary
+- Guarded authenticated route
+- Available to tenants, managers, and owners
+- Uses cached `vendors` data and refreshes from `GET /vendors`
+- Supports text search and service filtering
 
----
-
-## 7. Build for Production
+## Build
 
 ```bash
 bun run build
 ```
 
-This creates an optimized production build in the `dist/` directory.
+The production build is written to `dist/`.
 
----
+## Conventions
 
-## 8. Deployment
+- Use `src/services/api.ts` for backend calls.
+- Use TanStack Router file routes in `src/routes/`.
+- Use the design tokens and utility classes in `src/styles.css`.
+- Use `RequestType`, `REQUEST_TYPES`, and `getRequestTypeLabel()` for request type work.
+- Keep route guards aligned with `src/lib/auth.ts`.
+- Do not edit `src/routeTree.gen.ts` manually.
 
-### Vercel (Recommended)
-
-1. Connect your GitHub repository to Vercel
-2. Set root directory to `frontend`
-3. Set build command to `bun run build`
-4. Set output directory to `dist`
-5. Add environment variable: `VITE_API_URL=https://your-backend-url.onrender.com`
-6. Deploy
-
-### Other Platforms
-
-The frontend is a standard Vite build and can be deployed to:
-- Netlify
-- AWS S3 + CloudFront
-- GitHub Pages
-- Any static hosting service
-
----
-
-## 9. Conventions
-
-- **Always use design tokens.** Never hard-code colors like `text-white`; use `text-ranting-ice`, `bg-ranting-navy`, etc.
-- **Mobile**: tablet (768px+) and desktop are first-class. Mobile <768px is intentionally not optimized.
-- **Routing**: add a new page by dropping a file in `src/routes/`. Use dots, not nested directories (`settings.profile.tsx` → `/settings/profile`).
-- **API calls**: Use the typed functions from `src/services/api.ts`, not direct Axios calls.
-- **Error handling**: API errors automatically show toast notifications via the response interceptor.
-
----
-
-## 10. Requirements
+## Requirements
 
 - Node.js 18+ or bun
-- Backend API running on configured URL
-- API Keys for backend services (configured in backend)
+- Backend API running on the configured URL
+- Backend service keys configured when AI, voice, email, or SMS features are needed
