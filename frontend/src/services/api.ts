@@ -21,6 +21,7 @@ import type {
   VoiceTranscribeRequest,
   VoiceTranscribeResponse,
   VoiceProviderId,
+  VoiceProviderVoicesResponse,
   VoiceProvidersResponse,
   VoiceStartRequest,
   VoiceStartResponse,
@@ -282,6 +283,13 @@ export const sendRequestNotifications = async (requestId: string): Promise<Reque
 
 export const getVoiceProviders = async (): Promise<VoiceProvidersResponse> => {
   const response = await apiClient.get<VoiceProvidersResponse>('/voice/providers');
+  return response.data;
+};
+
+export const getVoiceProviderVoices = async (provider: VoiceProviderId): Promise<VoiceProviderVoicesResponse> => {
+  const response = await apiClient.get<VoiceProviderVoicesResponse>('/voice/voices', {
+    params: { provider },
+  });
   return response.data;
 };
 

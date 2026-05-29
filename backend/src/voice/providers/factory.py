@@ -59,3 +59,11 @@ def list_voice_providers() -> dict:
             }
         )
     return {"default_provider": default_provider, "providers": providers}
+
+
+def list_voice_provider_voices(provider_id: Optional[str] = None) -> dict:
+    provider = get_voice_provider(provider_id)
+    return {
+        "provider": provider.provider_id,
+        "voices": [voice.__dict__ for voice in provider.list_voices()],
+    }

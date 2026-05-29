@@ -200,6 +200,12 @@ export interface RequestSummary {
 
 export type VoiceProviderId = "elevenlabs" | "gradium";
 
+export interface Voice {
+  id: string;
+  name: string;
+  provider: VoiceProviderId;
+}
+
 export interface VoiceProviderCapability {
   id: VoiceProviderId;
   display_name: string;
@@ -210,16 +216,17 @@ export interface VoiceProviderCapability {
     stt: boolean;
     streaming_tts: boolean;
   };
-  voices: {
-    id: string;
-    name: string;
-    provider: VoiceProviderId;
-  }[];
+  voices: Voice[];
 }
 
 export interface VoiceProvidersResponse {
   default_provider: VoiceProviderId;
   providers: VoiceProviderCapability[];
+}
+
+export interface VoiceProviderVoicesResponse {
+  provider: VoiceProviderId;
+  voices: Voice[];
 }
 
 export interface VoiceTranscribeRequest {
@@ -234,6 +241,7 @@ export interface VoiceTranscribeResponse {
 export interface VoiceStartRequest {
   tenant_id: string;
   provider?: VoiceProviderId;
+  voice_id?: string;
 }
 
 export interface VoiceStartResponse {
@@ -249,6 +257,7 @@ export interface VoiceRespondRequest {
   tenant_id: string;
   transcript: string;
   provider?: VoiceProviderId;
+  voice_id?: string;
 }
 
 export interface VoiceRespondResponse {

@@ -33,6 +33,7 @@ from src.voice.providers import (
     ProviderUnavailableError,
     VoiceProviderError,
     get_voice_provider,
+    list_voice_provider_voices,
     list_voice_providers,
 )
 
@@ -41,6 +42,7 @@ class VoiceStartPayload(BaseModel):
     """Payload accepted when starting a voice session."""
     tenant_id: str
     provider: Optional[str] = None
+    voice_id: Optional[str] = None
 
 
 class VoiceRespondPayload(BaseModel):
@@ -49,6 +51,7 @@ class VoiceRespondPayload(BaseModel):
     tenant_id: str
     transcript: str
     provider: Optional[str] = None
+    voice_id: Optional[str] = None
 
 
 """API ROUTER-----------------------------------------------------------"""
@@ -77,6 +80,17 @@ def _provider_exception_to_http(exc: VoiceProviderError) -> HTTPException:
 async def get_voice_providers(request: Request):
     """Return supported voice providers and configuration/capability metadata."""
     return list_voice_providers()
+
+
+@router.get("/voices")
+@SlowLimiter.limit("30/minute")
+async def get_voice_provider_voices(request: Request, provider: Optional[str] = None):
+    """Return available voices for a configured provider."""
+    try:
+        return list_voice_provider_voices(provider)
+    except VoiceProviderError as e:
+        log_handler.error(f"Voice provider error listing voices: {e}")
+        raise _provider_exception_to_http(e)
 
 
 # Transcribe audio to text
@@ -197,7 +211,7 @@ async def start_voice_session(request: Request, body: VoiceStartPayload):
         # 5. Convert greeting to audio through selected provider
         voice_provider = get_voice_provider(body.provider)
         log_handler.info(f"Using voice provider '{voice_provider.provider_id}' for session greeting")
-        greeting_audio = voice_provider.tts(greeting)
+        greeting_audio = voice_provider.tts(greeting, voice_id=body.voice_id)
         greeting_audio_base64 = base64.b64encode(greeting_audio.audio_bytes).decode("utf-8")
 
         log_handler.info(
@@ -289,7 +303,7 @@ async def respond_to_voice_message(request: Request, body: VoiceRespondPayload):
         log_handler.info(f"Using voice provider '{voice_provider.provider_id}' for voice response")
         if is_escalated:
             log_handler.info(f"Request '{request_id}' is escalated, using emergency TTS")
-        audio_result = voice_provider.tts(reply_text, emergency=is_escalated)
+        audio_result = voice_provider.tts(reply_text, voice_id=body.voice_id, emergency=is_escalated)
         audio_base64 = base64.b64encode(audio_result.audio_bytes).decode("utf-8")
 
         log_handler.info(

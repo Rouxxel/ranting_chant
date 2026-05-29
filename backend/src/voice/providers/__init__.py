@@ -12,7 +12,7 @@ from src.voice.providers.base import (
     VoiceProviderError,
     VoiceProviderId,
 )
-from src.voice.providers.factory import get_voice_provider, list_voice_providers
+from src.voice.providers.factory import get_voice_provider, list_voice_provider_voices, list_voice_providers
 
 __all__ = [
     "AudioBytesResult",
@@ -24,5 +24,6 @@ __all__ = [
     "VoiceProviderError",
     "VoiceProviderId",
     "get_voice_provider",
+    "list_voice_provider_voices",
     "list_voice_providers",
 ]

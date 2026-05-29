@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import os
 
+from src.core_specs.configuration.config_loader import config_loader
 from src.voice.providers.base import AudioBytesResult, TranscriptionResult, Voice, VoiceProviderError
 from src.voice.stt_service import transcribe
 from src.voice.tts_service import text_to_speech_bytes, text_to_speech_emergency
@@ -55,7 +56,5 @@ class ElevenLabsProvider:
             raise VoiceProviderError(f"ElevenLabs text-to-speech failed: {exc}") from exc
 
     def list_voices(self) -> list[Voice]:
-        voice_id = os.getenv("ELEVENLABS_VOICE_ID", "").strip()
-        if not voice_id:
-            return []
+        voice_id = config_loader["voice_provider"]["elevenlabs"]["tts"]["voice_id"]
         return [Voice(id=voice_id, name="Default ElevenLabs Voice", provider=self.provider_id)]

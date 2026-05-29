@@ -10,9 +10,9 @@ import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useApp } from "@/context/AppContext";
 import { requireTenantAuth } from "@/lib/auth";
-import { startConversation, sendMessage, transcribeAudio, respondToVoice, saveConversation, sendRequestNotifications } from "@/services/api";
+import { startConversation, sendMessage, transcribeAudio, respondToVoice, saveConversation, sendRequestNotifications, getVoiceProviderVoices } from "@/services/api";
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
-import type { ConversationMessage, RequestType, Status, Urgency } from "@/types";
+import type { ConversationMessage, RequestType, Status, Urgency, Voice } from "@/types";
 
 export const Route = createFileRoute("/chat")({
   head: () => ({ meta: [{ title: "Chat — Ranting Chant" }] }),
@@ -36,6 +36,8 @@ function ChatPage() {
   const [urgency, setUrgency] = useState<Urgency>("low");
   const [escalated, setEscalated] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [voiceId, setVoiceId] = useState<string | undefined>(undefined);
+  const [voices, setVoices] = useState<Voice[]>([]);
   const scrollerRef = useRef<HTMLDivElement>(null);
 
   const { isRecording, audioBlob, startRecording, stopRecording, resetRecording } = useVoiceRecorder();
@@ -81,6 +83,32 @@ function ChatPage() {
   useEffect(() => {
     scrollerRef.current?.scrollTo({ top: scrollerRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, typing]);
+
+  useEffect(() => {
+    const loadProviderVoices = async () => {
+      const capabilityVoices = voiceProviders.find((provider) => provider.id === voiceProvider)?.voices ?? [];
+
+      try {
+        const response = await getVoiceProviderVoices(voiceProvider);
+        setVoices(response.voices);
+        setVoiceId((currentVoiceId) => (
+          response.voices.some((voice) => voice.id === currentVoiceId)
+            ? currentVoiceId
+            : response.voices[0]?.id
+        ));
+      } catch (error) {
+        console.error("Failed to load provider voices:", error);
+        setVoices(capabilityVoices);
+        setVoiceId((currentVoiceId) => (
+          capabilityVoices.some((voice) => voice.id === currentVoiceId)
+            ? currentVoiceId
+            : capabilityVoices[0]?.id
+        ));
+      }
+    };
+
+    loadProviderVoices();
+  }, [voiceProvider, voiceProviders]);
 
   async function send() {
     const t = input.trim();
@@ -216,7 +244,8 @@ function ChatPage() {
         request_id: requestId,
         tenant_id: tenantId,
         transcript,
-        provider: voiceProvider
+        provider: voiceProvider,
+        voice_id: voiceId
       });
 
       // Add AI response
@@ -338,7 +367,10 @@ function ChatPage() {
           onVoiceToggle={handleVoiceToggle}
           voiceProvider={voiceProvider}
           voiceProviders={voiceProviders}
+          voiceId={voiceId}
+          voices={voices}
           onVoiceProviderChange={setVoiceProvider}
+          onVoiceChange={setVoiceId}
           isRecording={isRecording}
           isTyping={typing}
         />

@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 from src.api_endpoints.routers.voice_router import _provider_exception_to_http
 from src.voice.providers.base import InvalidVoiceRequestError, ProviderUnavailableError
-from src.voice.providers.factory import get_voice_provider, list_voice_providers
+from src.voice.providers.factory import get_voice_provider, list_voice_provider_voices, list_voice_providers
 
 
 class TestVoiceProviderSelection(unittest.TestCase):
@@ -35,3 +35,11 @@ class TestVoiceProviderSelection(unittest.TestCase):
         self.assertEqual(response["default_provider"], "elevenlabs")
         self.assertIn("elevenlabs", provider_ids)
         self.assertIn("gradium", provider_ids)
+
+    @patch.dict("os.environ", {"GRADIUM_API_KEY": "gradium-key"}, clear=False)
+    def test_list_provider_voices_returns_voice_metadata(self):
+        response = list_voice_provider_voices("gradium")
+
+        self.assertEqual(response["provider"], "gradium")
+        self.assertEqual(response["voices"][0]["provider"], "gradium")
+        self.assertIn("id", response["voices"][0])
