@@ -30,7 +30,16 @@ import type {
   MCPTool,
   MCPToolsResponse,
   ApiResponse,
-  ApiError
+  ApiError,
+  PropertyCreateRequest,
+  PropertyUpdateRequest,
+  TenantCreateRequest,
+  TenantUpdateRequest,
+  VendorCreateRequest,
+  VendorUpdateRequest,
+  ProfileUpdateRequest,
+  RequestCancelRequest,
+  RequestCompleteRequest
 } from '../types';
 
 // Fallback endpoints from environment variables
@@ -160,6 +169,21 @@ export const getTenantsByProperty = async (propertyId: string): Promise<Tenant[]
   return response.data;
 };
 
+export const createTenant = async (data: TenantCreateRequest): Promise<Tenant> => {
+  const response = await apiClient.post<Tenant>('/tenants', data);
+  return response.data;
+};
+
+export const updateTenant = async (tenantId: string, data: TenantUpdateRequest): Promise<Tenant> => {
+  const response = await apiClient.patch<Tenant>(`/tenants/${tenantId}`, data);
+  return response.data;
+};
+
+export const updateTenantProfile = async (tenantId: string, data: ProfileUpdateRequest): Promise<Tenant> => {
+  const response = await apiClient.patch<Tenant>(`/tenants/${tenantId}/profile`, data);
+  return response.data;
+};
+
 // ==================== Properties ====================
 
 export const getProperties = async (): Promise<Property[]> => {
@@ -169,6 +193,16 @@ export const getProperties = async (): Promise<Property[]> => {
 
 export const getPropertyById = async (propertyId: string): Promise<Property> => {
   const response = await apiClient.get<Property>(`/properties/${propertyId}`);
+  return response.data;
+};
+
+export const createProperty = async (data: PropertyCreateRequest): Promise<Property> => {
+  const response = await apiClient.post<Property>('/properties', data);
+  return response.data;
+};
+
+export const updateProperty = async (propertyId: string, data: PropertyUpdateRequest): Promise<Property> => {
+  const response = await apiClient.patch<Property>(`/properties/${propertyId}`, data);
   return response.data;
 };
 
@@ -189,6 +223,20 @@ export const getVendorsByService = async (service: string): Promise<Vendor[]> =>
   return response.data;
 };
 
+export const createVendor = async (data: VendorCreateRequest): Promise<Vendor> => {
+  const response = await apiClient.post<Vendor>('/vendors', data);
+  return response.data;
+};
+
+export const updateVendor = async (vendorId: string, data: VendorUpdateRequest): Promise<Vendor> => {
+  const response = await apiClient.patch<Vendor>(`/vendors/${vendorId}`, data);
+  return response.data;
+};
+
+export const deleteVendor = async (vendorId: string): Promise<void> => {
+  await apiClient.delete(`/vendors/${vendorId}`);
+};
+
 // ==================== Managers ====================
 
 export const getManagers = async (): Promise<Manager[]> => {
@@ -201,8 +249,18 @@ export const getManagerById = async (managerId: string): Promise<Manager> => {
   return response.data;
 };
 
+export const updateManagerProfile = async (managerId: string, data: ProfileUpdateRequest): Promise<Manager> => {
+  const response = await apiClient.patch<Manager>(`/managers/${managerId}/profile`, data);
+  return response.data;
+};
+
 export const getOwners = async (): Promise<Owner[]> => {
   const response = await apiClient.get<Owner[]>('/owners');
+  return response.data;
+};
+
+export const updateOwnerProfile = async (ownerId: string, data: ProfileUpdateRequest): Promise<Owner> => {
+  const response = await apiClient.patch<Owner>(`/owners/${ownerId}/profile`, data);
   return response.data;
 };
 
@@ -235,6 +293,16 @@ export const createRequest = async (requestData: Partial<Request>): Promise<Requ
 
 export const updateRequest = async (requestId: string, requestData: Partial<Request>): Promise<Request> => {
   const response = await apiClient.patch<Request>(`/requests/${requestId}`, requestData);
+  return response.data;
+};
+
+export const cancelRequest = async (requestId: string, data: RequestCancelRequest): Promise<Request> => {
+  const response = await apiClient.post<Request>(`/requests/${requestId}/cancel`, data);
+  return response.data;
+};
+
+export const completeRequest = async (requestId: string, data: RequestCompleteRequest): Promise<Request> => {
+  const response = await apiClient.post<Request>(`/requests/${requestId}/complete`, data);
   return response.data;
 };
 

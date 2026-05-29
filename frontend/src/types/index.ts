@@ -3,7 +3,7 @@
 
 // ==================== Common Types ====================
 
-export type Status = "pending" | "in_progress" | "escalated" | "resolved" | "pending_approval" | "pending_review";
+export type Status = "pending" | "in_progress" | "escalated" | "resolved" | "pending_approval" | "pending_review" | "cancelled";
 export type Urgency = "low" | "medium" | "high";
 export const REQUEST_TYPES = [
   "plumbing",
@@ -337,6 +337,77 @@ export interface RequestSummary {
   };
   conversation_count: number;
   notification_count: number;
+}
+
+// ==================== Request Payload Types ====================
+
+export interface PropertyCreateRequest {
+  name: string;
+  address: string;
+  year_built?: number;
+  property_type?: string;
+  unit_count?: number;
+  owner_id?: string;
+  manager_id?: string;
+  tenant_ids?: string[];
+}
+
+export interface PropertyUpdateRequest {
+  name?: string;
+  address?: string;
+  year_built?: number;
+  property_type?: string;
+  unit_count?: number;
+  owner_id?: string;
+  manager_id?: string;
+  tenant_ids?: string[];
+}
+
+export interface TenantCreateRequest {
+  name: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  unit: string;
+  property_id: string;
+}
+
+export interface TenantUpdateRequest {
+  name?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  unit?: string;
+  property_id?: string;
+}
+
+export interface VendorCreateRequest {
+  name: string;
+  email: string;
+  phone: string;
+  services: string[];
+  emergency_available?: boolean;
+}
+
+export interface VendorUpdateRequest {
+  name?: string;
+  email?: string;
+  phone?: string;
+  services?: string[];
+  emergency_available?: boolean;
+}
+
+export interface ProfileUpdateRequest {
+  email?: string;
+  phone?: string;
+}
+
+export interface RequestCancelRequest {
+  cancellation_reason?: string;
+}
+
+export interface RequestCompleteRequest {
+  resolution_note?: string;
 }
 
 // ==================== Notification Preferences ====================
