@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 import { toast } from "sonner";
 import { useApp } from "@/context/AppContext";
 import { updateTenantProfile, getProperties } from "@/services/api";
@@ -62,7 +63,7 @@ export function TenantProfile() {
     }
 
     if (Object.keys(changes).length === 0) {
-      toast.error("Please add changes before saving");
+      toast.error("Please enter your changes");
       return;
     }
 
@@ -77,6 +78,18 @@ export function TenantProfile() {
       toast.success("Profile updated");
     } catch (error) {
       console.error("Failed to update profile:", error);
+      // Map the backend validation 400 to a friendly, field-specific message
+      const detail = axios.isAxiosError(error)
+        ? String((error.response?.data as { detail?: string })?.detail ?? "")
+        : "";
+      const lowerDetail = detail.toLowerCase();
+      if (lowerDetail.includes("email")) {
+        toast.error("Please enter a valid email");
+      } else if (lowerDetail.includes("phone")) {
+        toast.error("Please enter a valid phone number");
+      } else {
+        toast.error("Failed to update profile. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }

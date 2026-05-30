@@ -38,11 +38,16 @@ function ChatPage() {
   const [voiceId, setVoiceId] = useState<string | undefined>(undefined);
   const [voices, setVoices] = useState<Voice[]>([]);
   const scrollerRef = useRef<HTMLDivElement>(null);
+  // Guards against React StrictMode's double-mount starting two backend sessions.
+  const startedForTenantRef = useRef<string | null>(null);
 
   const { isRecording, audioBlob, startRecording, stopRecording, resetRecording } = useVoiceRecorder();
 
   // On mount: start conversation
   useEffect(() => {
+    if (startedForTenantRef.current === tenantId) return; // already started for this tenant
+    startedForTenantRef.current = tenantId;
+
     const initConversation = async () => {
       setIsLoading(true);
       try {

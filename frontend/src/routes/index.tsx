@@ -34,6 +34,11 @@ function LoginPage() {
       );
 
       if (matchedTenant) {
+        // Persist synchronously: route guards read localStorage in beforeLoad,
+        // which runs before AppContext's post-render effects would write it.
+        // Without this the first click fails the guard and redirects back to "/".
+        localStorage.setItem('current_tenant', JSON.stringify(matchedTenant));
+        localStorage.setItem('user_role', 'tenant');
         setCurrentTenant(matchedTenant);
         setUserRole('tenant');
         navigate({ to: "/chat" });
@@ -65,10 +70,15 @@ function LoginPage() {
       );
 
       if (matchedManager) {
+        // Persist synchronously so the route guard (which reads localStorage) passes on first click.
+        localStorage.setItem('current_manager', JSON.stringify(matchedManager));
+        localStorage.setItem('user_role', 'manager');
         setCurrentManager(matchedManager);
         setUserRole('manager');
         navigate({ to: "/management" });
       } else if (matchedOwner) {
+        localStorage.setItem('current_manager', JSON.stringify(matchedOwner));
+        localStorage.setItem('user_role', 'owner');
         setCurrentManager(matchedOwner);
         setUserRole('owner');
         navigate({ to: "/management" });

@@ -4,6 +4,14 @@
 
 import axios, { AxiosInstance } from 'axios';
 import { toast } from 'sonner';
+
+// Allow individual requests to opt out of the generic error toast so the
+// caller can show its own field-specific message (e.g. profile validation).
+declare module 'axios' {
+  export interface AxiosRequestConfig {
+    suppressErrorToast?: boolean;
+  }
+}
 import type {
   Tenant,
   Property,
@@ -132,13 +140,15 @@ apiClient.interceptors.response.use(
       localStorage.removeItem('auth_token');
       window.location.href = '/';
     } else if (status && status >= 400 && status < 600) {
-      // Show toast for 4xx/5xx errors
       const message = error.response?.data?.detail || error.message || 'An error occurred';
       console.error(`API Error ${status}:`, message);
-      
-      toast.error(status >= 500 ? 'Server Error' : 'Request Error', {
-        description: message,
-      });
+
+      // Skip the generic toast when the caller handles its own messaging
+      if (!error.config?.suppressErrorToast) {
+        toast.error(status >= 500 ? 'Server Error' : 'Request Error', {
+          description: message,
+        });
+      }
     }
     
     return Promise.reject(error);
@@ -180,7 +190,7 @@ export const updateTenant = async (tenantId: string, data: TenantUpdateRequest):
 };
 
 export const updateTenantProfile = async (tenantId: string, data: ProfileUpdateRequest): Promise<Tenant> => {
-  const response = await apiClient.patch<Tenant>(`/tenants/${tenantId}/profile`, data);
+  const response = await apiClient.patch<Tenant>(`/tenants/${tenantId}/profile`, data, { suppressErrorToast: true });
   return response.data;
 };
 

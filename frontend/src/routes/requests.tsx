@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
-import { Plus } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Plus, RefreshCw } from "lucide-react";
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { RequestCard } from "@/components/RequestCard";
 import { RequestTimeline } from "@/components/RequestTimeline";
@@ -22,44 +22,53 @@ function RequestsPage() {
   const [requests, setRequests] = useState<Request[]>([]);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  // Tracks which tenant we've already loaded so React StrictMode's double-mount
+  // (and plain re-renders) don't trigger a second fetch.
+  const loadedTenantRef = useRef<string | null>(null);
+
+  // Fetch fresh data from the API and refresh the cache. Used on first load
+  // (when nothing is cached) and by the explicit Reload button.
+  const fetchRequests = async () => {
+    setIsRefreshing(true);
+    try {
+      const allRequests = await getRequests();
+      const tenantRequests = allRequests.filter(r => r.requester_id === tenantId);
+      setRequests(tenantRequests);
+      localStorage.setItem(`requests_${tenantId}`, JSON.stringify(tenantRequests));
+    } catch (error) {
+      console.error("Failed to load requests:", error);
+      // Keep whatever is cached on failure
+      const cachedRequests = localStorage.getItem(`requests_${tenantId}`);
+      setRequests(cachedRequests ? JSON.parse(cachedRequests) : []);
+    } finally {
+      setIsRefreshing(false);
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadRequests = async () => {
-      try {
-        // Try to load from localStorage first
-        const cachedRequests = localStorage.getItem(`requests_${tenantId}`);
-        if (cachedRequests) {
-          setRequests(JSON.parse(cachedRequests));
-          setIsLoading(false);
-        }
+    if (loadedTenantRef.current === tenantId) return; // already loaded for this tenant
+    loadedTenantRef.current = tenantId;
 
-        // Fetch fresh data from API
-        const allRequests = await getRequests();
-        // Filter requests for current tenant
-        const tenantRequests = allRequests.filter(r => r.requester_id === tenantId);
-        setRequests(tenantRequests);
-        // Cache in localStorage
-        localStorage.setItem(`requests_${tenantId}`, JSON.stringify(tenantRequests));
-      } catch (error) {
-        console.error("Failed to load requests:", error);
-        // Fallback to cached data if API fails
-        const cachedRequests = localStorage.getItem(`requests_${tenantId}`);
-        if (cachedRequests) {
-          setRequests(JSON.parse(cachedRequests));
-        } else {
-          setRequests([]);
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    // Cache-first: if we already have this tenant's requests cached, use them
+    // and DON'T hit the network. The cache is invalidated on create (chat) and
+    // updated on cancel, and the Reload button forces a fresh fetch.
+    const cachedRequests = localStorage.getItem(`requests_${tenantId}`);
+    if (cachedRequests) {
+      setRequests(JSON.parse(cachedRequests));
+      setIsLoading(false);
+      return;
+    }
 
-    loadRequests();
+    fetchRequests();
   }, [tenantId]);
 
-  // RequestCard performs the cancel API call; here we only update the list.
+  // RequestCard performs the cancel API call; here we update the list and cache.
   const handleCancel = (requestId: string) => {
-    setRequests(requests.filter(r => r.id !== requestId));
+    const next = requests.filter(r => r.id !== requestId);
+    setRequests(next);
+    localStorage.setItem(`requests_${tenantId}`, JSON.stringify(next));
   };
 
   return (
@@ -69,9 +78,20 @@ function RequestsPage() {
           <div className="mb-8 pl-5">
             <h1 className="underline-glow text-3xl font-semibold tracking-tight text-ranting-ice">Request List</h1>
           </div>
-          <Link to="/chat" className="glossy-btn inline-flex items-center gap-2 px-4 py-2.5 text-sm">
-            <Plus className="h-4 w-4" /> New Request
-          </Link>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={fetchRequests}
+              disabled={isRefreshing}
+              className="glossy-btn-ghost inline-flex items-center gap-2 px-4 py-2.5 text-sm disabled:opacity-60"
+              title="Reload requests from the server"
+            >
+              <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+              {isRefreshing ? "Reloading..." : "Reload"}
+            </button>
+            <Link to="/chat" className="glossy-btn inline-flex items-center gap-2 px-4 py-2.5 text-sm">
+              <Plus className="h-4 w-4" /> New Request
+            </Link>
+          </div>
         </header>
 
       {isLoading ? (
