@@ -4,7 +4,9 @@
     "name": "QuickFix Locksmith",
     "email": "dispatch@quickfix.com",
     "phone": "+15554444",
-    "services": ["locksmith"],
+    "services": [
+      "locksmith"
+    ],
     "emergency_available": true
   },
   {
@@ -12,7 +14,9 @@
     "name": "AquaFlow Plumbing",
     "email": "support@aquaflow.com",
     "phone": "+15554445",
-    "services": ["plumbing"],
+    "services": [
+      "plumbing"
+    ],
     "emergency_available": true
   },
   {
@@ -20,7 +24,9 @@
     "name": "VoltPro Electrical Services",
     "email": "contact@voltpro.com",
     "phone": "+15554446",
-    "services": ["electrical"],
+    "services": [
+      "electrical"
+    ],
     "emergency_available": true
   },
   {
@@ -28,7 +34,9 @@
     "name": "ArcticAir HVAC Solutions",
     "email": "service@arcticairhvac.com",
     "phone": "+15554447",
-    "services": ["hvac"],
+    "services": [
+      "hvac"
+    ],
     "emergency_available": true
   },
   {
@@ -36,7 +44,10 @@
     "name": "HandyHero Maintenance",
     "email": "help@handyhero.com",
     "phone": "+15554448",
-    "services": ["handyman", "general_repair"],
+    "services": [
+      "handyman",
+      "general_repair"
+    ],
     "emergency_available": false
   },
   {
@@ -44,7 +55,11 @@
     "name": "RapidGlass & Door Repair",
     "email": "dispatch@rapidglass.com",
     "phone": "+15554449",
-    "services": ["glass_repair", "door_repair", "locksmith"],
+    "services": [
+      "glass_repair",
+      "door_repair",
+      "locksmith"
+    ],
     "emergency_available": true
   },
   {
@@ -52,7 +67,9 @@
     "name": "SafeNest Pest Control",
     "email": "support@safenestpest.com",
     "phone": "+15554450",
-    "services": ["pest_control"],
+    "services": [
+      "pest_control"
+    ],
     "emergency_available": false
   },
   {
@@ -60,7 +77,10 @@
     "name": "ClearFlow Drain Services",
     "email": "service@clearflowdrains.com",
     "phone": "+15554451",
-    "services": ["drain_cleaning", "plumbing"],
+    "services": [
+      "drain_cleaning",
+      "plumbing"
+    ],
     "emergency_available": true
   },
   {
@@ -68,7 +88,9 @@
     "name": "BrightSpark Appliance Repair",
     "email": "repair@brightspark.com",
     "phone": "+15554452",
-    "services": ["appliance_repair"],
+    "services": [
+      "appliance_repair"
+    ],
     "emergency_available": false
   },
   {
@@ -76,7 +98,11 @@
     "name": "SecureAccess Systems",
     "email": "support@secureaccess.com",
     "phone": "+15554453",
-    "services": ["access_control", "security_systems", "locksmith"],
+    "services": [
+      "access_control",
+      "security_systems",
+      "locksmith"
+    ],
     "emergency_available": true
   }
 ]
