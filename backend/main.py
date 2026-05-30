@@ -34,7 +34,7 @@ from src.core_specs.data.data_loader import data_loader
 
 #Endpoints imports
 from src.api_endpoints.root_endpoint import router as root_router
-from src.api_endpoints.routers.tenants_router import router as tenants_router
+from backend.src.api_endpoints.routers.tenant_routers.tenants_router import router as tenants_router
 from src.api_endpoints.routers.properties_router import router as properties_router
 from src.api_endpoints.routers.vendors_router import router as vendors_router
 from src.api_endpoints.routers.managers_router import router as managers_router
