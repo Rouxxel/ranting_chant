@@ -264,7 +264,7 @@ export const getManagerById = async (managerId: string): Promise<Manager> => {
 };
 
 export const updateManagerProfile = async (managerId: string, data: ProfileUpdateRequest): Promise<Manager> => {
-  const response = await apiClient.patch<Manager>(`/managers/${managerId}/profile`, data);
+  const response = await apiClient.patch<Manager>(`/managers/${managerId}/profile`, data, { suppressErrorToast: true });
   return response.data;
 };
 
@@ -274,7 +274,7 @@ export const getOwners = async (): Promise<Owner[]> => {
 };
 
 export const updateOwnerProfile = async (ownerId: string, data: ProfileUpdateRequest): Promise<Owner> => {
-  const response = await apiClient.patch<Owner>(`/owners/${ownerId}/profile`, data);
+  const response = await apiClient.patch<Owner>(`/owners/${ownerId}/profile`, data, { suppressErrorToast: true });
   return response.data;
 };
 

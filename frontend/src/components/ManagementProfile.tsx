@@ -1,10 +1,12 @@
 import { useState } from "react";
+import axios from "axios";
+import { toast } from "sonner";
 import { useApp } from "@/context/AppContext";
 import { updateManagerProfile, updateOwnerProfile } from "@/services/api";
 import type { ProfileUpdateRequest } from "@/types";
 
 export function ManagementProfile() {
-  const { currentManager, userRole } = useApp();
+  const { currentManager, setCurrentManager, userRole } = useApp();
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState<ProfileUpdateRequest>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -16,17 +18,47 @@ export function ManagementProfile() {
 
   const handleSave = async () => {
     if (!currentManager) return;
+
+    // Only keep fields that actually differ from the current values
+    const changes: ProfileUpdateRequest = {};
+    if (editForm.name !== undefined && editForm.name !== displayName) {
+      changes.name = editForm.name;
+    }
+    if (editForm.email !== undefined && editForm.email !== email) {
+      changes.email = editForm.email;
+    }
+    if (editForm.phone !== undefined && editForm.phone !== phone) {
+      changes.phone = editForm.phone;
+    }
+
+    if (Object.keys(changes).length === 0) {
+      toast.error("Please enter your changes");
+      return;
+    }
+
     setIsLoading(true);
     try {
-      if (isOwner) {
-        await updateOwnerProfile(currentManager.id, editForm);
-      } else {
-        await updateManagerProfile(currentManager.id, editForm);
-      }
+      const updated = isOwner
+        ? await updateOwnerProfile(currentManager.id, changes)
+        : await updateManagerProfile(currentManager.id, changes);
+      // Refresh the cached user (state + localStorage) so the UI reflects the change.
+      setCurrentManager(updated);
       setIsEditing(false);
       setEditForm({});
+      toast.success("Profile updated");
     } catch (error) {
       console.error("Failed to update profile:", error);
+      const detail = axios.isAxiosError(error)
+        ? String((error.response?.data as { detail?: string })?.detail ?? "")
+        : "";
+      const lowerDetail = detail.toLowerCase();
+      if (lowerDetail.includes("email")) {
+        toast.error("Please enter a valid email");
+      } else if (lowerDetail.includes("phone")) {
+        toast.error("Please enter a valid phone number");
+      } else {
+        toast.error("Failed to update profile. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }

@@ -101,7 +101,7 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
                 </p>
                 {req.resolved_at && (
                   <p className="text-[11px] text-ranting-muted">
-                    Resolved {new Date(req.resolved_at).toLocaleString()}
+                    {new Date(req.resolved_at).toLocaleString()}
                   </p>
                 )}
               </div>
@@ -131,8 +131,8 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
           <section>
             <SectionTitle>Conversation</SectionTitle>
             <div className="space-y-2">
-              {req.conversation_history && req.conversation_history.map((m: any) => (
-                <div key={m.id} className={`flex ${m.role === "tenant" ? "justify-end" : "justify-start"}`}>
+              {req.conversation_history && req.conversation_history.map((m: any, i: number) => (
+                <div key={m.id ?? `msg-${i}`} className={`flex ${m.role === "tenant" ? "justify-end" : "justify-start"}`}>
                   <div
                     className={m.role === "tenant"
                       ? "max-w-[80%] rounded-2xl rounded-br-md px-3 py-2 text-xs text-ranting-ice"
@@ -153,8 +153,8 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
           <section>
             <SectionTitle>Notifications</SectionTitle>
             <ul className="space-y-1.5">
-              {req.notifications_sent && req.notifications_sent.map((n: any) => (
-                <li key={n.id} className="flex items-center gap-2 text-xs text-ranting-ice/85">
+              {req.notifications_sent && req.notifications_sent.map((n: any, i: number) => (
+                <li key={n.id ?? `notif-${i}`} className="flex items-center gap-2 text-xs text-ranting-ice/85">
                   {n.type === "email" ? <Mail className="h-3.5 w-3.5 text-ranting-sky" /> : <MessageCircle className="h-3.5 w-3.5 text-ranting-sky" />}
                   <span className="font-medium">{n.type.toUpperCase()}</span>
                   <span className="text-ranting-muted">→ {n.recipient}</span>

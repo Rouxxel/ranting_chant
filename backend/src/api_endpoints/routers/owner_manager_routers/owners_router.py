@@ -24,11 +24,13 @@ from src.utils.custom_logger import log_handler
 from src.utils.limiter import limiter as SlowLimiter
 from src.core_specs.configuration.config_loader import config_loader
 from src.utils.json_store import read_all, find_by_id, update_record
+from src.utils.validators import validate_email_format, validate_phone_format
 
 """PYDANTIC MODELS-----------------------------------------------------------"""
 class OwnerProfileUpdatePayload(BaseModel):
     """Payload accepted for owner-owned profile edits."""
 
+    name: Optional[str] = None
     email: Optional[str] = None
     phone: Optional[str] = None
 
@@ -89,6 +91,12 @@ async def update_owner_profile(request: Request, owner_id: str, body: OwnerProfi
         updates = body.model_dump(exclude_none=True)
         if not updates:
             raise HTTPException(status_code=400, detail="No owner profile updates provided")
+
+        #Validate editable fields against config-driven rules
+        if "email" in updates:
+            validate_email_format(updates["email"])
+        if "phone" in updates:
+            validate_phone_format(updates["phone"])
 
         updated = update_record("owners", owner_id, updates)
         log_handler.info(f"Owner profile '{owner_id}' updated successfully")

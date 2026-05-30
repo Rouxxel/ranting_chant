@@ -1,16 +1,18 @@
 [
   {
     "id": "property_001",
-    "name": "Sunset Apartments",
+    "name": "Sunset Apartments very sunny",
     "address": "123 Main St, Berlin, 10115, Germany",
-    "year_built": 1998,
+    "year_built": 2026,
     "property_type": "apartment_building",
-    "unit_count": 24,
-
+    "unit_count": 21,
     "owner_id": "owner_001",
     "manager_id": "manager_001",
-    "tenant_ids": ["tenant_001","tenant_002","tenant_009"],
-
+    "tenant_ids": [
+      "tenant_001",
+      "tenant_002",
+      "tenant_009"
+    ],
     "representative": {
       "type": "property_manager",
       "id": "manager_001"
@@ -25,7 +27,10 @@
     "unit_count": 36,
     "owner_id": "owner_002",
     "manager_id": "manager_002",
-    "tenant_ids": ["tenant_003", "tenant_004"],
+    "tenant_ids": [
+      "tenant_003",
+      "tenant_004"
+    ],
     "representative": {
       "type": "property_manager",
       "id": "manager_002"
@@ -40,7 +45,9 @@
     "unit_count": 18,
     "owner_id": "owner_003",
     "manager_id": "manager_003",
-    "tenant_ids": ["tenant_005"],
+    "tenant_ids": [
+      "tenant_005"
+    ],
     "representative": {
       "type": "property_manager",
       "id": "manager_003"
@@ -55,7 +62,11 @@
     "unit_count": 12,
     "owner_id": "owner_004",
     "manager_id": "manager_004",
-    "tenant_ids": ["tenant_006", "tenant_007", "tenant_008"],
+    "tenant_ids": [
+      "tenant_006",
+      "tenant_007",
+      "tenant_008"
+    ],
     "representative": {
       "type": "property_manager",
       "id": "manager_004"
@@ -70,7 +81,9 @@
     "unit_count": 42,
     "owner_id": "owner_005",
     "manager_id": "owner_005",
-    "tenant_ids": ["tenant_010"],
+    "tenant_ids": [
+      "tenant_010"
+    ],
     "representative": {
       "type": "owner",
       "id": "owner_005"

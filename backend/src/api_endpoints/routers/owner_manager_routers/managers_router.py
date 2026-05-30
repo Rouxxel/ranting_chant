@@ -24,11 +24,13 @@ from src.utils.custom_logger import log_handler
 from src.utils.limiter import limiter as SlowLimiter
 from src.core_specs.configuration.config_loader import config_loader
 from src.utils.json_store import read_all, find_by_id, update_record
+from src.utils.validators import validate_email_format, validate_phone_format
 
 """PYDANTIC MODELS-----------------------------------------------------------"""
 class ManagerProfileUpdatePayload(BaseModel):
     """Payload accepted for manager-owned profile edits."""
 
+    name: Optional[str] = None
     email: Optional[str] = None
     phone: Optional[str] = None
     department: Optional[str] = None
@@ -90,6 +92,12 @@ async def update_manager_profile(request: Request, manager_id: str, body: Manage
         updates = body.model_dump(exclude_none=True)
         if not updates:
             raise HTTPException(status_code=400, detail="No manager profile updates provided")
+
+        #Validate editable fields against config-driven rules
+        if "email" in updates:
+            validate_email_format(updates["email"])
+        if "phone" in updates:
+            validate_phone_format(updates["phone"])
 
         updated = update_record("property_magament", manager_id, updates)
         log_handler.info(f"Manager profile '{manager_id}' updated successfully")

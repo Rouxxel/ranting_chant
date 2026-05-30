@@ -9,14 +9,24 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { Property, PropertyCreateRequest, PropertyUpdateRequest } from "@/types";
-import { getPropertyTypeLabel } from "@/types";
+import { getPropertyTypeLabel, PROPERTY_TYPES, propertyTypeLabels } from "@/types";
+
+const CURRENT_YEAR = new Date().getFullYear();
 
 export function ManagementProperties() {
-  const { currentManager } = useApp();
+  const { currentManager, userRole } = useApp();
   const [properties, setProperties] = useState<Property[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selected, setSelected] = useState<Property | null>(null);
@@ -71,7 +81,16 @@ export function ManagementProperties() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const newProperty = await createProperty(createForm);
+      // Associate the new property with the creator so its representative is set.
+      const payload: PropertyCreateRequest = { ...createForm };
+      if (currentManager) {
+        if (userRole === "owner") {
+          payload.owner_id = currentManager.id;
+        } else {
+          payload.manager_id = currentManager.id;
+        }
+      }
+      const newProperty = await createProperty(payload);
       setProperties([...properties, newProperty]);
       setIsCreateDialogOpen(false);
       setCreateForm({ name: "", address: "" });
@@ -125,7 +144,10 @@ export function ManagementProperties() {
           </DialogTrigger>
           <DialogContent className="border-ranting-sky/30 bg-ranting-navy text-ranting-ice max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Create New Property</DialogTitle>
+              <DialogTitle>Add New Property</DialogTitle>
+              <DialogDescription className="text-ranting-muted">
+                Enter the property details. Only name and address are required.
+              </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleCreate} className="space-y-4">
               <div>
@@ -150,12 +172,21 @@ export function ManagementProperties() {
               </div>
               <div>
                 <Label htmlFor="create-type">Type</Label>
-                <Input
-                  id="create-type"
-                  value={createForm.property_type || ""}
-                  onChange={(e) => setCreateForm({ ...createForm, property_type: e.target.value })}
-                  className="aero-input"
-                />
+                <Select
+                  value={createForm.property_type ?? ""}
+                  onValueChange={(value) => setCreateForm({ ...createForm, property_type: value })}
+                >
+                  <SelectTrigger id="create-type" className="aero-input">
+                    <SelectValue placeholder="Select a property type" />
+                  </SelectTrigger>
+                  <SelectContent className="border-ranting-sky/35 bg-ranting-navy text-ranting-ice">
+                    {PROPERTY_TYPES.map((type) => (
+                      <SelectItem key={type} value={type} className="focus:bg-ranting-accent focus:text-white">
+                        {propertyTypeLabels[type]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <Label htmlFor="create-units">Unit Count</Label>
@@ -164,6 +195,23 @@ export function ManagementProperties() {
                   type="number"
                   value={createForm.unit_count || ""}
                   onChange={(e) => setCreateForm({ ...createForm, unit_count: parseInt(e.target.value) || undefined })}
+                  className="aero-input"
+                />
+              </div>
+              <div>
+                <Label htmlFor="create-year">Year Built</Label>
+                <Input
+                  id="create-year"
+                  type="number"
+                  max={CURRENT_YEAR}
+                  value={createForm.year_built || ""}
+                  onChange={(e) => {
+                    const parsed = parseInt(e.target.value);
+                    setCreateForm({
+                      ...createForm,
+                      year_built: Number.isNaN(parsed) ? undefined : Math.min(parsed, CURRENT_YEAR),
+                    });
+                  }}
                   className="aero-input"
                 />
               </div>
@@ -242,6 +290,9 @@ export function ManagementProperties() {
         <DialogContent className="border-ranting-sky/30 bg-ranting-navy text-ranting-ice max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Property</DialogTitle>
+            <DialogDescription className="text-ranting-muted">
+              Update the property details and save your changes.
+            </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleUpdate} className="space-y-4">
             <div>
@@ -264,12 +315,21 @@ export function ManagementProperties() {
             </div>
             <div>
               <Label htmlFor="edit-type">Type</Label>
-              <Input
-                id="edit-type"
-                value={editForm.property_type || ""}
-                onChange={(e) => setEditForm({ ...editForm, property_type: e.target.value })}
-                className="aero-input"
-              />
+              <Select
+                value={editForm.property_type ?? ""}
+                onValueChange={(value) => setEditForm({ ...editForm, property_type: value })}
+              >
+                <SelectTrigger id="edit-type" className="aero-input">
+                  <SelectValue placeholder="Select a property type" />
+                </SelectTrigger>
+                <SelectContent className="border-ranting-sky/35 bg-ranting-navy text-ranting-ice">
+                  {PROPERTY_TYPES.map((type) => (
+                    <SelectItem key={type} value={type} className="focus:bg-ranting-accent focus:text-white">
+                      {propertyTypeLabels[type]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label htmlFor="edit-units">Unit Count</Label>
@@ -286,8 +346,15 @@ export function ManagementProperties() {
               <Input
                 id="edit-year"
                 type="number"
+                max={CURRENT_YEAR}
                 value={editForm.year_built || ""}
-                onChange={(e) => setEditForm({ ...editForm, year_built: parseInt(e.target.value) || undefined })}
+                onChange={(e) => {
+                  const parsed = parseInt(e.target.value);
+                  setEditForm({
+                    ...editForm,
+                    year_built: Number.isNaN(parsed) ? undefined : Math.min(parsed, CURRENT_YEAR),
+                  });
+                }}
                 className="aero-input"
               />
             </div>

@@ -81,7 +81,7 @@ export function RequestTimeline({ req, tenantName = "Tenant" }: RequestTimelineP
           </p>
           {req.resolved_at && (
             <p className="mt-1 text-[10px] text-ranting-muted">
-              Resolved {new Date(req.resolved_at).toLocaleString()}
+              {new Date(req.resolved_at).toLocaleDateString()}
             </p>
           )}
         </div>

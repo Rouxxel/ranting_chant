@@ -35,15 +35,20 @@ class RepresentativePayload(BaseModel):
 
 
 class PropertyCreatePayload(BaseModel):
-    """Payload accepted when creating a property."""
+    """Payload accepted when creating a property.
+
+    Only name and address are required; relationship and detail fields are
+    optional so a manager or owner can create a property and fill the rest
+    later. Mirrors PropertyUpdatePayload and the frontend PropertyCreateRequest.
+    """
 
     name: str
     address: str
-    year_built: int
-    property_type: str
-    unit_count: int
-    owner_id: str
-    manager_id: str
+    year_built: Optional[int] = None
+    property_type: Optional[str] = None
+    unit_count: Optional[int] = None
+    owner_id: Optional[str] = None
+    manager_id: Optional[str] = None
     tenant_ids: list[str] = Field(default_factory=list)
     representative: Optional[RepresentativePayload] = None
 
