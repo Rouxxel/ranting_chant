@@ -55,6 +55,36 @@ export interface Tenant {
 
 // ==================== Property ====================
 
+export const PROPERTY_TYPES = [
+  "apartment_building",
+  "condominium",
+  "single_family_home",
+  "townhouse",
+  "commercial",
+  "mixed_use",
+  "industrial",
+  "retail",
+  "office",
+] as const;
+
+export type PropertyType = (typeof PROPERTY_TYPES)[number];
+
+export const propertyTypeLabels: Record<PropertyType, string> = {
+  apartment_building: "Apartment Building",
+  condominium: "Condominium",
+  single_family_home: "Single Family Home",
+  townhouse: "Townhouse",
+  commercial: "Commercial",
+  mixed_use: "Mixed Use",
+  industrial: "Industrial",
+  retail: "Retail",
+  office: "Office",
+};
+
+export function getPropertyTypeLabel(type: PropertyType | string) {
+  return propertyTypeLabels[type as PropertyType] ?? type.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 export interface Property {
   id: string;
   name: string;
@@ -398,6 +428,7 @@ export interface VendorUpdateRequest {
 }
 
 export interface ProfileUpdateRequest {
+  name?: string;
   email?: string;
   phone?: string;
 }

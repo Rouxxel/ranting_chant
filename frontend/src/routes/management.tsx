@@ -34,7 +34,28 @@ function ManagementPage() {
   useEffect(() => {
     const loadRequests = async () => {
       try {
+        // Check localStorage for cached requests
+        const cachedRequests = localStorage.getItem('requests');
+        if (cachedRequests) {
+          const parsedRequests = JSON.parse(cachedRequests) as Request[];
+          // Filter requests for current manager/owner by property_id
+          const filteredRequests = parsedRequests.filter((r: Request) => {
+            // Get properties from currentManager (could be manager or owner)
+            if (!currentManager || !r.property_id) return false;
+
+            // Handle both managers (managed_properties) and owners (owned_properties)
+            const properties = (currentManager as any).managed_properties || (currentManager as any).owned_properties;
+            if (!properties) return false;
+
+            return properties.includes(r.property_id);
+          });
+          setRows(filteredRequests);
+          setIsLoading(false);
+        }
+
+        // Fetch fresh data
         const allRequests = await getRequests();
+        localStorage.setItem('requests', JSON.stringify(allRequests));
         // Filter requests for current manager/owner by property_id
         const filteredRequests = allRequests.filter(r => {
           // Get properties from currentManager (could be manager or owner)

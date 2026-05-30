@@ -46,7 +46,7 @@ export function AuthenticatedLayout({ children }: { children: ReactNode }) {
     clearUser();
 
     const keysToClear = Object.keys(localStorage).filter(
-      (key) => key.startsWith("requests_") || key === "vendors" || key === "auth_token",
+      (key) => key.startsWith("requests_") || key === "vendors" || key === "properties" || key === "tenants" || key === "requests" || key === "managers" || key === "owners" || key === "auth_token",
     );
     keysToClear.forEach((key) => localStorage.removeItem(key));
 

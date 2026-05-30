@@ -17,8 +17,25 @@ export function PropertyRepresentative() {
       }
 
       try {
+        // Check localStorage for cached properties and managers
+        const cachedProperties = localStorage.getItem('properties');
+        const cachedManagers = localStorage.getItem('managers');
+        if (cachedProperties && cachedManagers) {
+          const parsedProperties = JSON.parse(cachedProperties) as Property[];
+          const parsedManagers = JSON.parse(cachedManagers) as Manager[];
+          const tenantProperty = parsedProperties.find(p => p.id === currentTenant.property_id);
+          setProperty(tenantProperty || null);
+
+          if (tenantProperty?.manager_id) {
+            const propertyManager = parsedManagers.find(m => m.id === tenantProperty.manager_id);
+            setManager(propertyManager || null);
+          }
+          setIsLoading(false);
+        }
+
         // Load the tenant's property
         const properties = await getProperties();
+        localStorage.setItem('properties', JSON.stringify(properties));
         const tenantProperty = properties.find(p => p.id === currentTenant.property_id);
         setProperty(tenantProperty || null);
 
@@ -29,6 +46,7 @@ export function PropertyRepresentative() {
 
         // Load the manager
         const managers = await getManagers();
+        localStorage.setItem('managers', JSON.stringify(managers));
         const propertyManager = managers.find(m => m.id === tenantProperty.manager_id);
         setManager(propertyManager || null);
       } catch (error) {

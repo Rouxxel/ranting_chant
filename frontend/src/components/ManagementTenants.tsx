@@ -36,8 +36,39 @@ export function ManagementTenants() {
   useEffect(() => {
     const loadData = async () => {
       try {
+        // Check localStorage for cached tenants and properties
+        const cachedTenants = localStorage.getItem('tenants');
+        const cachedProperties = localStorage.getItem('properties');
+        if (cachedTenants && cachedProperties) {
+          const parsedTenants = JSON.parse(cachedTenants) as Tenant[];
+          const parsedProperties = JSON.parse(cachedProperties) as Property[];
+
+          // Filter tenants for current manager/owner based on their properties
+          const filteredTenants = parsedTenants.filter((t: Tenant) => {
+            if (!currentManager || !t.property_id) return false;
+            const managedProps = (currentManager as any).managed_properties || [];
+            const ownedProps = (currentManager as any).owned_properties || [];
+            return managedProps.includes(t.property_id) || ownedProps.includes(t.property_id);
+          });
+
+          // Filter properties for current manager/owner
+          const filteredProperties = parsedProperties.filter((p: Property) => {
+            if (!currentManager) return false;
+            const managedProps = (currentManager as any).managed_properties || [];
+            const ownedProps = (currentManager as any).owned_properties || [];
+            return managedProps.includes(p.id) || ownedProps.includes(p.id);
+          });
+
+          setTenants(filteredTenants);
+          setProperties(filteredProperties);
+          setIsLoading(false);
+        }
+
+        // Fetch fresh data
         const [allTenants, allProperties] = await Promise.all([getTenants(), getProperties()]);
-        
+        localStorage.setItem('tenants', JSON.stringify(allTenants));
+        localStorage.setItem('properties', JSON.stringify(allProperties));
+
         // Filter tenants for current manager/owner based on their properties
         const filteredTenants = allTenants.filter(t => {
           if (!currentManager || !t.property_id) return false;
@@ -45,7 +76,7 @@ export function ManagementTenants() {
           const ownedProps = (currentManager as any).owned_properties || [];
           return managedProps.includes(t.property_id) || ownedProps.includes(t.property_id);
         });
-        
+
         // Filter properties for current manager/owner
         const filteredProperties = allProperties.filter(p => {
           if (!currentManager) return false;

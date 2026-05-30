@@ -32,7 +32,23 @@ export function ManagementProperties() {
   useEffect(() => {
     const loadProperties = async () => {
       try {
+        // Check localStorage for cached properties
+        const cachedProperties = localStorage.getItem('properties');
+        if (cachedProperties) {
+          const parsedProperties = JSON.parse(cachedProperties) as Property[];
+          const filteredProperties = parsedProperties.filter((p: Property) => {
+            if (!currentManager) return false;
+            const managedProps = (currentManager as any).managed_properties || [];
+            const ownedProps = (currentManager as any).owned_properties || [];
+            return managedProps.includes(p.id) || ownedProps.includes(p.id);
+          });
+          setProperties(filteredProperties);
+          setIsLoading(false);
+        }
+
+        // Fetch fresh data
         const allProperties = await getProperties();
+        localStorage.setItem('properties', JSON.stringify(allProperties));
         const filteredProperties = allProperties.filter(p => {
           if (!currentManager) return false;
           const managedProps = (currentManager as any).managed_properties || [];
