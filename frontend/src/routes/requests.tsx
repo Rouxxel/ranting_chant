@@ -7,7 +7,7 @@ import { RequestTimeline } from "@/components/RequestTimeline";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useApp } from "@/context/AppContext";
 import { requireTenantAuth } from "@/lib/auth";
-import { getRequests, cancelRequest } from "@/services/api";
+import { getRequests } from "@/services/api";
 import type { Request } from "@/types";
 
 export const Route = createFileRoute("/requests")({
@@ -57,13 +57,9 @@ function RequestsPage() {
     loadRequests();
   }, [tenantId]);
 
-  const handleCancel = async (requestId: string) => {
-    try {
-      await cancelRequest(requestId, {});
-      setRequests(requests.filter(r => r.id !== requestId));
-    } catch (error) {
-      console.error("Failed to cancel request:", error);
-    }
+  // RequestCard performs the cancel API call; here we only update the list.
+  const handleCancel = (requestId: string) => {
+    setRequests(requests.filter(r => r.id !== requestId));
   };
 
   return (

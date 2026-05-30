@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
 import { RequestTypeBadge, StatusBadge, UrgencyBadge } from "@/components/Badges";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { useApp } from "@/context/AppContext";
 import { cancelRequest } from "@/services/api";
 import { getRequestTypeLabel } from "@/types";
@@ -17,18 +19,23 @@ interface RequestCardProps {
 }
 
 export function RequestCard({ req, open, onToggle, tenantName = "Tenant", onCancel, onComplete }: RequestCardProps) {
-  const { userRole } = useApp();
+  const { userRole, currentTenant } = useApp();
   const createdDate = new Date(req.created_at).toLocaleDateString();
   const isCancellable = req.status === "pending" || req.status === "in_progress";
   const isCompletable = req.status === "in_progress" || req.status === "escalated";
+  const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   const handleCancel = async () => {
-    if (!confirm("Are you sure you want to cancel this request?")) return;
+    setIsCancelling(true);
     try {
-      await cancelRequest(req.id, {});
+      await cancelRequest(req.id, { cancelled_by: currentTenant?.id ?? req.requester_id });
       onCancel?.(req.id);
+      setIsCancelDialogOpen(false);
     } catch (error) {
       console.error("Failed to cancel request:", error);
+    } finally {
+      setIsCancelling(false);
     }
   };
 
@@ -54,11 +61,21 @@ export function RequestCard({ req, open, onToggle, tenantName = "Tenant", onCanc
       </button>
       {(userRole === "tenant" && isCancellable && onCancel) && (
         <div className="border-t border-ranting-sky/20 px-5 py-3">
-          <Button onClick={handleCancel} variant="ghost" className="glossy-btn-ghost text-red-400 hover:text-red-300 text-xs">
+          <Button onClick={() => setIsCancelDialogOpen(true)} variant="ghost" className="glossy-btn-ghost text-red-400 hover:text-red-300 text-xs">
             Cancel Request
           </Button>
         </div>
       )}
+      <ConfirmDialog
+        open={isCancelDialogOpen}
+        onOpenChange={setIsCancelDialogOpen}
+        title="Cancel Request"
+        message="Are you sure you want to cancel this request? This action cannot be undone."
+        onConfirm={handleCancel}
+        isDeleting={isCancelling}
+        confirmLabel="Cancel Request"
+        confirmingLabel="Cancelling..."
+      />
     </article>
   );
 }

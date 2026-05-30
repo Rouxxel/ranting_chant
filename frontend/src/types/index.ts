@@ -434,6 +434,7 @@ export interface ProfileUpdateRequest {
 }
 
 export interface RequestCancelRequest {
+  cancelled_by: string;
   cancellation_reason?: string;
 }
 
