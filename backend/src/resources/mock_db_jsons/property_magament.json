@@ -2,11 +2,10 @@
   {
     "id": "manager_001",
     "name": "John management",
-    "email": "sarah@management.com",
+    "email": "sarah@gmail.com",
     "phone": "+15552222",
     "managed_properties": [
-      "property_001",
-      "property_4d89b8f1"
+      "property_001"
     ]
   },
   {
