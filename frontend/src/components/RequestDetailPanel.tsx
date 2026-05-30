@@ -1,7 +1,16 @@
 import { useState, useEffect } from "react";
 import { X, Mail, MessageCircle, Check } from "lucide-react";
-import { Avatar } from "@/components/Avatar";
-import { RequestTypeBadge, StatusBadge, UrgencyBadge } from "@/components/Badges";
+import { StatusBadge, UrgencyBadge } from "@/components/Badges";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { getRequestSummary } from "@/services/api";
 import { getRequestTypeLabel } from "@/types";
 import type { Request } from "@/types";
@@ -10,12 +19,29 @@ interface RequestDetailPanelProps {
   req: Request;
   onClose: () => void;
   onApprove: () => void;
-  onComplete?: () => void;
+  onComplete?: (resolutionNote?: string) => Promise<void> | void;
 }
 
 export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: RequestDetailPanelProps) {
   const [summary, setSummary] = useState<string | null>(req.summary || null);
   const [loadingSummary, setLoadingSummary] = useState(false);
+  const [isCompleteDialogOpen, setIsCompleteDialogOpen] = useState(false);
+  const [resolutionNote, setResolutionNote] = useState("");
+  const [isCompleting, setIsCompleting] = useState(false);
+
+  const handleConfirmComplete = async () => {
+    setIsCompleting(true);
+    try {
+      await onComplete?.(resolutionNote.trim() || undefined);
+      setIsCompleteDialogOpen(false);
+      setResolutionNote("");
+    } catch (error) {
+      // Keep the dialog open on failure; the API layer surfaces the error toast.
+      console.error("Failed to complete request:", error);
+    } finally {
+      setIsCompleting(false);
+    }
+  };
 
   useEffect(() => {
     const loadSummary = async () => {
@@ -58,7 +84,6 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
             <div className="text-[11px] text-ranting-muted">{req.id}</div>
             <h2 className="truncate text-lg font-semibold text-ranting-ice">{getRequestTypeLabel(req.type)}</h2>
             <div className="mt-2 flex items-center gap-2">
-              <RequestTypeBadge type={req.type} />
               <StatusBadge status={req.status} />
               <UrgencyBadge urgency={req.urgency} />
             </div>
@@ -150,12 +175,52 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
 
         {(req.status === "in_progress" || req.status === "escalated") && onComplete && (
           <footer className="border-t border-white/10 p-4">
-            <button onClick={onComplete} className="glossy-btn inline-flex w-full items-center justify-center gap-2 px-4 py-2.5 text-sm">
+            <button
+              onClick={() => setIsCompleteDialogOpen(true)}
+              className="glossy-btn inline-flex w-full items-center justify-center gap-2 px-4 py-2.5 text-sm"
+            >
               <Check className="h-4 w-4" /> Complete Request
             </button>
           </footer>
         )}
       </aside>
+
+      <Dialog open={isCompleteDialogOpen} onOpenChange={setIsCompleteDialogOpen}>
+        <DialogContent className="border-ranting-sky/30 bg-ranting-navy text-ranting-ice max-w-md">
+          <DialogHeader>
+            <DialogTitle>Complete Request</DialogTitle>
+            <DialogDescription className="text-sm text-ranting-muted">
+              Mark this request as resolved. You can add an optional resolution note for the record.
+            </DialogDescription>
+          </DialogHeader>
+          <Textarea
+            value={resolutionNote}
+            onChange={(e) => setResolutionNote(e.target.value)}
+            placeholder="Resolution note (optional)"
+            className="aero-input min-h-[96px] resize-none"
+            disabled={isCompleting}
+          />
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setIsCompleteDialogOpen(false)}
+              className="glossy-btn-ghost"
+              disabled={isCompleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={handleConfirmComplete}
+              disabled={isCompleting}
+              className="glossy-btn-green"
+            >
+              {isCompleting ? "Completing..." : "Complete Request"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

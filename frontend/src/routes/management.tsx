@@ -105,15 +105,15 @@ function ManagementPage() {
     }
   }
 
-  async function handleComplete(id: string) {
-    const resolutionNote = prompt("Enter resolution note (optional):");
-    if (resolutionNote === null) return; // User cancelled
+  async function handleComplete(id: string, resolutionNote?: string) {
+    if (!currentManager) return;
     try {
-      await completeRequest(id, { resolution_note: resolutionNote || undefined });
+      await completeRequest(id, { resolved_by: currentManager.id, resolution_note: resolutionNote });
       setRows((rs) => rs.map((r) => (r.id === id ? { ...r, status: "resolved" } : r)));
       if (selected?.id === id) setSelected({ ...selected, status: "resolved" });
     } catch (error) {
       console.error("Failed to complete request:", error);
+      throw error; // let the dialog stay open on failure
     }
   }
 
@@ -190,7 +190,7 @@ function ManagementPage() {
           )}
 
           {/* Detail panel */}
-          {selected && <RequestDetailPanel req={selected} onClose={() => setSelected(null)} onApprove={() => approve(selected.id)} onComplete={() => handleComplete(selected.id)} />}
+          {selected && <RequestDetailPanel req={selected} onClose={() => setSelected(null)} onApprove={() => approve(selected.id)} onComplete={(note) => handleComplete(selected.id, note)} />}
         </>
       )}
 

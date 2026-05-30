@@ -173,6 +173,7 @@ export interface Request {
   status: Status;
   created_at: string;
   updated_at?: string;
+  cancelled_at?: string;
   involved_parties: string[];
   conversation_history: ConversationMessage[];
   notifications_sent: NotificationEvent[];
@@ -439,6 +440,7 @@ export interface RequestCancelRequest {
 }
 
 export interface RequestCompleteRequest {
+  resolved_by: string;
   resolution_note?: string;
 }
 

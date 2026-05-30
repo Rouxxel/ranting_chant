@@ -9,6 +9,7 @@ const statusLabel: Record<Status, string> = {
   resolved: "Resolved",
   pending_approval: "Pending Approval",
   pending_review: "Pending Review",
+  cancelled: "Cancelled",
 };
 
 export function StatusBadge({ status, className }: { status: Status; className?: string }) {

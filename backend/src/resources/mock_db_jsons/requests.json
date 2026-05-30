@@ -4,7 +4,7 @@
     "requester_id": "tenant_001",
     "type": "access_control",
     "description": "Conversation started",
-    "status": "in_progress",
+    "status": "resolved",
     "urgency": "medium",
     "involved_parties": [
       "tenant_001"
@@ -28,7 +28,7 @@
       }
     ],
     "created_at": "2026-05-24T09:55:36.476999+00:00",
-    "updated_at": "2026-05-24T09:55:44.843733+00:00",
+    "updated_at": "2026-05-30T22:22:29.373865+00:00",
     "property_id": "property_001",
     "escalated": false,
     "sentiment": "neutral",
@@ -42,7 +42,10 @@
         "timestamp": "2026-05-24T09:55:37.667452+00:00"
       }
     ],
-    "summary": "The tenant has reported losing the key to their apartment at Sunset Apartments. The AI coordinator is currently confirming whether the tenant is locked out of their home to determine the next steps."
+    "summary": "The tenant has reported losing the key to their apartment at Sunset Apartments. The AI coordinator is currently confirming whether the tenant is locked out of their home to determine the next steps.",
+    "resolved_at": "2026-05-30T22:22:29.373865+00:00",
+    "resolved_by": "manager_001",
+    "resolution_note": "I dont gaf tbh mate, skill issue"
   },
   {
     "id": "request_5a64c091",
@@ -662,7 +665,7 @@
     "requester_id": "tenant_001",
     "type": "emergency",
     "description": "There is a burning smell and no power",
-    "status": "pending",
+    "status": "cancelled",
     "urgency": "high",
     "involved_parties": [
       "tenant_001"
@@ -679,7 +682,7 @@
       }
     ],
     "created_at": "2026-05-29T09:49:25.056113+00:00",
-    "updated_at": "2026-05-29T09:49:25.056113+00:00",
+    "updated_at": "2026-05-30T22:00:55.464395+00:00",
     "escalated": true,
     "sentiment": "angry",
     "confidence": 0.98,
@@ -688,14 +691,16 @@
     "notification_pending": true,
     "property_id": null,
     "property": null,
-    "summary": null
+    "summary": null,
+    "cancelled_at": "2026-05-30T22:00:55.464395+00:00",
+    "cancelled_by": "tenant_001"
   },
   {
     "id": "request_96edcdbe",
     "requester_id": "tenant_001",
     "type": "access_control",
     "description": "I lost my key",
-    "status": "pending",
+    "status": "cancelled",
     "urgency": "low",
     "involved_parties": [
       "tenant_001"
@@ -712,7 +717,7 @@
       }
     ],
     "created_at": "2026-05-29T09:49:25.080364+00:00",
-    "updated_at": "2026-05-29T09:49:25.080364+00:00",
+    "updated_at": "2026-05-30T22:00:22.254687+00:00",
     "escalated": false,
     "sentiment": "neutral",
     "confidence": 0.92,
@@ -721,6 +726,8 @@
     "notification_pending": true,
     "property_id": null,
     "property": null,
-    "summary": null
+    "summary": null,
+    "cancelled_at": "2026-05-30T22:00:22.254687+00:00",
+    "cancelled_by": "tenant_001"
   }
 ]

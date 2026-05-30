@@ -45,13 +45,17 @@ export function RequestCard({ req, open, onToggle, tenantName = "Tenant", onCanc
         <div className="flex-1">
           <div className="mb-1 flex items-center gap-2 flex-wrap">
             <h2 className="text-lg font-semibold text-ranting-ice">{getRequestTypeLabel(req.type)}</h2>
-            <RequestTypeBadge type={req.type} />
             <StatusBadge status={req.status} />
             <UrgencyBadge urgency={req.urgency} />
           </div>
           <p className="mb-3 text-sm text-ranting-muted">{req.description}</p>
           <div className="flex flex-wrap items-center gap-3">
             <span className="text-[11px] text-ranting-muted">Created {createdDate}</span>
+            {req.status === "cancelled" && (
+              <span className="text-[11px] font-medium text-slate-400">
+                Cancelled{req.cancelled_at ? ` ${new Date(req.cancelled_at).toLocaleDateString()}` : ""}
+              </span>
+            )}
             {req.involved_parties && req.involved_parties.length > 0 && (
               <span className="text-[11px] text-ranting-muted">{req.involved_parties.length} party(s) involved</span>
             )}
