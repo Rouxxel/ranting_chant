@@ -16,7 +16,7 @@ import {
 import type { ProfileUpdateRequest, Property } from "@/types";
 
 export function TenantProfile() {
-  const { currentTenant } = useApp();
+  const { currentTenant, setCurrentTenant } = useApp();
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState<ProfileUpdateRequest>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -68,11 +68,13 @@ export function TenantProfile() {
 
     setIsSubmitting(true);
     try {
-      await updateTenantProfile(currentTenant.id, changes);
+      const updated = await updateTenantProfile(currentTenant.id, changes);
+      // Write the fresh record back into AppContext so the cached tenant
+      // (state + localStorage) reflects the change without a page reload.
+      setCurrentTenant(updated);
       setIsEditing(false);
       setEditForm({});
-      // Reload the page to reflect changes
-      window.location.reload();
+      toast.success("Profile updated");
     } catch (error) {
       console.error("Failed to update profile:", error);
     } finally {

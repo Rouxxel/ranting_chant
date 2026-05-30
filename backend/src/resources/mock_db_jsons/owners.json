@@ -3,35 +3,35 @@
     "id": "owner_001",
     "name": "John Owner",
     "email": "owner@example.com",
-    "phone": "+1-555-3333",
+    "phone": "+15553333",
     "owned_properties": ["property_001"]
   },
   {
     "id": "owner_002",
     "name": "Michael Sterling",
     "email": "michael.sterling@example.com",
-    "phone": "+1-555-3334",
+    "phone": "+15553334",
     "owned_properties": ["property_002"]
   },
   {
     "id": "owner_003",
     "name": "Olivia Bennett",
     "email": "olivia.bennett@example.com",
-    "phone": "+1-555-3335",
+    "phone": "+15553335",
     "owned_properties": ["property_003"]
   },
   {
     "id": "owner_004",
     "name": "Robert Hayes",
     "email": "robert.hayes@example.com",
-    "phone": "+1-555-3336",
+    "phone": "+15553336",
     "owned_properties": ["property_004"]
   },
   {
     "id": "owner_005",
     "name": "Sophia Reynolds",
     "email": "sophia.reynolds@example.com",
-    "phone": "+1-555-3337",
+    "phone": "+15553337",
     "owned_properties": ["property_005"]
   }
 ]
