@@ -36,13 +36,13 @@ from src.core_specs.data.data_loader import data_loader
 from src.api_endpoints.root_endpoint import router as root_router
 from backend.src.api_endpoints.routers.tenant_routers.tenants_router import router as tenants_router
 from src.api_endpoints.routers.properties_router import router as properties_router
-from src.api_endpoints.routers.vendors_router import router as vendors_router
-from src.api_endpoints.routers.managers_router import router as managers_router
-from src.api_endpoints.routers.owners_router import router as owners_router
+from backend.src.api_endpoints.routers.vendor_routers.vendors_router import router as vendors_router
+from backend.src.api_endpoints.routers.owner_manager_routers.managers_router import router as managers_router
+from backend.src.api_endpoints.routers.owner_manager_routers.owners_router import router as owners_router
 from src.api_endpoints.routers.requests_router import router as requests_router
-from src.api_endpoints.routers.mcp_router import router as mcp_router
+from backend.src.api_endpoints.routers.mcp_routers.mcp_router import router as mcp_router
 from src.api_endpoints.routers.conversation_router import router as conversation_router
-from src.api_endpoints.routers.voice_router import router as voice_router
+from backend.src.api_endpoints.routers.voice_routers.voice_router import router as voice_router
 
 """API APP-----------------------------------------------------------"""
 #Lifespan event manager (startup and shutdown)
