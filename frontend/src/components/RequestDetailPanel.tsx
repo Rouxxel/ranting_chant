@@ -92,6 +92,22 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
         </header>
 
         <div className="flex-1 space-y-5 overflow-y-auto px-5 py-5">
+          {req.status === "resolved" && (
+            <section>
+              <SectionTitle>Resolution</SectionTitle>
+              <div className="glass-panel space-y-1 p-3">
+                <p className="text-sm text-ranting-ice/90">
+                  {req.resolution_note || "Marked resolved (no note provided)."}
+                </p>
+                {req.resolved_at && (
+                  <p className="text-[11px] text-ranting-muted">
+                    Resolved {new Date(req.resolved_at).toLocaleString()}
+                  </p>
+                )}
+              </div>
+            </section>
+          )}
+
           <section>
             <SectionTitle>Description</SectionTitle>
             <p className="text-sm text-ranting-ice/90">{req.description}</p>

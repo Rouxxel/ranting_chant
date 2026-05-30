@@ -72,6 +72,20 @@ export function RequestTimeline({ req, tenantName = "Tenant" }: RequestTimelineP
           ))}
         </ul>
       </div>
+
+      {req.status === "resolved" && (
+        <div className="mt-5 glass-panel p-3">
+          <div className="mb-1 text-[10px] uppercase tracking-wider text-ranting-muted">Resolution</div>
+          <p className="text-xs text-ranting-ice/90">
+            {req.resolution_note || "Marked resolved (no note provided)."}
+          </p>
+          {req.resolved_at && (
+            <p className="mt-1 text-[10px] text-ranting-muted">
+              Resolved {new Date(req.resolved_at).toLocaleString()}
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 }

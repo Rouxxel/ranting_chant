@@ -174,6 +174,9 @@ export interface Request {
   created_at: string;
   updated_at?: string;
   cancelled_at?: string;
+  resolved_at?: string;
+  resolved_by?: string;
+  resolution_note?: string;
   involved_parties: string[];
   conversation_history: ConversationMessage[];
   notifications_sent: NotificationEvent[];

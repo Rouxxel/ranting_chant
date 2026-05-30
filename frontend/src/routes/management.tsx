@@ -108,9 +108,9 @@ function ManagementPage() {
   async function handleComplete(id: string, resolutionNote?: string) {
     if (!currentManager) return;
     try {
-      await completeRequest(id, { resolved_by: currentManager.id, resolution_note: resolutionNote });
-      setRows((rs) => rs.map((r) => (r.id === id ? { ...r, status: "resolved" } : r)));
-      if (selected?.id === id) setSelected({ ...selected, status: "resolved" });
+      const updated = await completeRequest(id, { resolved_by: currentManager.id, resolution_note: resolutionNote });
+      setRows((rs) => rs.map((r) => (r.id === id ? { ...r, ...updated } : r)));
+      if (selected?.id === id) setSelected((prev) => (prev ? { ...prev, ...updated } : prev));
     } catch (error) {
       console.error("Failed to complete request:", error);
       throw error; // let the dialog stay open on failure
