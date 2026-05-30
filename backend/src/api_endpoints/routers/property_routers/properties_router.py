@@ -140,6 +140,23 @@ async def create_property(request: Request, body: PropertyCreatePayload):
         )
 
         created = create_record("properties", record)
+
+        #Link the property to its manager/owner so it appears in their listings
+        if body.manager_id:
+            manager = find_by_id("property_magament", body.manager_id)
+            if manager:
+                managed = list(manager.get("managed_properties", []))
+                if created["id"] not in managed:
+                    managed.append(created["id"])
+                    update_record("property_magament", body.manager_id, {"managed_properties": managed})
+        if body.owner_id:
+            owner = find_by_id("owners", body.owner_id)
+            if owner:
+                owned = list(owner.get("owned_properties", []))
+                if created["id"] not in owned:
+                    owned.append(created["id"])
+                    update_record("owners", body.owner_id, {"owned_properties": owned})
+
         log_handler.info(f"Property created successfully with id='{created['id']}'")
         return created
 

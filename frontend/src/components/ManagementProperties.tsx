@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { RefreshCw } from "lucide-react";
 import { useApp } from "@/context/AppContext";
 import { getProperties, createProperty, updateProperty } from "@/services/api";
 import { Button } from "@/components/ui/button";
@@ -38,44 +39,46 @@ export function ManagementProperties() {
   });
   const [editForm, setEditForm] = useState<PropertyUpdateRequest>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // A property belongs to the current manager/owner if it's in their managed/owned
+  // list OR its manager_id/owner_id points at them (covers freshly created properties
+  // whose ids aren't yet in the cached user record).
+  const ownsProperty = useCallback((p: Property) => {
+    if (!currentManager) return false;
+    const managedProps = (currentManager as any).managed_properties || [];
+    const ownedProps = (currentManager as any).owned_properties || [];
+    return (
+      managedProps.includes(p.id) ||
+      ownedProps.includes(p.id) ||
+      p.manager_id === currentManager.id ||
+      p.owner_id === currentManager.id
+    );
+  }, [currentManager]);
+
+  const fetchProperties = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      const allProperties = await getProperties();
+      localStorage.setItem('properties', JSON.stringify(allProperties));
+      setProperties(allProperties.filter(ownsProperty));
+    } catch (error) {
+      console.error("Failed to load properties:", error);
+    } finally {
+      setIsRefreshing(false);
+      setIsLoading(false);
+    }
+  }, [ownsProperty]);
 
   useEffect(() => {
-    const loadProperties = async () => {
-      try {
-        // Check localStorage for cached properties
-        const cachedProperties = localStorage.getItem('properties');
-        if (cachedProperties) {
-          const parsedProperties = JSON.parse(cachedProperties) as Property[];
-          const filteredProperties = parsedProperties.filter((p: Property) => {
-            if (!currentManager) return false;
-            const managedProps = (currentManager as any).managed_properties || [];
-            const ownedProps = (currentManager as any).owned_properties || [];
-            return managedProps.includes(p.id) || ownedProps.includes(p.id);
-          });
-          setProperties(filteredProperties);
-          setIsLoading(false);
-        }
-
-        // Fetch fresh data
-        const allProperties = await getProperties();
-        localStorage.setItem('properties', JSON.stringify(allProperties));
-        const filteredProperties = allProperties.filter(p => {
-          if (!currentManager) return false;
-          const managedProps = (currentManager as any).managed_properties || [];
-          const ownedProps = (currentManager as any).owned_properties || [];
-          return managedProps.includes(p.id) || ownedProps.includes(p.id);
-        });
-        setProperties(filteredProperties);
-      } catch (error) {
-        console.error("Failed to load properties:", error);
-        setProperties([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadProperties();
-  }, [currentManager]);
+    // Show cached data immediately, then refresh from the API.
+    const cachedProperties = localStorage.getItem('properties');
+    if (cachedProperties) {
+      setProperties((JSON.parse(cachedProperties) as Property[]).filter(ownsProperty));
+      setIsLoading(false);
+    }
+    fetchProperties();
+  }, [ownsProperty, fetchProperties]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -138,6 +141,17 @@ export function ManagementProperties() {
     <div>
       <div className="mb-4 flex items-center justify-between">
         <h2 className="pl-5 text-xl font-semibold text-ranting-ice">Properties</h2>
+        <div className="flex items-center gap-2">
+        <Button
+          onClick={fetchProperties}
+          disabled={isRefreshing}
+          variant="ghost"
+          className="glossy-btn-ghost inline-flex items-center gap-2 disabled:opacity-60"
+          title="Reload properties from the server"
+        >
+          <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+          {isRefreshing ? "Reloading..." : "Reload"}
+        </Button>
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
             <Button className="glossy-btn">Add Property</Button>
@@ -226,6 +240,7 @@ export function ManagementProperties() {
             </form>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       <div className="glass-panel">

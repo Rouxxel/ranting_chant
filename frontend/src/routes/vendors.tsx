@@ -17,6 +17,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog";
@@ -224,6 +225,9 @@ function VendorListPage() {
               <DialogContent className="border-ranting-sky/30 bg-ranting-navy text-ranting-ice max-w-lg max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Create New Vendor</DialogTitle>
+                  <DialogDescription className="text-ranting-muted">
+                    Enter the vendor's details and the services they provide.
+                  </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleCreate} className="space-y-4">
                   <div>
@@ -400,6 +404,9 @@ function VendorListPage() {
         <DialogContent className="border-ranting-sky/30 bg-ranting-navy text-ranting-ice max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Vendor</DialogTitle>
+            <DialogDescription className="text-ranting-muted">
+              Update the vendor's details and save your changes.
+            </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleUpdate} className="space-y-4">
             <div>

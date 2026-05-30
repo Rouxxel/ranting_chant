@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { RefreshCw } from "lucide-react";
+import { toast } from "sonner";
 import { useApp } from "@/context/AppContext";
 import { getTenants, createTenant, updateTenant, deleteTenant, getProperties } from "@/services/api";
 import { Button } from "@/components/ui/button";
@@ -9,6 +11,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog";
@@ -32,72 +35,55 @@ export function ManagementTenants() {
   const [editForm, setEditForm] = useState<TenantUpdateRequest>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // A property belongs to the current manager/owner if it's in their managed/owned
+  // list OR its manager_id/owner_id points at them (covers freshly created properties
+  // whose ids aren't yet in the cached user record).
+  const ownsProperty = useCallback((p: Property) => {
+    if (!currentManager) return false;
+    const managedProps = (currentManager as any).managed_properties || [];
+    const ownedProps = (currentManager as any).owned_properties || [];
+    return (
+      managedProps.includes(p.id) ||
+      ownedProps.includes(p.id) ||
+      p.manager_id === currentManager.id ||
+      p.owner_id === currentManager.id
+    );
+  }, [currentManager]);
+
+  const applyData = useCallback((allTenants: Tenant[], allProperties: Property[]) => {
+    const myProperties = allProperties.filter(ownsProperty);
+    const myPropertyIds = new Set(myProperties.map((p) => p.id));
+    setProperties(myProperties);
+    setTenants(allTenants.filter((t) => t.property_id && myPropertyIds.has(t.property_id)));
+  }, [ownsProperty]);
+
+  const fetchData = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      const [allTenants, allProperties] = await Promise.all([getTenants(), getProperties()]);
+      localStorage.setItem('tenants', JSON.stringify(allTenants));
+      localStorage.setItem('properties', JSON.stringify(allProperties));
+      applyData(allTenants, allProperties);
+    } catch (error) {
+      console.error("Failed to load data:", error);
+    } finally {
+      setIsRefreshing(false);
+      setIsLoading(false);
+    }
+  }, [applyData]);
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        // Check localStorage for cached tenants and properties
-        const cachedTenants = localStorage.getItem('tenants');
-        const cachedProperties = localStorage.getItem('properties');
-        if (cachedTenants && cachedProperties) {
-          const parsedTenants = JSON.parse(cachedTenants) as Tenant[];
-          const parsedProperties = JSON.parse(cachedProperties) as Property[];
-
-          // Filter tenants for current manager/owner based on their properties
-          const filteredTenants = parsedTenants.filter((t: Tenant) => {
-            if (!currentManager || !t.property_id) return false;
-            const managedProps = (currentManager as any).managed_properties || [];
-            const ownedProps = (currentManager as any).owned_properties || [];
-            return managedProps.includes(t.property_id) || ownedProps.includes(t.property_id);
-          });
-
-          // Filter properties for current manager/owner
-          const filteredProperties = parsedProperties.filter((p: Property) => {
-            if (!currentManager) return false;
-            const managedProps = (currentManager as any).managed_properties || [];
-            const ownedProps = (currentManager as any).owned_properties || [];
-            return managedProps.includes(p.id) || ownedProps.includes(p.id);
-          });
-
-          setTenants(filteredTenants);
-          setProperties(filteredProperties);
-          setIsLoading(false);
-        }
-
-        // Fetch fresh data
-        const [allTenants, allProperties] = await Promise.all([getTenants(), getProperties()]);
-        localStorage.setItem('tenants', JSON.stringify(allTenants));
-        localStorage.setItem('properties', JSON.stringify(allProperties));
-
-        // Filter tenants for current manager/owner based on their properties
-        const filteredTenants = allTenants.filter(t => {
-          if (!currentManager || !t.property_id) return false;
-          const managedProps = (currentManager as any).managed_properties || [];
-          const ownedProps = (currentManager as any).owned_properties || [];
-          return managedProps.includes(t.property_id) || ownedProps.includes(t.property_id);
-        });
-
-        // Filter properties for current manager/owner
-        const filteredProperties = allProperties.filter(p => {
-          if (!currentManager) return false;
-          const managedProps = (currentManager as any).managed_properties || [];
-          const ownedProps = (currentManager as any).owned_properties || [];
-          return managedProps.includes(p.id) || ownedProps.includes(p.id);
-        });
-
-        setTenants(filteredTenants);
-        setProperties(filteredProperties);
-      } catch (error) {
-        console.error("Failed to load data:", error);
-        setTenants([]);
-        setProperties([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadData();
-  }, [currentManager]);
+    // Show cached data immediately, then refresh from the API.
+    const cachedTenants = localStorage.getItem('tenants');
+    const cachedProperties = localStorage.getItem('properties');
+    if (cachedTenants && cachedProperties) {
+      applyData(JSON.parse(cachedTenants), JSON.parse(cachedProperties));
+      setIsLoading(false);
+    }
+    fetchData();
+  }, [applyData, fetchData]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -117,9 +103,24 @@ export function ManagementTenants() {
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selected) return;
+
+    // Only send fields that actually changed from the cached tenant.
+    const changes: TenantUpdateRequest = {};
+    if (editForm.unit !== undefined && editForm.unit !== selected.unit) {
+      changes.unit = editForm.unit;
+    }
+    if (editForm.property_id !== undefined && editForm.property_id !== selected.property_id) {
+      changes.property_id = editForm.property_id;
+    }
+
+    if (Object.keys(changes).length === 0) {
+      toast.error("Please enter your changes");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      const updatedTenant = await updateTenant(selected.id, editForm);
+      const updatedTenant = await updateTenant(selected.id, changes);
       setTenants(tenants.map(t => t.id === selected.id ? updatedTenant : t));
       setSelected(updatedTenant);
       setIsEditDialogOpen(false);
@@ -163,13 +164,27 @@ export function ManagementTenants() {
     <div>
       <div className="mb-4 flex items-center justify-between">
         <h2 className="pl-5 text-xl font-semibold text-ranting-ice">Tenants</h2>
-        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={fetchData}
+            disabled={isRefreshing}
+            variant="ghost"
+            className="glossy-btn-ghost inline-flex items-center gap-2 disabled:opacity-60"
+            title="Reload tenants from the server"
+          >
+            <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+            {isRefreshing ? "Reloading..." : "Reload"}
+          </Button>
+          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
             <Button className="glossy-btn">Add Tenant</Button>
           </DialogTrigger>
           <DialogContent className="border-ranting-sky/30 bg-ranting-navy text-ranting-ice max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Create New Tenant</DialogTitle>
+              <DialogDescription className="text-ranting-muted">
+                Name, unit, and property are required. Email and phone are optional.
+              </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleCreate} className="space-y-4">
               <div>
@@ -240,7 +255,8 @@ export function ManagementTenants() {
               </DialogFooter>
             </form>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
 
       <div className="glass-panel">
@@ -307,6 +323,9 @@ export function ManagementTenants() {
         <DialogContent className="border-ranting-sky/30 bg-ranting-navy text-ranting-ice max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Tenant</DialogTitle>
+            <DialogDescription className="text-ranting-muted">
+              Update the tenant's unit or property and save your changes.
+            </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleUpdate} className="space-y-4">
             <div>

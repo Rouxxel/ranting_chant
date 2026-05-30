@@ -29,14 +29,19 @@ from src.utils.validators import validate_email_format, validate_phone_format
 
 """PYDANTIC MODELS-----------------------------------------------------------"""
 class TenantCreatePayload(BaseModel):
-    """Payload accepted when creating a tenant."""
+    """Payload accepted when creating a tenant.
+
+    name, unit, and property_id are required; contact/address fields are
+    optional and can be filled in later. Mirrors the frontend create form
+    and TenantCreateRequest type.
+    """
 
     name: str
-    email: str
-    phone: str
-    address: str
     unit: str
     property_id: str
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    address: Optional[str] = None
 
 
 class TenantUpdatePayload(BaseModel):
