@@ -88,5 +88,22 @@
       "type": "owner",
       "id": "owner_005"
     }
+  },
+  {
+    "name": "APARTMENT",
+    "address": "ASADASDASDASDAD",
+    "year_built": 2023,
+    "property_type": "mixed_use",
+    "unit_count": 4,
+    "owner_id": null,
+    "manager_id": "manager_001",
+    "tenant_ids": [
+      "tenant_e0916e63"
+    ],
+    "id": "property_4d89b8f1",
+    "representative": {
+      "type": "property_manager",
+      "id": "manager_001"
+    }
   }
 ]
