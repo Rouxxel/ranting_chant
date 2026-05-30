@@ -12,6 +12,9 @@ This module defines several methods to validate several things.
 #Native imports
 import re
 
+#Third-party imports
+import phonenumbers
+
 #Other files imports
 from src.utils.custom_logger import log_handler
 from src.core_specs.configuration.config_loader import config_loader
@@ -70,6 +73,59 @@ def validate_email_format(email: str) -> bool:
         raise HTTPException(status_code=400, detail=message)
 
     log_handler.debug(f"Email '{email}' is valid, proceeding")
+
+def validate_phone_format(phone: str) -> None:
+    """
+        Validate a phone number for any country in the world.
+
+        Uses Google's libphonenumber (via the `phonenumbers` package), which
+        validates against the real numbering plan of every country/region. To
+        be region-agnostic, the number MUST be supplied in E.164 format, i.e.
+        a leading '+', the country calling code, then the national number
+        (e.g. '+14155552671', '+447911123456', '+5491123456789').
+
+        Checks that:
+        - The value parses as an international number (has a valid '+' country code).
+        - The number is actually valid for its numbering plan (length, prefix, etc.).
+
+        Args:
+            phone (str): The phone number string to validate.
+
+        Returns:
+            None. Raises HTTPException(400) when the number is invalid;
+            otherwise allows execution to continue.
+    """
+
+    #Reject empty/whitespace-only input early
+    if not phone or not phone.strip():
+        message = "Invalid phone number: value is empty"
+        log_handler.warning(message)
+        raise HTTPException(status_code=400, detail=message)
+
+    #Require E.164 so we can validate without assuming a default region
+    if not phone.strip().startswith('+'):
+        message = (
+            f"Invalid phone number '{phone}': must be in international E.164 "
+            f"format with a leading '+' and country code (e.g. +14155552671)"
+        )
+        log_handler.warning(message)
+        raise HTTPException(status_code=400, detail=message)
+
+    #Parse with no default region; the '+' country code identifies the country
+    try:
+        parsed = phonenumbers.parse(phone.strip(), None)
+    except phonenumbers.NumberParseException:
+        message = f"Invalid phone number '{phone}': could not be parsed"
+        log_handler.warning(message)
+        raise HTTPException(status_code=400, detail=message)
+
+    #Validate against the country's real numbering plan
+    if not phonenumbers.is_valid_number(parsed):
+        message = f"Invalid phone number '{phone}': not a valid number for its country"
+        log_handler.warning(message)
+        raise HTTPException(status_code=400, detail=message)
+
+    log_handler.debug(f"Phone '{phone}' is valid, proceeding")
 
 def validate_password_format(password: str):
     """

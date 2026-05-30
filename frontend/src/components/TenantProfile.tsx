@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { useApp } from "@/context/AppContext";
 import { updateTenantProfile, getProperties } from "@/services/api";
 import { Button } from "@/components/ui/button";
@@ -50,9 +51,24 @@ export function TenantProfile() {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentTenant) return;
+
+    // Only keep fields that actually differ from the current values
+    const changes: ProfileUpdateRequest = {};
+    if (editForm.email !== undefined && editForm.email !== email) {
+      changes.email = editForm.email;
+    }
+    if (editForm.phone !== undefined && editForm.phone !== phone) {
+      changes.phone = editForm.phone;
+    }
+
+    if (Object.keys(changes).length === 0) {
+      toast.error("Please add changes before saving");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      await updateTenantProfile(currentTenant.id, editForm);
+      await updateTenantProfile(currentTenant.id, changes);
       setIsEditing(false);
       setEditForm({});
       // Reload the page to reflect changes
@@ -103,12 +119,18 @@ export function TenantProfile() {
         <div>
           <Label className="text-ranting-muted">Phone</Label>
           {isEditing ? (
-            <Input
-              type="tel"
-              defaultValue={phone}
-              onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
-              className="aero-input"
-            />
+            <>
+              <Input
+                type="tel"
+                defaultValue={phone}
+                placeholder="+14155552671"
+                onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                className="aero-input"
+              />
+              <p className="mt-1 text-[11px] text-ranting-muted">
+                Use international format with country code, e.g. +14155552671
+              </p>
+            </>
           ) : (
             <div className="text-sm text-ranting-ice">{phone || "-"}</div>
           )}

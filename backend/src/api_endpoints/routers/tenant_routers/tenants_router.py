@@ -25,6 +25,7 @@ from src.utils.custom_logger import log_handler
 from src.utils.limiter import limiter as SlowLimiter
 from src.core_specs.configuration.config_loader import config_loader
 from src.utils.json_store import read_all, find_by_id, find_by_field, create_record, update_record
+from src.utils.validators import validate_email_format, validate_phone_format
 
 """PYDANTIC MODELS-----------------------------------------------------------"""
 class TenantCreatePayload(BaseModel):
@@ -174,6 +175,12 @@ async def update_tenant_profile(request: Request, tenant_id: str, body: TenantPr
         updates = body.model_dump(exclude_none=True)
         if not updates:
             raise HTTPException(status_code=400, detail="No tenant profile updates provided")
+
+        #Validate tenant-editable fields against config-driven rules
+        if "email" in updates:
+            validate_email_format(updates["email"])
+        if "phone" in updates:
+            validate_phone_format(updates["phone"])
 
         updated = update_record("tenants", tenant_id, updates)
         log_handler.info(f"Tenant profile '{tenant_id}' updated successfully")
