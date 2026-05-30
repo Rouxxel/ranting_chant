@@ -7,13 +7,12 @@ import pytest
 from fastapi import HTTPException
 from starlette.requests import Request
 
-from src.api_endpoints.routers import (
-    managers_router,
-    owners_router,
-    properties_router,
+from backend.src.api_endpoints.routers.owner_manager_routers import managers_router, owners_router
+from backend.src.api_endpoints.routers.property_routers import properties_router
+from backend.src.api_endpoints.routers.tenant_routers import tenants_router
+from backend.src.api_endpoints.routers.vendor_routers import vendors_router
+from backend.src.api_endpoints.routers.conver_reque_routers import (
     requests_router,
-    tenants_router,
-    vendors_router,
 )
 from src.utils import json_store
 

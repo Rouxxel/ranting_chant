@@ -9,8 +9,8 @@ from unittest.mock import MagicMock, patch
 
 from starlette.requests import Request
 
-from src.api_endpoints.routers import voice_router
-from src.api_endpoints.routers.voice_router import VoiceRespondPayload
+from backend.src.api_endpoints.routers.voice_routers import voice_router
+from backend.src.api_endpoints.routers.voice_routers.voice_router import VoiceRespondPayload
 from src.voice.providers.base import AudioBytesResult, TranscriptionResult
 
 
