@@ -11,9 +11,22 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { getRequestSummary } from "@/services/api";
+import { getRequestSummary, getTenants, getVendors, getManagers, getOwners } from "@/services/api";
 import { getRequestTypeLabel } from "@/types";
 import type { Request } from "@/types";
+
+// Build an id -> name map from a cached collection in localStorage.
+function readCachedNames(key: string, map: Record<string, string>) {
+  const raw = localStorage.getItem(key);
+  if (!raw) return;
+  try {
+    (JSON.parse(raw) as Array<{ id?: string; name?: string }>).forEach((item) => {
+      if (item.id && item.name) map[item.id] = item.name;
+    });
+  } catch {
+    // ignore malformed cache
+  }
+}
 
 interface RequestDetailPanelProps {
   req: Request;
@@ -28,6 +41,35 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
   const [isCompleteDialogOpen, setIsCompleteDialogOpen] = useState(false);
   const [resolutionNote, setResolutionNote] = useState("");
   const [isCompleting, setIsCompleting] = useState(false);
+  // Maps involved-party ids (e.g. "tenant_001") to display names.
+  const [partyNames, setPartyNames] = useState<Record<string, string>>({});
+
+  const resolvePartyName = (party: string) => partyNames[party] ?? party;
+
+  // Resolve involved-party ids to names: seed from cached collections, then
+  // fetch any collection referenced by the ids that wasn't already cached.
+  useEffect(() => {
+    const ids = req.involved_parties ?? [];
+    if (ids.length === 0) return;
+
+    const map: Record<string, string> = {};
+    ["tenants", "vendors", "managers", "owners"].forEach((key) => readCachedNames(key, map));
+    setPartyNames({ ...map });
+
+    const unresolved = ids.filter((id) => !map[id]);
+    const fetches: Promise<unknown>[] = [];
+    const collect = (list: Array<{ id: string; name: string }>) =>
+      list.forEach((item) => { map[item.id] = item.name; });
+
+    if (unresolved.some((id) => id.startsWith("tenant_"))) fetches.push(getTenants().then(collect).catch(() => {}));
+    if (unresolved.some((id) => id.startsWith("vendor_"))) fetches.push(getVendors().then(collect).catch(() => {}));
+    if (unresolved.some((id) => id.startsWith("manager_"))) fetches.push(getManagers().then(collect).catch(() => {}));
+    if (unresolved.some((id) => id.startsWith("owner_"))) fetches.push(getOwners().then(collect).catch(() => {}));
+
+    if (fetches.length > 0) {
+      Promise.all(fetches).then(() => setPartyNames({ ...map }));
+    }
+  }, [req.involved_parties]);
 
   const handleConfirmComplete = async () => {
     setIsCompleting(true);
@@ -119,7 +161,7 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
               {req.involved_parties && req.involved_parties.length > 0 ? (
                 req.involved_parties.map((p) => (
                   <div key={p} className="glass-panel flex items-center gap-2 px-2.5 py-1.5">
-                    <div className="text-xs text-ranting-ice">{p}</div>
+                    <div className="text-xs text-ranting-ice">{resolvePartyName(p)}</div>
                   </div>
                 ))
               ) : (
