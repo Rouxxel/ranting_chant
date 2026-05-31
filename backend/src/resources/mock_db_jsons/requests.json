@@ -37,7 +37,7 @@
     "notifications_sent": [
       {
         "type": "email",
-        "recipient": "sarah@management.com",
+        "recipient": "sarah@gmail.com",
         "status": "sent",
         "timestamp": "2026-05-24T09:55:37.667452+00:00"
       }
@@ -95,19 +95,19 @@
     "notifications_sent": [
       {
         "type": "email",
-        "recipient": "sarah@management.com",
+        "recipient": "sarah@gmail.com",
         "status": "sent",
         "timestamp": "2026-05-24T10:20:42.629560+00:00"
       },
       {
         "type": "email",
-        "recipient": "sarah@management.com",
+        "recipient": "sarah@gmail.com",
         "status": "failed",
         "timestamp": "2026-05-24T10:22:45.796905+00:00"
       },
       {
         "type": "email",
-        "recipient": "owner@example.com",
+        "recipient": "owner@gmail.com",
         "status": "failed",
         "timestamp": "2026-05-24T10:22:46.411768+00:00"
       }
@@ -203,7 +203,7 @@
     "notifications_sent": [
       {
         "type": "email",
-        "recipient": "sarah@management.com",
+        "recipient": "sarah@gmail.com",
         "status": "sent",
         "timestamp": "2026-05-24T11:18:22.627227+00:00",
         "recipient_type": "manager"
@@ -250,7 +250,7 @@
     "notifications_sent": [
       {
         "type": "email",
-        "recipient": "david.reynolds@management.com",
+        "recipient": "david.reynolds@gmail.com",
         "status": "sent",
         "timestamp": "2026-05-24T08:10:05+00:00"
       }
@@ -282,7 +282,7 @@
       },
       {
         "role": "ai",
-        "message": "I understand. Would you like us to contact the neighbor or management?",
+        "message": "I understand. Would you like us to contact the neighbor or gmail?",
         "timestamp": "2026-05-24T08:20:40+00:00"
       }
     ],
@@ -295,7 +295,7 @@
     "notifications_sent": [
       {
         "type": "email",
-        "recipient": "david.reynolds@management.com",
+        "recipient": "david.reynolds@gmail.com",
         "status": "sent",
         "timestamp": "2026-05-24T08:20:05+00:00"
       }
@@ -335,7 +335,7 @@
     "notifications_sent": [
       {
         "type": "email",
-        "recipient": "laura.mitchell@management.com",
+        "recipient": "laura.mitchell@gmail.com",
         "status": "sent",
         "timestamp": "2026-05-24T08:30:05+00:00"
       }
@@ -380,7 +380,7 @@
     "notifications_sent": [
       {
         "type": "email",
-        "recipient": "laura.mitchell@management.com",
+        "recipient": "laura.mitchell@gmail.com",
         "status": "sent",
         "timestamp": "2026-05-24T08:40:05+00:00"
       }
@@ -420,7 +420,7 @@
     "notifications_sent": [
       {
         "type": "email",
-        "recipient": "kevin.thompson@management.com",
+        "recipient": "kevin.thompson@gmail.com",
         "status": "sent",
         "timestamp": "2026-05-24T09:00:05+00:00"
       }
@@ -460,7 +460,7 @@
     "notifications_sent": [
       {
         "type": "email",
-        "recipient": "kevin.thompson@management.com",
+        "recipient": "kevin.thompson@gmail.com",
         "status": "sent",
         "timestamp": "2026-05-24T09:10:05+00:00"
       }
@@ -500,7 +500,7 @@
     "notifications_sent": [
       {
         "type": "email",
-        "recipient": "kevin.thompson@management.com",
+        "recipient": "kevin.thompson@gmail.com",
         "status": "sent",
         "timestamp": "2026-05-24T09:20:05+00:00"
       }
@@ -540,7 +540,7 @@
     "notifications_sent": [
       {
         "type": "email",
-        "recipient": "sophia.reynolds@example.com",
+        "recipient": "sophia.reynolds@gmail.com",
         "status": "sent",
         "timestamp": "2026-05-24T09:30:05+00:00"
       }
@@ -580,7 +580,7 @@
     "notifications_sent": [
       {
         "type": "email",
-        "recipient": "david.reynolds@management.com",
+        "recipient": "david.reynolds@gmail.com",
         "status": "sent",
         "timestamp": "2026-05-24T09:40:05+00:00"
       }
@@ -620,7 +620,7 @@
     "notifications_sent": [
       {
         "type": "email",
-        "recipient": "sophia.reynolds@example.com",
+        "recipient": "sophia.reynolds@gmail.com",
         "status": "sent",
         "timestamp": "2026-05-24T09:50:05+00:00"
       }

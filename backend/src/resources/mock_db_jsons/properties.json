@@ -90,11 +90,11 @@
     }
   },
   {
-    "name": "APARTMENT",
-    "address": "ASADASDASDASDAD",
-    "year_built": 2023,
+    "name": "APARTMENT 2",
+    "address": "somehwer 123",
+    "year_built": 2020,
     "property_type": "mixed_use",
-    "unit_count": 4,
+    "unit_count": 6,
     "owner_id": null,
     "manager_id": "manager_001",
     "tenant_ids": [

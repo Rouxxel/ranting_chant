@@ -2,8 +2,8 @@
   {
     "id": "manager_001",
     "name": "John management",
-    "email": "sarah@gmail.com",
-    "phone": "+15552222",
+    "email": "sarah@gmail.co",
+    "phone": "+14155552673",
     "managed_properties": [
       "property_001"
     ]
@@ -11,8 +11,8 @@
   {
     "id": "manager_002",
     "name": "David Reynolds",
-    "email": "david.reynolds@management.com",
-    "phone": "+15552223",
+    "email": "david.reynolds@gmail.com",
+    "phone": "+14155552673",
     "managed_properties": [
       "property_002"
     ]
@@ -20,7 +20,7 @@
   {
     "id": "manager_003",
     "name": "Laura Mitchell",
-    "email": "laura.mitchell@management.com",
+    "email": "laura.mitchell@gmail.com",
     "phone": "+15552224",
     "managed_properties": [
       "property_003"
@@ -29,7 +29,7 @@
   {
     "id": "manager_004",
     "name": "Kevin Thompson",
-    "email": "kevin.thompson@management.com",
+    "email": "kevin.thompson@gmail.com",
     "phone": "+15552225",
     "managed_properties": [
       "property_004"
