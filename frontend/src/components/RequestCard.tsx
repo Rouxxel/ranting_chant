@@ -50,14 +50,14 @@ export function RequestCard({ req, open, onToggle, tenantName = "Tenant", onCanc
           </div>
           <p className="mb-3 text-sm text-ranting-muted">{req.description}</p>
           <div className="flex flex-wrap items-center gap-3">
-            <span className="text-[11px] text-ranting-muted">Created {createdDate}</span>
+            <span className="text-[11px] text-[rgb(51,71,88)] font-bold">Created on {createdDate}</span>
             {req.status === "cancelled" && (
-              <span className="text-[11px] font-medium text-slate-400">
-                Cancelled{req.cancelled_at ? ` ${new Date(req.cancelled_at).toLocaleDateString()}` : ""}
+              <span className="text-[rgb(51,71,88)] text-[11px] font-medium">
+                Cancelled on{req.cancelled_at ? ` ${new Date(req.cancelled_at).toLocaleDateString()}` : ""}
               </span>
             )}
             {req.involved_parties && req.involved_parties.length > 0 && (
-              <span className="text-[11px] text-ranting-muted">{req.involved_parties.length} party(s) involved</span>
+              <span className="text-[11px] text-[rgb(51,71,88)]">{req.involved_parties.length} party(s) involved</span>
             )}
           </div>
         </div>

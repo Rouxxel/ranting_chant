@@ -11,22 +11,9 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { getRequestSummary, getTenants, getVendors, getManagers, getOwners } from "@/services/api";
+import { getRequestSummary } from "@/services/api";
 import { getRequestTypeLabel } from "@/types";
 import type { Request } from "@/types";
-
-// Build an id -> name map from a cached collection in localStorage.
-function readCachedNames(key: string, map: Record<string, string>) {
-  const raw = localStorage.getItem(key);
-  if (!raw) return;
-  try {
-    (JSON.parse(raw) as Array<{ id?: string; name?: string }>).forEach((item) => {
-      if (item.id && item.name) map[item.id] = item.name;
-    });
-  } catch {
-    // ignore malformed cache
-  }
-}
 
 interface RequestDetailPanelProps {
   req: Request;
@@ -41,35 +28,6 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
   const [isCompleteDialogOpen, setIsCompleteDialogOpen] = useState(false);
   const [resolutionNote, setResolutionNote] = useState("");
   const [isCompleting, setIsCompleting] = useState(false);
-  // Maps involved-party ids (e.g. "tenant_001") to display names.
-  const [partyNames, setPartyNames] = useState<Record<string, string>>({});
-
-  const resolvePartyName = (party: string) => partyNames[party] ?? party;
-
-  // Resolve involved-party ids to names: seed from cached collections, then
-  // fetch any collection referenced by the ids that wasn't already cached.
-  useEffect(() => {
-    const ids = req.involved_parties ?? [];
-    if (ids.length === 0) return;
-
-    const map: Record<string, string> = {};
-    ["tenants", "vendors", "managers", "owners"].forEach((key) => readCachedNames(key, map));
-    setPartyNames({ ...map });
-
-    const unresolved = ids.filter((id) => !map[id]);
-    const fetches: Promise<unknown>[] = [];
-    const collect = (list: Array<{ id: string; name: string }>) =>
-      list.forEach((item) => { map[item.id] = item.name; });
-
-    if (unresolved.some((id) => id.startsWith("tenant_"))) fetches.push(getTenants().then(collect).catch(() => {}));
-    if (unresolved.some((id) => id.startsWith("vendor_"))) fetches.push(getVendors().then(collect).catch(() => {}));
-    if (unresolved.some((id) => id.startsWith("manager_"))) fetches.push(getManagers().then(collect).catch(() => {}));
-    if (unresolved.some((id) => id.startsWith("owner_"))) fetches.push(getOwners().then(collect).catch(() => {}));
-
-    if (fetches.length > 0) {
-      Promise.all(fetches).then(() => setPartyNames({ ...map }));
-    }
-  }, [req.involved_parties]);
 
   const handleConfirmComplete = async () => {
     setIsCompleting(true);
@@ -117,13 +75,24 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
     <>
       <div onClick={onClose} className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm" />
       <aside
-        className="glass-panel-strong fixed right-0 top-0 z-50 flex h-screen w-full max-w-[480px] flex-col"
-        style={{ borderRadius: "18px 0 0 18px", animation: "slideIn 280ms ease-out" }}
+        className="glass-panel-strong flex flex-col"
+        style={{
+          position: "fixed",
+          top: 0,
+          right: 0,
+          bottom: 0,
+          height: "100vh",
+          maxHeight: "100vh",
+          width: "min(480px, 100vw)",
+          zIndex: 50,
+          borderRadius: "18px 0 0 18px",
+          animation: "slideIn 280ms ease-out",
+        }}
       >
         <style>{`@keyframes slideIn { from { transform: translateX(40px); opacity: 0;} to { transform: none; opacity: 1; } }`}</style>
         <header className="flex items-start justify-between border-b border-white/10 px-5 py-4">
           <div className="min-w-0">
-            <div className="text-[11px] text-ranting-muted">{req.id}</div>
+            <div className="text-[11px] text-ranting-deep">{req.id}</div>
             <h2 className="truncate text-lg font-semibold text-ranting-ice">{getRequestTypeLabel(req.type)}</h2>
             <div className="mt-2 flex items-center gap-2">
               <StatusBadge status={req.status} />
@@ -142,7 +111,7 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
                   {req.resolution_note || "Marked resolved (no note provided)."}
                 </p>
                 {req.resolved_at && (
-                  <p className="text-[11px] text-ranting-muted">
+                  <p className="text-[11px] text-ranting-deep">
                     {new Date(req.resolved_at).toLocaleString()}
                   </p>
                 )}
@@ -161,11 +130,11 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
               {req.involved_parties && req.involved_parties.length > 0 ? (
                 req.involved_parties.map((p) => (
                   <div key={p} className="glass-panel flex items-center gap-2 px-2.5 py-1.5">
-                    <div className="text-xs text-ranting-ice">{resolvePartyName(p)}</div>
+                    <div className="text-xs text-ranting-ice">{p}</div>
                   </div>
                 ))
               ) : (
-                <div className="text-xs text-ranting-muted">No involved parties</div>
+                <div className="text-xs text-ranting-deep">No involved parties</div>
               )}
             </div>
           </section>
@@ -185,7 +154,7 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
                     } : undefined}
                   >
                     {m.message}
-                    <div className="mt-0.5 text-[9px] text-ranting-muted">{new Date(m.timestamp).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</div>
+                    <div className="mt-0.5 text-[9px] text-ranting-deep">{new Date(m.timestamp).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</div>
                   </div>
                 </div>
               ))}
@@ -199,8 +168,8 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
                 <li key={n.id ?? `notif-${i}`} className="flex items-center gap-2 text-xs text-ranting-ice/85">
                   {n.type === "email" ? <Mail className="h-3.5 w-3.5 text-ranting-sky" /> : <MessageCircle className="h-3.5 w-3.5 text-ranting-sky" />}
                   <span className="font-medium">{n.type.toUpperCase()}</span>
-                  <span className="text-ranting-muted">→ {n.recipient}</span>
-                  <span className="text-ranting-muted">· {new Date(n.timestamp).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</span>
+                  <span className="text-ranting-deep">→ {n.recipient}</span>
+                  <span className="text-ranting-deep">· {new Date(n.timestamp).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</span>
                 </li>
               ))}
             </ul>
@@ -214,7 +183,7 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
                   <div className="shimmer h-3 w-4/5 rounded" />
                   <div className="shimmer h-3 w-full rounded" />
                   <div className="shimmer h-3 w-3/5 rounded" />
-                  <div className="pt-1 text-[11px] italic text-ranting-muted">Generating summary…</div>
+                  <div className="pt-1 text-[11px] italic text-ranting-deep">Generating summary…</div>
                 </>
               ) : (
                 <p className="text-sm text-ranting-ice/90">{summary || "No summary available."}</p>
@@ -244,10 +213,10 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
       </aside>
 
       <Dialog open={isCompleteDialogOpen} onOpenChange={setIsCompleteDialogOpen}>
-        <DialogContent className="border-ranting-sky/30 bg-ranting-navy text-ranting-ice max-w-md">
+        <DialogContent className="aero-surface max-w-md">
           <DialogHeader>
             <DialogTitle>Complete Request</DialogTitle>
-            <DialogDescription className="text-sm text-ranting-muted">
+            <DialogDescription className="text-sm text-ranting-deep">
               Mark this request as resolved. You can add an optional resolution note for the record.
             </DialogDescription>
           </DialogHeader>
@@ -284,5 +253,5 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <div className="mb-2 text-[10px] uppercase tracking-wider text-ranting-muted">{children}</div>;
+  return <div className="mb-2 text-[10px] uppercase tracking-wider text-ranting-deep">{children}</div>;
 }

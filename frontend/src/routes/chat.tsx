@@ -289,95 +289,95 @@ function ChatPage() {
   return (
     <AuthenticatedLayout>
       <main className="mx-auto flex min-h-[calc(100vh-130px)] max-w-[1400px] gap-5">
-      {/* Sidebar */}
-      <aside className="glass-panel hidden w-[280px] shrink-0 flex-col p-5 md:flex">
-        <div className="flex items-center gap-3 mb-5">
-          <Avatar name={name} size={48} />
-          <div className="min-w-0">
-            <div className="truncate text-sm font-semibold text-ranting-ice">{name}</div>
-            <div className="text-xs text-ranting-muted">Unit {unit}</div>
-          </div>
-        </div>
-
-        <div className="mb-2 text-[10px] uppercase tracking-wider text-ranting-muted">Current request</div>
-        <div className="mb-1 text-sm text-ranting-ice">Property Issue</div>
-        <StatusBadge status={status} className="self-start" />
-        {requestId && <div className="mt-2 text-[11px] text-ranting-muted">ID · {requestId}</div>}
-
-        <div className="mt-auto pt-4 space-y-2">
-          <button
-            onClick={handleSaveConversation}
-            disabled={isSaved || !requestId}
-            className="glossy-btn flex items-center justify-center gap-2 w-full px-3 py-2 text-sm disabled:opacity-50"
-          >
-            <Save className="h-4 w-4" />
-            {isSaved ? "Saved" : "End & Save"}
-          </button>
-          <button
-            onClick={handleSendNotifications}
-            disabled={!isSaved}
-            className="glossy-btn flex items-center justify-center gap-2 w-full px-3 py-2 text-sm disabled:opacity-50"
-          >
-            <Send className="h-4 w-4" />
-            Send Notifications
-          </button>
-          <Link to="/requests" className="glossy-btn-ghost flex items-center justify-center gap-2 px-3 py-2 text-sm">
-            <MessageSquareText className="h-4 w-4" /> View My Requests
-          </Link>
-        </div>
-      </aside>
-
-      {/* Chat */}
-      <section className="glass-panel-strong flex flex-1 flex-col overflow-hidden">
-        {escalated && (
-          <div className="flex items-center gap-2 border-b border-red-400/30 bg-red-500/10 px-5 py-3 text-sm text-red-200" style={{ boxShadow: "inset 0 0 24px rgba(239,68,68,0.25)" }}>
-            <AlertTriangle className="h-4 w-4" />
-            This request has been escalated — urgency: {urgency.toUpperCase()}
-          </div>
-        )}
-
-        <div ref={scrollerRef} className="flex-1 overflow-y-auto px-5 py-6 space-y-4">
-          {isLoading ? (
-            <div className="space-y-4">
-              <div className="flex gap-3">
-                <Skeleton className="h-10 w-10 rounded-full" />
-                <div className="space-y-2 flex-1">
-                  <Skeleton className="h-4 w-32" />
-                  <Skeleton className="h-16 w-3/4 rounded-2xl" />
-                </div>
-              </div>
+        {/* Sidebar */}
+        <aside className="glass-panel hidden w-[280px] shrink-0 flex-col p-5 md:flex">
+          <div className="flex items-center gap-3 mb-5">
+            <Avatar name={name} size={48} />
+            <div className="min-w-0">
+              <div className="truncate text-sm font-semibold text-ranting-ice">{name}</div>
+              <div className="text-xs text-ranting-muted">Unit {unit}</div>
             </div>
-          ) : messages.map((m) => (
-            <MessageBubble key={m.id} msg={m} tenantName={name} />
-          ))}
-          {typing && (
-            <div className="flex items-end gap-2">
-              <Avatar name="Ranting Chant" size={28} />
-              <div className="glass-panel flex items-center gap-1 px-4 py-3">
-                <span className="typing-dot h-1.5 w-1.5 rounded-full bg-ranting-sky" />
-                <span className="typing-dot h-1.5 w-1.5 rounded-full bg-ranting-sky" />
-                <span className="typing-dot h-1.5 w-1.5 rounded-full bg-ranting-sky" />
-              </div>
+          </div>
+
+          <div className="text-[rgb(51,71,88)] font-bold mb-2 text-[10px] uppercase tracking-wider">Current request</div>
+          <div className="mb-1 text-sm text-ranting-ice">Property Issue</div>
+          <StatusBadge status={status} className="self-start" />
+          {requestId && <div className="mt-2 text-[11px] text-ranting-muted">ID · {requestId}</div>}
+
+          <div className="mt-auto pt-4 space-y-2">
+            <button
+              onClick={handleSaveConversation}
+              disabled={isSaved || !requestId}
+              className="glossy-btn flex items-center justify-center gap-2 w-full px-3 py-2 text-sm disabled:opacity-50"
+            >
+              <Save className="h-4 w-4" />
+              {isSaved ? "Saved" : "End & Save"}
+            </button>
+            <button
+              onClick={handleSendNotifications}
+              disabled={!isSaved}
+              className="glossy-btn flex items-center justify-center gap-2 w-full px-3 py-2 text-sm disabled:opacity-50"
+            >
+              <Send className="h-4 w-4" />
+              Send Notifications
+            </button>
+            <Link to="/requests" className="glossy-btn-ghost flex items-center justify-center gap-2 px-3 py-2 text-sm">
+              <MessageSquareText className="h-4 w-4" /> View My Requests
+            </Link>
+          </div>
+        </aside>
+
+        {/* Chat */}
+        <section className="glass-panel-strong flex flex-1 flex-col overflow-hidden">
+          {escalated && (
+            <div className="flex items-center gap-2 border-b border-red-400/30 bg-red-500/10 px-5 py-3 text-sm text-red-200" style={{ boxShadow: "inset 0 0 24px rgba(239,68,68,0.25)" }}>
+              <AlertTriangle className="h-4 w-4" />
+              This request has been escalated — urgency: {urgency.toUpperCase()}
             </div>
           )}
-        </div>
 
-        {/* Input */}
-        <ChatInput
-          value={input}
-          onChange={setInput}
-          onSend={send}
-          onVoiceToggle={handleVoiceToggle}
-          voiceProvider={voiceProvider}
-          voiceProviders={voiceProviders}
-          voiceId={voiceId}
-          voices={voices}
-          onVoiceProviderChange={setVoiceProvider}
-          onVoiceChange={setVoiceId}
-          isRecording={isRecording}
-          isTyping={typing}
-        />
-      </section>
+          <div ref={scrollerRef} className="flex-1 overflow-y-auto px-5 py-6 space-y-4">
+            {isLoading ? (
+              <div className="space-y-4">
+                <div className="flex gap-3">
+                  <Skeleton className="h-10 w-10 rounded-full" />
+                  <div className="space-y-2 flex-1">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-16 w-3/4 rounded-2xl" />
+                  </div>
+                </div>
+              </div>
+            ) : messages.map((m) => (
+              <MessageBubble key={m.id} msg={m} tenantName={name} />
+            ))}
+            {typing && (
+              <div className="flex items-end gap-2">
+                <Avatar name="Ranting Chant" size={28} />
+                <div className="glass-panel flex items-center gap-1 px-4 py-3">
+                  <span className="typing-dot h-1.5 w-1.5 rounded-full bg-ranting-sky" />
+                  <span className="typing-dot h-1.5 w-1.5 rounded-full bg-ranting-sky" />
+                  <span className="typing-dot h-1.5 w-1.5 rounded-full bg-ranting-sky" />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Input */}
+          <ChatInput
+            value={input}
+            onChange={setInput}
+            onSend={send}
+            onVoiceToggle={handleVoiceToggle}
+            voiceProvider={voiceProvider}
+            voiceProviders={voiceProviders}
+            voiceId={voiceId}
+            voices={voices}
+            onVoiceProviderChange={setVoiceProvider}
+            onVoiceChange={setVoiceId}
+            isRecording={isRecording}
+            isTyping={typing}
+          />
+        </section>
       </main>
     </AuthenticatedLayout>
   );

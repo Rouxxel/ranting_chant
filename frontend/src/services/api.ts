@@ -155,15 +155,47 @@ apiClient.interceptors.response.use(
   }
 );
 
-// Map a backend validation error to a friendly, field-specific message.
-// Falls back to the provided message for anything that isn't email/phone.
+// Map a backend validation error (400 / 422) to a friendly, field-specific
+// message. Handles both FastAPI string `detail` (400) and the structured
+// list-of-errors `detail` (422). Falls back to a generic "try again later"
+// message for connection / server errors, or to the caller's `fallback`
+// for anything else.
 export function describeValidationError(error: unknown, fallback: string): string {
-  const detail = axios.isAxiosError(error)
-    ? String((error.response?.data as { detail?: string })?.detail ?? "")
-    : "";
-  const lower = detail.toLowerCase();
-  if (lower.includes("email")) return "Please enter a valid email";
-  if (lower.includes("phone")) return "Please enter a valid phone number";
+  if (!axios.isAxiosError(error)) return fallback;
+
+  // Network / no response from server
+  if (!error.response || error.code === "ERR_NETWORK") {
+    return "We are having some troubles, please try again later";
+  }
+
+  const status = error.response.status;
+  const data = error.response.data as { detail?: unknown } | undefined;
+  const rawDetail = data?.detail;
+
+  // Flatten detail (string for 400, array of {loc, msg, type} for 422)
+  let detailText = "";
+  if (typeof rawDetail === "string") {
+    detailText = rawDetail;
+  } else if (Array.isArray(rawDetail)) {
+    detailText = rawDetail
+      .map((d) => {
+        if (typeof d === "string") return d;
+        const loc = Array.isArray(d?.loc) ? d.loc.join(".") : "";
+        const msg = typeof d?.msg === "string" ? d.msg : "";
+        return `${loc} ${msg}`;
+      })
+      .join(" | ");
+  }
+
+  const lower = detailText.toLowerCase();
+  if (lower.includes("email")) return "Please enter a valid email address";
+  if (lower.includes("phone") || lower.includes("not a valid number")) {
+    return "Please enter a valid phone number";
+  }
+
+  if (status === 422) return "Some fields are invalid. Please review and try again.";
+  if (status >= 500) return "We are having some troubles, please try again later";
+
   return fallback;
 }
 
@@ -219,12 +251,12 @@ export const getPropertyById = async (propertyId: string): Promise<Property> => 
 };
 
 export const createProperty = async (data: PropertyCreateRequest): Promise<Property> => {
-  const response = await apiClient.post<Property>('/properties', data);
+  const response = await apiClient.post<Property>('/properties', data, { suppressErrorToast: true });
   return response.data;
 };
 
 export const updateProperty = async (propertyId: string, data: PropertyUpdateRequest): Promise<Property> => {
-  const response = await apiClient.patch<Property>(`/properties/${propertyId}`, data);
+  const response = await apiClient.patch<Property>(`/properties/${propertyId}`, data, { suppressErrorToast: true });
   return response.data;
 };
 

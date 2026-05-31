@@ -1,8 +1,7 @@
 import { useState } from "react";
-import axios from "axios";
 import { toast } from "sonner";
 import { useApp } from "@/context/AppContext";
-import { updateManagerProfile, updateOwnerProfile } from "@/services/api";
+import { updateManagerProfile, updateOwnerProfile, describeValidationError } from "@/services/api";
 import type { ProfileUpdateRequest } from "@/types";
 
 export function ManagementProfile() {
@@ -48,17 +47,7 @@ export function ManagementProfile() {
       toast.success("Profile updated");
     } catch (error) {
       console.error("Failed to update profile:", error);
-      const detail = axios.isAxiosError(error)
-        ? String((error.response?.data as { detail?: string })?.detail ?? "")
-        : "";
-      const lowerDetail = detail.toLowerCase();
-      if (lowerDetail.includes("email")) {
-        toast.error("Please enter a valid email");
-      } else if (lowerDetail.includes("phone")) {
-        toast.error("Please enter a valid phone number");
-      } else {
-        toast.error("Failed to update profile. Please try again.");
-      }
+      toast.error(describeValidationError(error, "Failed to update profile. Please try again."));
     } finally {
       setIsLoading(false);
     }
@@ -67,13 +56,13 @@ export function ManagementProfile() {
   return (
     <div>
       <div className="mb-4">
-        <h2 className="pl-5 text-xl font-semibold text-ranting-ice">Profile</h2>
+        <h2 className="text-[rgb(51,71,88)] pl-5 text-xl font-semibold">Profile</h2>
       </div>
 
       <div className="glass-panel p-6">
         <div className="space-y-4">
           <div>
-          <label className="block text-xs uppercase tracking-wider text-ranting-muted mb-1">{isOwner ? "Owner" : "Manager"}</label>
+            <label className="block text-xs uppercase tracking-wider mb-1">{isOwner ? "Owner" : "Manager"}</label>
             {isEditing ? (
               <input
                 type="text"

@@ -54,7 +54,7 @@ export function ChatInput({
     <div className="border-t border-white/10 p-4">
       <div className="mb-3 grid gap-3 sm:grid-cols-[minmax(0,250px)_minmax(0,250px)]">
         <div className="flex flex-col gap-1.5">
-          <label className="text-[10px] font-semibold uppercase tracking-[0.22em] text-ranting-muted">
+          <label className="text-[10px] font-semibold uppercase tracking-[0.22em] text-ranting-deep">
             Voice Provider
           </label>
           <Select
@@ -65,9 +65,9 @@ export function ChatInput({
             <SelectTrigger className="h-9 border-ranting-sky/35 bg-ranting-deep text-ranting-ice shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_0_14px_rgba(45,106,159,0.22)]">
               <SelectValue placeholder="Select provider" />
             </SelectTrigger>
-            <SelectContent className="border-ranting-sky/35 bg-ranting-navy text-ranting-ice shadow-[0_16px_34px_rgba(0,0,0,0.45)]">
+            <SelectContent className="aero-surface shadow-[0_16px_34px_rgba(0,0,0,0.45)]">
               {providerOptions.map((provider) => (
-                <SelectItem key={provider.id} value={provider.id} disabled={!provider.enabled} className="focus:bg-ranting-accent focus:text-white">
+                <SelectItem key={provider.id} value={provider.id} disabled={!provider.enabled} className="aero-select-item">
                   {provider.display_name}{provider.enabled ? "" : " (not configured)"}
                 </SelectItem>
               ))}
@@ -75,7 +75,7 @@ export function ChatInput({
           </Select>
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="text-[10px] font-semibold uppercase tracking-[0.22em] text-ranting-muted">
+          <label className="text-[10px] font-semibold uppercase tracking-[0.22em] text-ranting-deep">
             Voice
           </label>
           <Select
@@ -86,9 +86,9 @@ export function ChatInput({
             <SelectTrigger className="h-9 border-ranting-sky/35 bg-ranting-deep text-ranting-ice shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_0_14px_rgba(45,106,159,0.22)]">
               <SelectValue placeholder={voices.length ? "Select voice" : "No voices"} />
             </SelectTrigger>
-            <SelectContent className="border-ranting-sky/35 bg-ranting-navy text-ranting-ice shadow-[0_16px_34px_rgba(0,0,0,0.45)]">
+            <SelectContent className="aero-surface shadow-[0_16px_34px_rgba(0,0,0,0.45)]">
               {voices.map((voice) => (
-                <SelectItem key={voice.id} value={voice.id} className="focus:bg-ranting-accent focus:text-white">
+                <SelectItem key={voice.id} value={voice.id} className="aero-select-item">
                   {voice.name}
                 </SelectItem>
               ))}
@@ -118,7 +118,7 @@ export function ChatInput({
           <Send className="h-4 w-4" />
         </button>
       </div>
-      <div className="mt-1.5 text-[11px] text-ranting-muted">
+      <div className="mt-1.5 text-[11px] text-ranting-deep">
         {isRecording ? "Recording… tap mic to stop" : isTyping ? "Processing…" : "Press Enter to send · Shift+Enter for newline"}
       </div>
     </div>

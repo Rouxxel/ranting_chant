@@ -159,13 +159,13 @@ export function ManagementTenants() {
   };
 
   if (isLoading) {
-    return <div className="glass-panel p-8 text-center text-ranting-muted">Loading tenants...</div>;
+    return <div className="glass-panel p-8 text-center text-ranting-deep">Loading tenants...</div>;
   }
 
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="pl-5 text-xl font-semibold text-ranting-ice">Tenants</h2>
+        <h2 className="text-[rgb(51,71,88)] pl-5 text-xl font-semibold">Tenants</h2>
         <div className="flex items-center gap-2">
           <Button
             onClick={fetchData}
@@ -178,101 +178,101 @@ export function ManagementTenants() {
             {isRefreshing ? "Reloading..." : "Reload"}
           </Button>
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="glossy-btn">Add Tenant</Button>
-          </DialogTrigger>
-          <DialogContent className="border-ranting-sky/30 bg-ranting-navy text-ranting-ice max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Create New Tenant</DialogTitle>
-              <DialogDescription className="text-ranting-muted">
-                Name, unit, and property are required. Email and phone are optional.
-              </DialogDescription>
-            </DialogHeader>
-            <form onSubmit={handleCreate} className="space-y-4">
-              <div>
-                <Label htmlFor="create-name">Name</Label>
-                <Input
-                  id="create-name"
-                  value={createForm.name}
-                  onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
-                  required
-                  className="aero-input"
-                />
-              </div>
-              <div>
-                <Label htmlFor="create-unit">Unit</Label>
-                <Input
-                  id="create-unit"
-                  value={createForm.unit}
-                  onChange={(e) => setCreateForm({ ...createForm, unit: e.target.value })}
-                  required
-                  className="aero-input"
-                />
-              </div>
-              <div>
-                <Label htmlFor="create-property">Property</Label>
-                <select
-                  id="create-property"
-                  value={createForm.property_id}
-                  onChange={(e) => setCreateForm({ ...createForm, property_id: e.target.value })}
-                  required
-                  className="aero-input w-full px-3 py-2"
-                  style={{ colorScheme: "dark" }}
-                >
-                  <option value="">Select a property</option>
-                  {properties.map((p) => (
-                    <option key={p.id} value={p.id} className="bg-ranting-deep text-ranting-ice">
-                      {p.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <Label htmlFor="create-email">Email</Label>
-                <Input
-                  id="create-email"
-                  type="email"
-                  value={createForm.email || ""}
-                  onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })}
-                  className="aero-input"
-                />
-              </div>
-              <div>
-                <Label htmlFor="create-phone">Phone</Label>
-                <Input
-                  id="create-phone"
-                  type="tel"
-                  value={createForm.phone || ""}
-                  onChange={(e) => setCreateForm({ ...createForm, phone: e.target.value })}
-                  className="aero-input"
-                />
-              </div>
-              <DialogFooter>
-                <Button type="button" variant="ghost" onClick={() => setIsCreateDialogOpen(false)} className="glossy-btn-ghost">
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isSubmitting} className="glossy-btn">
-                  {isSubmitting ? "Creating..." : "Create"}
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
+            <DialogTrigger asChild>
+              <Button className="glossy-btn">Add Tenant</Button>
+            </DialogTrigger>
+            <DialogContent className="aero-surface max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Create New Tenant</DialogTitle>
+                <DialogDescription className="text-ranting-deep">
+                  Name, unit, and property are required. Email and phone are optional.
+                </DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleCreate} className="space-y-4">
+                <div>
+                  <Label htmlFor="create-name">Name</Label>
+                  <Input
+                    id="create-name"
+                    value={createForm.name}
+                    onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
+                    required
+                    className="aero-input"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="create-unit">Unit</Label>
+                  <Input
+                    id="create-unit"
+                    value={createForm.unit}
+                    onChange={(e) => setCreateForm({ ...createForm, unit: e.target.value })}
+                    required
+                    className="aero-input"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="create-property">Property</Label>
+                  <select
+                    id="create-property"
+                    value={createForm.property_id}
+                    onChange={(e) => setCreateForm({ ...createForm, property_id: e.target.value })}
+                    required
+                    className="aero-input w-full px-3 py-2"
+                    style={{ colorScheme: "dark" }}
+                  >
+                    <option value="">Select a property</option>
+                    {properties.map((p) => (
+                      <option key={p.id} value={p.id} className="bg-ranting-deep text-ranting-ice">
+                        {p.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <Label htmlFor="create-email">Email</Label>
+                  <Input
+                    id="create-email"
+                    type="email"
+                    value={createForm.email || ""}
+                    onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })}
+                    className="aero-input"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="create-phone">Phone</Label>
+                  <Input
+                    id="create-phone"
+                    type="tel"
+                    value={createForm.phone || ""}
+                    onChange={(e) => setCreateForm({ ...createForm, phone: e.target.value })}
+                    className="aero-input"
+                  />
+                </div>
+                <DialogFooter>
+                  <Button type="button" variant="ghost" onClick={() => setIsCreateDialogOpen(false)} className="glossy-btn-ghost">
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={isSubmitting} className="glossy-btn">
+                    {isSubmitting ? "Creating..." : "Create"}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
           </Dialog>
         </div>
       </div>
 
       <div className="glass-panel">
         {tenants.length === 0 ? (
-          <div className="p-8 text-center text-ranting-muted">No tenants found</div>
+          <div className="p-8 text-center text-ranting-deep">No tenants found</div>
         ) : (
           <table className="w-full">
             <thead>
               <tr className="border-b border-ranting-sky/20">
-                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-muted">Name</th>
-                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-muted">Unit</th>
-                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-muted">Property</th>
-                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-muted">Email</th>
-                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-muted">Phone</th>
+                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-deep">Name</th>
+                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-deep">Unit</th>
+                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-deep">Property</th>
+                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-deep">Email</th>
+                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-deep">Phone</th>
               </tr>
             </thead>
             <tbody>
@@ -283,10 +283,10 @@ export function ManagementTenants() {
                   onClick={() => setSelected(tenant)}
                 >
                   <td className="px-4 py-3 text-sm text-ranting-ice">{tenant.name}</td>
-                  <td className="px-4 py-3 text-sm text-ranting-muted">{tenant.unit}</td>
-                  <td className="px-4 py-3 text-sm text-ranting-muted">{tenant.property_id ? properties.find(p => p.id === tenant.property_id)?.name || "-" : "-"}</td>
-                  <td className="px-4 py-3 text-sm text-ranting-muted">{tenant.email || "-"}</td>
-                  <td className="px-4 py-3 text-sm text-ranting-muted">{tenant.phone || "-"}</td>
+                  <td className="px-4 py-3 text-sm text-ranting-deep">{tenant.unit}</td>
+                  <td className="px-4 py-3 text-sm text-ranting-deep">{tenant.property_id ? properties.find(p => p.id === tenant.property_id)?.name || "-" : "-"}</td>
+                  <td className="px-4 py-3 text-sm text-ranting-deep">{tenant.email || "-"}</td>
+                  <td className="px-4 py-3 text-sm text-ranting-deep">{tenant.phone || "-"}</td>
                 </tr>
               ))}
             </tbody>
@@ -296,7 +296,7 @@ export function ManagementTenants() {
 
       {selected && (
         <div className="glass-panel mt-4 p-6">
-          <label className="block text-xs uppercase tracking-wider text-ranting-muted mb-1">Tenant's Name</label>
+          <label className="block text-xs uppercase tracking-wider text-ranting-deep mb-1">Tenant's Name</label>
           <div className="mb-4 flex items-center justify-between">
             <h3 className="text-lg font-semibold text-ranting-ice">{selected.name}</h3>
             <div className="flex gap-2">
@@ -313,19 +313,19 @@ export function ManagementTenants() {
             </div>
           </div>
           <div className="space-y-2 text-sm">
-            <div><span className="text-ranting-muted">Unit:</span> {selected.unit}</div>
-            <div><span className="text-ranting-muted">Property:</span> {selected.property_id ? properties.find(p => p.id === selected.property_id)?.name || "-" : "-"}</div>
-            <div><span className="text-ranting-muted">Email:</span> {selected.email || "-"}</div>
-            <div><span className="text-ranting-muted">Phone:</span> {selected.phone || "-"}</div>
+            <div><span className="text-ranting-deep">Unit:</span> {selected.unit}</div>
+            <div><span className="text-ranting-deep">Property:</span> {selected.property_id ? properties.find(p => p.id === selected.property_id)?.name || "-" : "-"}</div>
+            <div><span className="text-ranting-deep">Email:</span> {selected.email || "-"}</div>
+            <div><span className="text-ranting-deep">Phone:</span> {selected.phone || "-"}</div>
           </div>
         </div>
       )}
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="border-ranting-sky/30 bg-ranting-navy text-ranting-ice max-h-[90vh] overflow-y-auto">
+        <DialogContent className="aero-surface max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Tenant</DialogTitle>
-            <DialogDescription className="text-ranting-muted">
+            <DialogDescription className="text-ranting-deep">
               Update the tenant's unit or property and save your changes.
             </DialogDescription>
           </DialogHeader>

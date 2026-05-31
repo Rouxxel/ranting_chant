@@ -31,10 +31,10 @@ export function ConfirmDialog({
 }: ConfirmDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border-ranting-sky/30 bg-ranting-navy text-ranting-ice max-w-md">
+      <DialogContent className="aero-surface max-w-md">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
-          <DialogDescription className="text-sm text-ranting-muted">{message}</DialogDescription>
+          <DialogDescription className="text-sm text-ranting-deep">{message}</DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <Button

@@ -102,11 +102,11 @@ function LoginPage() {
         </div>
 
         <Tabs defaultValue="tenant" className="w-full" onValueChange={() => setErr(null)}>
-          <TabsList className="mb-5 grid w-full grid-cols-2 bg-white/5 p-1 rounded-xl border border-white/10">
-            <TabsTrigger value="tenant" className="rounded-lg data-[state=active]:bg-ranting-accent/60 data-[state=active]:text-white">
+          <TabsList className="mb-5 grid w-full grid-cols-2 gap-2 bg-transparent p-0 h-auto">
+            <TabsTrigger value="tenant" className="aero-tab px-4 py-2 text-sm font-semibold">
               I'm a Tenant
             </TabsTrigger>
-            <TabsTrigger value="manager" className="rounded-lg data-[state=active]:bg-ranting-accent/60 data-[state=active]:text-white">
+            <TabsTrigger value="manager" className="aero-tab px-4 py-2 text-sm font-semibold">
               I'm a Manager/Owner
             </TabsTrigger>
           </TabsList>

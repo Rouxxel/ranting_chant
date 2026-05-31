@@ -45,7 +45,7 @@ export function RequestTypeBadge({ type, className }: { type: RequestType | stri
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full border border-ranting-sky/25 bg-ranting-sky/10 px-2.5 py-0.5 text-[10px] font-semibold text-ranting-ice",
+        "aero-type-chip inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-semibold",
         className
       )}
     >

@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { toast } from "sonner";
 import { useApp } from "@/context/AppContext";
-import { updateTenantProfile, getProperties } from "@/services/api";
+import { updateTenantProfile, getProperties, describeValidationError } from "@/services/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -78,18 +77,7 @@ export function TenantProfile() {
       toast.success("Profile updated");
     } catch (error) {
       console.error("Failed to update profile:", error);
-      // Map the backend validation 400 to a friendly, field-specific message
-      const detail = axios.isAxiosError(error)
-        ? String((error.response?.data as { detail?: string })?.detail ?? "")
-        : "";
-      const lowerDetail = detail.toLowerCase();
-      if (lowerDetail.includes("email")) {
-        toast.error("Please enter a valid email");
-      } else if (lowerDetail.includes("phone")) {
-        toast.error("Please enter a valid phone number");
-      } else {
-        toast.error("Failed to update profile. Please try again.");
-      }
+      toast.error(describeValidationError(error, "Failed to update profile. Please try again."));
     } finally {
       setIsSubmitting(false);
     }
@@ -98,17 +86,17 @@ export function TenantProfile() {
   return (
     <div className="glass-panel p-6">
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-ranting-ice">My Profile</h3>
+        <h3 className="text-[rgb(51, 71, 88)] text-lg font-semibold">My Profile</h3>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label className="text-ranting-muted">Name</Label>
+          <Label className="text-[rgb(51,71,88)]">Name</Label>
           <div className="text-sm text-ranting-ice">{displayName}</div>
         </div>
 
         <div>
-          <Label className="text-ranting-muted">Unit</Label>
+          <Label className="text-[rgb(51,71,88)]">Unit</Label>
           <div className="text-sm text-ranting-ice">{unit}</div>
         </div>
 

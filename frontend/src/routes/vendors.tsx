@@ -258,10 +258,10 @@ function VendorListPage() {
               <DialogTrigger asChild>
                 <Button className="glossy-btn">Add Vendor</Button>
               </DialogTrigger>
-              <DialogContent className="border-ranting-sky/30 bg-ranting-navy text-ranting-ice max-w-lg max-h-[90vh] overflow-y-auto">
+              <DialogContent className="aero-surface max-w-lg max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Create New Vendor</DialogTitle>
-                  <DialogDescription className="text-ranting-muted">
+                  <DialogDescription className="text-ranting-deep">
                     Enter the vendor's details and the services they provide.
                   </DialogDescription>
                 </DialogHeader>
@@ -358,28 +358,28 @@ function VendorListPage() {
           <SelectTrigger className="h-10 min-w-[210px] border-ranting-sky/35 bg-ranting-deep text-ranting-ice shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_0_14px_rgba(45,106,159,0.22)]">
             <SelectValue placeholder="All Services" />
           </SelectTrigger>
-          <SelectContent className="border-ranting-sky/35 bg-ranting-navy text-ranting-ice shadow-[0_16px_34px_rgba(0,0,0,0.45)]">
-            <SelectItem value="all" className="focus:bg-ranting-accent focus:text-white">
+          <SelectContent className="aero-surface shadow-[0_16px_34px_rgba(0,0,0,0.45)]">
+            <SelectItem value="all" className="aero-select-item">
               All Services
             </SelectItem>
             {allServices.map(service => (
-              <SelectItem key={service} value={service} className="focus:bg-ranting-accent focus:text-white">
+              <SelectItem key={service} value={service} className="aero-select-item">
                 {getServiceLabel(service)}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
-        <span className="ml-auto text-xs text-ranting-muted">{filteredVendors.length} of {vendors.length}</span>
+        <span className="ml-auto text-xs text-ranting-deep">{filteredVendors.length} of {vendors.length}</span>
       </div>
 
       {/* Vendor List */}
       {isLoading ? (
-        <div className="glass-panel p-8 text-center text-ranting-muted">Loading vendors...</div>
+        <div className="glass-panel p-8 text-center text-ranting-deep">Loading vendors...</div>
       ) : filteredVendors.length === 0 ? (
-        <div className="glass-panel p-8 text-center text-ranting-muted">No vendors found</div>
+        <div className="glass-panel p-8 text-center text-ranting-deep">No vendors found</div>
       ) : (
         <div className="glass-panel overflow-hidden">
-          <div className={`grid gap-3 border-b border-white/10 bg-white/[0.03] px-4 py-2.5 text-[10px] uppercase tracking-wider text-ranting-muted ${isManagerOrOwner ? 'grid-cols-[1fr_1fr_1fr_1fr_1fr_0.8fr_0.5fr]' : 'grid-cols-[1fr_1fr_1fr_1fr_1fr_0.8fr]'}`}>
+          <div className={`aero-table-header grid gap-3 px-4 py-2.5 text-[10px] font-semibold uppercase tracking-wider ${isManagerOrOwner ? 'grid-cols-[1fr_1fr_1fr_1fr_1fr_0.8fr_0.5fr]' : 'grid-cols-[1fr_1fr_1fr_1fr_1fr_0.8fr]'}`}>
             <div>Name</div><div>Email</div><div>Phone</div><div>Services</div><div>Emergency</div><div>Rating</div>
             {isManagerOrOwner && <div>Actions</div>}
           </div>
@@ -387,29 +387,29 @@ function VendorListPage() {
             {filteredVendors.map((v) => (
               <li
                 key={v.id}
-                className={`grid ${isManagerOrOwner ? 'grid-cols-[1fr_1fr_1fr_1fr_1fr_0.8fr_0.5fr]' : 'grid-cols-[1fr_1fr_1fr_1fr_1fr_0.8fr]'} items-center gap-3 border-b border-white/5 px-4 py-3 text-sm transition hover:bg-white/[0.05]`}
+                className={`aero-table-row grid ${isManagerOrOwner ? 'grid-cols-[1fr_1fr_1fr_1fr_1fr_0.8fr_0.5fr]' : 'grid-cols-[1fr_1fr_1fr_1fr_1fr_0.8fr]'} items-center gap-3 border-b border-white/10 px-4 py-3 text-sm transition hover:bg-white/[0.08]`}
               >
                 <div className="flex items-center gap-2">
                   <Avatar name={v.name} size={22} glow={false} />
-                  <span className="font-medium text-ranting-ice">{v.name}</span>
+                  <span className="font-semibold text-ranting-navy">{v.name}</span>
                 </div>
-                <div className="text-ranting-ice/85 truncate">{v.email}</div>
-                <div className="text-ranting-ice/85">{v.phone}</div>
+                <div className="truncate text-ranting-deep">{v.email}</div>
+                <div className="text-ranting-deep">{v.phone}</div>
                 <div className="flex flex-wrap gap-1">
                   {v.services.map((s) => (
-                    <span key={s} className="rounded bg-white/5 px-2 py-0.5 text-[10px] text-ranting-ice/80">
+                    <span key={s} className="aero-type-chip rounded-full px-2 py-0.5 text-[10px] font-semibold">
                       {getServiceLabel(s)}
                     </span>
                   ))}
                 </div>
                 <div>
                   {v.emergency_available ? (
-                    <span className="text-xs text-green-400">Yes</span>
+                    <span className="inline-flex items-center rounded-full bg-emerald-400/25 px-2 py-0.5 text-[11px] font-semibold text-emerald-900 ring-1 ring-emerald-600/40">Yes</span>
                   ) : (
-                    <span className="text-xs text-ranting-muted">No</span>
+                    <span className="inline-flex items-center rounded-full bg-slate-400/20 px-2 py-0.5 text-[11px] font-semibold text-slate-800 ring-1 ring-slate-500/30">No</span>
                   )}
                 </div>
-                <div className="text-xs text-ranting-ice/85">
+                <div className="text-xs font-semibold text-ranting-navy">
                   {v.rating ? `${v.rating} ★` : "N/A"}
                 </div>
                 {isManagerOrOwner && (
@@ -438,10 +438,10 @@ function VendorListPage() {
 
       {/* Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="border-ranting-sky/30 bg-ranting-navy text-ranting-ice max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="aero-surface max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Vendor</DialogTitle>
-            <DialogDescription className="text-ranting-muted">
+            <DialogDescription className="text-ranting-deep">
               Update the vendor's details and save your changes.
             </DialogDescription>
           </DialogHeader>

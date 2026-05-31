@@ -72,7 +72,7 @@ export function AuthenticatedLayout({ children }: { children: ReactNode }) {
         <div className="flex items-center gap-3">
           <div className="text-right">
             <div className="text-sm font-semibold text-ranting-ice">{displayName}</div>
-            <div className="text-[11px] text-ranting-muted">{roleLabel}</div>
+            <div className="text-[11px] text-ranting-deep">{roleLabel}</div>
           </div>
           <Avatar name={displayName} size={36} />
           <AlertDialog>
@@ -81,10 +81,10 @@ export function AuthenticatedLayout({ children }: { children: ReactNode }) {
                 Logout
               </button>
             </AlertDialogTrigger>
-            <AlertDialogContent className="border-ranting-sky/30 bg-ranting-navy text-ranting-ice">
+            <AlertDialogContent className="aero-surface">
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you sure you want to log out?</AlertDialogTitle>
-                <AlertDialogDescription className="text-ranting-muted">
+                <AlertDialogDescription className="text-ranting-deep">
                   You will return to the login screen and your current local session will be cleared.
                 </AlertDialogDescription>
               </AlertDialogHeader>

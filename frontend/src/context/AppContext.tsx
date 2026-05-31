@@ -38,7 +38,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         : enabledProviders[0]?.id ?? response.default_provider;
 
       setVoiceProviders(response.providers);
-      setVoiceProvider(selectedProvider);
+      setVoiceProvider(selectedProvider ?? 'elevenlabs');
     } catch (error) {
       console.error('Failed to load voice providers:', error);
       setVoiceProvider('elevenlabs');

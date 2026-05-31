@@ -2,7 +2,7 @@
 
 React 19 + TypeScript frontend for Ranting Chant, an AI-powered property operations platform. The app is wired to the FastAPI backend for tenants, managers, owners, vendors, requests, conversations, and voice services.
 
-The visual language is Frutiger Aero: glass panels, glossy controls, sky-blue glows, and a deep-navy radial background.
+The visual language is **retro Frutiger Aero** (circa 2004–2013): bright sky-blue + grass-green photo backdrop, translucent glossy glass panels with strong specular highlights, candy-pill buttons with bright top sheen and saturated bottom edge, and floating bubbles. Think Windows Vista / early-iOS skeuomorphism, 30.3k r/FrutigerAero. Text on glass surfaces is deep navy, not white — preserving the classic light-on-bright aero hierarchy.
 
 ## Tech Stack
 
@@ -149,37 +149,52 @@ Current request type UI support:
 - management filters include all canonical request types
 - chat/save metadata sends a canonical type instead of deriving type from status
 
-## Design System
+## Design System — Retro Frutiger Aero
 
-Design tokens and utilities live in `src/styles.css`.
+Design tokens and utilities live in `src/styles.css`. The aesthetic is built on three pillars:
 
-Core tokens:
+1. **Photographic sky/grass backdrop** — `public/aero-wallpaper.jpg` is rendered behind everything by `<AeroBackground />` with a sun halo and floating animated bubbles (`Bubble` sub-component).
+2. **Glossy translucent glass** — light-mode glass with `backdrop-filter: blur + saturate`, a 1px white top highlight (`::before` arc), and a soft navy bottom edge. Text on glass defaults to deep navy.
+3. **Candy-pill glossy buttons** — fully rounded (`border-radius: 999px`) with a hard top sheen at 48%, transparent gap at 50%, then a saturated brand gradient bottom. White 1px border + dark text-shadow for that early-iOS / Vista button feel.
+
+Core tokens (brightened palette):
 
 ```text
---ranting-navy   #0a1628
---ranting-deep   #1a3a5c
---ranting-accent #2d6a9f
---ranting-sky    #7ec8e3
---ranting-ice    #c8e6f5
---ranting-muted  #8a9bb0
+--ranting-navy    #0a2a4a   /* deep readable text on glass */
+--ranting-deep    #1f5d8f
+--ranting-accent  #2d8fd6   /* primary blue */
+--ranting-sky     #7ec8e3
+--ranting-ice     #e6f4fb
+--ranting-muted   #5a7892   /* secondary text on glass */
+--ranting-grass   #7ec96d   /* organic accent */
 ```
 
 Reusable utility classes:
 
 | Class | Purpose |
 |---|---|
-| `.aero-bg` | Page background |
-| `.glass-panel` / `.glass-panel-strong` | Glass surfaces |
-| `.glossy-btn` / `.glossy-btn-green` / `.glossy-btn-ghost` | Button variants |
-| `.aero-input` | Themed inputs and selects |
-| `.glow-{status}` | Status badge glow |
-| `.urg-{level}` | Urgency badge colors |
+| `.aero-bg` | Sky-to-grass gradient fallback (background image is preferred) |
+| `.glass-panel` / `.glass-panel-strong` | Translucent glossy glass surfaces (with top-highlight arc) |
+| `.glossy-btn` / `.glossy-btn-green` / `.glossy-btn-ghost` / `.glossy-btn-ghost-active` | Candy-pill buttons |
+| `.aero-input` | Pill-shaped translucent input |
+| `.aero-bubble` | Floating bubble (`bubbleFloat` 14s loop) |
+| `.glow-{status}` | Status badge glow (pending / in_progress / escalated / resolved / pending_approval / pending_review / cancelled) |
+| `.urg-{level}` | Urgency badge colors (low / medium / high) |
 | `.left-glow-escalated` / `.left-glow-high` | Table row urgency accents |
-| `.mic-pulse` | Recording state |
+| `.mic-pulse` | Recording-state pulsing red ring |
 | `.typing-dot` | Chat typing indicator |
 | `.shimmer` | Loading placeholders |
 | `.underline-glow` | Heading underline |
-| `.text-glow-sky` | Brand text glow |
+| `.text-glow-sky` | White headline with sky-blue halo |
+
+### Aesthetic guidelines for new UI
+
+- Wrap every section in `.glass-panel` (or `-strong`). Don't put raw `bg-*` colors over the wallpaper.
+- Use `.glossy-btn*` for any primary action. They're pill-shaped on purpose — avoid mixing square buttons.
+- Keep body text dark (`text-ranting-navy` or default panel color). Reserve white text for hero headlines + `text-glow-sky`.
+- Add `.aero-bubble` divs sparingly for ornament. The background already provides ambient bubbles.
+- Status pills should always use `.glow-*` classes for the glowing edge — never plain `bg-*` swatches.
+
 
 ## Project Layout
 

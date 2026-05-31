@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { useApp } from "@/context/AppContext";
-import { getProperties, createProperty, updateProperty } from "@/services/api";
+import { getProperties, createProperty, updateProperty, describeValidationError } from "@/services/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -100,6 +100,7 @@ export function ManagementProperties() {
       setCreateForm({ name: "", address: "" });
     } catch (error) {
       console.error("Failed to create property:", error);
+      toast.error(describeValidationError(error, "Failed to create property. Please try again."));
     } finally {
       setIsSubmitting(false);
     }
@@ -131,6 +132,7 @@ export function ManagementProperties() {
       setEditForm({});
     } catch (error) {
       console.error("Failed to update property:", error);
+      toast.error(describeValidationError(error, "Failed to update property. Please try again."));
     } finally {
       setIsSubmitting(false);
     }
@@ -149,126 +151,126 @@ export function ManagementProperties() {
   };
 
   if (isLoading) {
-    return <div className="glass-panel p-8 text-center text-ranting-muted">Loading properties...</div>;
+    return <div className="glass-panel p-8 text-center text-ranting-deep">Loading properties...</div>;
   }
 
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="pl-5 text-xl font-semibold text-ranting-ice">Properties</h2>
+        <h2 className="text-[rgb(51,71,88)] pl-5 text-xl font-semibold">Properties</h2>
         <div className="flex items-center gap-2">
-        <Button
-          onClick={fetchProperties}
-          disabled={isRefreshing}
-          variant="ghost"
-          className="glossy-btn-ghost inline-flex items-center gap-2 disabled:opacity-60"
-          title="Reload properties from the server"
-        >
-          <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
-          {isRefreshing ? "Reloading..." : "Reload"}
-        </Button>
-        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="glossy-btn">Add Property</Button>
-          </DialogTrigger>
-          <DialogContent className="border-ranting-sky/30 bg-ranting-navy text-ranting-ice max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Add New Property</DialogTitle>
-              <DialogDescription className="text-ranting-muted">
-                Enter the property details. Only name and address are required.
-              </DialogDescription>
-            </DialogHeader>
-            <form onSubmit={handleCreate} className="space-y-4">
-              <div>
-                <Label htmlFor="create-name">Name</Label>
-                <Input
-                  id="create-name"
-                  value={createForm.name}
-                  onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
-                  required
-                  className="aero-input"
-                />
-              </div>
-              <div>
-                <Label htmlFor="create-address">Address</Label>
-                <Input
-                  id="create-address"
-                  value={createForm.address}
-                  onChange={(e) => setCreateForm({ ...createForm, address: e.target.value })}
-                  required
-                  className="aero-input"
-                />
-              </div>
-              <div>
-                <Label htmlFor="create-type">Type</Label>
-                <Select
-                  value={createForm.property_type ?? ""}
-                  onValueChange={(value) => setCreateForm({ ...createForm, property_type: value })}
-                >
-                  <SelectTrigger id="create-type" className="aero-input">
-                    <SelectValue placeholder="Select a property type" />
-                  </SelectTrigger>
-                  <SelectContent className="border-ranting-sky/35 bg-ranting-navy text-ranting-ice">
-                    {PROPERTY_TYPES.map((type) => (
-                      <SelectItem key={type} value={type} className="focus:bg-ranting-accent focus:text-white">
-                        {propertyTypeLabels[type]}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="create-units">Unit Count</Label>
-                <Input
-                  id="create-units"
-                  type="number"
-                  value={createForm.unit_count || ""}
-                  onChange={(e) => setCreateForm({ ...createForm, unit_count: parseInt(e.target.value) || undefined })}
-                  className="aero-input"
-                />
-              </div>
-              <div>
-                <Label htmlFor="create-year">Year Built</Label>
-                <Input
-                  id="create-year"
-                  type="number"
-                  max={CURRENT_YEAR}
-                  value={createForm.year_built || ""}
-                  onChange={(e) => {
-                    const parsed = parseInt(e.target.value);
-                    setCreateForm({
-                      ...createForm,
-                      year_built: Number.isNaN(parsed) ? undefined : Math.min(parsed, CURRENT_YEAR),
-                    });
-                  }}
-                  className="aero-input"
-                />
-              </div>
-              <DialogFooter>
-                <Button type="button" variant="ghost" onClick={() => setIsCreateDialogOpen(false)} className="glossy-btn-ghost">
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isSubmitting} className="glossy-btn">
-                  {isSubmitting ? "Creating..." : "Create"}
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
+          <Button
+            onClick={fetchProperties}
+            disabled={isRefreshing}
+            variant="ghost"
+            className="glossy-btn-ghost inline-flex items-center gap-2 disabled:opacity-60"
+            title="Reload properties from the server"
+          >
+            <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+            {isRefreshing ? "Reloading..." : "Reload"}
+          </Button>
+          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="glossy-btn">Add Property</Button>
+            </DialogTrigger>
+            <DialogContent className="aero-surface max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Add New Property</DialogTitle>
+                <DialogDescription className="text-ranting-deep">
+                  Enter the property details. Only name and address are required.
+                </DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleCreate} className="space-y-4">
+                <div>
+                  <Label htmlFor="create-name">Name</Label>
+                  <Input
+                    id="create-name"
+                    value={createForm.name}
+                    onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
+                    required
+                    className="aero-input"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="create-address">Address</Label>
+                  <Input
+                    id="create-address"
+                    value={createForm.address}
+                    onChange={(e) => setCreateForm({ ...createForm, address: e.target.value })}
+                    required
+                    className="aero-input"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="create-type">Type</Label>
+                  <Select
+                    value={createForm.property_type ?? ""}
+                    onValueChange={(value) => setCreateForm({ ...createForm, property_type: value })}
+                  >
+                    <SelectTrigger id="create-type" className="aero-input">
+                      <SelectValue placeholder="Select a property type" />
+                    </SelectTrigger>
+                    <SelectContent className="aero-surface">
+                      {PROPERTY_TYPES.map((type) => (
+                        <SelectItem key={type} value={type} className="aero-select-item">
+                          {propertyTypeLabels[type]}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="create-units">Unit Count</Label>
+                  <Input
+                    id="create-units"
+                    type="number"
+                    value={createForm.unit_count || ""}
+                    onChange={(e) => setCreateForm({ ...createForm, unit_count: parseInt(e.target.value) || undefined })}
+                    className="aero-input"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="create-year">Year Built</Label>
+                  <Input
+                    id="create-year"
+                    type="number"
+                    max={CURRENT_YEAR}
+                    value={createForm.year_built || ""}
+                    onChange={(e) => {
+                      const parsed = parseInt(e.target.value);
+                      setCreateForm({
+                        ...createForm,
+                        year_built: Number.isNaN(parsed) ? undefined : Math.min(parsed, CURRENT_YEAR),
+                      });
+                    }}
+                    className="aero-input"
+                  />
+                </div>
+                <DialogFooter>
+                  <Button type="button" variant="ghost" onClick={() => setIsCreateDialogOpen(false)} className="glossy-btn-ghost">
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={isSubmitting} className="glossy-btn">
+                    {isSubmitting ? "Creating..." : "Create"}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
       <div className="glass-panel">
         {properties.length === 0 ? (
-          <div className="p-8 text-center text-ranting-muted">No properties found</div>
+          <div className="p-8 text-center text-ranting-deep">No properties found</div>
         ) : (
           <table className="w-full">
             <thead>
               <tr className="border-b border-ranting-sky/20">
-                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-muted">Name</th>
-                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-muted">Address</th>
-                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-muted">Type</th>
-                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-muted">Units</th>
+                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-deep">Name</th>
+                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-deep">Address</th>
+                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-deep">Type</th>
+                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-deep">Units</th>
               </tr>
             </thead>
             <tbody>
@@ -279,9 +281,9 @@ export function ManagementProperties() {
                   onClick={() => setSelected(property)}
                 >
                   <td className="px-4 py-3 text-sm text-ranting-ice">{property.name}</td>
-                  <td className="px-4 py-3 text-sm text-ranting-muted">{property.address}</td>
-                  <td className="px-4 py-3 text-sm text-ranting-muted">{property.property_type ? getPropertyTypeLabel(property.property_type) : "-"}</td>
-                  <td className="px-4 py-3 text-sm text-ranting-muted">{property.unit_count || "-"}</td>
+                  <td className="px-4 py-3 text-sm text-ranting-deep">{property.address}</td>
+                  <td className="px-4 py-3 text-sm text-ranting-deep">{property.property_type ? getPropertyTypeLabel(property.property_type) : "-"}</td>
+                  <td className="px-4 py-3 text-sm text-ranting-deep">{property.unit_count || "-"}</td>
                 </tr>
               ))}
             </tbody>
@@ -291,7 +293,7 @@ export function ManagementProperties() {
 
       {selected && (
         <div className="glass-panel mt-4 p-6">
-          <label className="block text-xs uppercase tracking-wider text-ranting-muted mb-1">Property Name</label>
+          <label className="block text-xs uppercase tracking-wider text-ranting-deep mb-1">Property Name</label>
           <div className="mb-4 flex items-center justify-between">
             <h3 className="text-lg font-semibold text-ranting-ice">{selected.name}</h3>
             <div className="flex gap-2">
@@ -308,19 +310,19 @@ export function ManagementProperties() {
             </div>
           </div>
           <div className="space-y-2 text-sm">
-            <div><span className="text-ranting-muted">Address:</span> {selected.address}</div>
-            <div><span className="text-ranting-muted">Type:</span> {selected.property_type ? getPropertyTypeLabel(selected.property_type) : "-"}</div>
-            <div><span className="text-ranting-muted">Units:</span> {selected.unit_count || "-"}</div>
-            <div><span className="text-ranting-muted">Year Built:</span> {selected.year_built || "-"}</div>
+            <div><span className="text-ranting-deep">Address:</span> {selected.address}</div>
+            <div><span className="text-ranting-deep">Type:</span> {selected.property_type ? getPropertyTypeLabel(selected.property_type) : "-"}</div>
+            <div><span className="text-ranting-deep">Units:</span> {selected.unit_count || "-"}</div>
+            <div><span className="text-ranting-deep">Year Built:</span> {selected.year_built || "-"}</div>
           </div>
         </div>
       )}
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="border-ranting-sky/30 bg-ranting-navy text-ranting-ice max-h-[90vh] overflow-y-auto">
+        <DialogContent className="aero-surface max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Property</DialogTitle>
-            <DialogDescription className="text-ranting-muted">
+            <DialogDescription className="text-ranting-deep">
               Update the property details and save your changes.
             </DialogDescription>
           </DialogHeader>
@@ -352,9 +354,9 @@ export function ManagementProperties() {
                 <SelectTrigger id="edit-type" className="aero-input">
                   <SelectValue placeholder="Select a property type" />
                 </SelectTrigger>
-                <SelectContent className="border-ranting-sky/35 bg-ranting-navy text-ranting-ice">
+                <SelectContent className="aero-surface">
                   {PROPERTY_TYPES.map((type) => (
-                    <SelectItem key={type} value={type} className="focus:bg-ranting-accent focus:text-white">
+                    <SelectItem key={type} value={type} className="aero-select-item">
                       {propertyTypeLabels[type]}
                     </SelectItem>
                   ))}

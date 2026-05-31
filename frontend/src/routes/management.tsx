@@ -11,6 +11,13 @@ import type { Request, RequestType, Status, Urgency } from "@/types";
 import { ManagementProperties } from "@/components/ManagementProperties";
 import { ManagementTenants } from "@/components/ManagementTenants";
 import { ManagementProfile } from "@/components/ManagementProfile";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export const Route = createFileRoute("/management")({
   head: () => ({ meta: [{ title: "Management — Ranting Chant" }] }),
@@ -22,7 +29,7 @@ function ManagementPage() {
   const navigate = useNavigate();
   const { currentManager } = useApp();
 
-  const [activeTab, setActiveTab] = useState<"requests" | "properties" | "tenants" | "profile">("requests");
+  const [activeTab, setActiveTab] = useState<"requests" | "properties" | "tenants" | "vendors" | "profile">("requests");
   const [rows, setRows] = useState<Request[]>([]);
   const [typeF, setTypeF] = useState<RequestType | "all">("all");
   const [statusF, setStatusF] = useState<Status | "all">("all");
@@ -126,88 +133,122 @@ function ManagementPage() {
           </div>
         </header>
 
-      {/* Tabs */}
-      <div className="glass-panel mb-5 flex gap-2 px-4 py-3">
-        {[
-          { id: "requests" as const, label: "Requests" },
-          { id: "properties" as const, label: "Properties" },
-          { id: "tenants" as const, label: "Tenants" },
-          { id: "profile" as const, label: "Profile" },
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2 text-xs ${
-              activeTab === tab.id
+        {/* Tabs */}
+        <div className="glass-panel mb-5 flex gap-2 px-4 py-3">
+          {[
+            { id: "requests" as const, label: "Requests" },
+            { id: "properties" as const, label: "Properties" },
+            { id: "tenants" as const, label: "Tenants" },
+            { id: "profile" as const, label: "Profile" },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`px-4 py-2 text-xs ${activeTab === tab.id
                 ? "glossy-btn"
                 : "glossy-btn-ghost"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Tab Content */}
-      {activeTab === "requests" && (
-        <>
-          {/* Stats */}
-          <div className="mb-5 grid grid-cols-2 gap-4 md:grid-cols-4">
-            <StatCard label="Total Requests" value={stats.total} accent="sky" />
-            <StatCard label="Escalated" value={stats.escalated} accent="red" />
-            <StatCard label="Pending Approval" value={stats.pendingApproval} accent="purple" />
-            <StatCard label="Resolved" value={stats.resolved} accent="green" />
-          </div>
-
-          {/* Filters */}
-          <div className="glass-panel mb-4 flex flex-wrap items-center gap-3 px-4 py-3">
-            <span className="text-xs uppercase tracking-wider text-ranting-muted">Filter</span>
-            <Select value={typeF} onChange={(v) => setTypeF(v as RequestType | "all")} options={[
-              ["all", "All types"], ...REQUEST_TYPES.map((type) => [type, getRequestTypeLabel(type)] as [string, string]),
-            ]} />
-            <Select value={statusF} onChange={(v) => setStatusF(v as Status | "all")} options={[
-              ["all", "All statuses"], ["pending", "Pending"], ["in_progress", "In Progress"], ["escalated", "Escalated"],
-              ["pending_approval", "Pending Approval"], ["pending_review", "Pending Review"], ["resolved", "Resolved"], ["cancelled", "Cancelled"],
-            ]} />
-            <Select value={urgencyF} onChange={(v) => setUrgencyF(v as Urgency | "all")} options={[
-              ["all", "All urgencies"], ["low", "Low"], ["medium", "Medium"], ["high", "High"],
-            ]} />
-            <Select value={propertyF} onChange={(v) => setPropertyF(v)} options={[
-              ["all", "All properties"], ...properties.map((p) => [p, p] as [string, string]),
-            ]} />
-            <span className="ml-auto text-xs text-ranting-muted">{filtered.length} of {rows.length}</span>
-          </div>
-
-          {/* Table */}
-          {isLoading ? (
-            <div className="glass-panel p-8 text-center text-ranting-muted">Loading requests...</div>
-          ) : (
-            <RequestTable
-              requests={filtered}
-              onRowClick={setSelected}
-              onApprove={approve}
-            />
-          )}
-
-          {/* Detail panel */}
-          {selected && <RequestDetailPanel req={selected} onClose={() => setSelected(null)} onApprove={() => approve(selected.id)} onComplete={(note) => handleComplete(selected.id, note)} />}
-        </>
-      )}
-
-      {activeTab === "properties" && <ManagementProperties />}
-      {activeTab === "tenants" && <ManagementTenants />}
-      {activeTab === "vendors" && (
-        <div className="glass-panel p-8 text-center text-ranting-muted">
-          <p>Vendors management - coming soon</p>
-          <button
-            onClick={() => navigate({ to: "/vendors" })}
-            className="glossy-btn mt-4 px-4 py-2 text-xs"
-          >
-            Go to Vendors Directory
-          </button>
+                }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
-      )}
-      {activeTab === "profile" && <ManagementProfile />}
+
+        {/* Tab Content */}
+        {activeTab === "requests" && (
+          <>
+            {/* Stats */}
+            <div className="mb-5 grid grid-cols-2 gap-4 md:grid-cols-4">
+              <StatCard label="Total Requests" value={stats.total} accent="sky" />
+              <StatCard label="Escalated" value={stats.escalated} accent="red" />
+              <StatCard label="Pending Approval" value={stats.pendingApproval} accent="purple" />
+              <StatCard label="Resolved" value={stats.resolved} accent="green" />
+            </div>
+
+            {/* Filters */}
+            <div className="glass-panel mb-4 flex flex-wrap items-center gap-3 px-4 py-3">
+              <span className="text-xs font-semibold uppercase tracking-wider text-ranting-deep">Filter</span>
+              <Select value={typeF} onValueChange={(v) => setTypeF(v as RequestType | "all")}>
+                <SelectTrigger className="h-auto py-1.5 px-3 text-xs w-auto min-w-[120px]">
+                  <SelectValue placeholder="All types" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All types</SelectItem>
+                  {REQUEST_TYPES.map((type) => (
+                    <SelectItem key={type} value={type}>{getRequestTypeLabel(type)}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={statusF} onValueChange={(v) => setStatusF(v as Status | "all")}>
+                <SelectTrigger className="h-auto py-1.5 px-3 text-xs w-auto min-w-[120px]">
+                  <SelectValue placeholder="All statuses" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All statuses</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="in_progress">In Progress</SelectItem>
+                  <SelectItem value="escalated">Escalated</SelectItem>
+                  <SelectItem value="pending_approval">Pending Approval</SelectItem>
+                  <SelectItem value="pending_review">Pending Review</SelectItem>
+                  <SelectItem value="resolved">Resolved</SelectItem>
+                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={urgencyF} onValueChange={(v) => setUrgencyF(v as Urgency | "all")}>
+                <SelectTrigger className="h-auto py-1.5 px-3 text-xs w-auto min-w-[120px]">
+                  <SelectValue placeholder="All urgencies" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All urgencies</SelectItem>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={propertyF} onValueChange={(v) => setPropertyF(v)}>
+                <SelectTrigger className="h-auto py-1.5 px-3 text-xs w-auto min-w-[140px]">
+                  <SelectValue placeholder="All properties" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All properties</SelectItem>
+                  {properties.map((p) => (
+                    <SelectItem key={p} value={p}>{p}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <span className="ml-auto text-xs text-ranting-deep">{filtered.length} of {rows.length}</span>
+            </div>
+
+            {/* Table */}
+            {isLoading ? (
+              <div className="glass-panel p-8 text-center text-ranting-muted">Loading requests...</div>
+            ) : (
+              <RequestTable
+                requests={filtered}
+                onRowClick={setSelected}
+                onApprove={approve}
+              />
+            )}
+
+            {/* Detail panel */}
+            {selected && <RequestDetailPanel req={selected} onClose={() => setSelected(null)} onApprove={() => approve(selected.id)} onComplete={(note) => handleComplete(selected.id, note)} />}
+          </>
+        )}
+
+        {activeTab === "properties" && <ManagementProperties />}
+        {activeTab === "tenants" && <ManagementTenants />}
+        {activeTab === "vendors" && (
+          <div className="glass-panel p-8 text-center text-ranting-muted">
+            <p>Vendors management - coming soon</p>
+            <button
+              onClick={() => navigate({ to: "/vendors" })}
+              className="glossy-btn mt-4 px-4 py-2 text-xs"
+            >
+              Go to Vendors Directory
+            </button>
+          </div>
+        )}
+        {activeTab === "profile" && <ManagementProfile />}
       </main>
     </AuthenticatedLayout>
   );
@@ -229,19 +270,5 @@ function StatCard({ label, value, accent }: { label: string; value: number; acce
   );
 }
 
-function Select({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: Array<[string, string]> }) {
-  return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="aero-input px-3 py-1.5 text-xs"
-      style={{ colorScheme: "dark" }}
-    >
-      {options.map(([v, l]) => (
-        <option key={v} value={v} className="bg-ranting-deep text-ranting-ice">{l}</option>
-      ))}
-    </select>
-  );
-}
 
 
