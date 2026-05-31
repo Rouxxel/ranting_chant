@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { RefreshCw } from "lucide-react";
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { Avatar } from "@/components/Avatar";
 import {
@@ -22,9 +23,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { toast } from "sonner";
 import { useApp } from "@/context/AppContext";
 import { requireAuthenticatedUser } from "@/lib/auth";
-import { getVendors, createVendor, updateVendor, deleteVendor } from "@/services/api";
+import { getVendors, createVendor, updateVendor, deleteVendor, describeValidationError } from "@/services/api";
 import type { Vendor, VendorCreateRequest, VendorUpdateRequest } from "@/types";
 
 const SERVICE_LABELS: Record<string, string> = {
@@ -78,33 +80,34 @@ function VendorListPage() {
   const [editForm, setEditForm] = useState<VendorUpdateRequest>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const isManagerOrOwner = userRole === "manager" || userRole === "owner";
 
-  useEffect(() => {
-    const loadVendors = async () => {
-      try {
-        // Check localStorage for cached vendors
-        const cachedVendors = localStorage.getItem('vendors');
-        if (cachedVendors) {
-          setVendors(JSON.parse(cachedVendors));
-          setIsLoading(false);
-        }
-
-        // Fetch fresh data
-        const freshVendors = await getVendors();
-        setVendors(freshVendors);
-        localStorage.setItem('vendors', JSON.stringify(freshVendors));
-      } catch (error) {
-        console.error("Failed to load vendors:", error);
-        setVendors([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadVendors();
+  // Fetch the full vendor list from the API and refresh the cache.
+  const fetchVendors = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      const freshVendors = await getVendors();
+      setVendors(freshVendors);
+      localStorage.setItem('vendors', JSON.stringify(freshVendors));
+    } catch (error) {
+      console.error("Failed to load vendors:", error);
+    } finally {
+      setIsRefreshing(false);
+      setIsLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    // Show cached vendors immediately, then refresh from the API.
+    const cachedVendors = localStorage.getItem('vendors');
+    if (cachedVendors) {
+      setVendors(JSON.parse(cachedVendors));
+      setIsLoading(false);
+    }
+    fetchVendors();
+  }, [fetchVendors]);
 
   const allServices = useMemo(() => {
     const services = new Set(vendors.flatMap(v => v.services));
@@ -137,6 +140,7 @@ function VendorListPage() {
       });
     } catch (error) {
       console.error("Failed to create vendor:", error);
+      toast.error(describeValidationError(error, "Failed to create vendor. Please try again."));
     } finally {
       setIsSubmitting(false);
     }
@@ -145,9 +149,29 @@ function VendorListPage() {
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selected) return;
+
+    // Only send fields that actually changed from the cached vendor.
+    const changes: VendorUpdateRequest = {};
+    if (editForm.name !== undefined && editForm.name !== selected.name) changes.name = editForm.name;
+    if (editForm.email !== undefined && editForm.email !== selected.email) changes.email = editForm.email;
+    if (editForm.phone !== undefined && editForm.phone !== selected.phone) changes.phone = editForm.phone;
+    if (editForm.services !== undefined &&
+        JSON.stringify(editForm.services) !== JSON.stringify(selected.services)) {
+      changes.services = editForm.services;
+    }
+    if (editForm.emergency_available !== undefined &&
+        editForm.emergency_available !== selected.emergency_available) {
+      changes.emergency_available = editForm.emergency_available;
+    }
+
+    if (Object.keys(changes).length === 0) {
+      toast.error("Please enter your changes");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      const updatedVendor = await updateVendor(selected.id, editForm);
+      const updatedVendor = await updateVendor(selected.id, changes);
       setVendors(vendors.map(v => v.id === selected.id ? updatedVendor : v));
       localStorage.setItem('vendors', JSON.stringify(vendors.map(v => v.id === selected.id ? updatedVendor : v)));
       setSelected(updatedVendor);
@@ -155,6 +179,7 @@ function VendorListPage() {
       setEditForm({});
     } catch (error) {
       console.error("Failed to update vendor:", error);
+      toast.error(describeValidationError(error, "Failed to update vendor. Please try again."));
     } finally {
       setIsSubmitting(false);
     }
@@ -182,14 +207,14 @@ function VendorListPage() {
     setIsDeleteDialogOpen(true);
   };
 
-  const openEditDialog = () => {
-    if (!selected) return;
+  const openEditDialog = (vendor: Vendor) => {
+    setSelected(vendor);
     setEditForm({
-      name: selected.name,
-      email: selected.email,
-      phone: selected.phone,
-      services: selected.services,
-      emergency_available: selected.emergency_available,
+      name: vendor.name,
+      email: vendor.email,
+      phone: vendor.phone,
+      services: vendor.services,
+      emergency_available: vendor.emergency_available,
     });
     setIsEditDialogOpen(true);
   };
@@ -217,6 +242,17 @@ function VendorListPage() {
           <div className="pl-5">
             <h1 className="underline-glow text-3xl font-semibold tracking-tight text-ranting-ice">Vendors List</h1>
           </div>
+          <div className="flex items-center gap-2">
+          <Button
+            onClick={fetchVendors}
+            disabled={isRefreshing}
+            variant="ghost"
+            className="glossy-btn-ghost inline-flex items-center gap-2 disabled:opacity-60"
+            title="Reload vendors from the server"
+          >
+            <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+            {isRefreshing ? "Reloading..." : "Reload"}
+          </Button>
           {isManagerOrOwner && (
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>
@@ -303,6 +339,7 @@ function VendorListPage() {
               </DialogContent>
             </Dialog>
           )}
+          </div>
         </header>
 
       {/* Filters */}
@@ -378,7 +415,7 @@ function VendorListPage() {
                 {isManagerOrOwner && (
                   <div className="flex gap-1">
                     <Button
-                      onClick={() => { setSelected(v); openEditDialog(); }}
+                      onClick={() => openEditDialog(v)}
                       variant="ghost"
                       className="glossy-btn-ghost px-2 py-1 text-xs"
                     >

@@ -25,6 +25,7 @@ from src.utils.custom_logger import log_handler
 from src.utils.limiter import limiter as SlowLimiter
 from src.core_specs.configuration.config_loader import config_loader
 from src.utils.json_store import read_all, find_by_id, create_record, update_record, delete_record
+from src.utils.validators import validate_email_format, validate_phone_format
 
 """PYDANTIC MODELS-----------------------------------------------------------"""
 class VendorCreatePayload(BaseModel):
@@ -96,6 +97,10 @@ async def list_vendors(request: Request):
 async def create_vendor(request: Request, body: VendorCreatePayload):
     """Create a vendor record."""
     try:
+        #Validate contact fields against config-driven rules
+        validate_email_format(body.email)
+        validate_phone_format(body.phone)
+
         record = body.model_dump()
         record["id"] = f"vendor_{uuid.uuid4().hex[:8]}"
 
@@ -219,6 +224,12 @@ async def update_vendor(request: Request, vendor_id: str, body: VendorUpdatePayl
         updates = body.model_dump(exclude_none=True)
         if not updates:
             raise HTTPException(status_code=400, detail="No vendor updates provided")
+
+        #Validate contact fields when provided
+        if "email" in updates:
+            validate_email_format(updates["email"])
+        if "phone" in updates:
+            validate_phone_format(updates["phone"])
 
         updated = update_record("vendors", vendor_id, updates)
         log_handler.info(f"Vendor '{vendor_id}' updated successfully")

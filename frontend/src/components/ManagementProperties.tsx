@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { RefreshCw } from "lucide-react";
+import { toast } from "sonner";
 import { useApp } from "@/context/AppContext";
 import { getProperties, createProperty, updateProperty } from "@/services/api";
 import { Button } from "@/components/ui/button";
@@ -107,9 +108,23 @@ export function ManagementProperties() {
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selected) return;
+
+    // Only send fields that actually changed from the cached property.
+    const changes: PropertyUpdateRequest = {};
+    if (editForm.name !== undefined && editForm.name !== selected.name) changes.name = editForm.name;
+    if (editForm.address !== undefined && editForm.address !== selected.address) changes.address = editForm.address;
+    if (editForm.year_built !== undefined && editForm.year_built !== selected.year_built) changes.year_built = editForm.year_built;
+    if (editForm.property_type !== undefined && editForm.property_type !== selected.property_type) changes.property_type = editForm.property_type;
+    if (editForm.unit_count !== undefined && editForm.unit_count !== selected.unit_count) changes.unit_count = editForm.unit_count;
+
+    if (Object.keys(changes).length === 0) {
+      toast.error("Please enter your changes");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      const updatedProperty = await updateProperty(selected.id, editForm);
+      const updatedProperty = await updateProperty(selected.id, changes);
       setProperties(properties.map(p => p.id === selected.id ? updatedProperty : p));
       setSelected(updatedProperty);
       setIsEditDialogOpen(false);

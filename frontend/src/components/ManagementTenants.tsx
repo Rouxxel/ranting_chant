@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { useApp } from "@/context/AppContext";
-import { getTenants, createTenant, updateTenant, deleteTenant, getProperties } from "@/services/api";
+import { getTenants, createTenant, updateTenant, deleteTenant, getProperties, describeValidationError } from "@/services/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -95,6 +95,7 @@ export function ManagementTenants() {
       setCreateForm({ name: "", unit: "", property_id: "" });
     } catch (error) {
       console.error("Failed to create tenant:", error);
+      toast.error(describeValidationError(error, "Failed to create tenant. Please try again."));
     } finally {
       setIsSubmitting(false);
     }
@@ -127,6 +128,7 @@ export function ManagementTenants() {
       setEditForm({});
     } catch (error) {
       console.error("Failed to update tenant:", error);
+      toast.error(describeValidationError(error, "Failed to update tenant. Please try again."));
     } finally {
       setIsSubmitting(false);
     }

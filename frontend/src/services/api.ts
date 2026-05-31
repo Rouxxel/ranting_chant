@@ -155,6 +155,18 @@ apiClient.interceptors.response.use(
   }
 );
 
+// Map a backend validation error to a friendly, field-specific message.
+// Falls back to the provided message for anything that isn't email/phone.
+export function describeValidationError(error: unknown, fallback: string): string {
+  const detail = axios.isAxiosError(error)
+    ? String((error.response?.data as { detail?: string })?.detail ?? "")
+    : "";
+  const lower = detail.toLowerCase();
+  if (lower.includes("email")) return "Please enter a valid email";
+  if (lower.includes("phone")) return "Please enter a valid phone number";
+  return fallback;
+}
+
 // ==================== Root Endpoint ====================
 
 export const getHealth = async () => {
@@ -180,12 +192,12 @@ export const getTenantsByProperty = async (propertyId: string): Promise<Tenant[]
 };
 
 export const createTenant = async (data: TenantCreateRequest): Promise<Tenant> => {
-  const response = await apiClient.post<Tenant>('/tenants', data);
+  const response = await apiClient.post<Tenant>('/tenants', data, { suppressErrorToast: true });
   return response.data;
 };
 
 export const updateTenant = async (tenantId: string, data: TenantUpdateRequest): Promise<Tenant> => {
-  const response = await apiClient.patch<Tenant>(`/tenants/${tenantId}`, data);
+  const response = await apiClient.patch<Tenant>(`/tenants/${tenantId}`, data, { suppressErrorToast: true });
   return response.data;
 };
 
@@ -234,12 +246,12 @@ export const getVendorsByService = async (service: string): Promise<Vendor[]> =>
 };
 
 export const createVendor = async (data: VendorCreateRequest): Promise<Vendor> => {
-  const response = await apiClient.post<Vendor>('/vendors', data);
+  const response = await apiClient.post<Vendor>('/vendors', data, { suppressErrorToast: true });
   return response.data;
 };
 
 export const updateVendor = async (vendorId: string, data: VendorUpdateRequest): Promise<Vendor> => {
-  const response = await apiClient.patch<Vendor>(`/vendors/${vendorId}`, data);
+  const response = await apiClient.patch<Vendor>(`/vendors/${vendorId}`, data, { suppressErrorToast: true });
   return response.data;
 };
 

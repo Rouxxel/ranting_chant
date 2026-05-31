@@ -146,6 +146,12 @@ async def list_tenants(
 async def create_tenant(request: Request, body: TenantCreatePayload):
     """Create a tenant and attach them to the target property."""
     try:
+        #Validate contact fields when provided
+        if body.email is not None:
+            validate_email_format(body.email)
+        if body.phone is not None:
+            validate_phone_format(body.phone)
+
         tenant_id = f"tenant_{uuid.uuid4().hex[:8]}"
         _sync_property_tenant_ids(tenant_id, None, body.property_id)
 
@@ -259,6 +265,12 @@ async def update_tenant(request: Request, tenant_id: str, body: TenantUpdatePayl
         updates = body.model_dump(exclude_none=True)
         if not updates:
             raise HTTPException(status_code=400, detail="No tenant updates provided")
+
+        #Validate contact fields when provided
+        if "email" in updates:
+            validate_email_format(updates["email"])
+        if "phone" in updates:
+            validate_phone_format(updates["phone"])
 
         if "property_id" in updates and updates["property_id"] != existing.get("property_id"):
             _sync_property_tenant_ids(tenant_id, existing.get("property_id"), updates["property_id"])
