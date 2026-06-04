@@ -122,18 +122,18 @@ async def list_tenants(
     """
     try:
         if property_id:
-            log_handler.debug(f"Listing tenants filtered by property_id='{property_id}'")
+            log_handler.debug(f"[tenants_router] Listing tenants filtered by property_id='{property_id}'")
             results = find_by_field("tenants", "property_id", property_id)
-            log_handler.info(f"Found {len(results)} tenant(s) for property '{property_id}'")
+            log_handler.info(f"[tenants_router] Found {len(results)} tenant(s) for property '{property_id}'")
             return results
 
-        log_handler.debug("Listing all tenants")
+        log_handler.debug("[tenants_router] Listing all tenants")
         tenants = read_all("tenants")
-        log_handler.info(f"Returning {len(tenants)} tenant(s)")
+        log_handler.info(f"[tenants_router] Returning {len(tenants)} tenant(s)")
         return tenants
 
     except Exception as e:
-        log_handler.error(f"Unexpected error listing tenants: {e}")
+        log_handler.error(f"[tenants_router] Unexpected error listing tenants: {e}")
         raise HTTPException(status_code=500, detail="Internal server error while fetching tenants")
 
 
@@ -158,13 +158,13 @@ async def create_tenant(request: Request, body: TenantCreatePayload):
         record = body.model_dump()
         record["id"] = tenant_id
         created = create_record("tenants", record)
-        log_handler.info(f"Tenant created successfully with id='{created['id']}'")
+        log_handler.info(f"[tenants_router] Tenant created successfully with id='{created['id']}'")
         return created
 
     except HTTPException:
         raise
     except Exception as e:
-        log_handler.error(f"Unexpected error creating tenant: {e}")
+        log_handler.error(f"[tenants_router] Unexpected error creating tenant: {e}")
         raise HTTPException(status_code=500, detail="Internal server error while creating tenant")
 
 
@@ -194,13 +194,13 @@ async def update_tenant_profile(request: Request, tenant_id: str, body: TenantPr
             validate_phone_format(updates["phone"])
 
         updated = update_record("tenants", tenant_id, updates)
-        log_handler.info(f"Tenant profile '{tenant_id}' updated successfully")
+        log_handler.info(f"[tenants_router] Tenant profile '{tenant_id}' updated successfully")
         return updated
 
     except HTTPException:
         raise
     except Exception as e:
-        log_handler.error(f"Unexpected error updating tenant profile '{tenant_id}': {e}")
+        log_handler.error(f"[tenants_router] Unexpected error updating tenant profile '{tenant_id}': {e}")
         raise HTTPException(status_code=500, detail="Internal server error while updating tenant profile")
 
 
@@ -229,21 +229,21 @@ async def get_tenant(request: Request, tenant_id: str):
         If the rate limit is exceeded, the rate_limit_handler() handles the response.
     """
     try:
-        log_handler.debug(f"Looking up tenant with id='{tenant_id}'")
+        log_handler.debug(f"[tenants_router] Looking up tenant with id='{tenant_id}'")
         tenant = find_by_id("tenants", tenant_id)
 
         if not tenant:
-            message = f"Tenant '{tenant_id}' not found"
+            message = f"[tenants_router] Tenant '{tenant_id}' not found"
             log_handler.warning(message)
             raise HTTPException(status_code=404, detail=message)
 
-        log_handler.info(f"Tenant '{tenant_id}' retrieved successfully")
+        log_handler.info(f"[tenants_router] Tenant '{tenant_id}' retrieved successfully")
         return tenant
 
     except HTTPException:
         raise
     except Exception as e:
-        log_handler.error(f"Unexpected error fetching tenant '{tenant_id}': {e}")
+        log_handler.error(f"[tenants_router] Unexpected error fetching tenant '{tenant_id}': {e}")
         raise HTTPException(status_code=500, detail="Internal server error while fetching tenant")
 
 
@@ -276,11 +276,11 @@ async def update_tenant(request: Request, tenant_id: str, body: TenantUpdatePayl
             _sync_property_tenant_ids(tenant_id, existing.get("property_id"), updates["property_id"])
 
         updated = update_record("tenants", tenant_id, updates)
-        log_handler.info(f"Tenant '{tenant_id}' updated successfully")
+        log_handler.info(f"[tenants_router] Tenant '{tenant_id}' updated successfully")
         return updated
 
     except HTTPException:
         raise
     except Exception as e:
-        log_handler.error(f"Unexpected error updating tenant '{tenant_id}': {e}")
+        log_handler.error(f"[tenants_router] Unexpected error updating tenant '{tenant_id}': {e}")
         raise HTTPException(status_code=500, detail="Internal server error while updating tenant")

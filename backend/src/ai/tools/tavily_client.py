@@ -130,7 +130,7 @@ def tavily_search(
         if item.get("url")
     ]
     log_handler.info(
-        "Tavily search metadata: "
+        "[tavily_client] Tavily search metadata: "
         f"query='{payload['query']}', elapsed_ms={elapsed_ms:.2f}, result_count={len(results)}"
     )
     return WebSearchResponse(query=data.get("query", query), answer=data.get("answer"), results=results)
@@ -153,7 +153,7 @@ def tavily_extract(urls: list[str] | str, *, include_images: bool = False) -> We
         if item.get("url")
     ]
     log_handler.info(
-        "Tavily extract metadata: "
+        "[tavily_client] Tavily extract metadata: "
         f"url_count={len(safe_urls)}, elapsed_ms={elapsed_ms:.2f}, result_count={len(results)}, "
         f"failed_count={len(data.get('failed_results', []))}"
     )
@@ -166,7 +166,7 @@ def tavily_map(url: str, *, max_depth: int = 1, limit: int = 50) -> WebMapRespon
     data, elapsed_ms = _post("map", {"url": safe_url, "max_depth": max_depth, "limit": limit})
     nodes = [WebMapNode(url=result_url) for result_url in data.get("results", [])]
     log_handler.info(
-        "Tavily map metadata: "
+        "[tavily_client] Tavily map metadata: "
         f"url='{safe_url}', elapsed_ms={elapsed_ms:.2f}, result_count={len(nodes)}"
     )
     return WebMapResponse(base_url=data.get("base_url", safe_url), results=nodes)
@@ -207,4 +207,4 @@ def should_trigger_tavily_search(message: str) -> bool:
     return any(keyword.lower() in lowered for keyword in TAVILY_CONFIG.get("trigger_keywords", []))
 
 
-log_handler.debug("Tavily client helpers loaded")
+log_handler.debug("[tavily_client] Tavily client helpers loaded")

@@ -112,13 +112,13 @@ async def list_properties(request: Request):
         If the rate limit is exceeded, the rate_limit_handler() handles the response.
     """
     try:
-        log_handler.debug("Listing all properties")
+        log_handler.debug("[properties_router] Listing all properties")
         properties = read_all("properties")
-        log_handler.info(f"Returning {len(properties)} property/properties")
+        log_handler.info(f"[properties_router] Returning {len(properties)} property/properties")
         return properties
 
     except Exception as e:
-        log_handler.error(f"Unexpected error listing properties: {e}")
+        log_handler.error(f"[properties_router] Unexpected error listing properties: {e}")
         raise HTTPException(status_code=500, detail="Internal server error while fetching properties")
 
 
@@ -157,11 +157,11 @@ async def create_property(request: Request, body: PropertyCreatePayload):
                     owned.append(created["id"])
                     update_record("owners", body.owner_id, {"owned_properties": owned})
 
-        log_handler.info(f"Property created successfully with id='{created['id']}'")
+        log_handler.info(f"[properties_router] Property created successfully with id='{created['id']}'")
         return created
 
     except Exception as e:
-        log_handler.error(f"Unexpected error creating property: {e}")
+        log_handler.error(f"[properties_router] Unexpected error creating property: {e}")
         raise HTTPException(status_code=500, detail="Internal server error while creating property")
 
 
@@ -190,21 +190,21 @@ async def get_property(request: Request, property_id: str):
         If the rate limit is exceeded, the rate_limit_handler() handles the response.
     """
     try:
-        log_handler.debug(f"Looking up property with id='{property_id}'")
+        log_handler.debug(f"[properties_router] Looking up property with id='{property_id}'")
         prop = find_by_id("properties", property_id)
 
         if not prop:
-            message = f"Property '{property_id}' not found"
+            message = f"[properties_router] Property '{property_id}' not found"
             log_handler.warning(message)
             raise HTTPException(status_code=404, detail=message)
 
-        log_handler.info(f"Property '{property_id}' retrieved successfully")
+        log_handler.info(f"[properties_router] Property '{property_id}' retrieved successfully")
         return prop
 
     except HTTPException:
         raise
     except Exception as e:
-        log_handler.error(f"Unexpected error fetching property '{property_id}': {e}")
+        log_handler.error(f"[properties_router] Unexpected error fetching property '{property_id}': {e}")
         raise HTTPException(status_code=500, detail="Internal server error while fetching property")
 
 
@@ -236,11 +236,11 @@ async def update_property(request: Request, property_id: str, body: PropertyUpda
             )
 
         updated = update_record("properties", property_id, updates)
-        log_handler.info(f"Property '{property_id}' updated successfully")
+        log_handler.info(f"[properties_router] Property '{property_id}' updated successfully")
         return updated
 
     except HTTPException:
         raise
     except Exception as e:
-        log_handler.error(f"Unexpected error updating property '{property_id}': {e}")
+        log_handler.error(f"[properties_router] Unexpected error updating property '{property_id}': {e}")
         raise HTTPException(status_code=500, detail="Internal server error while updating property")

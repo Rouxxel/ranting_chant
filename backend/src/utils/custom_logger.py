@@ -82,12 +82,12 @@ if not log_handler.hasHandlers():
         log_handler.addHandler(file_handler)
     log_handler.addHandler(console_handler)
 
-log_handler.info("Ranting chant server starting")
+log_handler.info("[custom_logger] Ranting chant server starting")
 if log_file:
-    log_handler.warning(f"Current working directory: {os.getcwd()}, Logs are written to "
+    log_handler.warning(f"[custom_logger] Current working directory: {os.getcwd()}, Logs are written to "
                         f"'{log_file}'")
 else:
-    log_handler.warning(f"Current working directory: {os.getcwd()}, File logging "
+    log_handler.warning(f"[custom_logger] Current working directory: {os.getcwd()}, File logging "
                         f"unavailable - console only")
 
 # --- Shutdown function ---

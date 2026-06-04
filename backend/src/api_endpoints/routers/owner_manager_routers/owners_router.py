@@ -63,13 +63,13 @@ async def list_owners(request: Request):
         If the rate limit is exceeded, the rate_limit_handler() handles the response.
     """
     try:
-        log_handler.debug("Listing all property owners")
+        log_handler.debug("[owners_router] Listing all property owners")
         owners = read_all("owners")
-        log_handler.info(f"Returning {len(owners)} owner(s)")
+        log_handler.info(f"[owners_router] Returning {len(owners)} owner(s)")
         return owners
 
     except Exception as e:
-        log_handler.error(f"Unexpected error listing owners: {e}")
+        log_handler.error(f"[owners_router] Unexpected error listing owners: {e}")
         raise HTTPException(status_code=500, detail="Internal server error while fetching owners")
 
 
@@ -99,13 +99,13 @@ async def update_owner_profile(request: Request, owner_id: str, body: OwnerProfi
             validate_phone_format(updates["phone"])
 
         updated = update_record("owners", owner_id, updates)
-        log_handler.info(f"Owner profile '{owner_id}' updated successfully")
+        log_handler.info(f"[owners_router] Owner profile '{owner_id}' updated successfully")
         return updated
 
     except HTTPException:
         raise
     except Exception as e:
-        log_handler.error(f"Unexpected error updating owner profile '{owner_id}': {e}")
+        log_handler.error(f"[owners_router] Unexpected error updating owner profile '{owner_id}': {e}")
         raise HTTPException(status_code=500, detail="Internal server error while updating owner profile")
 
 
@@ -134,19 +134,19 @@ async def get_owner(request: Request, owner_id: str):
         If the rate limit is exceeded, the rate_limit_handler() handles the response.
     """
     try:
-        log_handler.debug(f"Looking up owner with id='{owner_id}'")
+        log_handler.debug(f"[owners_router] Looking up owner with id='{owner_id}'")
         owner = find_by_id("owners", owner_id)
 
         if not owner:
-            message = f"Owner '{owner_id}' not found"
+            message = f"[owners_router] Owner '{owner_id}' not found"
             log_handler.warning(message)
             raise HTTPException(status_code=404, detail=message)
 
-        log_handler.info(f"Owner '{owner_id}' retrieved successfully")
+        log_handler.info(f"[owners_router] Owner '{owner_id}' retrieved successfully")
         return owner
 
     except HTTPException:
         raise
     except Exception as e:
-        log_handler.error(f"Unexpected error fetching owner '{owner_id}': {e}")
+        log_handler.error(f"[owners_router] Unexpected error fetching owner '{owner_id}': {e}")
         raise HTTPException(status_code=500, detail="Internal server error while fetching owner")

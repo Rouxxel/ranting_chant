@@ -78,13 +78,13 @@ async def list_vendors(request: Request):
         If the rate limit is exceeded, the rate_limit_handler() handles the response.
     """
     try:
-        log_handler.debug("Listing all vendors")
+        log_handler.debug("[vendors_router] Listing all vendors")
         vendors = read_all("vendors")
-        log_handler.info(f"Returning {len(vendors)} vendor(s)")
+        log_handler.info(f"[vendors_router] Returning {len(vendors)} vendor(s)")
         return vendors
 
     except Exception as e:
-        log_handler.error(f"Unexpected error listing vendors: {e}")
+        log_handler.error(f"[vendors_router] Unexpected error listing vendors: {e}")
         raise HTTPException(status_code=500, detail="Internal server error while fetching vendors")
 
 
@@ -105,11 +105,11 @@ async def create_vendor(request: Request, body: VendorCreatePayload):
         record["id"] = f"vendor_{uuid.uuid4().hex[:8]}"
 
         created = create_record("vendors", record)
-        log_handler.info(f"Vendor created successfully with id='{created['id']}'")
+        log_handler.info(f"[vendors_router] Vendor created successfully with id='{created['id']}'")
         return created
 
     except Exception as e:
-        log_handler.error(f"Unexpected error creating vendor: {e}")
+        log_handler.error(f"[vendors_router] Unexpected error creating vendor: {e}")
         raise HTTPException(status_code=500, detail="Internal server error while creating vendor")
 
 
@@ -144,7 +144,7 @@ async def get_vendors_by_service(request: Request, service: str):
             log_handler.warning(message)
             raise HTTPException(status_code=400, detail=message)
 
-        log_handler.debug(f"Filtering vendors by service='{service}'")
+        log_handler.debug(f"[vendors_router] Filtering vendors by service='{service}'")
         all_vendors = read_all("vendors")
 
         #Case-insensitive match against each vendor's services list
@@ -153,13 +153,13 @@ async def get_vendors_by_service(request: Request, service: str):
             if service.lower() in [s.lower() for s in v.get("services", [])]
         ]
 
-        log_handler.info(f"Found {len(results)} vendor(s) offering service '{service}'")
+        log_handler.info(f"[vendors_router] Found {len(results)} vendor(s) offering service '{service}'")
         return results
 
     except HTTPException:
         raise
     except Exception as e:
-        log_handler.error(f"Unexpected error filtering vendors by service '{service}': {e}")
+        log_handler.error(f"[vendors_router] Unexpected error filtering vendors by service '{service}': {e}")
         raise HTTPException(status_code=500, detail="Internal server error while filtering vendors")
 
 
@@ -188,7 +188,7 @@ async def get_vendor(request: Request, vendor_id: str):
         If the rate limit is exceeded, the rate_limit_handler() handles the response.
     """
     try:
-        log_handler.debug(f"Looking up vendor with id='{vendor_id}'")
+        log_handler.debug(f"[vendors_router] Looking up vendor with id='{vendor_id}'")
         vendor = find_by_id("vendors", vendor_id)
 
         if not vendor:
@@ -196,13 +196,13 @@ async def get_vendor(request: Request, vendor_id: str):
             log_handler.warning(message)
             raise HTTPException(status_code=404, detail=message)
 
-        log_handler.info(f"Vendor '{vendor_id}' retrieved successfully")
+        log_handler.info(f"[vendors_router] Vendor '{vendor_id}' retrieved successfully")
         return vendor
 
     except HTTPException:
         raise
     except Exception as e:
-        log_handler.error(f"Unexpected error fetching vendor '{vendor_id}': {e}")
+        log_handler.error(f"[vendors_router] Unexpected error fetching vendor '{vendor_id}': {e}")
         raise HTTPException(status_code=500, detail="Internal server error while fetching vendor")
 
 
@@ -232,13 +232,13 @@ async def update_vendor(request: Request, vendor_id: str, body: VendorUpdatePayl
             validate_phone_format(updates["phone"])
 
         updated = update_record("vendors", vendor_id, updates)
-        log_handler.info(f"Vendor '{vendor_id}' updated successfully")
+        log_handler.info(f"[vendors_router] Vendor '{vendor_id}' updated successfully")
         return updated
 
     except HTTPException:
         raise
     except Exception as e:
-        log_handler.error(f"Unexpected error updating vendor '{vendor_id}': {e}")
+        log_handler.error(f"[vendors_router] Unexpected error updating vendor '{vendor_id}': {e}")
         raise HTTPException(status_code=500, detail="Internal server error while updating vendor")
 
 
@@ -268,11 +268,11 @@ async def remove_vendor(request: Request, vendor_id: str):
             )
 
         deleted = delete_record("vendors", vendor_id)
-        log_handler.info(f"Vendor '{vendor_id}' deleted successfully")
+        log_handler.info(f"[vendors_router] Vendor '{vendor_id}' deleted successfully")
         return deleted
 
     except HTTPException:
         raise
     except Exception as e:
-        log_handler.error(f"Unexpected error deleting vendor '{vendor_id}': {e}")
+        log_handler.error(f"[vendors_router] Unexpected error deleting vendor '{vendor_id}': {e}")
         raise HTTPException(status_code=500, detail="Internal server error while deleting vendor")

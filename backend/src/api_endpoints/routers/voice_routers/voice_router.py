@@ -89,7 +89,7 @@ async def get_voice_provider_voices(request: Request, provider: Optional[str] = 
     try:
         return list_voice_provider_voices(provider)
     except VoiceProviderError as e:
-        log_handler.error(f"Voice provider error listing voices: {e}")
+        log_handler.error(f"[voice_router] Voice provider error listing voices: {e}")
         raise _provider_exception_to_http(e)
 
 
@@ -109,26 +109,26 @@ async def transcribe_audio(request: Request, audio: UploadFile, provider: Option
         dict: The transcribed text.
     """
     try:
-        log_handler.debug(f"Transcribing audio file: {audio.filename}")
+        log_handler.debug(f"[voice_router] Transcribing audio file: {audio.filename}")
 
         audio_bytes = await audio.read()
         if not audio_bytes:
             raise HTTPException(status_code=400, detail="Audio file is empty")
 
         voice_provider = get_voice_provider(provider)
-        log_handler.info(f"Using voice provider '{voice_provider.provider_id}' for transcription")
+        log_handler.info(f"[voice_router] Using voice provider '{voice_provider.provider_id}' for transcription")
         result = voice_provider.transcribe(audio_bytes, mime_type=audio.content_type or "audio/wav")
 
-        log_handler.info(f"Audio transcribed successfully: {result.transcript[:50]}...")
+        log_handler.info(f"[voice_router] Audio transcribed successfully: {result.transcript[:50]}...")
         return {"transcript": result.transcript}
 
     except HTTPException:
         raise
     except VoiceProviderError as e:
-        log_handler.error(f"Voice provider error transcribing audio: {e}")
+        log_handler.error(f"[voice_router] Voice provider error transcribing audio: {e}")
         raise _provider_exception_to_http(e)
     except Exception as e:
-        log_handler.error(f"Unexpected error transcribing audio: {e}")
+        log_handler.error(f"[voice_router] Unexpected error transcribing audio: {e}")
         raise HTTPException(status_code=500, detail="Internal server error while transcribing audio")
 
 
@@ -144,7 +144,7 @@ async def start_voice_session(request: Request, body: VoiceStartPayload):
     """
     try:
         tenant_id = body.tenant_id.strip()
-        log_handler.debug(f"Starting voice session for tenant_id='{tenant_id}'")
+        log_handler.debug(f"[voice_router] Starting voice session for tenant_id='{tenant_id}'")
 
         # 1. Fetch tenant
         tenant = tenant_mcp.lookup_tenant(tenant_id)
@@ -177,7 +177,7 @@ async def start_voice_session(request: Request, body: VoiceStartPayload):
             if response and response.text:
                 greeting = response.text.strip()
         except Exception as ai_err:
-            log_handler.error(f"Failed to generate greeting via Gemini: {ai_err}")
+            log_handler.error(f"[voice_router] Failed to generate greeting via Gemini: {ai_err}")
 
         # Fallback greeting if Gemini fails or is empty
         if not greeting:
@@ -210,12 +210,12 @@ async def start_voice_session(request: Request, body: VoiceStartPayload):
 
         # 5. Convert greeting to audio through selected provider
         voice_provider = get_voice_provider(body.provider)
-        log_handler.info(f"Using voice provider '{voice_provider.provider_id}' for session greeting")
+        log_handler.info(f"[voice_router] Using voice provider '{voice_provider.provider_id}' for session greeting")
         greeting_audio = voice_provider.tts(greeting, voice_id=body.voice_id)
         greeting_audio_base64 = base64.b64encode(greeting_audio.audio_bytes).decode("utf-8")
 
         log_handler.info(
-            f"Successfully started voice session for tenant '{tenant_id}'. "
+            f"[voice_router] Successfully started voice session for tenant '{tenant_id}'. "
             f"Stub request record created with id='{stub_request['id']}'"
         )
         return {
@@ -229,10 +229,10 @@ async def start_voice_session(request: Request, body: VoiceStartPayload):
     except HTTPException:
         raise
     except VoiceProviderError as e:
-        log_handler.error(f"Voice provider error starting voice session: {e}")
+        log_handler.error(f"[voice_router] Voice provider error starting voice session: {e}")
         raise _provider_exception_to_http(e)
     except Exception as e:
-        log_handler.error(f"Unexpected error starting voice session: {e}")
+        log_handler.error(f"[voice_router] Unexpected error starting voice session: {e}")
         raise HTTPException(status_code=500, detail="Internal server error while starting voice session")
 
 
@@ -248,7 +248,7 @@ async def respond_to_voice_message(request: Request, body: VoiceRespondPayload):
         tenant_id = body.tenant_id.strip()
         transcript = body.transcript.strip()
 
-        log_handler.debug(f"Processing voice message in session='{request_id}' from tenant='{tenant_id}'")
+        log_handler.debug(f"[voice_router] Processing voice message in session='{request_id}' from tenant='{tenant_id}'")
 
         # 1. Fetch existing request record
         req = request_mcp.get_request(request_id)
@@ -300,14 +300,14 @@ async def respond_to_voice_message(request: Request, body: VoiceRespondPayload):
         is_escalated = updated_request.get("escalated", False)
 
         voice_provider = get_voice_provider(body.provider)
-        log_handler.info(f"Using voice provider '{voice_provider.provider_id}' for voice response")
+        log_handler.info(f"[voice_router] Using voice provider '{voice_provider.provider_id}' for voice response")
         if is_escalated:
-            log_handler.info(f"Request '{request_id}' is escalated, using emergency TTS")
+            log_handler.info(f"[voice_router] Request '{request_id}' is escalated, using emergency TTS")
         audio_result = voice_provider.tts(reply_text, voice_id=body.voice_id, emergency=is_escalated)
         audio_base64 = base64.b64encode(audio_result.audio_bytes).decode("utf-8")
 
         log_handler.info(
-            f"Voice message processed successfully in session '{request_id}'. "
+            f"[voice_router] Voice message processed successfully in session '{request_id}'. "
             f"Status: {updated_request.get('status')}, "
             f"Escalated: {is_escalated}, "
             f"Is Complete: {parsed_response.get('is_complete')}"
@@ -326,8 +326,8 @@ async def respond_to_voice_message(request: Request, body: VoiceRespondPayload):
     except HTTPException:
         raise
     except VoiceProviderError as e:
-        log_handler.error(f"Voice provider error processing voice message: {e}")
+        log_handler.error(f"[voice_router] Voice provider error processing voice message: {e}")
         raise _provider_exception_to_http(e)
     except Exception as e:
-        log_handler.error(f"Unexpected error processing voice message: {e}")
+        log_handler.error(f"[voice_router] Unexpected error processing voice message: {e}")
         raise HTTPException(status_code=500, detail="Internal server error while processing voice message")

@@ -64,13 +64,13 @@ async def list_managers(request: Request):
         If the rate limit is exceeded, the rate_limit_handler() handles the response.
     """
     try:
-        log_handler.debug("Listing all property managers")
+        log_handler.debug("[managers_router] Listing all property managers")
         managers = read_all("property_magament")
-        log_handler.info(f"Returning {len(managers)} manager(s)")
+        log_handler.info(f"[managers_router] Returning {len(managers)} manager(s)")
         return managers
 
     except Exception as e:
-        log_handler.error(f"Unexpected error listing managers: {e}")
+        log_handler.error(f"[managers_router] Unexpected error listing managers: {e}")
         raise HTTPException(status_code=500, detail="Internal server error while fetching managers")
 
 
@@ -100,13 +100,13 @@ async def update_manager_profile(request: Request, manager_id: str, body: Manage
             validate_phone_format(updates["phone"])
 
         updated = update_record("property_magament", manager_id, updates)
-        log_handler.info(f"Manager profile '{manager_id}' updated successfully")
+        log_handler.info(f"[managers_router] Manager profile '{manager_id}' updated successfully")
         return updated
 
     except HTTPException:
         raise
     except Exception as e:
-        log_handler.error(f"Unexpected error updating manager profile '{manager_id}': {e}")
+        log_handler.error(f"[managers_router] Unexpected error updating manager profile '{manager_id}': {e}")
         raise HTTPException(status_code=500, detail="Internal server error while updating manager profile")
 
 
@@ -135,19 +135,19 @@ async def get_manager(request: Request, manager_id: str):
         If the rate limit is exceeded, the rate_limit_handler() handles the response.
     """
     try:
-        log_handler.debug(f"Looking up manager with id='{manager_id}'")
+        log_handler.debug(f"[managers_router] Looking up manager with id='{manager_id}'")
         manager = find_by_id("property_magament", manager_id)
 
         if not manager:
-            message = f"Manager '{manager_id}' not found"
+            message = f"[managers_router] Manager '{manager_id}' not found"
             log_handler.warning(message)
             raise HTTPException(status_code=404, detail=message)
 
-        log_handler.info(f"Manager '{manager_id}' retrieved successfully")
+        log_handler.info(f"[managers_router] Manager '{manager_id}' retrieved successfully")
         return manager
 
     except HTTPException:
         raise
     except Exception as e:
-        log_handler.error(f"Unexpected error fetching manager '{manager_id}': {e}")
+        log_handler.error(f"[managers_router] Unexpected error fetching manager '{manager_id}': {e}")
         raise HTTPException(status_code=500, detail="Internal server error while fetching manager")

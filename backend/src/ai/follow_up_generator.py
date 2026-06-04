@@ -62,25 +62,25 @@ def needs_more_context(classification: dict, turn_count: int) -> bool:
     """
     if turn_count >= MAX_TURNS:
         log_handler.debug(
-            f"Max turns ({MAX_TURNS}) reached — no more follow-up questions"
+            f"[follow_up_generator] Max turns ({MAX_TURNS}) reached — no more follow-up questions"
         )
         return False
 
     #Check if the AI already marked the conversation as complete
     if classification.get("is_complete", False):
-        log_handler.debug("Classification marked is_complete=True — no follow-up needed")
+        log_handler.debug("[follow_up_generator] Classification marked is_complete=True — no follow-up needed")
         return False
 
     #Check confidence threshold
     confidence = classification.get("confidence", 0.0)
     if confidence >= 0.85:
         log_handler.debug(
-            f"Confidence {confidence:.2f} >= 0.85 — no follow-up needed"
+            f"[follow_up_generator] Confidence {confidence:.2f} >= 0.85 — no follow-up needed"
         )
         return False
 
     log_handler.debug(
-        f"Follow-up needed: turn_count={turn_count}, confidence={confidence:.2f}"
+        f"[follow_up_generator] Follow-up needed: turn_count={turn_count}, confidence={confidence:.2f}"
     )
     return True
 
@@ -102,7 +102,7 @@ def generate_follow_up(context: str, conversation_history: list) -> str:
     Returns:
         str: A single clarifying question to present to the tenant.
     """
-    log_handler.debug("Generating follow-up question")
+    log_handler.debug("[follow_up_generator] Generating follow-up question")
 
     #Format conversation history
     history_text = ""
@@ -129,9 +129,9 @@ def generate_follow_up(context: str, conversation_history: list) -> str:
         )
 
         question = response.text.strip()
-        log_handler.info(f"Follow-up question generated: {question[:100]}")
+        log_handler.info(f"[follow_up_generator] Follow-up question generated: {question[:100]}")
         return question
 
     except Exception as e:
-        log_handler.error(f"Follow-up generation failed: {e} — using fallback question")
+        log_handler.error(f"[follow_up_generator] Follow-up generation failed: {e} — using fallback question")
         return "Could you please provide more details about the issue you are experiencing?"

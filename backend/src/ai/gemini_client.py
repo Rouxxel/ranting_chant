@@ -43,14 +43,14 @@ def get_client() -> genai.Client:
     global _client
 
     if _client is not None:
-        log_handler.debug("Reusing existing Gemini client instance")
+        log_handler.debug("[gemini_client] Reusing existing Gemini client instance")
         return _client
 
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         raise RuntimeError("GEMINI_API_KEY environment variable is not set.")
 
-    log_handler.debug("Initializing Gemini client")
+    log_handler.debug("[gemini_client] Initializing Gemini client")
     _client = genai.Client(api_key=api_key)
-    log_handler.info("Gemini client initialized successfully")
+    log_handler.info("[gemini_client] Gemini client initialized successfully")
     return _client

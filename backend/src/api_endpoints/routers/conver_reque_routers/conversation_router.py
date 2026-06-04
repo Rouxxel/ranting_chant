@@ -83,13 +83,13 @@ async def start_conversation(request: Request, body: ConversationStartPayload):
     """
     try:
         tenant_id = body.tenant_id.strip()
-        log_handler.debug(f"Starting conversation for tenant_id='{tenant_id}'")
+        log_handler.debug(f"[conversation_router] Starting conversation for tenant_id='{tenant_id}'")
 
         # 1. Fetch tenant
         tenant = tenant_mcp.lookup_tenant(tenant_id)
         if not tenant:
             message = f"Tenant '{tenant_id}' not found"
-            log_handler.warning(message)
+            log_handler.warning(f"[conversation_router] {message}")
             raise HTTPException(status_code=404, detail=message)
 
         # 2. Fetch associated property
@@ -104,7 +104,7 @@ async def start_conversation(request: Request, body: ConversationStartPayload):
         session_id = f"session_{uuid.uuid4().hex[:8]}"
 
         log_handler.info(
-            f"Successfully started conversation session for tenant '{tenant_id}'. "
+            f"[conversation_router] Successfully started conversation session for tenant '{tenant_id}'. "
             f"Session ID: {session_id} (no request created until first message)"
         )
         return {
@@ -117,7 +117,7 @@ async def start_conversation(request: Request, body: ConversationStartPayload):
     except HTTPException:
         raise
     except Exception as e:
-        log_handler.error(f"Unexpected error starting conversation session: {e}")
+        log_handler.error(f"[conversation_router] Unexpected error starting conversation session: {e}")
         raise HTTPException(status_code=500, detail="Internal server error while starting conversation")
 
 
@@ -157,14 +157,14 @@ async def send_message(request: Request, body: ConversationMessagePayload):
         tenant_id = body.tenant_id.strip()
         message = body.message.strip()
 
-        log_handler.debug(f"Processing message from tenant='{tenant_id}' with id='{request_id_or_session_id}'")
+        log_handler.debug(f"[conversation_router] Processing message from tenant='{tenant_id}' with id='{request_id_or_session_id}'")
 
         # Check if this is a session_id (first message) or request_id (subsequent message)
         is_first_message = request_id_or_session_id.startswith("session_")
 
         if is_first_message:
             # First message: process with AI but don't create request yet
-            log_handler.info(f"First message in session '{request_id_or_session_id}', processing without creating request")
+            log_handler.info(f"[conversation_router] First message in session '{request_id_or_session_id}', processing without creating request")
 
             # Fetch tenant and property for AI processing
             tenant = tenant_mcp.lookup_tenant(tenant_id)
@@ -267,7 +267,7 @@ async def send_message(request: Request, body: ConversationMessagePayload):
             if vendors:
                 updates["vendor_id"] = vendors[0].get("id")
                 log_handler.info(
-                    f"Intake complete. Assigned vendor '{vendors[0].get('id')}' "
+                    f"[conversation_router] Intake complete. Assigned vendor '{vendors[0].get('id')}' "
                     f"for service category '{vendor_service}'"
                 )
 
@@ -275,7 +275,7 @@ async def send_message(request: Request, body: ConversationMessagePayload):
         updated_request = request_mcp.update_request(request_id, updates)
 
         log_handler.info(
-            f"Message processed successfully in session '{request_id}'. "
+            f"[conversation_router] Message processed successfully in session '{request_id}'. "
             f"Status: {updated_request.get('status')}, "
             f"Is Complete: {parsed_response.get('is_complete')}"
         )
@@ -296,7 +296,7 @@ async def send_message(request: Request, body: ConversationMessagePayload):
     except HTTPException:
         raise
     except Exception as e:
-        log_handler.error(f"Unexpected error processing conversation message: {e}")
+        log_handler.error(f"[conversation_router] Unexpected error processing conversation message: {e}")
         raise HTTPException(status_code=500, detail="Internal server error while processing message")
 
 
@@ -330,7 +330,7 @@ async def save_conversation(request: Request, body: dict):
         conversation_history = body.get("conversation_history", [])
         metadata = body.get("metadata", {})
 
-        log_handler.info(f"Saving conversation for session '{session_id}', tenant '{tenant_id}'")
+        log_handler.info(f"[conversation_router] Saving conversation for session '{session_id}', tenant '{tenant_id}'")
 
         # Fetch tenant and property
         tenant = tenant_mcp.lookup_tenant(tenant_id)
@@ -361,14 +361,14 @@ async def save_conversation(request: Request, body: dict):
         }
 
         req = request_mcp.create_request(request_data)
-        log_handler.info(f"Created request '{req['id']}' from saved conversation")
+        log_handler.info(f"[conversation_router] Created request '{req['id']}' from saved conversation")
 
         return req
 
     except HTTPException:
         raise
     except Exception as e:
-        log_handler.error(f"Unexpected error saving conversation: {e}")
+        log_handler.error(f"[conversation_router] Unexpected error saving conversation: {e}")
         raise HTTPException(status_code=500, detail="Internal server error while saving conversation")
 
 
@@ -394,7 +394,7 @@ async def get_history(request: Request, request_id: str):
         HTTPException 500: If an unexpected error occurs during lookup.
     """
     try:
-        log_handler.debug(f"Fetching conversation history for request_id='{request_id}'")
+        log_handler.debug(f"[conversation_router] Fetching conversation history for request_id='{request_id}'")
 
         req = request_mcp.get_request(request_id)
         if not req:
@@ -403,11 +403,11 @@ async def get_history(request: Request, request_id: str):
             raise HTTPException(status_code=404, detail=err_msg)
 
         history = req.get("conversation_history", [])
-        log_handler.info(f"Returning {len(history)} turn(s) for request '{request_id}'")
+        log_handler.info(f"[conversation_router] Returning {len(history)} turn(s) for request '{request_id}'")
         return history
 
     except HTTPException:
         raise
     except Exception as e:
-        log_handler.error(f"Unexpected error fetching conversation history: {e}")
+        log_handler.error(f"[conversation_router] Unexpected error fetching conversation history: {e}")
         raise HTTPException(status_code=500, detail="Internal server error while fetching history")

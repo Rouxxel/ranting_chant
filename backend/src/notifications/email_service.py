@@ -29,9 +29,9 @@ RESEND_FROM_EMAIL = os.getenv("RESEND_FROM_EMAIL", "onboarding@resend.dev")
 
 if RESEND_API_KEY:
     resend.api_key = RESEND_API_KEY
-    log_handler.debug("Resend API key configured")
+    log_handler.debug("[email_service] Resend API key configured")
 else:
-    log_handler.warning("RESEND_API_KEY not set — email notifications will be disabled")
+    log_handler.warning("[email_service] RESEND_API_KEY not set — email notifications will be disabled")
 
 """METHODS-----------------------------------------------------------"""
 def send_request_created(

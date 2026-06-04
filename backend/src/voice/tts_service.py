@@ -32,11 +32,11 @@ client = None
 if ELEVENLABS_API_KEY:
     try:
         client = ElevenLabs(api_key=ELEVENLABS_API_KEY)
-        log_handler.debug("ElevenLabs client initialized")
+        log_handler.debug("[tts_service] ElevenLabs client initialized")
     except Exception as e:
-        log_handler.warning(f"Failed to initialize ElevenLabs client: {e}")
+        log_handler.warning(f"[tts_service] Failed to initialize ElevenLabs client: {e}")
 else:
-    log_handler.warning("ELEVENLABS_API_KEY not set — TTS will be disabled")
+    log_handler.warning("[tts_service] ELEVENLABS_API_KEY not set — TTS will be disabled")
 
 """METHODS-----------------------------------------------------------"""
 def text_to_speech_bytes(text: str, voice_id: str | None = None) -> bytes:

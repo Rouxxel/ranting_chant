@@ -83,13 +83,13 @@ class ConversationEngine:
             ValueError: If the tenant with tenant_id does not exist.
         """
         log_handler.debug(
-            f"Processing message for tenant='{tenant_id}', request='{request_id}'"
+            f"[conversation_engine] Processing message for tenant='{tenant_id}', request='{request_id}'"
         )
 
         #Fetch tenant record
         tenant = tenant_mcp.lookup_tenant(tenant_id)
         if not tenant:
-            log_handler.error(f"Tenant '{tenant_id}' not found")
+            log_handler.error(f"[conversation_engine] Tenant '{tenant_id}' not found")
             raise ValueError(f"Tenant '{tenant_id}' not found")
 
         #Fetch property record
@@ -121,11 +121,11 @@ class ConversationEngine:
                     max_results=config_loader["tavily"].get("max_results", 5),
                 )
                 log_handler.info(
-                    f"Tavily search added {len(web_search_response.results)} result(s) "
+                    f"[conversation_engine] Tavily search added {len(web_search_response.results)} result(s) "
                     f"for tenant message"
                 )
             except Exception as e:
-                log_handler.warning(f"Tavily search skipped after error: {e}")
+                log_handler.warning(f"[conversation_engine] Tavily search skipped after error: {e}")
 
         #Call Gemini
         raw_response = self._call_gemini(context, history_with_new, web_context=web_context)
@@ -145,11 +145,11 @@ class ConversationEngine:
                     max_results=config_loader["tavily"].get("max_results", 5),
                 )
                 log_handler.info(
-                    f"Tavily search added {len(web_search_response.results)} result(s) "
+                    f"[conversation_engine] Tavily search added {len(web_search_response.results)} result(s) "
                     f"after low-confidence Gemini response"
                 )
             except Exception as e:
-                log_handler.warning(f"Tavily low-confidence search skipped after error: {e}")
+                log_handler.warning(f"[conversation_engine] Tavily low-confidence search skipped after error: {e}")
 
         #Check escalation
         parsed["escalate"] = self._should_escalate(parsed)
@@ -174,14 +174,14 @@ class ConversationEngine:
                 ]
             })
             parsed["request_id"] = new_request["id"]
-            log_handler.info(f"New request created from conversation: '{new_request['id']}'")
+            log_handler.info(f"[conversation_engine] New request created from conversation: '{new_request['id']}'")
 
             #If vendor service needed, find matching vendors
             vendor_service = parsed.get("vendor_service_needed")
             if vendor_service:
                 vendors = vendor_mcp.find_vendors_by_service(vendor_service)
                 parsed["suggested_vendors"] = vendors
-                log_handler.info(f"Found {len(vendors)} vendor(s) for service '{vendor_service}'")
+                log_handler.info(f"[conversation_engine] Found {len(vendors)} vendor(s) for service '{vendor_service}'")
 
         #On escalation: call escalate_request if we have a request_id
         if parsed.get("escalate") and request_id:
@@ -191,13 +191,13 @@ class ConversationEngine:
                     f"Escalated by AI: urgency={parsed.get('urgency')}, sentiment={parsed.get('sentiment')}"
                 )
             except ValueError as e:
-                log_handler.warning(f"Could not escalate request '{request_id}': {e}")
+                log_handler.warning(f"[conversation_engine] Could not escalate request '{request_id}': {e}")
 
         #Attach context for callers that need it
         parsed["context"] = context
 
         log_handler.info(
-            f"Message processed: type={parsed.get('type')}, "
+            f"[conversation_engine] Message processed: type={parsed.get('type')}, "
             f"urgency={parsed.get('urgency')}, "
             f"escalate={parsed.get('escalate')}, "
             f"is_complete={parsed.get('is_complete')}"
@@ -254,7 +254,7 @@ class ConversationEngine:
             ]
 
         context = "\n".join(lines)
-        log_handler.debug(f"Context built ({len(context)} chars)")
+        log_handler.debug(f"[conversation_engine] Context built ({len(context)} chars)")
         return context
 
     def _call_gemini(self, context: str, conversation_history: list, web_context: str = "") -> str:
@@ -273,7 +273,7 @@ class ConversationEngine:
         Returns:
             str: The raw text response from Gemini.
         """
-        log_handler.debug(f"Calling Gemini with {len(conversation_history)} history turns")
+        log_handler.debug(f"[conversation_engine] Calling Gemini with {len(conversation_history)} history turns")
 
         #Format history as readable text
         history_text = ""
@@ -300,7 +300,7 @@ class ConversationEngine:
         )
 
         raw = response.text.strip()
-        log_handler.debug(f"Gemini raw response length: {len(raw)} chars")
+        log_handler.debug(f"[conversation_engine] Gemini raw response length: {len(raw)} chars")
         return raw
 
     def _parse_response(self, raw: str) -> dict:
@@ -329,13 +329,13 @@ class ConversationEngine:
             cleaned = cleaned.strip()
 
             parsed = json.loads(cleaned)
-            log_handler.debug("Gemini response parsed successfully")
+            log_handler.debug(f"[conversation_engine] Gemini response parsed successfully")
             parsed["type"] = normalize_request_type(parsed.get("type"))
             return parsed
 
         except (json.JSONDecodeError, IndexError) as e:
             log_handler.warning(
-                f"Failed to parse Gemini response: {e} — using fallback"
+                f"[conversation_engine] Failed to parse Gemini response: {e} — using fallback"
             )
             return {
                 "reply": (
@@ -368,25 +368,25 @@ class ConversationEngine:
         """
         #Gemini explicitly flagged escalation
         if parsed.get("escalate", False):
-            log_handler.info("Escalation triggered: Gemini flagged escalate=true")
+            log_handler.info("[conversation_engine] Escalation triggered: Gemini flagged escalate=true")
             return True
 
         #High urgency always escalates
         if parsed.get("urgency") == "high":
-            log_handler.info("Escalation triggered: urgency=high")
+            log_handler.info("[conversation_engine] Escalation triggered: urgency=high")
             return True
 
         #Low confidence requires human review
         confidence = parsed.get("confidence", 1.0)
         if confidence < 0.7:
             log_handler.info(
-                f"Escalation triggered: confidence={confidence:.2f} < 0.7"
+                f"[conversation_engine] Escalation triggered: confidence={confidence:.2f} < 0.7"
             )
             return True
 
         #Angry sentiment requires human attention
         if parsed.get("sentiment") == "angry":
-            log_handler.info("Escalation triggered: sentiment=angry")
+            log_handler.info("[conversation_engine] Escalation triggered: sentiment=angry")
             return True
 
         return False

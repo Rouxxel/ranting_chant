@@ -73,7 +73,7 @@ def classify_request(conversation_history: list) -> dict:
             escalate, confidence, vendor_service_needed, and
             involved_party_types.
     """
-    log_handler.debug("Classifying request from conversation history")
+    log_handler.debug("[classifier] Classifying request from conversation history")
 
     #Format conversation history as readable text for the prompt
     history_text = ""
@@ -83,7 +83,7 @@ def classify_request(conversation_history: list) -> dict:
         history_text += f"{role.upper()}: {message}\n"
 
     if not history_text.strip():
-        log_handler.warning("Empty conversation history passed to classifier — returning defaults")
+        log_handler.warning("[classifier] Empty conversation history passed to classifier — returning defaults")
         return _default_classification()
 
     try:
@@ -100,11 +100,11 @@ def classify_request(conversation_history: list) -> dict:
         )
 
         raw = response.text.strip()
-        log_handler.debug(f"Classifier raw response: {raw[:200]}")
+        log_handler.debug(f"[classifier] Classifier raw response: {raw[:200]}")
         return _parse_classification(raw)
 
     except Exception as e:
-        log_handler.error(f"Classifier Gemini call failed: {e}")
+        log_handler.error(f"[classifier] Classifier Gemini call failed: {e}")
         return _default_classification()
 
 
@@ -132,11 +132,11 @@ def _parse_classification(raw: str) -> dict:
 
         parsed = json.loads(cleaned)
         parsed["type"] = normalize_request_type(parsed.get("type"))
-        log_handler.debug("Classification parsed successfully")
+        log_handler.debug(f"[classifier] Classification parsed successfully")
         return parsed
 
     except (json.JSONDecodeError, IndexError) as e:
-        log_handler.warning(f"Failed to parse classification response: {e} — using defaults")
+        log_handler.warning(f"[classifier] Failed to parse classification response: {e} — using defaults")
         return _default_classification()
 
 

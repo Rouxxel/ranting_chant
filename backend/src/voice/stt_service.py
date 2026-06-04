@@ -32,6 +32,7 @@ ELEVENLABS_CONFIG = config_loader["voice_provider"]["elevenlabs"]
 
 # Initialize ElevenLabs client
 client = None
+whisper_model = None
 if ELEVENLABS_API_KEY:
     try:
         client = ElevenLabs(api_key=ELEVENLABS_API_KEY)
@@ -42,11 +43,11 @@ if ELEVENLABS_API_KEY:
             cpu_threads=ELEVENLABS_CONFIG["stt"]["cpu_threads"],
             num_workers=ELEVENLABS_CONFIG["stt"]["num_workers"]
             )
-        log_handler.debug("ElevenLabs client initialized, whisper model selected")
+        log_handler.debug("[stt_service] ElevenLabs client initialized, whisper model selected")
     except Exception as e:
-        log_handler.warning(f"Failed to initialize ElevenLabs client: {e}")
+        log_handler.warning(f"[stt_service] Failed to initialize ElevenLabs client: {e}")
 else:
-    log_handler.warning("ELEVENLABS_API_KEY not set — STT will use Whisper fallback only")
+    log_handler.warning("[stt_service] ELEVENLABS_API_KEY not set — STT will use Whisper fallback only")
 
 """METHODS-----------------------------------------------------------"""
 def transcribe_elevenlabs(audio_bytes: bytes, language_code: str = "eng") -> str:
@@ -103,6 +104,8 @@ def transcribe_whisper(audio_path: str) -> str:
     Raises:
         Exception: If Whisper transcription fails.
     """
+    if whisper_model is None:
+        raise RuntimeError("Whisper model not initialized")
     try:
         log_handler.debug(f"[stt_service] Transcribing audio with Whisper: {audio_path}")
         

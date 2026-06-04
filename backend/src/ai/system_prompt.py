@@ -74,4 +74,4 @@ When WEB SEARCH RESULTS are included in the prompt, use them only when they are 
 If you use them, include a short "Relevant links" list inside the reply field with title and URL.
 """
 
-log_handler.debug("System prompt loaded")
+log_handler.debug("[system_prompt] System prompt loaded")

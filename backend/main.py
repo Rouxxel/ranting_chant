@@ -49,9 +49,9 @@ from src.api_endpoints.routers.voice_routers.voice_router import router as voice
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     port = config_loader["network"]["server_port"]
-    log_handler.info(f"Ranting Chat server starting on port {port}")
+    log_handler.info(f"[main] Ranting Chat server starting on port {port}")
     yield
-    log_handler.info("Ranting Chat server shutting down")
+    log_handler.info(f"[main] Ranting Chat server shutting down")
 
 #Create FastAPI app
 app = FastAPI(
@@ -75,7 +75,7 @@ async def global_exception_handler(request, exc):
     Global exception handler for unhandled errors.
     Logs the error and returns a generic error message.
     """
-    log_handler.error(f"Unhandled exception: {exc}")
+    log_handler.error(f"[main] Unhandled exception: {exc}")
     return {"error": "Internal server error"}
 
 #CORS
@@ -115,6 +115,6 @@ if __name__ == "__main__":
         proxy_headers=config_loader["network"]["proxy_headers"]
     )
     
-    log_handler.info(f"Loaded configuration: \n {config_loader}")
-    log_handler.info(f"Loaded data: \n {data_loader}")
+    log_handler.info(f"[main] Loaded configuration: \n {config_loader}")
+    log_handler.info(f"[main] Loaded data: \n {data_loader}")
     #available at: http://127.0.0.1:8000/docs

@@ -52,11 +52,11 @@ async def get_mcp_tools(request: Request):
         If the rate limit is exceeded, the rate_limit_handler() handles the response.
     """
     try:
-        log_handler.debug("Listing all registered MCP tools")
+        log_handler.debug("[mcp_router] Listing all registered MCP tools")
         tools = list_tools()
-        log_handler.info(f"Returning {len(tools)} registered MCP tool(s)")
+        log_handler.info(f"[mcp_router] Returning {len(tools)} registered MCP tool(s)")
         return {"count": len(tools), "tools": tools}
 
     except Exception as e:
-        log_handler.error(f"Unexpected error listing MCP tools: {e}")
+        log_handler.error(f"[mcp_router] Unexpected error listing MCP tools: {e}")
         raise HTTPException(status_code=500, detail="Internal server error while listing MCP tools")

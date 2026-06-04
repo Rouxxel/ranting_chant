@@ -105,18 +105,18 @@ async def list_requests(
     """
     try:
         if tenant_id:
-            log_handler.debug(f"Listing requests filtered by tenant_id='{tenant_id}'")
+            log_handler.debug(f"[requests_router] Listing requests filtered by tenant_id='{tenant_id}'")
             results = find_by_field("requests", "requester_id", tenant_id)
-            log_handler.info(f"Found {len(results)} request(s) for tenant '{tenant_id}'")
+            log_handler.info(f"[requests_router] Found {len(results)} request(s) for tenant '{tenant_id}'")
             return results
 
-        log_handler.debug("Listing all requests")
+        log_handler.debug(f"[requests_router] Listing all requests")
         requests = read_all("requests")
-        log_handler.info(f"Returning {len(requests)} request(s)")
+        log_handler.info(f"[requests_router] Returning {len(requests)} request(s)")
         return requests
 
     except Exception as e:
-        log_handler.error(f"Unexpected error listing requests: {e}")
+        log_handler.error(f"[requests_router] Unexpected error listing requests: {e}")
         raise HTTPException(status_code=500, detail="Internal server error while fetching requests")
 
 
@@ -146,7 +146,7 @@ async def get_request_notifications(request: Request, request_id: str):
         If the rate limit is exceeded, the rate_limit_handler() handles the response.
     """
     try:
-        log_handler.debug(f"Fetching notifications for request_id='{request_id}'")
+        log_handler.debug(f"[requests_router] Fetching notifications for request_id='{request_id}'")
         req = find_by_id("requests", request_id)
 
         if not req:
@@ -156,14 +156,14 @@ async def get_request_notifications(request: Request, request_id: str):
 
         notifications = req.get("notifications_sent", [])
         log_handler.info(
-            f"Returning {len(notifications)} notification(s) for request '{request_id}'"
+            f"[requests_router] Returning {len(notifications)} notification(s) for request '{request_id}'"
         )
         return notifications
 
     except HTTPException:
         raise
     except Exception as e:
-        log_handler.error(f"Unexpected error fetching notifications for '{request_id}': {e}")
+        log_handler.error(f"[requests_router] Unexpected error fetching notifications for '{request_id}': {e}")
         raise HTTPException(status_code=500, detail="Internal server error while fetching notifications")
 
 
@@ -192,7 +192,7 @@ async def get_request_summary(request: Request, request_id: str):
         HTTPException 500: If an unexpected error occurs during summarization.
     """
     try:
-        log_handler.debug(f"Generating summary for request_id='{request_id}'")
+        log_handler.debug(f"[requests_router] Generating summary for request_id='{request_id}'")
         req = find_by_id("requests", request_id)
 
         if not req:
@@ -203,12 +203,12 @@ async def get_request_summary(request: Request, request_id: str):
         # Check if summary is already cached
         existing_summary = req.get("summary")
         if existing_summary:
-            log_handler.info(f"Returning cached summary for request '{request_id}'")
+            log_handler.info(f"[requests_router] Returning cached summary for request '{request_id}'")
             return {"summary": existing_summary}
 
         history = req.get("conversation_history", [])
         if not history:
-            log_handler.info(f"No conversation history available for request '{request_id}'")
+            log_handler.info(f"[requests_router] No conversation history available for request '{request_id}'")
             return {"summary": "No conversation history available to summarize."}
 
         # Format history as readable text
@@ -237,7 +237,7 @@ async def get_request_summary(request: Request, request_id: str):
             if response and response.text:
                 summary = response.text.strip()
         except Exception as ai_err:
-            log_handler.error(f"Failed to generate summary via Gemini: {ai_err}")
+            log_handler.error(f"[requests_router] Failed to generate summary via Gemini: {ai_err}")
 
         if not summary:
             # Fallback simple programmatically generated summary if Gemini fails
@@ -245,19 +245,19 @@ async def get_request_summary(request: Request, request_id: str):
             urgency = req.get("urgency", "low")
             status = req.get("status", "pending")
             summary = (
-                f"This request was submitted with the description: '{desc}'. "
-                f"It is currently classified as having a {urgency} urgency level and is in a {status} status."
+                f"[requests_router] This request was submitted with the description: '{desc}'. "
+                f"[requests_router] It is currently classified as having a {urgency} urgency level and is in a {status} status."
             )
 
         # Cache the summary in the request
         update_record("requests", request_id, {"summary": summary})
-        log_handler.info(f"Successfully generated and cached summary for request '{request_id}'")
+        log_handler.info(f"[requests_router] Successfully generated and cached summary for request '{request_id}'")
         return {"summary": summary}
 
     except HTTPException:
         raise
     except Exception as e:
-        log_handler.error(f"Unexpected error generating request summary for '{request_id}': {e}")
+        log_handler.error(f"[requests_router] Unexpected error generating request summary for '{request_id}': {e}")
         raise HTTPException(status_code=500, detail="Internal server error while generating summary")
 
 
@@ -287,21 +287,21 @@ async def get_request(request: Request, request_id: str):
         If the rate limit is exceeded, the rate_limit_handler() handles the response.
     """
     try:
-        log_handler.debug(f"Looking up request with id='{request_id}'")
+        log_handler.debug(f"[requests_router] Looking up request with id='{request_id}'")
         req = find_by_id("requests", request_id)
 
         if not req:
-            message = f"Request '{request_id}' not found"
+            message = f"[requests_router] Request '{request_id}' not found"
             log_handler.warning(message)
             raise HTTPException(status_code=404, detail=message)
 
-        log_handler.info(f"Request '{request_id}' retrieved successfully")
+        log_handler.info(f"[requests_router] Request '{request_id}' retrieved successfully")
         return req
 
     except HTTPException:
         raise
     except Exception as e:
-        log_handler.error(f"Unexpected error fetching request '{request_id}': {e}")
+        log_handler.error(f"[requests_router] Unexpected error fetching request '{request_id}': {e}")
         raise HTTPException(status_code=500, detail="Internal server error while fetching request")
 
 
@@ -362,13 +362,13 @@ async def create_request(request: Request, body: RequestCreatePayload):
         }
 
         created = create_record("requests", record)
-        log_handler.info(f"Request created successfully with id='{created['id']}'")
+        log_handler.info(f"[requests_router] Request created successfully with id='{created['id']}'")
         return created
 
     except HTTPException:
         raise
     except Exception as e:
-        log_handler.error(f"Unexpected error creating request: {e}")
+        log_handler.error(f"[requests_router] Unexpected error creating request: {e}")
         raise HTTPException(status_code=500, detail="Internal server error while creating request")
 
 
@@ -410,7 +410,7 @@ async def update_request(request: Request, request_id: str, body: RequestUpdateP
         If the rate limit is exceeded, the rate_limit_handler() handles the response.
     """
     try:
-        log_handler.debug(f"Updating request with id='{request_id}'")
+        log_handler.debug(f"[requests_router] Updating request with id='{request_id}'")
 
         #Confirm the record exists before attempting update
         existing = find_by_id("requests", request_id)
@@ -426,13 +426,13 @@ async def update_request(request: Request, request_id: str, body: RequestUpdateP
         updates["updated_at"] = datetime.now(timezone.utc).isoformat()
 
         updated = update_record("requests", request_id, updates)
-        log_handler.info(f"Request '{request_id}' updated successfully")
+        log_handler.info(f"[requests_router] Request '{request_id}' updated successfully")
         return updated
 
     except HTTPException:
         raise
     except Exception as e:
-        log_handler.error(f"Unexpected error updating request '{request_id}': {e}")
+        log_handler.error(f"[requests_router] Unexpected error updating request '{request_id}': {e}")
         raise HTTPException(status_code=500, detail="Internal server error while updating request")
 
 
@@ -471,13 +471,13 @@ async def cancel_request(request: Request, request_id: str, body: RequestCancelP
             updates["cancellation_reason"] = body.cancellation_reason
 
         updated = update_record("requests", request_id, updates)
-        log_handler.info(f"Request '{request_id}' cancelled successfully")
+        log_handler.info(f"[requests_router] Request '{request_id}' cancelled successfully")
         return updated
 
     except HTTPException:
         raise
     except Exception as e:
-        log_handler.error(f"Unexpected error cancelling request '{request_id}': {e}")
+        log_handler.error(f"[requests_router] Unexpected error cancelling request '{request_id}': {e}")
         raise HTTPException(status_code=500, detail="Internal server error while cancelling request")
 
 
@@ -513,13 +513,13 @@ async def complete_request(request: Request, request_id: str, body: RequestCompl
             updates["resolution_note"] = body.resolution_note
 
         updated = update_record("requests", request_id, updates)
-        log_handler.info(f"Request '{request_id}' completed successfully")
+        log_handler.info(f"[requests_router] Request '{request_id}' completed successfully")
         return updated
 
     except HTTPException:
         raise
     except Exception as e:
-        log_handler.error(f"Unexpected error completing request '{request_id}': {e}")
+        log_handler.error(f"[requests_router] Unexpected error completing request '{request_id}': {e}")
         raise HTTPException(status_code=500, detail="Internal server error while completing request")
 
 
@@ -554,18 +554,18 @@ async def send_notifications(request: Request, request_id: str):
         If the rate limit is exceeded, the rate_limit_handler() handles the response.
     """
     try:
-        log_handler.debug(f"Sending notifications for request_id='{request_id}'")
+        log_handler.debug(f"[requests_router] Sending notifications for request_id='{request_id}'")
 
         #Fetch the request
         req = find_by_id("requests", request_id)
         if not req:
-            message = f"Request '{request_id}' not found"
+            message = f"[requests_router] Request '{request_id}' not found"
             log_handler.warning(message)
             raise HTTPException(status_code=404, detail=message)
 
         #Check if notifications are pending
         if not req.get("notification_pending", False):
-            message = f"Notifications are not pending for request '{request_id}'"
+            message = f"[requests_router] Notifications are not pending for request '{request_id}'"
             log_handler.warning(message)
             raise HTTPException(status_code=400, detail=message)
 
@@ -586,12 +586,12 @@ async def send_notifications(request: Request, request_id: str):
         })
 
         log_handler.info(
-            f"Successfully sent {len(events)} notification(s) for request '{request_id}'"
+            f"[requests_router] Successfully sent {len(events)} notification(s) for request '{request_id}'"
         )
         return updated
 
     except HTTPException:
         raise
     except Exception as e:
-        log_handler.error(f"Unexpected error sending notifications for '{request_id}': {e}")
+        log_handler.error(f"[requests_router] Unexpected error sending notifications for '{request_id}': {e}")
         raise HTTPException(status_code=500, detail="Internal server error while sending notifications")
