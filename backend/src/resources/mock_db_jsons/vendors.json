@@ -2,7 +2,7 @@
   {
     "id": "vendor_001",
     "name": "QuickFix Locksmith",
-    "email": "dispatch@gmail.com",
+    "email": "quickfixdispatch@gmail.com",
     "phone": "+14155552673",
     "services": [
       "locksmith",
@@ -13,7 +13,7 @@
   {
     "id": "vendor_002",
     "name": "AquaFlow Plumbing",
-    "email": "support@gmail.com",
+    "email": "flowaquasupport@gmail.com",
     "phone": "+14155552673",
     "services": [
       "plumbing"
@@ -23,7 +23,7 @@
   {
     "id": "vendor_003",
     "name": "VoltPro Electrical Services",
-    "email": "contact@gmail.com",
+    "email": "voltprocontact@gmail.com",
     "phone": "+14155552673",
     "services": [
       "electrical"
@@ -33,7 +33,7 @@
   {
     "id": "vendor_004",
     "name": "ArcticAir HVAC Solutions",
-    "email": "service@gmail.com",
+    "email": "arcticservice@gmail.com",
     "phone": "+14155552673",
     "services": [
       "hvac"
@@ -43,7 +43,7 @@
   {
     "id": "vendor_005",
     "name": "HandyHero Maintenance",
-    "email": "help@gmail.com",
+    "email": "handyhelp@gmail.com",
     "phone": "+14155552673",
     "services": [
       "handyman",
@@ -54,7 +54,7 @@
   {
     "id": "vendor_006",
     "name": "RapidGlass & Door Repair",
-    "email": "dispatch@gmail.com",
+    "email": "rapidglassdispatch@gmail.com",
     "phone": "+14155552673",
     "services": [
       "glass_repair",
@@ -65,8 +65,8 @@
   },
   {
     "id": "vendor_007",
-    "name": "SafeNest Pest Control",
-    "email": "support@gmail.com",
+    "name": "Safe Pest Control",
+    "email": "Safesupport@gmail.com",
     "phone": "+14155552673",
     "services": [
       "pest_control"
@@ -76,7 +76,7 @@
   {
     "id": "vendor_008",
     "name": "ClearFlow Drain Services",
-    "email": "service@gmail.com",
+    "email": "clearflowservice@gmail.com",
     "phone": "+14155552673",
     "services": [
       "drain_cleaning",
@@ -87,7 +87,7 @@
   {
     "id": "vendor_009",
     "name": "BrightSpark Appliance Repair",
-    "email": "repair@gmail.com",
+    "email": "brightsparkrepair@gmail.com",
     "phone": "+14155552673",
     "services": [
       "appliance_repair"
@@ -97,7 +97,7 @@
   {
     "id": "vendor_010",
     "name": "SecureAccess Systems",
-    "email": "support@gmail.com",
+    "email": "SecureAccessSupport@gmail.com",
     "phone": "+14155552673",
     "services": [
       "access_control",
@@ -105,15 +105,5 @@
       "locksmith"
     ],
     "emergency_available": true
-  },
-  {
-    "name": "dassdds",
-    "email": "example@gmail.com",
-    "phone": "+14155552673",
-    "services": [
-      "drain_cleaning"
-    ],
-    "emergency_available": true,
-    "id": "vendor_9e8f5c02"
   }
 ]

@@ -1,8 +1,8 @@
 [
   {
     "id": "property_001",
-    "name": "Sunset Apartments very sunny",
-    "address": "123 Main St, Berlin, 10115, Germany",
+    "name": "Sunset Apartments",
+    "address": "Spandauer Damm 10-22, 14059 Berlin, Germany",
     "year_built": 2026,
     "property_type": "apartment_building",
     "unit_count": 21,
@@ -21,7 +21,7 @@
   {
     "id": "property_002",
     "name": "Riverbend Residences",
-    "address": "88 River Street, Berlin, 10243, Germany",
+    "address": "Hardenbergpl. 8, 10787 Berlin, Germany",
     "year_built": 2005,
     "property_type": "apartment_building",
     "unit_count": 36,
@@ -39,7 +39,7 @@
   {
     "id": "property_003",
     "name": "Maple Heights",
-    "address": "14 Maple Avenue, Berlin, 10405, Germany",
+    "address": "Pariser Platz, 10117 Berlin, Germany",
     "year_built": 2010,
     "property_type": "apartment_building",
     "unit_count": 18,
@@ -56,7 +56,7 @@
   {
     "id": "property_004",
     "name": "Willow Creek Lofts",
-    "address": "56 Willow Street, Berlin, 10997, Germany",
+    "address": "Prenzlauer Allee 80, 10405 Berlin, Germany",
     "year_built": 2015,
     "property_type": "loft_building",
     "unit_count": 12,
@@ -75,7 +75,7 @@
   {
     "id": "property_005",
     "name": "Poplar Gardens",
-    "address": "88 Poplar Street, Berlin, 10179, Germany",
+    "address": "Osloer Str. 12, 13359 Berlin, Germany",
     "year_built": 2020,
     "property_type": "modern_apartment_complex",
     "unit_count": 42,
@@ -87,23 +87,6 @@
     "representative": {
       "type": "owner",
       "id": "owner_005"
-    }
-  },
-  {
-    "name": "APARTMENT 2",
-    "address": "somehwer 123",
-    "year_built": 2020,
-    "property_type": "mixed_use",
-    "unit_count": 6,
-    "owner_id": null,
-    "manager_id": "manager_001",
-    "tenant_ids": [
-      "tenant_e0916e63"
-    ],
-    "id": "property_4d89b8f1",
-    "representative": {
-      "type": "property_manager",
-      "id": "manager_001"
     }
   }
 ]

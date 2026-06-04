@@ -4,7 +4,7 @@
     "name": "John Tenant",
     "email": "john@gmail.com",
     "phone": "+14155552673",
-    "address": "123 Main St Apt 4B",
+    "address": "Spandauer Damm 10-22, 14059 Berlin, Germany",
     "unit": "4B",
     "property_id": "property_001"
   },
@@ -13,7 +13,7 @@
     "name": "John Hackathon",
     "email": "hckthnspecific@gmail.com",
     "phone": "+15552345",
-    "address": "45 Oak Street Apt 2A",
+    "address": "Spandauer Damm 10-22, 14059 Berlin, Germany",
     "unit": "2A",
     "property_id": "property_001"
   },
@@ -22,7 +22,7 @@
     "name": "Michael Brown",
     "email": "michael.brown@example.com",
     "phone": "+15553456",
-    "address": "78 Pine Avenue Apt 10C",
+    "address": "Hardenbergpl. 8, 10787 Berlin, Germany",
     "unit": "10C",
     "property_id": "property_002"
   },
@@ -31,7 +31,7 @@
     "name": "Sophia Williams",
     "email": "sophia.williams@example.com",
     "phone": "+15554567",
-    "address": "12 Maple Drive Apt 5B",
+    "address": "Hardenbergpl. 8, 10787 Berlin, Germany",
     "unit": "5B",
     "property_id": "property_002"
   },
@@ -40,7 +40,7 @@
     "name": "Daniel Johnson",
     "email": "daniel.johnson@example.com",
     "phone": "+15555678",
-    "address": "99 Cedar Lane Apt 3D",
+    "address": "Pariser Platz, 10117 Berlin, Germany",
     "unit": "3D",
     "property_id": "property_003"
   },
@@ -49,7 +49,7 @@
     "name": "Olivia Martinez",
     "email": "olivia.martinez@example.com",
     "phone": "+15556789",
-    "address": "21 Birch Road Apt 7A",
+    "address": "Prenzlauer Allee 80, 10405 Berlin, Germany",
     "unit": "7A",
     "property_id": "property_004"
   },
@@ -58,7 +58,7 @@
     "name": "James Wilson",
     "email": "james.wilson@example.com",
     "phone": "+15557890",
-    "address": "33 Elm Street Apt 1F",
+    "address": "Prenzlauer Allee 80, 10405 Berlin, Germany",
     "unit": "1F",
     "property_id": "property_004"
   },
@@ -67,7 +67,7 @@
     "name": "Isabella Anderson",
     "email": "isabella.anderson@example.com",
     "phone": "+15558901",
-    "address": "56 Willow Court Apt 8B",
+    "address": "Prenzlauer Allee 80, 10405 Berlin, Germany",
     "unit": "8B",
     "property_id": "property_004"
   },
@@ -76,7 +76,7 @@
     "name": "Ethan Thomas",
     "email": "ethan.thomas@example.com",
     "phone": "+15559012",
-    "address": "14 Aspen Way Apt 6C",
+    "address": "Spandauer Damm 10-22, 14059 Berlin, Germany",
     "unit": "6C",
     "property_id": "property_001"
   },
@@ -85,17 +85,8 @@
     "name": "Ava Taylor",
     "email": "ava.taylor@example.com",
     "phone": "+15550123",
-    "address": "88 Poplar Street Apt 4D",
+    "address": "Osloer Str. 12, 13359 Berlin, Germany",
     "unit": "4D",
     "property_id": "property_005"
-  },
-  {
-    "name": "ASDADASDA",
-    "unit": "5H",
-    "property_id": "property_4d89b8f1",
-    "email": "example@gmail.com",
-    "phone": "+15256856658",
-    "address": null,
-    "id": "tenant_e0916e63"
   }
 ]

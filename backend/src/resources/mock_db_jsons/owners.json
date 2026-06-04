@@ -2,7 +2,7 @@
   {
     "id": "owner_001",
     "name": "John Owner",
-    "email": "owner@gmail.com",
+    "email": "johnowner@gmail.com",
     "phone": "+14155552673",
     "owned_properties": ["property_001"]
   },
@@ -16,21 +16,21 @@
   {
     "id": "owner_003",
     "name": "Olivia Bennett",
-    "email": "olivia.bennett@gmail.com",
+    "email": "olivia.bennett@hotmail.com",
     "phone": "+14155552673",
     "owned_properties": ["property_003"]
   },
   {
     "id": "owner_004",
     "name": "Robert Hayes",
-    "email": "robert.hayes@gmail.com",
+    "email": "hayesrobert@gmail.com",
     "phone": "+14155552673",
     "owned_properties": ["property_004"]
   },
   {
     "id": "owner_005",
     "name": "Sophia Reynolds",
-    "email": "sophia.reynolds@gmail.com",
+    "email": "sreynolds@gmail.com",
     "phone": "+14155552673",
     "owned_properties": ["property_005"]
   }

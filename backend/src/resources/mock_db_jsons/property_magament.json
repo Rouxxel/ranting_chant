@@ -1,8 +1,8 @@
 [
   {
     "id": "manager_001",
-    "name": "John management",
-    "email": "sarah@gmail.co",
+    "name": "Sara Johnson",
+    "email": "sarah@gmail.com",
     "phone": "+14155552673",
     "managed_properties": [
       "property_001"

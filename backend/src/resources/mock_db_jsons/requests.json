@@ -1,733 +1,104 @@
 [
   {
-    "id": "request_5abd5f11",
-    "requester_id": "tenant_001",
-    "type": "access_control",
-    "description": "Conversation started",
-    "status": "resolved",
-    "urgency": "medium",
-    "involved_parties": [
-      "tenant_001"
-    ],
-    "property": "Sunset Apartments",
-    "conversation_history": [
-      {
-        "role": "ai",
-        "message": "Hello John Tenant, welcome to Ranting Chant. How can I assist you with your home at Sunset Apartments today?",
-        "timestamp": "2026-05-24T09:55:36.476001+00:00"
-      },
-      {
-        "role": "tenant",
-        "message": "I lost my key",
-        "timestamp": "2026-05-24T09:55:44.843733+00:00"
-      },
-      {
-        "role": "ai",
-        "message": "I understand you've lost your key. Are you currently locked out of your apartment?",
-        "timestamp": "2026-05-24T09:55:44.843733+00:00"
-      }
-    ],
-    "created_at": "2026-05-24T09:55:36.476999+00:00",
-    "updated_at": "2026-05-30T22:22:29.373865+00:00",
-    "property_id": "property_001",
-    "escalated": false,
-    "sentiment": "neutral",
-    "confidence": 0.9,
-    "vendor_id": null,
-    "notifications_sent": [
-      {
-        "type": "email",
-        "recipient": "sarah@gmail.com",
-        "status": "sent",
-        "timestamp": "2026-05-24T09:55:37.667452+00:00"
-      }
-    ],
-    "summary": "The tenant has reported losing the key to their apartment at Sunset Apartments. The AI coordinator is currently confirming whether the tenant is locked out of their home to determine the next steps.",
-    "resolved_at": "2026-05-30T22:22:29.373865+00:00",
-    "resolved_by": "manager_001",
-    "resolution_note": "I dont gaf tbh mate, skill issue"
-  },
-  {
-    "id": "request_5a64c091",
-    "requester_id": "tenant_001",
-    "type": "lockout",
-    "description": "Conversation started",
-    "status": "escalated",
-    "urgency": "high",
-    "involved_parties": [
-      "tenant_001"
-    ],
-    "property": "Sunset Apartments",
-    "property_id": "property_001",
-    "conversation_history": [
-      {
-        "role": "ai",
-        "message": "Welcome to Sunset Apartments, John Tenant! It is a pleasure to have you here at 123 Main St Apt 4B, and I am happy to assist you with anything you need today.",
-        "timestamp": "2026-05-24T10:20:42.007009+00:00"
-      },
-      {
-        "role": "tenant",
-        "message": "i lost my key",
-        "timestamp": "2026-05-24T10:20:59.147894+00:00"
-      },
-      {
-        "role": "ai",
-        "message": "I am sorry to hear that you lost your key, John. To assist you with regaining access to your apartment, could you please confirm if you are currently locked out of your unit and if you need immediate assistance?",
-        "timestamp": "2026-05-24T10:20:59.147894+00:00"
-      },
-      {
-        "role": "tenant",
-        "message": "yes i am locked out, a guy came out of nowhere and stole my bag, my keys where inside, i need a locksmith to enter",
-        "timestamp": "2026-05-24T10:22:46.411768+00:00"
-      },
-      {
-        "role": "ai",
-        "message": "I am so sorry to hear about your bag being stolen, John. That sounds like a very distressing experience. Since you are locked out and this involves a security incident, I am escalating this immediately. Please stay in a safe place while I contact the property manager to arrange for a locksmith to assist you right away.",
-        "timestamp": "2026-05-24T10:22:46.411768+00:00"
-      }
-    ],
-    "created_at": "2026-05-24T10:20:42.007009+00:00",
-    "updated_at": "2026-05-24T10:22:46.441827+00:00",
-    "escalated": true,
-    "sentiment": "frustrated",
-    "confidence": 0.95,
-    "vendor_id": "vendor_001",
-    "notifications_sent": [
-      {
-        "type": "email",
-        "recipient": "sarah@gmail.com",
-        "status": "sent",
-        "timestamp": "2026-05-24T10:20:42.629560+00:00"
-      },
-      {
-        "type": "email",
-        "recipient": "sarah@gmail.com",
-        "status": "failed",
-        "timestamp": "2026-05-24T10:22:45.796905+00:00"
-      },
-      {
-        "type": "email",
-        "recipient": "owner@gmail.com",
-        "status": "failed",
-        "timestamp": "2026-05-24T10:22:46.411768+00:00"
-      }
-    ],
-    "summary": "The tenant is currently locked out of their apartment after their keys were stolen during a robbery. The AI coordinator has escalated the situation to the property manager to arrange for an emergency locksmith."
-  },
-  {
-    "id": "request_6faa1922",
+    "id": "request_d977968d",
     "requester_id": "tenant_001",
     "type": "plumbing",
-    "description": "I have a plumbing problem, i dont have pressure on my faucet",
-    "status": "in_progress",
-    "urgency": "medium",
+    "description": "i have an issue with my plumbing",
+    "status": "pending",
+    "urgency": "low",
     "involved_parties": [
       "tenant_001"
     ],
-    "property": "Sunset Apartments",
-    "property_id": "property_001",
     "conversation_history": [
       {
-        "id": "a3c3738a-713c-4707-9f36-c9e5345a8f28",
+        "id": "b8fa38d3-2ff6-45c4-ab56-6e575189d60f",
         "role": "ai",
-        "message": "Hello John Tenant. We are delighted to have you at 123 Main St Apt 4B. How can I assist you today?",
-        "timestamp": "2026-05-24T11:14:48.923Z"
+        "message": "Hello John Tenant. We are delighted to have you at Spandauer Damm 10-22, 14059 Berlin, Germany. How can I assist you today?",
+        "timestamp": "2026-06-04T22:55:30.580Z"
       },
       {
-        "id": "38314870-c604-466d-9223-d06b5d7a2741",
+        "id": "96a49b32-46ea-4036-ad39-c94eab14bc61",
         "role": "tenant",
-        "message": "I have a plumbing problem, i dont have pressure on my faucet",
-        "timestamp": "2026-05-24T11:15:15.742Z"
+        "message": "i have an issue with my plumbing",
+        "timestamp": "2026-06-04T22:56:44.774Z"
       },
       {
-        "id": "fcd72572-efac-4b7d-8952-f68884e567a6",
+        "id": "6706c91d-2158-4a62-bb2b-17eaa5c13659",
         "role": "ai",
-        "message": "I'm sorry to hear you're having issues with your water pressure, John. To help me get the right person out to assist you, could you please let me know if this is affecting all faucets in your apartment or just one, and if you've noticed any leaks or unusual sounds coming from the pipes?",
-        "timestamp": "2026-05-24T11:15:18.986Z"
+        "message": "I'm sorry to hear you're having trouble with your plumbing, John. To help me get the right person to assist you, could you please describe the specific issue? For example, is it a leak, a clogged drain, or a problem with water pressure?",
+        "timestamp": "2026-06-04T22:56:49.467Z"
       },
       {
-        "id": "3d6b3b9a-5050-427c-8925-115e6387dbb2",
+        "id": "ff11984e-a927-4427-9bd2-5fde70fbdb97",
         "role": "tenant",
-        "message": "only the one in the kitchen sink, i have to wash my cutlery in the bathroom",
-        "timestamp": "2026-05-24T11:15:46.374Z"
+        "message": "its a water pressure problem with my shower head, there is barely enough pressure to take a proper bath",
+        "timestamp": "2026-06-04T22:57:34.981Z"
       },
       {
-        "id": "9d2fe17e-801f-4268-9a8b-9d3d5b9a5eb9",
+        "id": "da408874-96f3-4569-ae0f-7e09ec30d750",
         "role": "ai",
-        "message": "I am very sorry to hear about the trouble with your kitchen sink; that sounds incredibly inconvenient. To ensure I get the right person to help you, could you please tell me if the sink is leaking water onto the floor, or is it just clogged and not draining?",
-        "timestamp": "2026-05-24T11:15:47.549Z"
+        "message": "I'm sorry to hear you're having trouble with your shower's water pressure, John. To help me coordinate the right repair, could you please let me know if this is happening in other faucets throughout your apartment as well, or is it isolated just to the shower?",
+        "timestamp": "2026-06-04T22:57:37.009Z"
       },
       {
-        "id": "48ea1261-44df-40bb-85ec-98c848b985f0",
+        "id": "b5ca17e6-1ea5-474d-bcad-0d9687a1d3a8",
         "role": "tenant",
-        "message": "no leaking, it seems that there is no pressure at all, i am not sure if it clogged",
-        "timestamp": "2026-05-24T11:16:10.910Z"
+        "message": "Isolated to the shower only, can you contact the property manager and relevant party?",
+        "timestamp": "2026-06-04T22:59:09.714Z"
       },
       {
-        "id": "8c1265b5-6f33-4c9a-bb76-36e8ef0715af",
+        "id": "74b39ec1-1850-4ef4-8214-8f3f3dd5176f",
         "role": "ai",
-        "message": "I'm sorry to hear you're having trouble with your water pressure. To help me get the right person to look at this, could you please clarify if this is happening with all the faucets in your apartment or just one specific sink or shower?",
-        "timestamp": "2026-05-24T11:16:12.152Z"
-      },
-      {
-        "id": "4b522449-c1a3-4cfd-a332-48d6dce33bcd",
-        "role": "tenant",
-        "message": "its only the kitchen sink, everything else is fine",
-        "timestamp": "2026-05-24T11:16:35.231Z"
-      },
-      {
-        "id": "3475e1f7-d86c-4c3e-ac54-36451d2228dc",
-        "role": "ai",
-        "message": "I understand the issue is limited to your kitchen sink. To help me coordinate the right repair, could you please describe what is happening with the sink (e.g., is it leaking, clogged, or not draining?) and if there is any water damage to the surrounding cabinets or floor?",
-        "timestamp": "2026-05-24T11:16:36.357Z"
-      },
-      {
-        "id": "9fc946ac-6cc0-4a86-99a8-d1e1c0ba4b77",
-        "role": "tenant",
-        "message": "no damage, just a lack of pressure on the water stream, its so weak barely droplets come out, could you contact my apartment's manager to find a company to fix this?",
-        "timestamp": "2026-05-24T11:17:24.715Z"
-      },
-      {
-        "id": "88f83372-78e5-47f3-9243-8ad49b816e55",
-        "role": "ai",
-        "message": "I'm sorry to hear about the low water pressure in your apartment, John. I have logged this as a maintenance request and will notify your property manager immediately to arrange for a plumber to inspect and resolve the issue. You should hear from them shortly.",
-        "timestamp": "2026-05-24T11:17:31.873Z"
+        "message": "I'm sorry to hear you're having trouble with your shower. To make sure I get the right person out to help, could you please clarify if this is a leak, a clog, or an issue with the water temperature/pressure?\n\nRelevant links:\n- Can a property manager tell me not to use my only shower with no ...: https://www.avvo.com/legal-answers/can-a-property-manager-tell-me-not-to-use-my-only--5507640.html - You are entitled to a rent abatement for the period of time you are living without a tub/shower. See if there is a local health club like...\n- Is it okay to tell your landlord the shower doesn't get hot enough, or ...: https://www.quora.com/Is-it-okay-to-tell-your-landlord-the-shower-doesnt-get-hot-enough-or-is-that-not-their-job - However, do not tell him that the shower does not get hot enough. First call and text your property manager. DO NOT TRY TO FIX IT YOUR SE...\n- Came home from work this afternoon to find my water randomly shut ...: https://www.reddit.com/r/shitrentals/comments/1i1v87x/came_home_from_work_this_afternoon_to_find_my - Property manager suggests going to the local gym to shower. Water comes under urgent repairs in Vic, which means you are legally able to",
+        "timestamp": "2026-06-04T22:59:15.215Z",
+        "web_results": {
+          "query": "Isolated to the shower only, can you contact the property manager and relevant party?",
+          "answer": null,
+          "results": [
+            {
+              "title": "Can a property manager tell me not to use my only shower with no ...",
+              "url": "https://www.avvo.com/legal-answers/can-a-property-manager-tell-me-not-to-use-my-only--5507640.html",
+              "content_snippet": "You are entitled to a rent abatement for the period of time you are living without a tub/shower. See if there is a local health club like a YMCA",
+              "score": 0.3169086
+            },
+            {
+              "title": "Is it okay to tell your landlord the shower doesn't get hot enough, or ...",
+              "url": "https://www.quora.com/Is-it-okay-to-tell-your-landlord-the-shower-doesnt-get-hot-enough-or-is-that-not-their-job",
+              "content_snippet": "However, do not tell him that the shower does not get hot enough. First call and text your property manager. DO NOT TRY TO FIX IT YOUR SELF if",
+              "score": 0.1902425
+            },
+            {
+              "title": "Came home from work this afternoon to find my water randomly shut ...",
+              "url": "https://www.reddit.com/r/shitrentals/comments/1i1v87x/came_home_from_work_this_afternoon_to_find_my",
+              "content_snippet": "Property manager suggests going to the local gym to shower. Water comes under urgent repairs in Vic, which means you are legally able to",
+              "score": 0.1527768
+            },
+            {
+              "title": "What to do when shower isn't available to tenants? - BiggerPockets",
+              "url": "https://www.biggerpockets.com/forums/52/topics/948155-what-to-do-when-shower-isnt-available-to-tenants",
+              "content_snippet": "Staying in communication with the tenant is key - so they know you are on top of it. The shower makes up less than 10% of the functional",
+              "score": 0.14563736
+            },
+            {
+              "title": "Is it appropriate to ask my property manager them I'm hiring a ...",
+              "url": "https://www.facebook.com/groups/HousingHotline/posts/8372044086155536",
+              "content_snippet": "Is it appropriate to ask my property manager them I'm hiring a plumber today and will send you the bill.",
+              "score": 0.088481195
+            }
+          ]
+        }
       }
     ],
-    "created_at": "2026-05-24T11:17:54.464519+00:00",
-    "updated_at": "2026-05-24T11:18:22.633712+00:00",
-    "escalated": false,
+    "created_at": "2026-06-04T22:59:59.602997+00:00",
+    "updated_at": "2026-06-04T22:59:59.602997+00:00",
+    "escalated": true,
     "sentiment": "neutral",
     "confidence": 1,
     "vendor_id": null,
-    "notifications_sent": [
-      {
-        "type": "email",
-        "recipient": "sarah@gmail.com",
-        "status": "sent",
-        "timestamp": "2026-05-24T11:18:22.627227+00:00",
-        "recipient_type": "manager"
-      }
-    ],
-    "notification_pending": false,
-    "summary": "The tenant is experiencing extremely low water pressure exclusively at their kitchen sink. A maintenance request has been logged, and the property manager will be notified to arrange for a plumber to inspect and repair the issue."
-  },
-  {
-    "id": "request_1001",
-    "requester_id": "tenant_003",
-    "type": "hvac",
-    "description": "Heating system not working in apartment",
-    "status": "in_progress",
-    "urgency": "high",
-    "involved_parties": [
-      "tenant_003"
-    ],
-    "property": "Riverside Residences",
-    "property_id": "property_002",
-    "conversation_history": [
-      {
-        "role": "ai",
-        "message": "Hello Michael Brown, how can I assist you today?",
-        "timestamp": "2026-05-24T08:10:00+00:00"
-      },
-      {
-        "role": "tenant",
-        "message": "My heating is not working at all.",
-        "timestamp": "2026-05-24T08:10:30+00:00"
-      },
-      {
-        "role": "ai",
-        "message": "I'm sorry to hear that. Is the issue affecting all rooms?",
-        "timestamp": "2026-05-24T08:10:45+00:00"
-      }
-    ],
-    "created_at": "2026-05-24T08:10:00+00:00",
-    "updated_at": "2026-05-24T08:10:45+00:00",
-    "escalated": false,
-    "sentiment": "negative",
-    "confidence": 0.92,
-    "vendor_id": null,
-    "notifications_sent": [
-      {
-        "type": "email",
-        "recipient": "david.reynolds@gmail.com",
-        "status": "sent",
-        "timestamp": "2026-05-24T08:10:05+00:00"
-      }
-    ],
-    "summary": "Tenant reports complete heating failure in the apartment. Issue is being assessed for maintenance dispatch."
-  },
-  {
-    "id": "request_1002",
-    "requester_id": "tenant_004",
-    "type": "noise",
-    "description": "Loud noise from neighboring unit at night",
-    "status": "in_progress",
-    "urgency": "medium",
-    "involved_parties": [
-      "tenant_004"
-    ],
-    "property": "Riverside Residences",
-    "property_id": "property_002",
-    "conversation_history": [
-      {
-        "role": "ai",
-        "message": "Hello Sophia Williams, how can I help you?",
-        "timestamp": "2026-05-24T08:20:00+00:00"
-      },
-      {
-        "role": "tenant",
-        "message": "There is loud music every night from next door.",
-        "timestamp": "2026-05-24T08:20:20+00:00"
-      },
-      {
-        "role": "ai",
-        "message": "I understand. Would you like us to contact the neighbor or gmail?",
-        "timestamp": "2026-05-24T08:20:40+00:00"
-      }
-    ],
-    "created_at": "2026-05-24T08:20:00+00:00",
-    "updated_at": "2026-05-24T08:20:40+00:00",
-    "escalated": false,
-    "sentiment": "frustrated",
-    "confidence": 0.88,
-    "vendor_id": null,
-    "notifications_sent": [
-      {
-        "type": "email",
-        "recipient": "david.reynolds@gmail.com",
-        "status": "sent",
-        "timestamp": "2026-05-24T08:20:05+00:00"
-      }
-    ],
-    "summary": "Tenant reports recurring noise disturbance from neighboring unit during nighttime hours."
-  },
-  {
-    "id": "request_1003",
-    "requester_id": "tenant_005",
-    "type": "rent_payment",
-    "description": "Question about rent increase notice",
-    "status": "in_progress",
-    "urgency": "low",
-    "involved_parties": [
-      "tenant_005"
-    ],
-    "property": "Oak Heights",
-    "property_id": "property_003",
-    "conversation_history": [
-      {
-        "role": "ai",
-        "message": "Hello Daniel Johnson, how can I assist you?",
-        "timestamp": "2026-05-24T08:30:00+00:00"
-      },
-      {
-        "role": "tenant",
-        "message": "I received a notice about rent increase, is this correct?",
-        "timestamp": "2026-05-24T08:30:25+00:00"
-      }
-    ],
-    "created_at": "2026-05-24T08:30:00+00:00",
-    "updated_at": "2026-05-24T08:30:25+00:00",
-    "escalated": false,
-    "sentiment": "neutral",
-    "confidence": 0.85,
-    "vendor_id": null,
-    "notifications_sent": [
-      {
-        "type": "email",
-        "recipient": "laura.mitchell@gmail.com",
-        "status": "sent",
-        "timestamp": "2026-05-24T08:30:05+00:00"
-      }
-    ],
-    "summary": "Tenant is requesting clarification regarding a rent increase notice."
-  },
-  {
-    "id": "request_1004",
-    "requester_id": "tenant_005",
-    "type": "lockout",
-    "description": "Locked out of apartment after forgetting keys",
-    "status": "escalated",
-    "urgency": "high",
-    "involved_parties": [
-      "tenant_005"
-    ],
-    "property": "Oak Heights",
-    "property_id": "property_003",
-    "conversation_history": [
-      {
-        "role": "ai",
-        "message": "Hello Daniel Johnson, are you experiencing an access issue?",
-        "timestamp": "2026-05-24T08:40:00+00:00"
-      },
-      {
-        "role": "tenant",
-        "message": "Yes, I'm locked out.",
-        "timestamp": "2026-05-24T08:40:15+00:00"
-      },
-      {
-        "role": "ai",
-        "message": "We are escalating this to your property manager for immediate assistance.",
-        "timestamp": "2026-05-24T08:40:30+00:00"
-      }
-    ],
-    "created_at": "2026-05-24T08:40:00+00:00",
-    "updated_at": "2026-05-24T08:40:30+00:00",
-    "escalated": true,
-    "sentiment": "frustrated",
-    "confidence": 0.93,
-    "vendor_id": "vendor_002",
-    "notifications_sent": [
-      {
-        "type": "email",
-        "recipient": "laura.mitchell@gmail.com",
-        "status": "sent",
-        "timestamp": "2026-05-24T08:40:05+00:00"
-      }
-    ],
-    "summary": "Tenant locked out of apartment; request escalated for urgent locksmith assistance."
-  },
-  {
-    "id": "request_1005",
-    "requester_id": "tenant_006",
-    "type": "plumbing",
-    "description": "Water leak under kitchen sink",
-    "status": "in_progress",
-    "urgency": "high",
-    "involved_parties": [
-      "tenant_006"
-    ],
-    "property": "Greenfield Apartments",
-    "property_id": "property_004",
-    "conversation_history": [
-      {
-        "role": "ai",
-        "message": "Hello Olivia Martinez, how can I help you?",
-        "timestamp": "2026-05-24T09:00:00+00:00"
-      },
-      {
-        "role": "tenant",
-        "message": "There is water leaking under my kitchen sink.",
-        "timestamp": "2026-05-24T09:00:25+00:00"
-      }
-    ],
-    "created_at": "2026-05-24T09:00:00+00:00",
-    "updated_at": "2026-05-24T09:00:25+00:00",
-    "escalated": false,
-    "sentiment": "concerned",
-    "confidence": 0.94,
-    "vendor_id": null,
-    "notifications_sent": [
-      {
-        "type": "email",
-        "recipient": "kevin.thompson@gmail.com",
-        "status": "sent",
-        "timestamp": "2026-05-24T09:00:05+00:00"
-      }
-    ],
-    "summary": "Tenant reports active water leak under kitchen sink requiring plumbing intervention."
-  },
-  {
-    "id": "request_1006",
-    "requester_id": "tenant_007",
-    "type": "electrical",
-    "description": "No electricity in living room outlets",
-    "status": "in_progress",
-    "urgency": "high",
-    "involved_parties": [
-      "tenant_007"
-    ],
-    "property": "Greenfield Apartments",
-    "property_id": "property_004",
-    "conversation_history": [
-      {
-        "role": "ai",
-        "message": "Hello James Wilson, how can I assist you?",
-        "timestamp": "2026-05-24T09:10:00+00:00"
-      },
-      {
-        "role": "tenant",
-        "message": "My living room has no power in the outlets.",
-        "timestamp": "2026-05-24T09:10:20+00:00"
-      }
-    ],
-    "created_at": "2026-05-24T09:10:00+00:00",
-    "updated_at": "2026-05-24T09:10:20+00:00",
-    "escalated": false,
-    "sentiment": "negative",
-    "confidence": 0.9,
-    "vendor_id": null,
-    "notifications_sent": [
-      {
-        "type": "email",
-        "recipient": "kevin.thompson@gmail.com",
-        "status": "sent",
-        "timestamp": "2026-05-24T09:10:05+00:00"
-      }
-    ],
-    "summary": "Electrical outage affecting living room outlets; likely requires inspection."
-  },
-  {
-    "id": "request_1007",
-    "requester_id": "tenant_008",
-    "type": "pest_control",
-    "description": "Suspected pest infestation in kitchen",
-    "status": "in_progress",
-    "urgency": "medium",
-    "involved_parties": [
-      "tenant_008"
-    ],
-    "property": "Greenfield Apartments",
-    "property_id": "property_004",
-    "conversation_history": [
-      {
-        "role": "ai",
-        "message": "Hello Isabella Anderson, how can I assist you?",
-        "timestamp": "2026-05-24T09:20:00+00:00"
-      },
-      {
-        "role": "tenant",
-        "message": "I think I have pests in my kitchen.",
-        "timestamp": "2026-05-24T09:20:30+00:00"
-      }
-    ],
-    "created_at": "2026-05-24T09:20:00+00:00",
-    "updated_at": "2026-05-24T09:20:30+00:00",
-    "escalated": false,
-    "sentiment": "concerned",
-    "confidence": 0.87,
-    "vendor_id": null,
-    "notifications_sent": [
-      {
-        "type": "email",
-        "recipient": "kevin.thompson@gmail.com",
-        "status": "sent",
-        "timestamp": "2026-05-24T09:20:05+00:00"
-      }
-    ],
-    "summary": "Tenant reports possible pest infestation requiring inspection and pest control assessment."
-  },
-  {
-    "id": "request_1008",
-    "requester_id": "tenant_010",
-    "type": "hvac",
-    "description": "Air conditioning not cooling properly",
-    "status": "in_progress",
-    "urgency": "medium",
-    "involved_parties": [
-      "tenant_010"
-    ],
-    "property": "Sunrise Lofts",
-    "property_id": "property_005",
-    "conversation_history": [
-      {
-        "role": "ai",
-        "message": "Hello Ava Taylor, how can I help you?",
-        "timestamp": "2026-05-24T09:30:00+00:00"
-      },
-      {
-        "role": "tenant",
-        "message": "My AC is blowing warm air.",
-        "timestamp": "2026-05-24T09:30:20+00:00"
-      }
-    ],
-    "created_at": "2026-05-24T09:30:00+00:00",
-    "updated_at": "2026-05-24T09:30:20+00:00",
-    "escalated": false,
-    "sentiment": "frustrated",
-    "confidence": 0.91,
-    "vendor_id": null,
-    "notifications_sent": [
-      {
-        "type": "email",
-        "recipient": "sophia.reynolds@gmail.com",
-        "status": "sent",
-        "timestamp": "2026-05-24T09:30:05+00:00"
-      }
-    ],
-    "summary": "Tenant reports AC malfunction causing warm air instead of cooling."
-  },
-  {
-    "id": "request_1009",
-    "requester_id": "tenant_003",
-    "type": "access_control",
-    "description": "Unable to access building after hours",
-    "status": "in_progress",
-    "urgency": "medium",
-    "involved_parties": [
-      "tenant_003"
-    ],
-    "property": "Riverside Residences",
-    "property_id": "property_002",
-    "conversation_history": [
-      {
-        "role": "ai",
-        "message": "Hello Michael Brown, do you need access assistance?",
-        "timestamp": "2026-05-24T09:40:00+00:00"
-      },
-      {
-        "role": "tenant",
-        "message": "I can't get into the building late at night.",
-        "timestamp": "2026-05-24T09:40:25+00:00"
-      }
-    ],
-    "created_at": "2026-05-24T09:40:00+00:00",
-    "updated_at": "2026-05-24T09:40:25+00:00",
-    "escalated": false,
-    "sentiment": "neutral",
-    "confidence": 0.89,
-    "vendor_id": null,
-    "notifications_sent": [
-      {
-        "type": "email",
-        "recipient": "david.reynolds@gmail.com",
-        "status": "sent",
-        "timestamp": "2026-05-24T09:40:05+00:00"
-      }
-    ],
-    "summary": "Tenant experiencing intermittent building access issues outside normal hours."
-  },
-  {
-    "id": "request_1010",
-    "requester_id": "tenant_010",
-    "type": "rent_payment",
-    "description": "Question about utility charges on latest bill",
-    "status": "in_progress",
-    "urgency": "low",
-    "involved_parties": [
-      "tenant_010"
-    ],
-    "property": "Sunrise Lofts",
-    "property_id": "property_005",
-    "conversation_history": [
-      {
-        "role": "ai",
-        "message": "Hello Ava Taylor, I can help with your billing question.",
-        "timestamp": "2026-05-24T09:50:00+00:00"
-      },
-      {
-        "role": "tenant",
-        "message": "Why are my utility charges higher this month?",
-        "timestamp": "2026-05-24T09:50:30+00:00"
-      }
-    ],
-    "created_at": "2026-05-24T09:50:00+00:00",
-    "updated_at": "2026-05-24T09:50:30+00:00",
-    "escalated": false,
-    "sentiment": "confused",
-    "confidence": 0.86,
-    "vendor_id": null,
-    "notifications_sent": [
-      {
-        "type": "email",
-        "recipient": "sophia.reynolds@gmail.com",
-        "status": "sent",
-        "timestamp": "2026-05-24T09:50:05+00:00"
-      }
-    ],
-    "summary": "Tenant is questioning increased utility charges on their latest bill."
-  },
-  {
-    "id": "request_01121d80",
-    "requester_id": "tenant_001",
-    "type": "emergency",
-    "description": "There is a burning smell and no power",
-    "status": "pending",
-    "urgency": "high",
-    "involved_parties": [
-      "tenant_001"
-    ],
-    "conversation_history": [
-      {
-        "role": "tenant",
-        "message": "There is a burning smell and no power"
-      },
-      {
-        "role": "ai",
-        "message": "This is an emergency! Please evacuate immediately.",
-        "timestamp": "2026-05-29T09:47:43.019331+00:00"
-      }
-    ],
-    "created_at": "2026-05-29T09:47:43.019331+00:00",
-    "updated_at": "2026-05-29T09:47:43.019331+00:00",
-    "escalated": true,
-    "sentiment": "angry",
-    "confidence": 0.98,
-    "vendor_id": null,
     "notifications_sent": [],
     "notification_pending": true,
-    "property_id": null,
-    "property": null,
+    "property_id": "property_001",
+    "property": "Sunset Apartments",
     "summary": null
-  },
-  {
-    "id": "request_b408868a",
-    "requester_id": "tenant_001",
-    "type": "emergency",
-    "description": "There is a burning smell and no power",
-    "status": "cancelled",
-    "urgency": "high",
-    "involved_parties": [
-      "tenant_001"
-    ],
-    "conversation_history": [
-      {
-        "role": "tenant",
-        "message": "There is a burning smell and no power"
-      },
-      {
-        "role": "ai",
-        "message": "This is an emergency! Please evacuate immediately.",
-        "timestamp": "2026-05-29T09:49:25.056113+00:00"
-      }
-    ],
-    "created_at": "2026-05-29T09:49:25.056113+00:00",
-    "updated_at": "2026-05-30T22:00:55.464395+00:00",
-    "escalated": true,
-    "sentiment": "angry",
-    "confidence": 0.98,
-    "vendor_id": null,
-    "notifications_sent": [],
-    "notification_pending": true,
-    "property_id": null,
-    "property": null,
-    "summary": null,
-    "cancelled_at": "2026-05-30T22:00:55.464395+00:00",
-    "cancelled_by": "tenant_001"
-  },
-  {
-    "id": "request_96edcdbe",
-    "requester_id": "tenant_001",
-    "type": "access_control",
-    "description": "I lost my key",
-    "status": "cancelled",
-    "urgency": "low",
-    "involved_parties": [
-      "tenant_001"
-    ],
-    "conversation_history": [
-      {
-        "role": "tenant",
-        "message": "I lost my key"
-      },
-      {
-        "role": "ai",
-        "message": "I have logged your key replacement request.",
-        "timestamp": "2026-05-29T09:49:25.080364+00:00"
-      }
-    ],
-    "created_at": "2026-05-29T09:49:25.080364+00:00",
-    "updated_at": "2026-05-30T22:00:22.254687+00:00",
-    "escalated": false,
-    "sentiment": "neutral",
-    "confidence": 0.92,
-    "vendor_id": null,
-    "notifications_sent": [],
-    "notification_pending": true,
-    "property_id": null,
-    "property": null,
-    "summary": null,
-    "cancelled_at": "2026-05-30T22:00:22.254687+00:00",
-    "cancelled_by": "tenant_001"
   }
 ]
