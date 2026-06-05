@@ -1,6 +1,6 @@
 # Ranting Chant Backend
 
-FastAPI backend for Ranting Chant, an AI-assisted property operations platform. The backend owns request intake, request classification, voice services, notification dispatch, MCP-style data tools, and JSON-backed mock persistence.
+FastAPI backend for Ranting Chant, an AI-assisted property operations platform. The backend owns request intake, request classification, voice services, notification dispatch, MCP-style data tools, and JSON-backed mock persistence. Production-ready PostgreSQL schema definitions live in `src/resources/db/migrations/` (see `src/resources/README.md`).
 
 ## Features
 
@@ -11,7 +11,8 @@ FastAPI backend for Ranting Chant, an AI-assisted property operations platform. 
 - **Voice services** for audio transcription and text-to-speech responses.
 - **Notifications** through Resend email and Twilio SMS.
 - **MCP-style tools** for property, tenant, vendor, and request workflows.
-- **JSON mock data store** with per-collection locking.
+- **JSON mock data store** with per-collection locking (current runtime persistence).
+- **PostgreSQL schema** — migrations for entities, units, soft delete, request audit tables, RLS, and seed data.
 - **Rate limiting**, structured logging, Pydantic validation, and Docker support.
 
 ## Quick Start
@@ -127,6 +128,31 @@ The backend includes routers for:
 - **Voice**: transcription, voice session start, and voice response
 - **MCP**: tool discovery and MCP-style operations
 
+## Data & Persistence
+
+The backend currently reads and writes through `src/utils/json_store.py` against `src/resources/mock_db_jsons/`. Routers, MCP tools, and notifications use the denormalized JSON shape (e.g. `tenants.property_id` + `unit`, `properties.tenant_ids`).
+
+PostgreSQL schema for production is defined separately under `src/resources/db/migrations/`:
+
+| Migration | Purpose |
+|-----------|---------|
+| `001_initial_schema.sql` | Base tables, enums, indexes, triggers |
+| `002_rls_policies.sql` | Row Level Security policies |
+| `003_seed_data.sql` | Sample data from mock JSON |
+| `004_schema_hardening.sql` | Soft delete, `units`, audit tables, FK hardening |
+
+Apply migrations in numeric order against PostgreSQL. Full table definitions, entity relationships, JSON-to-SQL mapping, and deletion strategy: **`src/resources/README.md`**.
+
+**Schema highlights (004):**
+
+- Soft delete (`is_active`, `deleted_at`) on core entities
+- `units` table; tenants link via `unit_id` (property derived: tenant → unit → property)
+- `request_attachments`, `request_status_history`, `request_assignments` for files, status audit, and vendor assignment history
+- `user_accounts` for auth-to-entity mapping
+- `ON DELETE RESTRICT` on `properties.owner_id` and `requests.requester_id` to preserve history
+
+Mock JSON files are unchanged and still match the runtime API. SQL seeding backfills `units` from tenant `property_id` + `unit` in migration 004.
+
 ## Project Structure
 
 ```text
@@ -145,7 +171,9 @@ backend/
 |   |   `-- request.py
 |   |-- notifications/
 |   |-- resources/
-|   |   `-- mock_db_jsons/
+|   |   |-- db/migrations/       # PostgreSQL schema (001–004)
+|   |   |-- mock_db_jsons/       # Runtime mock data
+|   |   `-- README.md            # Schema & data reference
 |   |-- utils/
 |   `-- voice/
 |-- tests/
@@ -195,7 +223,8 @@ async def example_endpoint(request: Request):
 - Request types should be added in `src/models/request.py` first, then mirrored in `frontend/src/types/index.ts`.
 - The conversation and classifier prompts are generated from the backend request type definitions.
 - The JSON mock data in `src/resources/mock_db_jsons/requests.json` should always use canonical request type values.
-- Backend authentication is not implemented yet; frontend logout is currently client-side only.
+- Backend authentication is not implemented yet; frontend logout is currently client-side only. The `user_accounts` table in `004_schema_hardening.sql` is ready for future auth integration.
+- When migrating runtime code from JSON to PostgreSQL, follow `src/resources/README.md` for the canonical schema; do not mirror SQL-only tables (`request_status_history`, `request_assignments`) in mock JSON until the API layer supports them.
 
 ## Google Cloud OAuth Setup (Future)
 

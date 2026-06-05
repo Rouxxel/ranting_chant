@@ -16,7 +16,7 @@ Ranting Chant is a full-stack property management solution that enables:
 
 The project has two main applications:
 
-- **Backend** (`/backend`) - FastAPI REST API with AI classification, conversation orchestration, voice services, JSON-backed mock data, MCP-style tools, and notifications.
+- **Backend** (`/backend`) - FastAPI REST API with AI classification, conversation orchestration, voice services, JSON-backed mock data (runtime), PostgreSQL schema definitions (`backend/src/resources/db/migrations/`), MCP-style tools, and notifications.
 - **Frontend** (`/frontend`) - React 19 + TypeScript app using Vite, TanStack Router, Tailwind v4, shadcn/ui, and a Frutiger Aero design system.
 
 ## Data Flow Workflow
@@ -47,6 +47,8 @@ Request is saved or updated
   -> Backend creates a request record in mock JSON storage
   -> Request stores conversation history, type, urgency, status, escalation state,
      property_id, involved parties, vendor_id, notifications, and summary data
+     (PostgreSQL schema also defines request_attachments, request_status_history,
+     and request_assignments for production use — see backend/src/resources/README.md)
   -> Frontend clears cached tenant request data so dashboards refresh
 
 Notifications and vendor routing
@@ -125,7 +127,8 @@ VITE_PROD_BACKEND=https://your-production-backend.example.com
 - Request type normalization for older coarse values such as `maintenance`, `access`, and `rental_agreement`.
 - Voice transcription and text-to-speech response flow.
 - Email and SMS notification services with readable request type labels.
-- JSON-backed mock data through `json_store`.
+- JSON-backed mock data through `json_store` (current runtime persistence).
+- PostgreSQL migrations in `src/resources/db/migrations/` — base schema, RLS, seed data, and production hardening (soft delete, units, audit tables, `user_accounts`).
 - Rate limiting, logging, validation, and Docker support.
 
 ### Frontend
@@ -187,6 +190,9 @@ ranting_chant/
 |   |   |-- models/
 |   |   |-- notifications/
 |   |   |-- resources/
+|   |   |   |-- db/migrations/    # PostgreSQL schema (001–004)
+|   |   |   |-- mock_db_jsons/    # Runtime mock data
+|   |   |   `-- README.md         # Schema & data reference
 |   |   |-- utils/
 |   |   `-- voice/
 |   |-- tests/
@@ -242,8 +248,20 @@ For Vercel:
 ## Documentation
 
 - Backend details: `backend/README.md`
+- Database schema & mock data: `backend/src/resources/README.md`
 - Frontend details: `frontend/README.md`
 - Product and integration docs: `documentation/`
+
+## Data Model
+
+Runtime APIs use denormalized JSON (`property_id` + `unit` on tenants, `tenant_ids` on properties). The PostgreSQL schema normalizes this for production:
+
+- Tenants belong to **units**; property is derived via `tenant → unit → property`
+- Core entities use **soft delete** (`is_active`, `deleted_at`)
+- Requests keep **status history**, **vendor assignment history**, and **file attachments** in dedicated tables
+- `requests.vendor_id` holds the current vendor; `request_assignments` stores full history
+
+Apply migrations `001` through `004` in order. Details: `backend/src/resources/README.md`.
 
 ## License
 
