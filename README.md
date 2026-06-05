@@ -1,6 +1,6 @@
 # Ranting Chant
 
-AI-powered property operations platform with a conversational tenant intake flow, voice support, and a management dashboard for property managers and owners.
+AI-powered property operations platform with a conversational tenant intake flow, voice support, and a management dashboard for property managers and owners. Currently the voice chat seems to not be working
 
 ## Overview
 
