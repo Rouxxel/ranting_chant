@@ -330,7 +330,7 @@ function ChatPage() {
         {/* Chat */}
         <section className="glass-panel-strong flex flex-1 flex-col overflow-hidden">
           {escalated && (
-            <div className="flex items-center gap-2 border-b border-red-400/30 bg-red-500/10 px-5 py-3 text-sm text-red-200" style={{ boxShadow: "inset 0 0 24px rgba(239,68,68,0.25)" }}>
+            <div className="flex items-center gap-2 border-b border-red-400/30 bg-red-500/10 px-5 py-3 text-sm" style={{ color: "#991b1b", boxShadow: "inset 0 0 24px rgba(239,68,68,0.25)" }}>
               <AlertTriangle className="h-4 w-4" />
               This request has been escalated — urgency: {urgency.toUpperCase()}
             </div>

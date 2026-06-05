@@ -145,13 +145,7 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
               {req.conversation_history && req.conversation_history.map((m: any, i: number) => (
                 <div key={m.id ?? `msg-${i}`} className={`flex ${m.role === "tenant" ? "justify-end" : "justify-start"}`}>
                   <div
-                    className={m.role === "tenant"
-                      ? "max-w-[80%] rounded-2xl rounded-br-md px-3 py-2 text-xs text-ranting-ice"
-                      : "glass-panel max-w-[80%] px-3 py-2 text-xs text-ranting-ice"}
-                    style={m.role === "tenant" ? {
-                      background: "linear-gradient(180deg, rgba(45,106,159,0.95), rgba(26,58,92,0.95))",
-                      border: "1px solid rgba(126,200,227,0.3)",
-                    } : undefined}
+                    className={`glass-panel max-w-[80%] px-3 py-2 text-xs text-ranting-ice ${m.role === "tenant" ? "rounded-br-md" : ""}`}
                   >
                     {m.message}
                     <div className="mt-0.5 text-[9px] text-ranting-deep">{new Date(m.timestamp).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</div>

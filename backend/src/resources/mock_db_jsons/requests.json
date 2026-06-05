@@ -99,6 +99,96 @@
     "notification_pending": true,
     "property_id": "property_001",
     "property": "Sunset Apartments",
+    "summary": "The tenant is experiencing low water pressure specifically in their shower and has requested that the property manager be notified to arrange a repair. The AI is currently seeking additional clarification on the nature of the issue before escalating the request to the property management team."
+  },
+  {
+    "id": "request_9285b9eb",
+    "requester_id": "tenant_001",
+    "type": "general",
+    "description": "I have an electrical issue, there is no power and i need it for my respiratory system",
+    "status": "pending",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "id": "b5f3f2f6-5e13-4528-ba12-edf1a6a6a938",
+        "role": "ai",
+        "message": "Hello John Tenant. We are delighted to have you at Spandauer Damm 10-22, 14059 Berlin, Germany. How can I assist you today?",
+        "timestamp": "2026-06-04T23:40:07.898Z"
+      },
+      {
+        "id": "31207110-032d-43c4-a35e-9329190f1673",
+        "role": "tenant",
+        "message": "I have an electrical issue, there is no power and i need it for my respiratory system",
+        "timestamp": "2026-06-04T23:40:41.042Z"
+      },
+      {
+        "id": "cb96fdc8-9288-4a99-9008-482ca5a6d565",
+        "role": "ai",
+        "message": "I am very sorry to hear this, John. Because this involves your medical equipment, this is being treated as an emergency. Please prioritize your safety and seek medical assistance if needed. I have escalated this to the property manager immediately to restore power as a top priority.",
+        "timestamp": "2026-06-04T23:40:42.176Z"
+      },
+      {
+        "id": "a50e99f6-a34c-4e8a-b790-d254fd08055d",
+        "role": "tenant",
+        "message": "provide me with some information on the internet on how to give power to my respiratory system?",
+        "timestamp": "2026-06-04T23:41:31.848Z"
+      },
+      {
+        "id": "13ec70dd-54b2-4a2b-86ce-9c9ea07313e4",
+        "role": "ai",
+        "message": "I'm sorry, but I'm not sure I understand your request. As a property operations coordinator for Ranting Chant, I am here to assist with maintenance, lease, or building-related issues at your apartment. If you are experiencing a medical emergency, please contact local emergency services immediately. Otherwise, could you please clarify how I can help you with your property?\n\nRelevant links:\n- Respiratory System: Organs, Facts, Anatomy & Function: https://my.clevelandclinic.org/health/body/21205-respiratory-system - # Respiratory System. Your respiratory system is made up of your lungs, airways (trachea, bronchi and bronchioles), diaphragm, voice box,...\n- How We Breathe - Craig Hospital: https://craighospital.org/resources/how-we-breathe - The role of the respiratory system is to breathe in oxygen and breathe out carbon dioxide. This is known as respiration.\n- How the Lungs Work - The Respiratory System | NHLBI, NIH: https://www.nhlbi.nih.gov/health/lungs/respiratory-system - An official website of the United States government. A **.gov** website belongs to an official government organization in the United Stat...",
+        "timestamp": "2026-06-04T23:41:35.689Z",
+        "web_results": {
+          "query": "provide me with some information on the internet on how to give power to my respiratory system?",
+          "answer": null,
+          "results": [
+            {
+              "title": "Respiratory System: Organs, Facts, Anatomy & Function",
+              "url": "https://my.clevelandclinic.org/health/body/21205-respiratory-system",
+              "content_snippet": "# Respiratory System. Your respiratory system is made up of your lungs, airways (trachea, bronchi and bronchioles), diaphragm, voice box, throat, nose and mouth. Its main function is to breathe in oxygen and breathe out carbon dioxide. Your respiratory system is the organs and structures in your body that allow you to breathe. These parts work together to bring oxygen into your body when you inhale and get rid of carbon dioxide when you exhale. ### What is the main function of your respiratory system? The main function of your respiratory system is to pull in oxygen for your body’s cells and get rid of carbon dioxide, a waste product. ### What are the parts of the respiratory system? The main organs of your respiratory system are your lungs. The main job of your respiratory system is to bring oxygen into your lungs and move carbon dioxide out of them (gas exchange).",
+              "score": 0.9730365
+            },
+            {
+              "title": "How We Breathe - Craig Hospital",
+              "url": "https://craighospital.org/resources/how-we-breathe",
+              "content_snippet": "The role of the respiratory system is to breathe in oxygen and breathe out carbon dioxide. This is known as respiration.",
+              "score": 0.8624676
+            },
+            {
+              "title": "How the Lungs Work - The Respiratory System | NHLBI, NIH",
+              "url": "https://www.nhlbi.nih.gov/health/lungs/respiratory-system",
+              "content_snippet": "An official website of the United States government. A **.gov** website belongs to an official government organization in the United States. * < Back To How the Lungs Work. * How Your Body Controls Breathing. * How to Keep Your Lungs Healthy. # How the Lungs Work The Respiratory System ---. Your lungs are on each side of your heart, inside your chest cavity. When you breathe in, air enters your airways and travels down into the air sacs, or alveoli, in your lungs. The circulatory system, which is made up of the heart and blood vessels, supports the respiratory system by bringing blood to and from the lungs. The circulatory system helps deliver nutrients and oxygen from the lungs to tissues and organs throughout the body. The image shows an enlarged view of the airways and lungs, as well as the trachea; bronchial tubes, or bronchi; and bronchioles. The airways are pipes that carry oxygen-rich air to the alveoli in your lungs.",
+              "score": 0.7826625
+            },
+            {
+              "title": "How to Increase Lung Capacity: Breathing Exercises",
+              "url": "https://www.healthline.com/health/how-to-increase-lung-capacity",
+              "content_snippet": "# Breathing Exercises to Increase Lung Capacity. Lung capacity shows how much air your lungs can hold. Performing breathing exercises can improve your lung capacity over time. Your lung capacity is the total amount of air your lungs can hold. Some conditions, such as asthma, can significantly speed up the loss of lung capacity and function. This leads to difficulty in breathing and shortness of breath. Exercises exist that can help maintain lung capacity, making it easier to keep your lungs healthy and get your body the oxygen it needs. Diaphragmatic breathing, or “belly breathing,” engages the diaphragm, which is supposed to do most of the heavy lifting when it comes to breathing. If you have COPD, ask a doctor or respiratory therapist to show you how to use this exercise for the best results. This breathing exercise is often easier for beginners than diaphragmatic breathing, and you can do it at home even if no one has shown you how.",
+              "score": 0.70416015
+            },
+            {
+              "title": "7 Tips for Healthy Lungs",
+              "url": "https://www.ouhealth.com/blog/2024/november/7-tips-for-healthy-lungs",
+              "content_snippet": "# 7 Tips for Healthy Lungs. The lungs are essential parts of the respiratory system, which helps you breathe. They provide oxygen to your body and remove carbon dioxide. The respiratory system brings in fresh air and gets rid of waste gases. When you breathe in, oxygen goes into your lungs and then into your bloodstream, which carries it to your cells. At the cells, oxygen is swapped for carbon dioxide, which the blood brings back to the lungs to be exhaled. After 35, it’s normal for lung function to gradually decline, making breathing a bit harder as you age. Despite the natural decline of lungs as you age, the good news is that you can maintain healthy lungs. One of these chemicals, carbon monoxide, displaces oxygen in your blood, depriving your organs of the oxygen they need. Smoking also damages the cilia, the tiny hairs in your airways that help keep dirt and mucus out of your lungs.",
+              "score": 0.3539863
+            }
+          ]
+        }
+      }
+    ],
+    "created_at": "2026-06-04T23:42:55.072668+00:00",
+    "updated_at": "2026-06-04T23:42:55.072668+00:00",
+    "escalated": true,
+    "sentiment": "neutral",
+    "confidence": 1,
+    "vendor_id": null,
+    "notifications_sent": [],
+    "notification_pending": true,
+    "property_id": "property_001",
+    "property": "Sunset Apartments",
     "summary": null
   }
 ]
