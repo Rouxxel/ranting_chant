@@ -33,6 +33,26 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
   // Build an ID → name lookup from all entity collections
   useEffect(() => {
     const load = async () => {
+      // 1. Try cache first
+      const cachedT = localStorage.getItem('tenants');
+      const cachedV = localStorage.getItem('vendors');
+      const cachedM = localStorage.getItem('managers');
+      const cachedO = localStorage.getItem('owners');
+
+      if (cachedT && cachedV && cachedM && cachedO) {
+        try {
+          const map: Record<string, string> = {};
+          JSON.parse(cachedT).forEach((t: any) => map[t.id] = t.name);
+          JSON.parse(cachedV).forEach((v: any) => map[v.id] = v.name);
+          JSON.parse(cachedM).forEach((m: any) => map[m.id] = m.name);
+          JSON.parse(cachedO).forEach((o: any) => map[o.id] = o.name);
+          setPartyNames(map);
+        } catch (e) {
+          console.error("Failed to parse cached party names:", e);
+        }
+      }
+
+      // 2. Fetch fresh data in the background to update/populate cache
       try {
         const [tenants, vendors, managers, owners] = await Promise.all([
           getTenants().catch(() => []),
@@ -40,14 +60,20 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
           getManagers().catch(() => []),
           getOwners().catch(() => []),
         ]);
+        
         const map: Record<string, string> = {};
-        for (const t of tenants) map[t.id] = t.name;
-        for (const v of vendors) map[v.id] = v.name;
-        for (const m of managers) map[m.id] = m.name;
-        for (const o of owners) map[o.id] = o.name;
+        tenants.forEach(t => map[t.id] = t.name);
+        vendors.forEach(v => map[v.id] = v.name);
+        managers.forEach(m => map[m.id] = m.name);
+        owners.forEach(o => map[o.id] = o.name);
         setPartyNames(map);
-      } catch {
-        // Silently fall back to raw IDs
+
+        localStorage.setItem('tenants', JSON.stringify(tenants));
+        localStorage.setItem('vendors', JSON.stringify(vendors));
+        localStorage.setItem('managers', JSON.stringify(managers));
+        localStorage.setItem('owners', JSON.stringify(owners));
+      } catch (error) {
+        console.error("Failed to refresh party names from server:", error);
       }
     };
     load();

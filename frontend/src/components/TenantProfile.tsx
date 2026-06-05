@@ -25,9 +25,22 @@ export function TenantProfile() {
 
   useEffect(() => {
     const loadProperties = async () => {
+      // 1. Try cache first
+      const cached = localStorage.getItem('properties');
+      if (cached) {
+        try {
+          setProperties(JSON.parse(cached));
+          setIsLoadingProperties(false);
+        } catch (e) {
+          console.error("Failed to parse cached properties:", e);
+        }
+      }
+
+      // 2. Network fetch in background
       try {
         const props = await getProperties();
         setProperties(props);
+        localStorage.setItem('properties', JSON.stringify(props));
       } catch (error) {
         console.error("Failed to load properties:", error);
       } finally {
