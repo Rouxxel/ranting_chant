@@ -47,13 +47,31 @@ CREATE TABLE properties (
     representative_type representative_type NOT NULL,
     representative_id UUID NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    
-    CONSTRAINT valid_representative CHECK (
-        (representative_type = 'property_manager' AND representative_id IN (SELECT id FROM property_managers)) OR
-        (representative_type = 'owner' AND representative_id IN (SELECT id FROM owners))
-    )
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- Trigger to validate representative_id exists in the appropriate table
+CREATE OR REPLACE FUNCTION check_property_representative()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.representative_type = 'property_manager' THEN
+        IF NOT EXISTS (SELECT 1 FROM property_managers WHERE id = NEW.representative_id) THEN
+            RAISE EXCEPTION 'Representative ID % must exist in property_managers when representative_type is property_manager', NEW.representative_id;
+        END IF;
+    ELSIF NEW.representative_type = 'owner' THEN
+        IF NOT EXISTS (SELECT 1 FROM owners WHERE id = NEW.representative_id) THEN
+            RAISE EXCEPTION 'Representative ID % must exist in owners when representative_type is owner', NEW.representative_id;
+        END IF;
+    ELSE
+        RAISE EXCEPTION 'Invalid representative_type %', NEW.representative_type;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_check_property_representative
+BEFORE INSERT OR UPDATE ON properties
+FOR EACH ROW EXECUTE FUNCTION check_property_representative();
 
 -- Junction table for owner-property relationships (many-to-many)
 CREATE TABLE owner_properties (
