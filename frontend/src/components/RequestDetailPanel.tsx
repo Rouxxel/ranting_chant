@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { getRequestSummary } from "@/services/api";
+import { getRequestSummary, getTenants, getVendors, getManagers, getOwners } from "@/services/api";
 import { getRequestTypeLabel } from "@/types";
 import type { Request } from "@/types";
 
@@ -28,6 +28,30 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
   const [isCompleteDialogOpen, setIsCompleteDialogOpen] = useState(false);
   const [resolutionNote, setResolutionNote] = useState("");
   const [isCompleting, setIsCompleting] = useState(false);
+  const [partyNames, setPartyNames] = useState<Record<string, string>>({});
+
+  // Build an ID → name lookup from all entity collections
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const [tenants, vendors, managers, owners] = await Promise.all([
+          getTenants().catch(() => []),
+          getVendors().catch(() => []),
+          getManagers().catch(() => []),
+          getOwners().catch(() => []),
+        ]);
+        const map: Record<string, string> = {};
+        for (const t of tenants) map[t.id] = t.name;
+        for (const v of vendors) map[v.id] = v.name;
+        for (const m of managers) map[m.id] = m.name;
+        for (const o of owners) map[o.id] = o.name;
+        setPartyNames(map);
+      } catch {
+        // Silently fall back to raw IDs
+      }
+    };
+    load();
+  }, []);
 
   const handleConfirmComplete = async () => {
     setIsCompleting(true);
@@ -130,7 +154,7 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
               {req.involved_parties && req.involved_parties.length > 0 ? (
                 req.involved_parties.map((p) => (
                   <div key={p} className="glass-panel flex items-center gap-2 px-2.5 py-1.5">
-                    <div className="text-xs text-ranting-ice">{p}</div>
+                    <div className="text-xs text-ranting-ice">{partyNames[p] || p}</div>
                   </div>
                 ))
               ) : (
