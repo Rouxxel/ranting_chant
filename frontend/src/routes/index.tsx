@@ -4,6 +4,7 @@ import { Logo } from "@/components/Logo";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useApp } from "@/context/AppContext";
 import { getTenants, getManagers, getOwners } from "@/services/api";
+import { Tenant, Manager, Owner } from "@/types";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [{ title: "Ranting Chant — Sign in" }] }),
@@ -38,8 +39,8 @@ function LoginPage() {
       }
 
       let matchedTenant = tenants.find(
-        t => t.name.toLowerCase() === tName.trim().toLowerCase() && 
-             t.unit.toLowerCase() === tUnit.trim().toLowerCase()
+        t => t.name.toLowerCase() === tName.trim().toLowerCase() &&
+          t.unit.toLowerCase() === tUnit.trim().toLowerCase()
       );
 
       // 2. Fetch fresh from network if not cached or if lookup failed
@@ -47,8 +48,8 @@ function LoginPage() {
         const freshTenants = await getTenants();
         localStorage.setItem('tenants', JSON.stringify(freshTenants));
         matchedTenant = freshTenants.find(
-          t => t.name.toLowerCase() === tName.trim().toLowerCase() && 
-               t.unit.toLowerCase() === tUnit.trim().toLowerCase()
+          t => t.name.toLowerCase() === tName.trim().toLowerCase() &&
+            t.unit.toLowerCase() === tUnit.trim().toLowerCase()
         );
       }
 
@@ -83,12 +84,12 @@ function LoginPage() {
       let owners: Owner[] = [];
       const cachedManagers = localStorage.getItem('managers');
       const cachedOwners = localStorage.getItem('owners');
-      
+
       if (cachedManagers) {
-        try { managers = JSON.parse(cachedManagers); } catch {}
+        try { managers = JSON.parse(cachedManagers); } catch { }
       }
       if (cachedOwners) {
-        try { owners = JSON.parse(cachedOwners); } catch {}
+        try { owners = JSON.parse(cachedOwners); } catch { }
       }
 
       let matchedManager = managers.find(
@@ -103,7 +104,7 @@ function LoginPage() {
         const [freshManagers, freshOwners] = await Promise.all([getManagers(), getOwners()]);
         localStorage.setItem('managers', JSON.stringify(freshManagers));
         localStorage.setItem('owners', JSON.stringify(freshOwners));
-        
+
         matchedManager = freshManagers.find(
           m => m.name.toLowerCase() === mName.trim().toLowerCase()
         );
