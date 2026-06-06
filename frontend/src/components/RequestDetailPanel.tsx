@@ -205,19 +205,34 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
             </div>
           </section>
 
-          <section>
-            <SectionTitle>Notifications</SectionTitle>
-            <ul className="space-y-1.5">
-              {req.notifications_sent && req.notifications_sent.map((n: any, i: number) => (
-                <li key={n.id ?? `notif-${i}`} className="flex items-center gap-2 text-xs text-ranting-ice/85">
-                  {n.type === "email" ? <Mail className="h-3.5 w-3.5 text-ranting-sky" /> : <MessageCircle className="h-3.5 w-3.5 text-ranting-sky" />}
-                  <span className="font-medium">{n.type.toUpperCase()}</span>
-                  <span className="text-ranting-deep">→ {n.recipient}</span>
-                  <span className="text-ranting-deep">· {new Date(n.timestamp).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
+          {req.notifications_sent?.length > 0 && (
+            <section>
+              <SectionTitle>Notifications</SectionTitle>
+              <ul className="space-y-1.5">
+                {req.notifications_sent.map((n: any, i: number) => (
+                  <li
+                    key={n.id ?? `notif-${i}`}
+                    className="flex items-center gap-2 text-xs text-ranting-ice/85"
+                  >
+                    {n.type === "email" ? (
+                      <Mail className="h-3.5 w-3.5 text-ranting-sky" />
+                    ) : (
+                      <MessageCircle className="h-3.5 w-3.5 text-ranting-sky" />
+                    )}
+                    <span className="font-medium">{n.type.toUpperCase()}</span>
+                    <span className="text-ranting-deep">→ {n.recipient}</span>
+                    <span className="text-ranting-deep">
+                      ·{" "}
+                      {new Date(n.timestamp).toLocaleTimeString([], {
+                        hour: "numeric",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
 
           <section>
             <SectionTitle>AI Summary</SectionTitle>

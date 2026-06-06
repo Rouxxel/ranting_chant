@@ -38,7 +38,7 @@ export function RequestTimeline({ req, tenantName = "Tenant" }: RequestTimelineP
           className="absolute left-2 top-1 bottom-1 w-px"
           style={{ background: "linear-gradient(180deg, rgba(126,200,227,0.7), rgba(126,200,227,0.15))", boxShadow: "0 0 10px rgba(126,200,227,0.6)" }}
         />
-        <ul className="space-y-4 bg-black/20 border-t border-white/10 p-8 rounded-lg">
+        <ul className="space-y-4 bg-black/10 border-t border-black p-8 rounded-lg">
           {nodes.map((n, i) => (
             <li key={i} className="relative">
               <span
