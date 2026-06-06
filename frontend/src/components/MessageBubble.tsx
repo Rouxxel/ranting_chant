@@ -61,6 +61,12 @@ export function MessageBubble({ msg, tenantName = "Tenant", suggestedContacts = 
   const handleSendNotifications = async () => {
     if (!tenantId || !requestId || selectedContacts.size === 0) return;
 
+    // Don't allow sending notifications for unsaved conversations (session_id)
+    if (requestId.startsWith("session_")) {
+      toast.error("Please save the conversation first before sending notifications");
+      return;
+    }
+
     setIsSending(true);
     try {
       const contactsToSend = suggestedContacts.filter(c => selectedContacts.has(c.name));
@@ -133,10 +139,11 @@ export function MessageBubble({ msg, tenantName = "Tenant", suggestedContacts = 
             <div className="mt-3 flex gap-2">
               <button
                 onClick={handleSendNotifications}
-                disabled={isSending || selectedContacts.size === 0}
+                disabled={isSending || selectedContacts.size === 0 || !!requestId?.startsWith("session_")}
                 className="glossy-btn flex-1 px-3 py-1.5 text-xs font-medium disabled:opacity-50"
+                title={requestId?.startsWith("session_") ? "Save conversation first" : ""}
               >
-                {isSending ? "Sending..." : `Send (${selectedContacts.size})`}
+                {isSending ? "Sending..." : requestId?.startsWith("session_") ? "Save conversation first" : `Send (${selectedContacts.size})`}
               </button>
               <button
                 onClick={handleDismiss}

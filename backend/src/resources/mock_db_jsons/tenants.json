@@ -88,5 +88,14 @@
     "address": "Osloer Str. 12, 13359 Berlin, Germany",
     "unit": "4D",
     "property_id": "property_005"
+  },
+  {
+    "name": "Sebastian Russo",
+    "unit": "5H",
+    "property_id": "property_001",
+    "email": "sebasruse03@gmail.com",
+    "phone": "+15256856658",
+    "address": null,
+    "id": "tenant_24eb6eef"
   }
 ]

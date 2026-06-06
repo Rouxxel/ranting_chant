@@ -789,5 +789,60 @@
     "property_id": "property_001",
     "property": "Sunset Apartment",
     "summary": "John Tenant is experiencing a recurring electrical short circuit in his apartment that causes the breaker to trip whenever appliances are plugged in. The AI coordinator has advised him to stop using the affected outlets for safety and has escalated the issue to the property manager to arrange for a professional electrician."
+  },
+  {
+    "id": "request_3334b7ed",
+    "requester_id": "tenant_001",
+    "type": "emergency",
+    "description": "I have a gas leak",
+    "status": "escalated",
+    "urgency": "high",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "id": "5405b76b-142c-42c9-af54-4da9817d9edc",
+        "role": "ai",
+        "message": "Hello John Tenant. We are delighted to have you at Spandauer Damm 10-22, 14059 Berlin, Germany. How can I assist you today?",
+        "timestamp": "2026-06-06T11:32:35.498Z"
+      },
+      {
+        "id": "c38b2f3a-601c-40b7-ba9a-2771941a6b6a",
+        "role": "tenant",
+        "message": "I have a gas leak",
+        "timestamp": "2026-06-06T11:32:43.842Z"
+      },
+      {
+        "id": "43cfc1b7-742c-4e68-a681-a92b5e971eed",
+        "role": "ai",
+        "message": "I am very sorry to hear this. Please evacuate the building immediately and move to a safe location. Do not use any light switches, electronics, or open flames. Once you are in a safe place, please call the local emergency services (112 in Germany) and your gas provider immediately. I have escalated this to your property manager as an emergency.",
+        "timestamp": "2026-06-06T11:33:01.192Z"
+      }
+    ],
+    "created_at": "2026-06-06T11:34:08.680229+00:00",
+    "updated_at": "2026-06-06T11:34:13.800947+00:00",
+    "escalated": true,
+    "sentiment": "neutral",
+    "confidence": 1,
+    "vendor_id": null,
+    "notifications_sent": [
+      {
+        "recipient": "Sara Johnson",
+        "type": "email",
+        "status": "failed",
+        "timestamp": "2026-06-06T11:34:13.796886+00:00"
+      },
+      {
+        "recipient": "Sara Johnson",
+        "type": "sms",
+        "status": "failed",
+        "timestamp": "2026-06-06T11:34:13.796886+00:00"
+      }
+    ],
+    "notification_pending": false,
+    "property_id": "property_001",
+    "property": "Sunset Apartment",
+    "summary": "The tenant reported a gas leak at their apartment building, which is a critical safety hazard. The AI instructed the tenant to evacuate and contact emergency services immediately, and the issue has been escalated to the property manager as an emergency."
   }
 ]

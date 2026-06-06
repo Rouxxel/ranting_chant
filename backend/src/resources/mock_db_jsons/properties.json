@@ -11,7 +11,8 @@
     "tenant_ids": [
       "tenant_001",
       "tenant_002",
-      "tenant_009"
+      "tenant_009",
+      "tenant_24eb6eef"
     ],
     "representative": {
       "type": "property_manager",
