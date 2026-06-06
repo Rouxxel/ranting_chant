@@ -415,6 +415,14 @@ export const sendRequestNotifications = async (requestId: string): Promise<Reque
   return response.data;
 };
 
+export const resolveRequest = async (requestId: string, resolvedBy: string, resolutionNote: string): Promise<Request> => {
+  const response = await apiClient.post<Request>(`/requests/${requestId}/resolve`, {
+    resolved_by: resolvedBy,
+    resolution_note: resolutionNote
+  });
+  return response.data;
+};
+
 // ==================== Voice ====================
 
 export const getVoiceProviders = async (): Promise<VoiceProvidersResponse> => {

@@ -20,14 +20,18 @@ interface RequestDetailPanelProps {
   onClose: () => void;
   onApprove: () => void;
   onComplete?: (resolutionNote?: string) => Promise<void> | void;
+  onResolve?: (resolutionNote: string) => Promise<void> | void;
 }
 
-export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: RequestDetailPanelProps) {
+export function RequestDetailPanel({ req, onClose, onApprove, onComplete, onResolve }: RequestDetailPanelProps) {
   const [summary, setSummary] = useState<string | null>(req.summary || null);
   const [loadingSummary, setLoadingSummary] = useState(false);
   const [isCompleteDialogOpen, setIsCompleteDialogOpen] = useState(false);
+  const [isResolveDialogOpen, setIsResolveDialogOpen] = useState(false);
   const [resolutionNote, setResolutionNote] = useState("");
+  const [resolveNote, setResolveNote] = useState("");
   const [isCompleting, setIsCompleting] = useState(false);
+  const [isResolving, setIsResolving] = useState(false);
   const [partyNames, setPartyNames] = useState<Record<string, string>>({});
 
   // Build an ID → name lookup from all entity collections
@@ -90,6 +94,20 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
       console.error("Failed to complete request:", error);
     } finally {
       setIsCompleting(false);
+    }
+  };
+
+  const handleConfirmResolve = async () => {
+    setIsResolving(true);
+    try {
+      await onResolve?.(resolveNote.trim());
+      setIsResolveDialogOpen(false);
+      setResolveNote("");
+    } catch (error) {
+      // Keep the dialog open on failure; the API layer surfaces the error toast.
+      console.error("Failed to resolve request:", error);
+    } finally {
+      setIsResolving(false);
     }
   };
 
@@ -287,6 +305,17 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
             </button>
           </footer>
         )}
+
+        {onResolve && req.status !== "cancelled" && req.status !== "resolved" && (
+          <footer className="border-t border-white/10 p-4">
+            <button
+              onClick={() => setIsResolveDialogOpen(true)}
+              className="glossy-btn-green inline-flex w-full items-center justify-center gap-2 px-4 py-2.5 text-sm"
+            >
+              <Check className="h-4 w-4" /> Resolve Request
+            </button>
+          </footer>
+        )}
       </aside>
 
       <Dialog open={isCompleteDialogOpen} onOpenChange={setIsCompleteDialogOpen}>
@@ -321,6 +350,43 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
               className="glossy-btn-green"
             >
               {isCompleting ? "Completing..." : "Complete Request"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isResolveDialogOpen} onOpenChange={setIsResolveDialogOpen}>
+        <DialogContent className="aero-surface max-w-md">
+          <DialogHeader>
+            <DialogTitle>Resolve Request</DialogTitle>
+            <DialogDescription className="text-sm text-ranting-deep">
+              Provide a resolution for this request. The tenant will be able to see your response.
+            </DialogDescription>
+          </DialogHeader>
+          <Textarea
+            value={resolveNote}
+            onChange={(e) => setResolveNote(e.target.value)}
+            placeholder="e.g., I will approve QuickFix Locksmith to solve your problem for $150"
+            className="aero-input min-h-[96px] resize-none"
+            disabled={isResolving}
+          />
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setIsResolveDialogOpen(false)}
+              className="glossy-btn-ghost"
+              disabled={isResolving}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={handleConfirmResolve}
+              disabled={isResolving || !resolveNote.trim()}
+              className="glossy-btn-green"
+            >
+              {isResolving ? "Sending..." : "Send Resolution"}
             </Button>
           </DialogFooter>
         </DialogContent>
