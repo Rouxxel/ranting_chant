@@ -96,8 +96,7 @@
     "confidence": 1,
     "vendor_id": null,
     "notifications_sent": [
-      "manager_001",
-      "manager_002"
+      "manager_001"
     ],
     "notification_pending": true,
     "property_id": "property_001",
@@ -192,7 +191,7 @@
     "notification_pending": true,
     "property_id": "property_001",
     "property": "Sunset Apartments",
-    "summary": null
+    "summary": "The tenant reported a total loss of power in their apartment, which is particularly concerning due to their reliance on medical equipment. The issue has been escalated to the property manager as an emergency, and the tenant was advised to seek external medical assistance if necessary."
   },
   {
     "id": "request_7eedc058",
@@ -630,5 +629,95 @@
     "property_id": "property_005",
     "property": "Poplar Gardens",
     "summary": "Multiple residents are unable to use the building access keypad. Security systems vendor assigned for urgent review."
+  },
+  {
+    "id": "request_cc61eea1",
+    "requester_id": "tenant_001",
+    "type": "electrical",
+    "description": "I have a problem with the electricity in my apartment, please send an email to the manager my apartment",
+    "status": "pending",
+    "urgency": "high",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "id": "be2d5bb2-6dae-4475-82cd-3dfd4b82bbce",
+        "role": "ai",
+        "message": "Hello John Tenant. We are delighted to have you at Spandauer Damm 10-22, 14059 Berlin, Germany. How can I assist you today?",
+        "timestamp": "2026-06-06T09:13:18.670Z"
+      },
+      {
+        "id": "f63eaf13-8d0f-49e7-a941-c6e7e9960713",
+        "role": "tenant",
+        "message": "I have a problem with the electricity in my apartment, please send an email to the manager my apartment",
+        "timestamp": "2026-06-06T09:13:54.793Z"
+      },
+      {
+        "id": "fdb8bce6-3208-41ed-9417-2826b0babdda",
+        "role": "ai",
+        "message": "I'm sorry to hear you're having electrical issues, John. To make sure I get the right help to you, could you please clarify if you have a total power loss, or if it's just specific outlets or lights that aren't working? Also, are you currently safe?\n\nRelevant links:\n- I have an electrical problem in my apartment that my electric would ...: https://www.quora.com/I-have-an-electrical-problem-in-my-apartment-that-my-electric-would-shut-off-starting-mid-afternoon-all-thru-the-night-and-my-landlord-won-t-do-anything-about-it-What-can-I-do-to-get-it-taken-seriously-and-fix-it - Learn where the apartment breakers are, and reset them yourself. Or call an electrician, and bill the landlord- in some cases, having\n- Power Outage Email Templates - TextExpander: https://textexpander.com/templates/energy-power-outage-email - This article presents a series of unique power outage email templates designed to help you effectively communicate during such disruptions.\n- The 7 Most Common Calls for Electrical Repairs in Apartments: https://gladiatorelectric.com/electrical-repairs-apartments - From faulty wiring in older units to frequent breaker trips, outlet failures, lighting problems in shared spaces, and power surges that d...",
+        "timestamp": "2026-06-06T09:14:02.530Z",
+        "web_results": {
+          "query": "I have a problem with the electricity in my apartment, please send an email to the manager my apartment",
+          "answer": null,
+          "results": [
+            {
+              "title": "I have an electrical problem in my apartment that my electric would ...",
+              "url": "https://www.quora.com/I-have-an-electrical-problem-in-my-apartment-that-my-electric-would-shut-off-starting-mid-afternoon-all-thru-the-night-and-my-landlord-won-t-do-anything-about-it-What-can-I-do-to-get-it-taken-seriously-and-fix-it",
+              "content_snippet": "Learn where the apartment breakers are, and reset them yourself. Or call an electrician, and bill the landlord- in some cases, having",
+              "score": 0.9998511
+            },
+            {
+              "title": "Power Outage Email Templates - TextExpander",
+              "url": "https://textexpander.com/templates/energy-power-outage-email",
+              "content_snippet": "This article presents a series of unique power outage email templates designed to help you effectively communicate during such disruptions.",
+              "score": 0.9965436
+            },
+            {
+              "title": "The 7 Most Common Calls for Electrical Repairs in Apartments",
+              "url": "https://gladiatorelectric.com/electrical-repairs-apartments",
+              "content_snippet": "From faulty wiring in older units to frequent breaker trips, outlet failures, lighting problems in shared spaces, and power surges that damage",
+              "score": 0.9961456
+            },
+            {
+              "title": "Tenants say apartment complex has left them in the dark - YouTube",
+              "url": "https://www.youtube.com/watch?v=bVqv-HotupI",
+              "content_snippet": "Family says they've spent more than two weeks without power, forced into a hotel as their apartment complex offers no answers or timeline",
+              "score": 0.8688268
+            },
+            {
+              "title": "Property Manager demands that I keep power on after I move out",
+              "url": "https://www.reddit.com/r/TenantHelp/comments/1lgpuaz/property_manager_demands_that_i_keep_power_on",
+              "content_snippet": "She stated (in an email) that I will not be held to the standard move-out policy as long as I leave the place the way it was when I moved in and",
+              "score": 0.85195273
+            }
+          ]
+        }
+      },
+      {
+        "id": "de3dda66-11f7-45d7-9671-45f00649a45e",
+        "role": "tenant",
+        "message": "the breaker keeps turningn off a portion of the house, even when i put it back on, as soon as i connect something it shorts and turns off right away, there must be something shorting off and making the mechanical safety feature engage, please send an email to my manager",
+        "timestamp": "2026-06-06T09:15:44.741Z"
+      },
+      {
+        "id": "0bf93520-3411-4ae8-893d-45953e6d79b6",
+        "role": "ai",
+        "message": "I am very sorry to hear about this electrical issue, John. Since the breaker is tripping immediately upon use, this indicates a potential short circuit which poses a fire risk. Please keep that circuit turned off and avoid plugging anything into those outlets until a professional can inspect it. I am escalating this to your property manager immediately to ensure an electrician is dispatched as soon as possible.",
+        "timestamp": "2026-06-06T09:15:54.105Z"
+      }
+    ],
+    "created_at": "2026-06-06T09:16:17.784323+00:00",
+    "updated_at": "2026-06-06T09:16:17.784323+00:00",
+    "escalated": true,
+    "sentiment": "neutral",
+    "confidence": 1,
+    "vendor_id": null,
+    "notifications_sent": [],
+    "notification_pending": true,
+    "property_id": "property_001",
+    "property": "Sunset Apartment",
+    "summary": "John Tenant is experiencing a recurring electrical short circuit in his apartment that causes the breaker to trip whenever appliances are plugged in. The AI coordinator has advised him to stop using the affected outlets for safety and has escalated the issue to the property manager to arrange for a professional electrician."
   }
 ]
