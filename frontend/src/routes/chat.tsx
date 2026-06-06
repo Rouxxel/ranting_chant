@@ -291,13 +291,6 @@ function ChatPage() {
       <main className="mx-auto flex min-h-[calc(100vh-130px)] max-w-[1400px] gap-5">
         {/* Sidebar */}
         <aside className="glass-panel hidden w-[280px] shrink-0 flex-col p-5 md:flex">
-          <div className="flex items-center gap-3 mb-5">
-            <Avatar name={name} size={48} />
-            <div className="min-w-0">
-              <div className="truncate text-sm font-semibold text-ranting-ice">{name}</div>
-              <div className="text-xs text-ranting-muted">Unit {unit}</div>
-            </div>
-          </div>
 
           <div className="text-[rgb(51,71,88)] font-bold mb-2 text-[10px] uppercase tracking-wider">Current request</div>
           <div className="mb-1 text-sm text-ranting-ice">Property Issue</div>
