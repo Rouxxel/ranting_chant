@@ -133,6 +133,37 @@ class ConversationEngine:
         #Parse response
         parsed = self._parse_response(raw_response)
 
+        #Populate suggested_contacts with actual contact info if AI suggested any
+        suggested_contacts = parsed.get("suggested_contacts", [])
+        if suggested_contacts:
+            populated_contacts = []
+            for contact in suggested_contacts:
+                contact_type = contact.get("type")
+                contact_info = contact.copy()
+
+                if contact_type == "manager" and property_record:
+                    manager = property_mcp.get_property_manager(property_record.get("id"))
+                    if manager:
+                        contact_info["name"] = manager.get("name", contact.get("name", ""))
+                        contact_info["email"] = manager.get("email", contact.get("email"))
+                        contact_info["phone"] = manager.get("phone", contact.get("phone"))
+                        populated_contacts.append(contact_info)
+                elif contact_type == "owner" and property_record:
+                    owner = property_mcp.get_property_owner(property_record.get("id"))
+                    if owner:
+                        contact_info["name"] = owner.get("name", contact.get("name", ""))
+                        contact_info["email"] = owner.get("email", contact.get("email"))
+                        contact_info["phone"] = owner.get("phone", contact.get("phone"))
+                        populated_contacts.append(contact_info)
+                elif contact_type == "vendor":
+                    # For vendors, use the info provided by AI since we don't know which vendor yet
+                    populated_contacts.append(contact_info)
+
+            parsed["suggested_contacts"] = populated_contacts
+            log_handler.info(f"[conversation_engine] Populated {len(populated_contacts)} suggested contact(s)")
+        else:
+            parsed["suggested_contacts"] = []
+
         if (
             enable_web
             and not web_search_response

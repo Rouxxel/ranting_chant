@@ -96,7 +96,12 @@
     "confidence": 1,
     "vendor_id": null,
     "notifications_sent": [
-      "manager_001"
+      {
+        "type": "email",
+        "recipient": "sarah@gmail.com",
+        "status": "sent",
+        "timestamp": "2026-06-04T22:59:59.602997+00:00"
+      }
     ],
     "notification_pending": true,
     "property_id": "property_001",
@@ -285,8 +290,18 @@
     "confidence": 0.98,
     "vendor_id": "vendor_004",
     "notifications_sent": [
-      "manager_002",
-      "vendor_004"
+      {
+        "type": "email",
+        "recipient": "david.reynolds@gmail.com",
+        "status": "sent",
+        "timestamp": "2026-06-01T08:17:20Z"
+      },
+      {
+        "type": "email",
+        "recipient": "arcticservice@gmail.com",
+        "status": "sent",
+        "timestamp": "2026-06-01T08:17:20Z"
+      }
     ],
     "notification_pending": false,
     "property_id": "property_002",
@@ -337,8 +352,18 @@
     "confidence": 0.96,
     "vendor_id": "vendor_003",
     "notifications_sent": [
-      "manager_002",
-      "vendor_003"
+      {
+        "type": "email",
+        "recipient": "david.reynolds@gmail.com",
+        "status": "sent",
+        "timestamp": "2026-06-02T13:46:30Z"
+      },
+      {
+        "type": "email",
+        "recipient": "voltprocontact@gmail.com",
+        "status": "sent",
+        "timestamp": "2026-06-02T13:46:30Z"
+      }
     ],
     "notification_pending": false,
     "property_id": "property_002",
@@ -383,7 +408,12 @@
     "confidence": 0.94,
     "vendor_id": "vendor_007",
     "notifications_sent": [
-      "manager_003"
+      {
+        "type": "email",
+        "recipient": "laura.mitchell@gmail.com",
+        "status": "sent",
+        "timestamp": "2026-06-03T10:11:30Z"
+      }
     ],
     "notification_pending": true,
     "property_id": "property_003",
@@ -434,8 +464,18 @@
     "confidence": 1,
     "vendor_id": "vendor_001",
     "notifications_sent": [
-      "manager_004",
-      "vendor_001"
+      {
+        "type": "email",
+        "recipient": "kevin.thompson@gmail.com",
+        "status": "sent",
+        "timestamp": "2026-06-04T18:00:40Z"
+      },
+      {
+        "type": "email",
+        "recipient": "quickfixdispatch@gmail.com",
+        "status": "sent",
+        "timestamp": "2026-06-04T18:00:40Z"
+      }
     ],
     "notification_pending": false,
     "property_id": "property_004",
@@ -480,7 +520,12 @@
     "confidence": 0.95,
     "vendor_id": "vendor_006",
     "notifications_sent": [
-      "manager_004"
+      {
+        "type": "email",
+        "recipient": "kevin.thompson@gmail.com",
+        "status": "sent",
+        "timestamp": "2026-06-05T09:31:10Z"
+      }
     ],
     "notification_pending": true,
     "property_id": "property_004",
@@ -525,7 +570,12 @@
     "confidence": 0.97,
     "vendor_id": "vendor_009",
     "notifications_sent": [
-      "manager_004"
+      {
+        "type": "email",
+        "recipient": "kevin.thompson@gmail.com",
+        "status": "sent",
+        "timestamp": "2026-06-05T16:16:20Z"
+      }
     ],
     "notification_pending": true,
     "property_id": "property_004",
@@ -570,8 +620,18 @@
     "confidence": 0.99,
     "vendor_id": "vendor_008",
     "notifications_sent": [
-      "owner_005",
-      "vendor_008"
+      {
+        "type": "email",
+        "recipient": "sreynolds@gmail.com",
+        "status": "sent",
+        "timestamp": "2026-06-05T12:01:00Z"
+      },
+      {
+        "type": "email",
+        "recipient": "clearflowservice@gmail.com",
+        "status": "sent",
+        "timestamp": "2026-06-05T12:01:00Z"
+      }
     ],
     "notification_pending": false,
     "property_id": "property_005",
@@ -622,8 +682,18 @@
     "confidence": 0.98,
     "vendor_id": "vendor_010",
     "notifications_sent": [
-      "owner_005",
-      "vendor_010"
+      {
+        "type": "email",
+        "recipient": "sreynolds@gmail.com",
+        "status": "sent",
+        "timestamp": "2026-06-06T06:21:15Z"
+      },
+      {
+        "type": "email",
+        "recipient": "SecureAccessSupport@gmail.com",
+        "status": "sent",
+        "timestamp": "2026-06-06T06:21:15Z"
+      }
     ],
     "notification_pending": false,
     "property_id": "property_005",

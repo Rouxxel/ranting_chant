@@ -26,6 +26,7 @@ import type {
   ConversationMessageRequest,
   ConversationMessageResponse,
   ConversationHistoryResponse,
+  SuggestedContact,
   VoiceTranscribeRequest,
   VoiceTranscribeResponse,
   VoiceProviderId,
@@ -397,6 +398,15 @@ export const saveConversation = async (data: {
   };
 }): Promise<Request> => {
   const response = await apiClient.post<Request>('/conversation/save-conversation', data);
+  return response.data;
+};
+
+export const sendNotifications = async (data: {
+  tenant_id: string;
+  request_id: string;
+  contacts: SuggestedContact[];
+}): Promise<{ success: boolean; total: number; sent: number; results: any[] }> => {
+  const response = await apiClient.post<{ success: boolean; total: number; sent: number; results: any[] }>('/conversation/send-notifications', data);
   return response.data;
 };
 

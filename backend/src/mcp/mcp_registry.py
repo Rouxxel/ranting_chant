@@ -14,7 +14,7 @@ execute_tool() entry point for dispatching tool calls by name.
 
 #Other files imports
 from src.utils.custom_logger import log_handler
-from src.mcp import tenant_mcp, property_mcp, vendor_mcp, request_mcp, tavily_mcp
+from src.mcp import tenant_mcp, property_mcp, vendor_mcp, request_mcp, tavily_mcp, notification_mcp
 
 """REGISTRY-----------------------------------------------------------"""
 #Map of tool name -> callable
@@ -104,6 +104,16 @@ TOOL_REGISTRY: dict[str, dict] = {
     "web.map": {
         "description": "Discover a lightweight site map for an HTTPS URL with Tavily",
         "fn": tavily_mcp.web_map
+    },
+
+    # Notification tools
+    "send_email_notification": {
+        "description": "Send an email notification to a manager, owner, or vendor",
+        "fn": notification_mcp.send_email_notification
+    },
+    "send_sms_notification": {
+        "description": "Send an emergency SMS notification to a manager or owner",
+        "fn": notification_mcp.send_sms_notification
     },
 }
 

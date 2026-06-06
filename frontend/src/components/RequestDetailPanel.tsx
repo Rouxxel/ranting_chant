@@ -229,15 +229,19 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
                     ) : (
                       <MessageCircle className="h-3.5 w-3.5 text-ranting-sky" />
                     )}
-                    <span className="font-medium">{n}</span>
-                    <span className="text-ranting-deep">→ {n.recipient}</span>
+                    <span className="font-medium">{n.recipient}</span>
                     <span className="text-ranting-deep">
                       ·{" "}
-                      {new Date(n.timestamp).toLocaleTimeString([], {
+                      {n.timestamp ? new Date(n.timestamp).toLocaleString([], {
+                        month: "short",
+                        day: "numeric",
                         hour: "numeric",
                         minute: "2-digit",
-                      })}
+                      }) : "Invalid Date"}
                     </span>
+                    {n.status === "failed" && (
+                      <span className="text-red-400">(failed)</span>
+                    )}
                   </li>
                 ))}
               </ul>

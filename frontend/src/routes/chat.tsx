@@ -11,7 +11,7 @@ import { useApp } from "@/context/AppContext";
 import { requireTenantAuth } from "@/lib/auth";
 import { startConversation, sendMessage, transcribeAudio, respondToVoice, saveConversation, sendRequestNotifications, getVoiceProviderVoices } from "@/services/api";
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
-import type { ConversationMessage, RequestType, Status, Urgency, Voice } from "@/types";
+import type { ConversationMessage, RequestType, Status, Urgency, Voice, SuggestedContact } from "@/types";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/chat")({
@@ -38,6 +38,7 @@ function ChatPage() {
   const [isSaved, setIsSaved] = useState(false);
   const [voiceId, setVoiceId] = useState<string | undefined>(undefined);
   const [voices, setVoices] = useState<Voice[]>([]);
+  const [suggestedContacts, setSuggestedContacts] = useState<SuggestedContact[]>([]);
   const scrollerRef = useRef<HTMLDivElement>(null);
   // Guards against React StrictMode's double-mount starting two backend sessions.
   const startedForTenantRef = useRef<string | null>(null);
@@ -150,6 +151,7 @@ function ChatPage() {
       setRequestType(response.type ?? "general");
       setUrgency(response.urgency);
       setEscalated(response.escalated);
+      setSuggestedContacts(response.suggested_contacts || []);
     } catch (error) {
       console.error("Failed to send message:", error);
       setMessages((m) => [...m, {
@@ -341,8 +343,15 @@ function ChatPage() {
                   </div>
                 </div>
               </div>
-            ) : messages.map((m) => (
-              <MessageBubble key={m.id} msg={m} tenantName={name} />
+            ) : messages.map((m, index) => (
+              <MessageBubble
+                key={m.id}
+                msg={m}
+                tenantName={name}
+                suggestedContacts={m.role === "ai" && index === messages.length - 1 ? suggestedContacts : []}
+                tenantId={tenantId}
+                requestId={requestId || undefined}
+              />
             ))}
             {typing && (
               <div className="flex items-end gap-2">

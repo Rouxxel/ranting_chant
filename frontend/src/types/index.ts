@@ -210,6 +210,14 @@ export interface ConversationMessageRequest {
   enable_web?: boolean;
 }
 
+export interface SuggestedContact {
+  type: "manager" | "owner" | "vendor";
+  name: string;
+  email: string | null;
+  phone: string | null;
+  reason: string;
+}
+
 export interface ConversationMessageResponse {
   request_id: string;
   reply: string;
@@ -219,6 +227,7 @@ export interface ConversationMessageResponse {
   escalated: boolean;
   is_complete: boolean;
   web_results?: WebSearchResponse;
+  suggested_contacts: SuggestedContact[];
 }
 
 export interface ConversationHistoryResponse {

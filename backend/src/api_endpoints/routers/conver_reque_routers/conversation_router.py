@@ -25,7 +25,7 @@ from pydantic import BaseModel
 from src.utils.custom_logger import log_handler
 from src.utils.limiter import limiter as SlowLimiter
 from src.core_specs.configuration.config_loader import config_loader
-from src.mcp import tenant_mcp, property_mcp, vendor_mcp, request_mcp
+from src.mcp import tenant_mcp, property_mcp, vendor_mcp, request_mcp, notification_mcp
 from src.ai.conversation_engine import ConversationEngine
 from src.ai.gemini_client import get_client
 from src.models.request import normalize_request_type
@@ -42,6 +42,13 @@ class ConversationMessagePayload(BaseModel):
     tenant_id: str
     message: str
     enable_web: bool = True
+
+
+class SendNotificationsPayload(BaseModel):
+    """Payload accepted when sending notifications based on AI suggestions."""
+    tenant_id: str
+    request_id: str
+    contacts: list  # List of contact objects with type, name, email, phone, reason
 
 
 """API ROUTER-----------------------------------------------------------"""
@@ -210,7 +217,8 @@ async def send_message(request: Request, body: ConversationMessagePayload):
                 "urgency": parsed_response.get("urgency", "low"),
                 "escalated": parsed_response.get("escalate", False),
                 "is_complete": parsed_response.get("is_complete", False),
-                "conversation_history": history
+                "conversation_history": history,
+                "suggested_contacts": parsed_response.get("suggested_contacts", [])
             }
             if parsed_response.get("web_results"):
                 response_payload["web_results"] = parsed_response.get("web_results")
@@ -287,7 +295,8 @@ async def send_message(request: Request, body: ConversationMessagePayload):
             "type": updated_request.get("type"),
             "urgency": updated_request.get("urgency"),
             "escalated": updated_request.get("escalated"),
-            "is_complete": parsed_response.get("is_complete")
+            "is_complete": parsed_response.get("is_complete"),
+            "suggested_contacts": parsed_response.get("suggested_contacts", [])
         }
         if parsed_response.get("web_results"):
             response_payload["web_results"] = parsed_response.get("web_results")
@@ -411,3 +420,148 @@ async def get_history(request: Request, request_id: str):
     except Exception as e:
         log_handler.error(f"[conversation_router] Unexpected error fetching conversation history: {e}")
         raise HTTPException(status_code=500, detail="Internal server error while fetching history")
+
+
+# Send notifications based on AI suggestions
+@router.post("/send-notifications")
+@SlowLimiter.limit(
+    f"{config_loader['endpoints']['conversation_endpoint']['request_limit']}/"
+    f"{config_loader['endpoints']['conversation_endpoint']['unit_of_time_for_limit']}"
+)
+async def send_notifications(request: Request, body: SendNotificationsPayload):
+    """
+    Send notifications to selected contacts based on AI suggestions.
+
+    This endpoint is called when the user confirms they want to send notifications
+    to specific contacts (manager, owner, or vendor). It sends email and SMS notifications
+    based on the contact information provided.
+
+    Parameters:
+        request (Request): The incoming HTTP request for rate limit tracking.
+        body (SendNotificationsPayload): Contains tenant_id, request_id, and list of contacts.
+
+    Returns:
+        dict: Success status and details of sent notifications.
+
+    Raises:
+        HTTPException 404: If the tenant or request does not exist.
+        HTTPException 500: If an unexpected error occurs during notification dispatch.
+    """
+    try:
+        tenant_id = body.tenant_id.strip()
+        request_id = body.request_id.strip()
+        contacts = body.contacts
+
+        log_handler.info(f"[conversation_router] Sending notifications for request '{request_id}', {len(contacts)} contact(s)")
+
+        # Fetch tenant and request
+        tenant = tenant_mcp.lookup_tenant(tenant_id)
+        if not tenant:
+            err_msg = f"Tenant '{tenant_id}' not found"
+            log_handler.warning(err_msg)
+            raise HTTPException(status_code=404, detail=err_msg)
+
+        req = request_mcp.get_request(request_id)
+        if not req:
+            err_msg = f"Request '{request_id}' not found"
+            log_handler.warning(err_msg)
+            raise HTTPException(status_code=404, detail=err_msg)
+
+        # Send notifications to each selected contact
+        results = []
+        for contact in contacts:
+            contact_type = contact.get("type")
+            contact_name = contact.get("name")
+            contact_email = contact.get("email")
+            contact_phone = contact.get("phone")
+            reason = contact.get("reason", "")
+
+            # Determine notification type based on request urgency and escalation
+            notification_type = "request_created"
+            if req.get("escalated", False):
+                notification_type = "escalation_alert"
+
+            # Send email if email is provided
+            if contact_email:
+                try:
+                    email_result = notification_mcp.send_email_notification(
+                        recipient_type=contact_type,
+                        recipient_email=contact_email,
+                        recipient_name=contact_name,
+                        notification_type=notification_type,
+                        tenant_name=tenant.get("name"),
+                        request_type=req.get("type", "general"),
+                        description=req.get("description", reason),
+                        urgency=req.get("urgency", "medium")
+                    )
+                    results.append({
+                        "contact": contact_name,
+                        "type": "email",
+                        "success": email_result.get("success", False),
+                        "details": email_result
+                    })
+                except Exception as e:
+                    log_handler.error(f"[conversation_router] Failed to send email to {contact_name}: {e}")
+                    results.append({
+                        "contact": contact_name,
+                        "type": "email",
+                        "success": False,
+                        "error": str(e)
+                    })
+
+            # Send SMS if phone is provided and urgency is high
+            if contact_phone and req.get("urgency") == "high":
+                try:
+                    sms_result = notification_mcp.send_sms_notification(
+                        recipient_type=contact_type,
+                        recipient_phone=contact_phone,
+                        recipient_name=contact_name,
+                        tenant_name=tenant.get("name"),
+                        urgency=req.get("urgency", "high"),
+                        description=req.get("description", reason)
+                    )
+                    results.append({
+                        "contact": contact_name,
+                        "type": "sms",
+                        "success": sms_result.get("success", False),
+                        "details": sms_result
+                    })
+                except Exception as e:
+                    log_handler.error(f"[conversation_router] Failed to send SMS to {contact_name}: {e}")
+                    results.append({
+                        "contact": contact_name,
+                        "type": "sms",
+                        "success": False,
+                        "error": str(e)
+                    })
+
+        # Update request with notification events
+        existing_notifications = req.get("notifications_sent", [])
+        updated_notifications = existing_notifications + [
+            {
+                "recipient": r["contact"],
+                "type": r["type"],
+                "status": "sent" if r["success"] else "failed",
+                "timestamp": datetime.now(timezone.utc).isoformat()
+            }
+            for r in results
+        ]
+
+        request_mcp.update_request(request_id, {
+            "notifications_sent": updated_notifications,
+            "notification_pending": False
+        })
+
+        log_handler.info(f"[conversation_router] Successfully sent {len([r for r in results if r['success']])}/{len(results)} notification(s)")
+        return {
+            "success": True,
+            "total": len(results),
+            "sent": len([r for r in results if r["success"]]),
+            "results": results
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        log_handler.error(f"[conversation_router] Unexpected error sending notifications: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error while sending notifications")
