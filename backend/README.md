@@ -10,7 +10,9 @@ FastAPI backend for Ranting Chant, an AI-assisted property operations platform. 
 - **Canonical request type taxonomy** enforced in models, prompts, classifier parsing, request creation, and request updates.
 - **Voice services** for audio transcription and text-to-speech responses.
 - **Notifications** through Resend email and Twilio SMS.
-- **MCP-style tools** for property, tenant, vendor, and request workflows.
+- **MCP-style tools** for property, tenant, vendor, request, and notification workflows.
+- **AI-suggested contacts** for notifications with user confirmation flow.
+- **Request resolution endpoint** for managers/owners to provide responses to tenants.
 - **JSON mock data store** with per-collection locking (current runtime persistence).
 - **PostgreSQL schema** — migrations for entities, units, soft delete, request audit tables, RLS, and seed data.
 - **Rate limiting**, structured logging, Pydantic validation, and Docker support.
@@ -123,10 +125,10 @@ The backend includes routers for:
 - **Vendors**: vendor reads, create, update, delete, and service-category lookup
 - **Managers**: manager reads and profile update
 - **Owners**: owner reads and profile update
-- **Requests**: request listing, detail, summary, create, update, cancel, complete, and notification dispatch
-- **Conversation**: AI-powered chat sessions, message processing, history, and save-conversation
+- **Requests**: request listing, detail, summary, create, update, cancel, complete, resolve, and notification dispatch
+- **Conversation**: AI-powered chat sessions, message processing, history, save-conversation, and send-notifications
 - **Voice**: transcription, voice session start, and voice response
-- **MCP**: tool discovery and MCP-style operations
+- **MCP**: tool discovery and MCP-style operations (property, tenant, vendor, request, notification)
 
 ## Data & Persistence
 
@@ -223,6 +225,7 @@ async def example_endpoint(request: Request):
 - Request types should be added in `src/models/request.py` first, then mirrored in `frontend/src/types/index.ts`.
 - The conversation and classifier prompts are generated from the backend request type definitions.
 - The JSON mock data in `src/resources/mock_db_jsons/requests.json` should always use canonical request type values.
+- The `notifications_sent` field in mock data uses a detailed format: `[{type, recipient, status, timestamp}]` instead of simple ID strings.
 - Backend authentication is not implemented yet; frontend logout is currently client-side only. The `user_accounts` table in `004_schema_hardening.sql` is ready for future auth integration.
 - When migrating runtime code from JSON to PostgreSQL, follow `src/resources/README.md` for the canonical schema; do not mirror SQL-only tables (`request_status_history`, `request_assignments`) in mock JSON until the API layer supports them.
 

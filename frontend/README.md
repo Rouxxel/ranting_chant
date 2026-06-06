@@ -80,12 +80,12 @@ The Vite router plugin regenerates `src/routeTree.gen.ts`; do not edit it manual
 - `Logo.tsx` - Ranting Chant wordmark
 - `Avatar.tsx` - initials avatar
 - `Badges.tsx` - status, urgency, and request type badges
-- `MessageBubble.tsx` - tenant/AI chat messages
+- `MessageBubble.tsx` - tenant/AI chat messages with suggested contacts and notification sending
 - `ChatInput.tsx` - text input, send button, voice toggle
 - `RequestCard.tsx` - tenant request card with cancel button
 - `RequestTimeline.tsx` - conversation/notification timeline
 - `RequestTable.tsx` - management request table
-- `RequestDetailPanel.tsx` - slide-in request details, AI summary, and complete button
+- `RequestDetailPanel.tsx` - slide-in request details, AI summary, notification history, and resolve/complete buttons
 - `TenantProfile.tsx` - tenant profile with editable email/phone
 - `PropertyRepresentative.tsx` - property manager/owner contact info for tenants
 - `ManagementProperties.tsx` - properties management with create/edit forms
@@ -100,9 +100,10 @@ The Vite router plugin regenerates `src/routeTree.gen.ts`; do not edit it manual
 It includes typed helpers for:
 
 - tenants, properties, vendors, managers, owners (CRUD operations)
-- requests (create, update, cancel, complete)
+- requests (create, update, cancel, complete, resolve)
 - profile updates for tenants, managers, and owners
 - conversation start/message/history/save
+- conversation send-notifications
 - voice transcription/start/respond
 - MCP tools
 
@@ -253,6 +254,8 @@ src/
 - Guarded tenant route
 - Starts a conversation through `POST /conversation/start`
 - Sends messages through `POST /conversation/message`
+- Displays AI-suggested contacts with toggles for notification confirmation
+- Sends notifications through `POST /conversation/send-notifications` (after conversation is saved)
 - Supports voice transcription through `POST /voice/transcribe`
 - Supports voice response through `POST /voice/respond`
 - Saves conversations through `POST /conversation/save-conversation`
@@ -280,8 +283,9 @@ src/
 - Requests tab filters by managed or owned property IDs
 - Displays stats for total, escalated, pending approval, and resolved requests
 - Filters by request type, status, urgency, and property
-- Opens a request detail panel with summary, conversation, and notifications
+- Opens a request detail panel with summary, conversation, and detailed notification history
 - Approves pending approval requests with `PATCH /requests/{id}`
+- Resolves requests with resolution responses using `POST /requests/{id}/resolve`
 - Completes in-progress or escalated requests with resolution note using `POST /requests/{id}/complete`
 - Properties tab with create/edit forms and tenant listings
 - Tenants tab with create/edit forms and request history

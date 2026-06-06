@@ -38,9 +38,12 @@ Tenant sends message
   -> ConversationEngine builds tenant/property/request context
   -> Gemini returns structured JSON:
        reply, is_complete, type, urgency, sentiment, confidence, escalate,
-       involved_party_types, vendor_service_needed
+       involved_party_types, vendor_service_needed, suggested_contacts
   -> Backend normalizes type to the canonical request taxonomy
-  -> Backend returns AI reply + request metadata to the frontend
+  -> Backend returns AI reply + request metadata + suggested contacts to the frontend
+  -> Frontend displays suggested contacts with toggles for user confirmation
+  -> User confirms contacts -> POST /conversation/send-notifications
+  -> Backend dispatches email/SMS notifications via Resend/Twilio MCP tools
 
 Request is saved or updated
   -> If the user chooses End & Save, frontend calls POST /conversation/save-conversation
@@ -61,6 +64,9 @@ Manager or owner reviews requests
   -> Management dashboard filters requests by managed_properties or owned_properties
   -> Manager/owner filters by type, status, urgency, and property
   -> Detail panel can fetch GET /requests/{id}/summary for an AI summary
+  -> Detail panel shows detailed notification history (recipient, type, timestamp)
+  -> Manager/owner can provide resolution responses via POST /requests/{id}/resolve
+  -> Resolution responses appear in conversation history as AI messages
   -> Pending approval requests can be approved with PATCH /requests/{id}
 ```
 
@@ -127,6 +133,9 @@ VITE_PROD_BACKEND=https://your-production-backend.example.com
 - Request type normalization for older coarse values such as `maintenance`, `access`, and `rental_agreement`.
 - Voice transcription and text-to-speech response flow.
 - Email and SMS notification services with readable request type labels.
+- MCP-style tools for sending email and SMS notifications via Resend and Twilio.
+- AI-suggested contacts for notifications with user confirmation flow.
+- Request resolution endpoint for managers/owners to provide responses to tenants.
 - JSON-backed mock data through `json_store` (current runtime persistence).
 - PostgreSQL migrations in `src/resources/db/migrations/` — base schema, RLS, seed data, and production hardening (soft delete, units, audit tables, `user_accounts`).
 - Rate limiting, logging, validation, and Docker support.
@@ -137,10 +146,13 @@ VITE_PROD_BACKEND=https://your-production-backend.example.com
 - Authenticated layout with shared header, role-aware navigation, avatar, and client-side logout.
 - Route guards for `/chat`, `/dashboard`, `/management`, `/vendors`, and `/profile`.
 - Tenant chat flow with text and voice input.
+- AI-suggested contacts display with toggles and Send button for notification confirmation.
 - Tenant request dashboard with expandable timelines and cancel request functionality.
 - Tenant profile page with editable email/phone and property representative contact info.
 - Management dashboard with stats, filters, sortable table, AI summaries, and request approval.
 - Management tabs for Requests, Properties, Tenants, Vendors, and Profile.
+- Request detail panel with detailed notification history (recipient, type, timestamp).
+- Request resolution dialog for managers/owners to provide responses to tenants.
 - Properties management with create/edit forms and tenant listings.
 - Tenant management with create/edit forms and request history.
 - Vendor directory with search, service filtering, and role-aware CRUD for managers/owners.
