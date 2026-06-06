@@ -95,7 +95,10 @@
     "sentiment": "neutral",
     "confidence": 1,
     "vendor_id": null,
-    "notifications_sent": [],
+    "notifications_sent": [
+      "manager_001",
+      "manager_002"
+    ],
     "notification_pending": true,
     "property_id": "property_001",
     "property": "Sunset Apartments",
@@ -232,5 +235,400 @@
     "property_id": "property_001",
     "property": "Sunset Apartments",
     "summary": "The tenant reported a suspected gas leak inside their apartment at Spandauer Damm. The AI instructed the tenant to evacuate the building immediately and contact emergency services, while simultaneously escalating the issue to the property manager as a priority emergency."
+  },
+  {
+    "id": "request_bf92d101",
+    "requester_id": "tenant_003",
+    "type": "hvac",
+    "description": "The heating system is not working and the apartment is very cold.",
+    "status": "pending",
+    "urgency": "medium",
+    "involved_parties": [
+      "tenant_003",
+      "manager_002"
+    ],
+    "conversation_history": [
+      {
+        "id": "msg_001",
+        "role": "ai",
+        "message": "Hello Michael Brown. How can I assist you today?",
+        "timestamp": "2026-06-01T08:15:00Z"
+      },
+      {
+        "id": "msg_002",
+        "role": "tenant",
+        "message": "The heating system is not working and the apartment is very cold.",
+        "timestamp": "2026-06-01T08:16:10Z"
+      },
+      {
+        "id": "msg_003",
+        "role": "ai",
+        "message": "I'm sorry to hear that. Has the thermostat been adjusted recently, and are other residents experiencing similar issues?",
+        "timestamp": "2026-06-01T08:16:35Z"
+      },
+      {
+        "id": "msg_004",
+        "role": "tenant",
+        "message": "My neighbors say theirs is working fine.",
+        "timestamp": "2026-06-01T08:17:01Z"
+      },
+      {
+        "id": "msg_005",
+        "role": "ai",
+        "message": "Thank you. I have escalated this issue to the property manager and assigned an HVAC vendor for inspection.",
+        "timestamp": "2026-06-01T08:17:20Z"
+      }
+    ],
+    "created_at": "2026-06-01T08:17:20Z",
+    "updated_at": "2026-06-01T08:17:20Z",
+    "escalated": true,
+    "sentiment": "negative",
+    "confidence": 0.98,
+    "vendor_id": "vendor_004",
+    "notifications_sent": [
+      "manager_002",
+      "vendor_004"
+    ],
+    "notification_pending": false,
+    "property_id": "property_002",
+    "property": "Riverbend Residences",
+    "summary": "Tenant reported a heating failure isolated to their apartment. The issue was escalated to the property manager and HVAC contractor."
+  },
+  {
+    "id": "request_ae81f223",
+    "requester_id": "tenant_004",
+    "type": "electrical",
+    "description": "Half of the outlets in my apartment stopped working.",
+    "status": "in_progress",
+    "urgency": "medium",
+    "involved_parties": [
+      "tenant_004",
+      "manager_002"
+    ],
+    "conversation_history": [
+      {
+        "id": "msg_006",
+        "role": "tenant",
+        "message": "Half of the outlets in my apartment stopped working.",
+        "timestamp": "2026-06-02T13:45:00Z"
+      },
+      {
+        "id": "msg_007",
+        "role": "ai",
+        "message": "Have you checked the circuit breaker panel for any tripped breakers?",
+        "timestamp": "2026-06-02T13:45:25Z"
+      },
+      {
+        "id": "msg_008",
+        "role": "tenant",
+        "message": "Yes, everything appears normal.",
+        "timestamp": "2026-06-02T13:46:02Z"
+      },
+      {
+        "id": "msg_009",
+        "role": "ai",
+        "message": "Thank you. An electrician has been notified and the property manager has been informed.",
+        "timestamp": "2026-06-02T13:46:30Z"
+      }
+    ],
+    "created_at": "2026-06-02T13:46:30Z",
+    "updated_at": "2026-06-02T13:46:30Z",
+    "escalated": true,
+    "sentiment": "neutral",
+    "confidence": 0.96,
+    "vendor_id": "vendor_003",
+    "notifications_sent": [
+      "manager_002",
+      "vendor_003"
+    ],
+    "notification_pending": false,
+    "property_id": "property_002",
+    "property": "Riverbend Residences",
+    "summary": "Several electrical outlets stopped functioning despite no visible breaker issue. Escalated to electrical contractor."
+  },
+  {
+    "id": "request_c4471d91",
+    "requester_id": "tenant_005",
+    "type": "pest_control",
+    "description": "I have noticed cockroaches in the kitchen for the past week.",
+    "status": "pending",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_005",
+      "manager_003"
+    ],
+    "conversation_history": [
+      {
+        "id": "msg_010",
+        "role": "tenant",
+        "message": "I have noticed cockroaches in the kitchen for the past week.",
+        "timestamp": "2026-06-03T10:10:00Z"
+      },
+      {
+        "id": "msg_011",
+        "role": "ai",
+        "message": "Thank you for reporting this. Approximately how many have you seen and at what times?",
+        "timestamp": "2026-06-03T10:10:30Z"
+      },
+      {
+        "id": "msg_012",
+        "role": "tenant",
+        "message": "Usually a few at night around the sink.",
+        "timestamp": "2026-06-03T10:11:11Z"
+      }
+    ],
+    "created_at": "2026-06-03T10:11:30Z",
+    "updated_at": "2026-06-03T10:11:30Z",
+    "escalated": true,
+    "sentiment": "negative",
+    "confidence": 0.94,
+    "vendor_id": "vendor_007",
+    "notifications_sent": [
+      "manager_003"
+    ],
+    "notification_pending": true,
+    "property_id": "property_003",
+    "property": "Maple Heights",
+    "summary": "Tenant reported recurring cockroach activity in the kitchen area. Pest control service requested."
+  },
+  {
+    "id": "request_d5f4a882",
+    "requester_id": "tenant_006",
+    "type": "locksmith",
+    "description": "My apartment key broke inside the lock.",
+    "status": "in_progress",
+    "urgency": "high",
+    "involved_parties": [
+      "tenant_006",
+      "manager_004"
+    ],
+    "conversation_history": [
+      {
+        "id": "msg_013",
+        "role": "tenant",
+        "message": "My apartment key broke inside the lock and I cannot enter.",
+        "timestamp": "2026-06-04T18:00:00Z"
+      },
+      {
+        "id": "msg_014",
+        "role": "ai",
+        "message": "Are you currently locked out of your apartment?",
+        "timestamp": "2026-06-04T18:00:14Z"
+      },
+      {
+        "id": "msg_015",
+        "role": "tenant",
+        "message": "Yes.",
+        "timestamp": "2026-06-04T18:00:25Z"
+      },
+      {
+        "id": "msg_016",
+        "role": "ai",
+        "message": "This has been escalated as an urgent access issue and a locksmith has been contacted.",
+        "timestamp": "2026-06-04T18:00:40Z"
+      }
+    ],
+    "created_at": "2026-06-04T18:00:40Z",
+    "updated_at": "2026-06-04T18:00:40Z",
+    "escalated": true,
+    "sentiment": "negative",
+    "confidence": 1,
+    "vendor_id": "vendor_001",
+    "notifications_sent": [
+      "manager_004",
+      "vendor_001"
+    ],
+    "notification_pending": false,
+    "property_id": "property_004",
+    "property": "Willow Creek Lofts",
+    "summary": "Tenant is locked out after a key snapped inside the lock. Emergency locksmith dispatched."
+  },
+  {
+    "id": "request_e88c1194",
+    "requester_id": "tenant_007",
+    "type": "glass_repair",
+    "description": "Bedroom window cracked after a storm.",
+    "status": "pending",
+    "urgency": "medium",
+    "involved_parties": [
+      "tenant_007",
+      "manager_004"
+    ],
+    "conversation_history": [
+      {
+        "id": "msg_017",
+        "role": "tenant",
+        "message": "My bedroom window cracked after yesterday's storm.",
+        "timestamp": "2026-06-05T09:30:00Z"
+      },
+      {
+        "id": "msg_018",
+        "role": "ai",
+        "message": "Thank you for reporting this. Is the glass intact or are there loose shards present?",
+        "timestamp": "2026-06-05T09:30:18Z"
+      },
+      {
+        "id": "msg_019",
+        "role": "tenant",
+        "message": "The glass is still intact but the crack is spreading.",
+        "timestamp": "2026-06-05T09:31:00Z"
+      }
+    ],
+    "created_at": "2026-06-05T09:31:10Z",
+    "updated_at": "2026-06-05T09:31:10Z",
+    "escalated": true,
+    "sentiment": "neutral",
+    "confidence": 0.95,
+    "vendor_id": "vendor_006",
+    "notifications_sent": [
+      "manager_004"
+    ],
+    "notification_pending": true,
+    "property_id": "property_004",
+    "property": "Willow Creek Lofts",
+    "summary": "Tenant reported a cracked bedroom window that may worsen. Glass repair vendor recommended."
+  },
+  {
+    "id": "request_f9017c61",
+    "requester_id": "tenant_008",
+    "type": "appliance_repair",
+    "description": "The refrigerator is not cooling properly.",
+    "status": "pending",
+    "urgency": "medium",
+    "involved_parties": [
+      "tenant_008",
+      "manager_004"
+    ],
+    "conversation_history": [
+      {
+        "id": "msg_020",
+        "role": "tenant",
+        "message": "The refrigerator is not cooling properly.",
+        "timestamp": "2026-06-05T16:15:00Z"
+      },
+      {
+        "id": "msg_021",
+        "role": "ai",
+        "message": "Are both the refrigerator and freezer compartments affected?",
+        "timestamp": "2026-06-05T16:15:21Z"
+      },
+      {
+        "id": "msg_022",
+        "role": "tenant",
+        "message": "The freezer still works but the refrigerator section is warm.",
+        "timestamp": "2026-06-05T16:16:00Z"
+      }
+    ],
+    "created_at": "2026-06-05T16:16:20Z",
+    "updated_at": "2026-06-05T16:16:20Z",
+    "escalated": true,
+    "sentiment": "neutral",
+    "confidence": 0.97,
+    "vendor_id": "vendor_009",
+    "notifications_sent": [
+      "manager_004"
+    ],
+    "notification_pending": true,
+    "property_id": "property_004",
+    "property": "Willow Creek Lofts",
+    "summary": "Refrigerator compartment has lost cooling while freezer remains operational. Appliance repair requested."
+  },
+  {
+    "id": "request_g312a774",
+    "requester_id": "tenant_010",
+    "type": "plumbing",
+    "description": "Kitchen sink drain is completely clogged.",
+    "status": "in_progress",
+    "urgency": "medium",
+    "involved_parties": [
+      "tenant_010",
+      "owner_005"
+    ],
+    "conversation_history": [
+      {
+        "id": "msg_023",
+        "role": "tenant",
+        "message": "The kitchen sink drain is completely clogged.",
+        "timestamp": "2026-06-05T12:00:00Z"
+      },
+      {
+        "id": "msg_024",
+        "role": "ai",
+        "message": "Is any water draining at all or is it completely blocked?",
+        "timestamp": "2026-06-05T12:00:15Z"
+      },
+      {
+        "id": "msg_025",
+        "role": "tenant",
+        "message": "No water is draining.",
+        "timestamp": "2026-06-05T12:00:45Z"
+      }
+    ],
+    "created_at": "2026-06-05T12:01:00Z",
+    "updated_at": "2026-06-05T12:01:00Z",
+    "escalated": true,
+    "sentiment": "negative",
+    "confidence": 0.99,
+    "vendor_id": "vendor_008",
+    "notifications_sent": [
+      "owner_005",
+      "vendor_008"
+    ],
+    "notification_pending": false,
+    "property_id": "property_005",
+    "property": "Poplar Gardens",
+    "summary": "Tenant reported a fully blocked kitchen sink drain. Drain cleaning vendor assigned."
+  },
+  {
+    "id": "request_h842e991",
+    "requester_id": "tenant_010",
+    "type": "security",
+    "description": "The main building entrance access keypad is malfunctioning.",
+    "status": "pending",
+    "urgency": "high",
+    "involved_parties": [
+      "tenant_010",
+      "owner_005"
+    ],
+    "conversation_history": [
+      {
+        "id": "msg_026",
+        "role": "tenant",
+        "message": "The entrance keypad is not unlocking the main door.",
+        "timestamp": "2026-06-06T06:20:00Z"
+      },
+      {
+        "id": "msg_027",
+        "role": "ai",
+        "message": "Are all residents affected or only your access code?",
+        "timestamp": "2026-06-06T06:20:22Z"
+      },
+      {
+        "id": "msg_028",
+        "role": "tenant",
+        "message": "Several residents are having the same issue.",
+        "timestamp": "2026-06-06T06:21:00Z"
+      },
+      {
+        "id": "msg_029",
+        "role": "ai",
+        "message": "Thank you. This has been escalated as a building access issue and the owner has been notified.",
+        "timestamp": "2026-06-06T06:21:15Z"
+      }
+    ],
+    "created_at": "2026-06-06T06:21:15Z",
+    "updated_at": "2026-06-06T06:21:15Z",
+    "escalated": true,
+    "sentiment": "neutral",
+    "confidence": 0.98,
+    "vendor_id": "vendor_010",
+    "notifications_sent": [
+      "owner_005",
+      "vendor_010"
+    ],
+    "notification_pending": false,
+    "property_id": "property_005",
+    "property": "Poplar Gardens",
+    "summary": "Multiple residents are unable to use the building access keypad. Security systems vendor assigned for urgent review."
   }
 ]
