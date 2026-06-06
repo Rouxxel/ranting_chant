@@ -171,11 +171,17 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
 
           <section>
             <SectionTitle>Description</SectionTitle>
-            <p className="text-sm text-ranting-ice/90">{req.description}</p>
+            {req.description.length > 0 ? (
+              <p className="glass-panel p-3 text-sm text-ranting-deep bold">"{req.description}"</p>
+            ) : (
+              <p className="glass-panel p-3 text-sm text-ranting-deep italic">
+                No description provided
+              </p>
+            )}
           </section>
 
           <section>
-            <SectionTitle>Involved parties</SectionTitle>
+            <SectionTitle>Tenant</SectionTitle>
             <div className="flex flex-wrap gap-2">
               {req.involved_parties && req.involved_parties.length > 0 ? (
                 req.involved_parties.map((p) => (
@@ -184,31 +190,35 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
                   </div>
                 ))
               ) : (
-                <div className="text-xs text-ranting-deep">No involved parties</div>
+                <div className="glass-panel p-3 text-xs text-ranting-deep italic">
+                  Tenant could not be loaded
+                </div>
               )}
             </div>
           </section>
 
           <section>
             <SectionTitle>Conversation</SectionTitle>
-            <div className="space-y-2">
-              {req.conversation_history && req.conversation_history.map((m: any, i: number) => (
-                <div key={m.id ?? `msg-${i}`} className={`flex ${m.role === "tenant" ? "justify-end" : "justify-start"}`}>
-                  <div
-                    className={`glass-panel max-w-[80%] px-3 py-2 text-xs text-ranting-ice ${m.role === "tenant" ? "rounded-br-md" : ""}`}
-                  >
-                    {m.message}
-                    <div className="mt-0.5 text-[9px] text-ranting-deep">{new Date(m.timestamp).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</div>
+            <div className="glass-panel p-3">
+              <div className="space-y-2">
+                {req.conversation_history && req.conversation_history.map((m: any, i: number) => (
+                  <div key={m.id ?? `msg-${i}`} className={`flex ${m.role === "tenant" ? "justify-end" : "justify-start"}`}>
+                    <div
+                      className={`glass-panel max-w-[80%] px-3 py-2 text-xs text-ranting-ice ${m.role === "tenant" ? "rounded-br-md" : ""}`}
+                    >
+                      {m.message}
+                      <div className="mt-0.5 text-[9px] text-ranting-deep">{new Date(m.timestamp).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </section>
 
-          {req.notifications_sent?.length > 0 && (
-            <section>
-              <SectionTitle>Notifications</SectionTitle>
-              <ul className="space-y-1.5">
+          <section>
+            <SectionTitle>Notified parties</SectionTitle>
+            {req.notifications_sent?.length > 0 ? (
+              <ul className="space-y-1.5 glass-panel p-3">
                 {req.notifications_sent.map((n: any, i: number) => (
                   <li
                     key={n.id ?? `notif-${i}`}
@@ -219,7 +229,7 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
                     ) : (
                       <MessageCircle className="h-3.5 w-3.5 text-ranting-sky" />
                     )}
-                    <span className="font-medium">{n.type.toUpperCase()}</span>
+                    <span className="font-medium">{n}</span>
                     <span className="text-ranting-deep">→ {n.recipient}</span>
                     <span className="text-ranting-deep">
                       ·{" "}
@@ -231,8 +241,12 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
                   </li>
                 ))}
               </ul>
-            </section>
-          )}
+            ) : (
+              <div className="glass-panel p-3 text-xs text-ranting-deep italic">
+                No parties notified
+              </div>
+            )}
+          </section>
 
           <section>
             <SectionTitle>AI Summary</SectionTitle>
