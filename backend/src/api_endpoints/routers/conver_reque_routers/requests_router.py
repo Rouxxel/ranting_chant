@@ -68,13 +68,6 @@ class RequestCompletePayload(BaseModel):
     resolution_note: Optional[str] = Field(None, description="Optional resolution note")
 
 
-class RequestResolvePayload(BaseModel):
-    """Payload accepted when a manager or owner provides a resolution response."""
-
-    resolved_by: str = Field(..., description="ID of the manager or owner providing the resolution")
-    resolution_note: str = Field(..., description="Resolution response to the tenant")
-
-
 TERMINAL_STATUSES = {"cancelled", "resolved"}
 
 """API ROUTER-----------------------------------------------------------"""
@@ -519,6 +512,19 @@ async def complete_request(request: Request, request_id: str, body: RequestCompl
         if body.resolution_note is not None:
             updates["resolution_note"] = body.resolution_note
 
+            # Create a new conversation message for the resolution
+            resolution_message = {
+                "id": str(uuid.uuid4()),
+                "role": "ai",
+                "message": body.resolution_note,
+                "timestamp": now
+            }
+
+            # Get existing conversation history or start a new one
+            conversation_history = req.get("conversation_history", [])
+            conversation_history.append(resolution_message)
+            updates["conversation_history"] = conversation_history
+
         updated = update_record("requests", request_id, updates)
         log_handler.info(f"[requests_router] Request '{request_id}' completed successfully")
         return updated
@@ -528,77 +534,6 @@ async def complete_request(request: Request, request_id: str, body: RequestCompl
     except Exception as e:
         log_handler.error(f"[requests_router] Unexpected error completing request '{request_id}': {e}")
         raise HTTPException(status_code=500, detail="Internal server error while completing request")
-
-
-#Provide a resolution response to a request
-@router.post("/{request_id}/resolve")
-@SlowLimiter.limit(
-    f"{config_loader['endpoints']['requests_endpoint']['request_limit']}/"
-    f"{config_loader['endpoints']['requests_endpoint']['unit_of_time_for_limit']}"
-)
-async def resolve_request(request: Request, request_id: str, body: RequestResolvePayload):
-    """
-    Provide a resolution response to a request.
-
-    This endpoint allows managers or owners to provide a resolution response
-    to a tenant's request. The resolution is added to the conversation history
-    as an AI message so the tenant can see it, and also stored in the resolution_note field.
-
-    Parameters:
-        request (Request): The incoming HTTP request for rate limit tracking.
-        request_id (str): The unique identifier of the request.
-        body (RequestResolvePayload): The resolution payload containing the resolver ID and note.
-
-    Returns:
-        dict: The updated request record with the resolution added to conversation history.
-
-    Raises:
-        HTTPException 404: If no request with the given ID exists.
-        HTTPException 500: If an unexpected error occurs during the resolution.
-
-    Note:
-        If the rate limit is exceeded, the rate_limit_handler() handles the response.
-    """
-    try:
-        log_handler.debug(f"[requests_router] Providing resolution for request_id='{request_id}'")
-
-        req = find_by_id("requests", request_id)
-        if not req:
-            message = f"Request '{request_id}' not found"
-            log_handler.warning(message)
-            raise HTTPException(status_code=404, detail=message)
-
-        now = datetime.now(timezone.utc).isoformat()
-
-        # Create a new conversation message for the resolution
-        resolution_message = {
-            "id": str(uuid.uuid4()),
-            "role": "ai",
-            "message": body.resolution_note,
-            "timestamp": now
-        }
-
-        # Get existing conversation history or start a new one
-        conversation_history = req.get("conversation_history", [])
-        conversation_history.append(resolution_message)
-
-        # Update the request with the resolution
-        updates = {
-            "resolution_note": body.resolution_note,
-            "resolved_by": body.resolved_by,
-            "conversation_history": conversation_history,
-            "updated_at": now,
-        }
-
-        updated = update_record("requests", request_id, updates)
-        log_handler.info(f"[requests_router] Resolution provided for request '{request_id}' successfully")
-        return updated
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        log_handler.error(f"[requests_router] Unexpected error providing resolution for request '{request_id}': {e}")
-        raise HTTPException(status_code=500, detail="Internal server error while providing resolution")
 
 
 #Send notifications for a request (user confirmation)

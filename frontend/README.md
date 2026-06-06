@@ -85,7 +85,7 @@ The Vite router plugin regenerates `src/routeTree.gen.ts`; do not edit it manual
 - `RequestCard.tsx` - tenant request card with cancel button
 - `RequestTimeline.tsx` - conversation/notification timeline
 - `RequestTable.tsx` - management request table
-- `RequestDetailPanel.tsx` - slide-in request details, AI summary, notification history, and resolve/complete buttons
+- `RequestDetailPanel.tsx` - slide-in request details, AI summary, notification history, and complete button
 - `TenantProfile.tsx` - tenant profile with editable email/phone
 - `PropertyRepresentative.tsx` - property manager/owner contact info for tenants
 - `ManagementProperties.tsx` - properties management with create/edit forms
@@ -100,7 +100,7 @@ The Vite router plugin regenerates `src/routeTree.gen.ts`; do not edit it manual
 It includes typed helpers for:
 
 - tenants, properties, vendors, managers, owners (CRUD operations)
-- requests (create, update, cancel, complete, resolve)
+- requests (create, update, cancel, complete)
 - profile updates for tenants, managers, and owners
 - conversation start/message/history/save
 - conversation send-notifications
@@ -285,8 +285,7 @@ src/
 - Filters by request type, status, urgency, and property
 - Opens a request detail panel with summary, conversation, and detailed notification history
 - Approves pending approval requests with `PATCH /requests/{id}`
-- Resolves requests with resolution responses using `POST /requests/{id}/resolve`
-- Completes in-progress or escalated requests with resolution note using `POST /requests/{id}/complete`
+- Completes requests with optional resolution note using `POST /requests/{id}/complete` (resolution note added to conversation history)
 - Properties tab with create/edit forms and tenant listings
 - Tenants tab with create/edit forms and request history
 - Vendors tab with role-aware CRUD for managers/owners

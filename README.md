@@ -65,8 +65,8 @@ Manager or owner reviews requests
   -> Manager/owner filters by type, status, urgency, and property
   -> Detail panel can fetch GET /requests/{id}/summary for an AI summary
   -> Detail panel shows detailed notification history (recipient, type, timestamp)
-  -> Manager/owner can provide resolution responses via POST /requests/{id}/resolve
-  -> Resolution responses appear in conversation history as AI messages
+  -> Manager/owner can complete requests with optional resolution note via POST /requests/{id}/complete
+  -> Resolution notes appear in conversation history as AI messages
   -> Pending approval requests can be approved with PATCH /requests/{id}
 ```
 
@@ -135,7 +135,7 @@ VITE_PROD_BACKEND=https://your-production-backend.example.com
 - Email and SMS notification services with readable request type labels.
 - MCP-style tools for sending email and SMS notifications via Resend and Twilio.
 - AI-suggested contacts for notifications with user confirmation flow.
-- Request resolution endpoint for managers/owners to provide responses to tenants.
+- Request completion endpoint with optional resolution note that adds to conversation history.
 - JSON-backed mock data through `json_store` (current runtime persistence).
 - PostgreSQL migrations in `src/resources/db/migrations/` — base schema, RLS, seed data, and production hardening (soft delete, units, audit tables, `user_accounts`).
 - Rate limiting, logging, validation, and Docker support.
@@ -152,7 +152,7 @@ VITE_PROD_BACKEND=https://your-production-backend.example.com
 - Management dashboard with stats, filters, sortable table, AI summaries, and request approval.
 - Management tabs for Requests, Properties, Tenants, Vendors, and Profile.
 - Request detail panel with detailed notification history (recipient, type, timestamp).
-- Request resolution dialog for managers/owners to provide responses to tenants.
+- Request completion dialog for managers/owners with optional resolution note that adds to conversation history.
 - Properties management with create/edit forms and tenant listings.
 - Tenant management with create/edit forms and request history.
 - Vendor directory with search, service filtering, and role-aware CRUD for managers/owners.
