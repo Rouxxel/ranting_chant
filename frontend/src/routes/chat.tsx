@@ -12,6 +12,7 @@ import { requireTenantAuth } from "@/lib/auth";
 import { startConversation, sendMessage, transcribeAudio, respondToVoice, saveConversation, sendRequestNotifications, getVoiceProviderVoices } from "@/services/api";
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
 import type { ConversationMessage, RequestType, Status, Urgency, Voice } from "@/types";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/chat")({
   head: () => ({ meta: [{ title: "Chat — Ranting Chant" }] }),
@@ -186,25 +187,25 @@ function ChatPage() {
       // Invalidate requests cache since a new request was created
       localStorage.removeItem(`requests_${tenantId}`);
 
-      alert("Conversation saved successfully!");
+      toast.success("Conversation saved successfully!");
     } catch (error) {
       console.error("Failed to save conversation:", error);
-      alert("Failed to save conversation. Please try again.");
+      toast.error("Failed to save conversation. Please try again.");
     }
   }
 
   async function handleSendNotifications() {
     if (!requestId || !isSaved) {
-      alert("Please save the conversation first before sending notifications.");
+      toast.error("Please save the conversation first before sending notifications.");
       return;
     }
 
     try {
       await sendRequestNotifications(requestId);
-      alert("Notifications sent successfully!");
+      toast.success("Notifications sent successfully!");
     } catch (error) {
       console.error("Failed to send notifications:", error);
-      alert("Failed to send notifications. Please try again.");
+      toast.error("Failed to send notifications. Please try again.");
     }
   }
 

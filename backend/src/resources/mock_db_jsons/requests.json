@@ -190,5 +190,47 @@
     "property_id": "property_001",
     "property": "Sunset Apartments",
     "summary": null
+  },
+  {
+    "id": "request_7eedc058",
+    "requester_id": "tenant_001",
+    "type": "emergency",
+    "description": "i have an issue, there is a small gas leak i can smell it",
+    "status": "pending",
+    "urgency": "high",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "id": "7e57e3e9-89ac-4d4b-ac99-4bf99f593dfd",
+        "role": "ai",
+        "message": "Hello John Tenant. We are delighted to have you at Spandauer Damm 10-22, 14059 Berlin, Germany. How can I assist you today?",
+        "timestamp": "2026-06-06T07:38:32.026Z"
+      },
+      {
+        "id": "5bd7a87d-52e1-4446-87d2-23b74edfea14",
+        "role": "tenant",
+        "message": "i have an issue, there is a small gas leak i can smell it",
+        "timestamp": "2026-06-06T07:40:12.570Z"
+      },
+      {
+        "id": "3bc16980-4ba2-4207-b8e2-94b1cedc7992",
+        "role": "ai",
+        "message": "I am very concerned to hear about a gas leak. Please evacuate the premises immediately, leave the door unlocked, and call local emergency services (112 in Germany) from a safe location outside. Do not use any light switches or electrical devices. I have escalated this to your property manager as an emergency.",
+        "timestamp": "2026-06-06T07:40:18.283Z"
+      }
+    ],
+    "created_at": "2026-06-06T07:40:23.214913+00:00",
+    "updated_at": "2026-06-06T07:40:23.214913+00:00",
+    "escalated": true,
+    "sentiment": "neutral",
+    "confidence": 1,
+    "vendor_id": null,
+    "notifications_sent": [],
+    "notification_pending": true,
+    "property_id": "property_001",
+    "property": "Sunset Apartments",
+    "summary": null
   }
 ]
