@@ -12,7 +12,7 @@ FastAPI backend for Ranting Chant, an AI-assisted property operations platform. 
 - **Notifications** through Resend email and Twilio SMS.
 - **MCP-style tools** for property, tenant, vendor, request, and notification workflows.
 - **AI-suggested contacts** for notifications with user confirmation flow.
-- **Request completion endpoint** with optional resolution note that adds to conversation history.
+- **Request completion endpoint** with optional resolution note stored separately.
 - **JSON mock data store** with per-collection locking (current runtime persistence).
 - **PostgreSQL schema** — migrations for entities, units, soft delete, request audit tables, RLS, and seed data.
 - **Rate limiting**, structured logging, Pydantic validation, and Docker support.

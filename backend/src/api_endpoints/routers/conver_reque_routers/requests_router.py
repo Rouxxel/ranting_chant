@@ -512,19 +512,6 @@ async def complete_request(request: Request, request_id: str, body: RequestCompl
         if body.resolution_note is not None:
             updates["resolution_note"] = body.resolution_note
 
-            # Create a new conversation message for the resolution
-            resolution_message = {
-                "id": str(uuid.uuid4()),
-                "role": "ai",
-                "message": body.resolution_note,
-                "timestamp": now
-            }
-
-            # Get existing conversation history or start a new one
-            conversation_history = req.get("conversation_history", [])
-            conversation_history.append(resolution_message)
-            updates["conversation_history"] = conversation_history
-
         updated = update_record("requests", request_id, updates)
         log_handler.info(f"[requests_router] Request '{request_id}' completed successfully")
         return updated

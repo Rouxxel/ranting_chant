@@ -153,22 +153,6 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
         </header>
 
         <div className="flex-1 space-y-5 overflow-y-auto px-5 py-5">
-          {req.status === "resolved" && (
-            <section>
-              <SectionTitle>Resolution</SectionTitle>
-              <div className="glass-panel space-y-1 p-3">
-                <p className="text-sm text-ranting-ice/90">
-                  {req.resolution_note || "Marked resolved (no note provided)."}
-                </p>
-                {req.resolved_at && (
-                  <p className="text-[11px] text-ranting-deep">
-                    {new Date(req.resolved_at).toLocaleString()}
-                  </p>
-                )}
-              </div>
-            </section>
-          )}
-
           <section>
             <SectionTitle>Description</SectionTitle>
             {req.description.length > 0 ? (
@@ -267,6 +251,18 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
               )}
             </div>
           </section>
+
+          {req.resolution_note && (
+            <section>
+              <SectionTitle>Resolution</SectionTitle>
+              <div className="glass-panel space-y-2 p-3">
+                <p className="text-sm text-ranting-ice/90">{req.resolution_note}</p>
+                <div className="text-[11px] italic text-ranting-deep">
+                  Resolved on {new Date(req.resolved_at || "").toLocaleDateString()} by {partyNames[req.resolved_by || ""] || "Unknown"}
+                </div>
+              </div>
+            </section>
+          )}
         </div>
 
         {req.status === "pending_approval" && (
@@ -294,7 +290,7 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
           <DialogHeader>
             <DialogTitle>Complete Request</DialogTitle>
             <DialogDescription className="text-sm text-ranting-deep">
-              Mark this request as resolved. You can add an optional resolution note which will be added to the conversation history for the tenant to see.
+              Mark this request as resolved. You can add an optional resolution note.
             </DialogDescription>
           </DialogHeader>
           <Textarea

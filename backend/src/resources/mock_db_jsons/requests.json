@@ -4,7 +4,7 @@
     "requester_id": "tenant_001",
     "type": "plumbing",
     "description": "i have an issue with my plumbing",
-    "status": "pending",
+    "status": "resolved",
     "urgency": "low",
     "involved_parties": [
       "tenant_001"
@@ -90,7 +90,7 @@
       }
     ],
     "created_at": "2026-06-04T22:59:59.602997+00:00",
-    "updated_at": "2026-06-04T22:59:59.602997+00:00",
+    "updated_at": "2026-06-06T15:55:09.863676+00:00",
     "escalated": true,
     "sentiment": "neutral",
     "confidence": 1,
@@ -106,7 +106,10 @@
     "notification_pending": true,
     "property_id": "property_001",
     "property": "Sunset Apartments",
-    "summary": "The tenant is experiencing low water pressure specifically in their shower and has requested that the property manager be notified to arrange a repair. The AI is currently seeking additional clarification on the nature of the issue before escalating the request to the property management team."
+    "summary": "The tenant is experiencing low water pressure specifically in their shower and has requested that the property manager be notified to arrange a repair. The AI is currently seeking additional clarification on the nature of the issue before escalating the request to the property management team.",
+    "resolved_at": "2026-06-06T15:55:09.863676+00:00",
+    "resolved_by": "manager_001",
+    "resolution_note": "Skill issue lil bro"
   },
   {
     "id": "request_9285b9eb",
@@ -795,7 +798,7 @@
     "requester_id": "tenant_001",
     "type": "emergency",
     "description": "I have a gas leak",
-    "status": "escalated",
+    "status": "resolved",
     "urgency": "high",
     "involved_parties": [
       "tenant_001"
@@ -821,7 +824,7 @@
       }
     ],
     "created_at": "2026-06-06T11:34:08.680229+00:00",
-    "updated_at": "2026-06-06T11:34:13.800947+00:00",
+    "updated_at": "2026-06-06T15:57:18.629779+00:00",
     "escalated": true,
     "sentiment": "neutral",
     "confidence": 1,
@@ -843,6 +846,9 @@
     "notification_pending": false,
     "property_id": "property_001",
     "property": "Sunset Apartment",
-    "summary": "The tenant reported a gas leak at their apartment building, which is a critical safety hazard. The AI instructed the tenant to evacuate and contact emergency services immediately, and the issue has been escalated to the property manager as an emergency."
+    "summary": "The tenant reported a gas leak at their apartment building, which is a critical safety hazard. The AI instructed the tenant to evacuate and contact emergency services immediately, and the issue has been escalated to the property manager as an emergency.",
+    "resolved_at": "2026-06-06T15:57:18.629779+00:00",
+    "resolved_by": "manager_001",
+    "resolution_note": "skill issue lil bro"
   }
 ]
