@@ -108,6 +108,7 @@ export function ChatInput({
           className="aero-input flex-1 resize-none px-3.5 py-2.5 text-sm"
           disabled={disabled}
         />
+        {/* TODO: Currently facing many issues, disabled for now
         <button
           onClick={onVoiceToggle}
           className={isRecording ? "mic-pulse rounded-[10px] p-2.5 text-white" : "glossy-btn p-2.5"}
@@ -116,6 +117,7 @@ export function ChatInput({
         >
           <Mic className="h-4 w-4" />
         </button>
+        */}
         <button onClick={onSend} className="glossy-btn p-2.5" aria-label="Send" disabled={disabled}>
           <Send className="h-4 w-4" />
         </button>
