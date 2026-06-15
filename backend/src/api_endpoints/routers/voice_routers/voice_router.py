@@ -10,6 +10,9 @@
 This module defines endpoints for voice-based interactions with the Ranting Chant
 AI assistant. It supports audio transcription, starting voice sessions with audio
 greetings, and processing voice messages with audio responses.
+
+TODO: Elevenlabs API claims to have a ban on for "abuse"
+TODO: Gradium is not being able to process STT requests
 """
 
 # Native imports
