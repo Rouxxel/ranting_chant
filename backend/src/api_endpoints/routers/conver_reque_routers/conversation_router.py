@@ -105,7 +105,7 @@ async def start_conversation(request: Request, body: ConversationStartPayload):
         address = tenant.get("address", "your home")
 
         # 3. Build hardcoded greeting (no LLM call)
-        greeting = f"Hello {tenant.get('name')}. We are delighted to have you at {address}. How can I assist you today?"
+        greeting = f"Hello {tenant.get('name')}. We are delighted to have you at {address}. How can I assist you today?, please detail your request as much as you can for best results."
 
         # 4. Generate a temporary session ID (no request created yet)
         session_id = f"session_{uuid.uuid4().hex[:8]}"

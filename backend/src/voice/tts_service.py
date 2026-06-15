@@ -10,6 +10,9 @@
 This module provides text-to-speech conversion using ElevenLabs. It generates
 audio responses for the Ranting Chant application, including emergency mode
 with urgency tone prefixes.
+
+TODO: Elevenlabs API claims to have a ban on for "abuse"
+TODO: Gradium is not being able to process STT requests
 """
 
 #Native imports

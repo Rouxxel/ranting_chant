@@ -10,6 +10,9 @@
 This module provides speech-to-text transcription using ElevenLabs as the primary
 service and faster-whisper as a fallback. It handles audio file transcription
 for voice input in the Ranting Chant application.
+
+TODO: ElevenLabs API claims to have a ban on for "abuse"
+TODO: Gradium is not being able to process STT requests
 """
 
 #Native imports

@@ -62,7 +62,7 @@ function ChatPage() {
         setMessages([{
           id: crypto.randomUUID(),
           role: "ai",
-          message: response.greeting || `Hello ${name}! I'm Ranting Chant, your property operations assistant. How can I help you today?`,
+          message: response.greeting || `Hello ${name}! I'm Ranting Chant, your property operations assistant. How can I help you today?, please detail your request as much as you can for best results`,
           timestamp: new Date().toISOString()
         }]);
         setStatus("pending");
@@ -75,7 +75,7 @@ function ChatPage() {
         setMessages([{
           id: "1",
           role: "ai",
-          message: `Hello ${name}! I'm Ranting Chant, your property operations assistant. How can I help you today?`,
+          message: `Hello ${name}! I'm Ranting Chant, your property operations assistant. How can I help you today?, please detail your request as much as you can for best results.`,
           timestamp: new Date().toISOString()
         }]);
       } finally {
