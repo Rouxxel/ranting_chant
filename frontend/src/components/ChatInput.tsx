@@ -52,6 +52,7 @@ export function ChatInput({
 
   return (
     <div className="border-t border-white/10 p-4">
+      {/*
       <div className="mb-3 grid gap-3 sm:grid-cols-[minmax(0,250px)_minmax(0,250px)]">
         <div className="flex flex-col gap-1.5">
           <label className="text-[10px] font-semibold uppercase tracking-[0.22em] text-ranting-deep">
@@ -96,6 +97,7 @@ export function ChatInput({
           </Select>
         </div>
       </div>
+      */}
       <div className="flex items-end gap-2">
         <textarea
           value={value}
