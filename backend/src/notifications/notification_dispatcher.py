@@ -56,6 +56,68 @@ def _build_notification_event(
     return event
 
 
+def _resolve_request_context(request: dict) -> tuple[dict | None, dict | None, dict | None]:
+    """
+    Resolve tenant, property, and manager records for a request.
+
+    Parameters:
+        request (dict): The request record.
+
+    Returns:
+        tuple: tenant, property, and manager records; each may be None.
+    """
+    tenant_id = request.get("requester_id", "")
+    tenant = find_by_id("tenants", tenant_id)
+    if not tenant:
+        return None, None, None
+
+    property_id = request.get("property_id") or tenant.get("property_id", "")
+    prop = find_by_id("properties", property_id)
+    if not prop:
+        return tenant, None, None
+
+    manager_id = prop.get("manager_id", "")
+    manager = find_by_id("property_magament", manager_id) if manager_id else None
+    return tenant, prop, manager
+
+
+def _resolve_property_representative(prop: dict, fallback_manager: dict | None = None) -> tuple[str, str]:
+    """
+    Resolve representative details used for vendor coordination.
+
+    Parameters:
+        prop (dict): The property record.
+        fallback_manager (dict | None): Manager record used when no representative is found.
+
+    Returns:
+        tuple[str, str]: Representative name and contact string.
+    """
+    representative = prop.get("representative") or {}
+    rep_type = representative.get("type")
+    rep_id = representative.get("id")
+    rep_record = None
+
+    if rep_type == "owner" and rep_id:
+        rep_record = find_by_id("owners", rep_id)
+    elif rep_type == "property_manager" and rep_id:
+        rep_record = find_by_id("property_magament", rep_id)
+
+    if not rep_record:
+        rep_record = fallback_manager
+
+    if not rep_record:
+        return "the property representative", "the contact details on file"
+
+    name = rep_record.get("name", "the property representative")
+    contact_parts = [
+        value
+        for value in (rep_record.get("email"), rep_record.get("phone"))
+        if value
+    ]
+    contact = " / ".join(contact_parts) if contact_parts else "the contact details on file"
+    return name, contact
+
+
 def dispatch_on_create(request: dict) -> list[dict]:
     """
     Send notifications when a new request is created.
@@ -80,29 +142,24 @@ def dispatch_on_create(request: dict) -> list[dict]:
 
     try:
         #Resolve tenant and property to find the manager
-        tenant_id = request.get("requester_id", "")
-        tenant = find_by_id("tenants", tenant_id)
+        tenant, prop, manager = _resolve_request_context(request)
         if not tenant:
             log_handler.warning(
-                f"[notification_dispatcher] Tenant '{tenant_id}' not found "
+                f"[notification_dispatcher] Tenant '{request.get('requester_id', '')}' not found "
                 f"— skipping create notifications"
             )
             return events
 
-        property_id = tenant.get("property_id", "")
-        prop = find_by_id("properties", property_id)
         if not prop:
             log_handler.warning(
-                f"[notification_dispatcher] Property '{property_id}' not found "
+                f"[notification_dispatcher] Property for tenant '{tenant.get('id')}' not found "
                 f"— skipping create notifications"
             )
             return events
 
-        manager_id = prop.get("manager_id", "")
-        manager = find_by_id("property_magament", manager_id)
         if not manager:
             log_handler.warning(
-                f"[notification_dispatcher] Manager '{manager_id}' not found "
+                f"[notification_dispatcher] Manager '{prop.get('manager_id', '')}' not found "
                 f"— skipping create notifications"
             )
             return events
@@ -111,11 +168,15 @@ def dispatch_on_create(request: dict) -> list[dict]:
         tenant_name = tenant.get("name", "Unknown Tenant")
         req_type = request.get("type", "general")
         description = request.get("description", "No description provided")
+        urgency = request.get("urgency", "medium")
+        property_name = prop.get("name", "Unknown Property")
 
         #Send email to manager
         success = send_request_created(
             manager_email=manager_email,
             tenant_name=tenant_name,
+            urgency=urgency,
+            property_name=property_name,
             request_type=req_type,
             summary=description
         )
@@ -162,20 +223,17 @@ def dispatch_on_escalate(request: dict) -> list[dict]:
     events = []
 
     try:
-        tenant_id = request.get("requester_id", "")
-        tenant = find_by_id("tenants", tenant_id)
+        tenant, prop, manager = _resolve_request_context(request)
         if not tenant:
             log_handler.warning(
-                f"[notification_dispatcher] Tenant '{tenant_id}' not found "
+                f"[notification_dispatcher] Tenant '{request.get('requester_id', '')}' not found "
                 f"— skipping escalation notifications"
             )
             return events
 
-        property_id = tenant.get("property_id", "")
-        prop = find_by_id("properties", property_id)
         if not prop:
             log_handler.warning(
-                f"[notification_dispatcher] Property '{property_id}' not found "
+                f"[notification_dispatcher] Property for tenant '{tenant.get('id')}' not found "
                 f"— skipping escalation notifications"
             )
             return events
@@ -183,16 +241,19 @@ def dispatch_on_escalate(request: dict) -> list[dict]:
         tenant_name = tenant.get("name", "Unknown Tenant")
         urgency = request.get("urgency", "high")
         description = request.get("description", "No description provided")
+        property_name = prop.get("name", "Unknown Property")
 
         #Notify manager via email + SMS
-        manager_id = prop.get("manager_id", "")
-        manager = find_by_id("property_magament", manager_id)
         if manager:
             manager_email = manager.get("email", "")
             manager_phone = manager.get("phone", "")
 
             email_ok = send_escalation_alert(
-                manager_email, tenant_name, urgency, description
+                recipient_email=manager_email,
+                tenant_name=tenant_name,
+                urgency=urgency,
+                property_name=property_name,
+                description=description
             )
             events.append(
                 _build_notification_event("email", manager_email, "sent" if email_ok else "failed", "manager")
@@ -200,8 +261,11 @@ def dispatch_on_escalate(request: dict) -> list[dict]:
 
             if urgency == "high" and manager_phone:
                 sms_ok = send_emergency_sms(
-                    manager_phone,
-                    f"Escalated request from {tenant_name}: {description}"
+                    to_number=manager_phone,
+                    message=f"Escalated request: {description}",
+                    tenant_name=tenant_name,
+                    urgency=urgency,
+                    property_name=property_name
                 )
                 events.append(
                     _build_notification_event("sms", manager_phone, "sent" if sms_ok else "failed", "manager")
@@ -215,7 +279,11 @@ def dispatch_on_escalate(request: dict) -> list[dict]:
             owner_phone = owner.get("phone", "")
 
             email_ok = send_escalation_alert(
-                owner_email, tenant_name, urgency, description
+                recipient_email=owner_email,
+                tenant_name=tenant_name,
+                urgency=urgency,
+                property_name=property_name,
+                description=description
             )
             events.append(
                 _build_notification_event("email", owner_email, "sent" if email_ok else "failed", "owner")
@@ -223,8 +291,11 @@ def dispatch_on_escalate(request: dict) -> list[dict]:
 
             if urgency == "high" and owner_phone:
                 sms_ok = send_emergency_sms(
-                    owner_phone,
-                    f"Escalated request from {tenant_name}: {description}"
+                    to_number=owner_phone,
+                    message=f"Escalated request: {description}",
+                    tenant_name=tenant_name,
+                    urgency=urgency,
+                    property_name=property_name
                 )
                 events.append(
                     _build_notification_event("sms", owner_phone, "sent" if sms_ok else "failed", "owner")
@@ -275,6 +346,14 @@ def dispatch_vendor_dispatch(request: dict, vendor: dict) -> list[dict]:
     events = []
 
     try:
+        tenant, prop, manager = _resolve_request_context(request)
+        property_name = prop.get("name", "Unknown Property") if prop else request.get("property", "Unknown Property")
+        representative_name, representative_contact = (
+            _resolve_property_representative(prop, manager)
+            if prop
+            else ("the property representative", "the contact details on file")
+        )
+
         vendor_email = vendor.get("email", "")
         vendor_name = vendor.get("name", "Vendor")
 
@@ -288,7 +367,10 @@ def dispatch_vendor_dispatch(request: dict, vendor: dict) -> list[dict]:
         success = send_vendor_dispatch(
             vendor_email=vendor_email,
             vendor_name=vendor_name,
-            request_details=request
+            request_details=request,
+            property_name=property_name,
+            relevant_property_representative=representative_name,
+            relevant_property_contact=representative_contact
         )
         status = "sent" if success else "failed"
         events.append(_build_notification_event("email", vendor_email, status, "vendor"))

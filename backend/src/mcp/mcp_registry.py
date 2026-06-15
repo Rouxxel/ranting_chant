@@ -108,11 +108,11 @@ TOOL_REGISTRY: dict[str, dict] = {
 
     # Notification tools
     "send_email_notification": {
-        "description": "Send an email notification to a manager, owner, or vendor",
+        "description": "Send an email notification to a manager, owner, or vendor, including property and representative context",
         "fn": notification_mcp.send_email_notification
     },
     "send_sms_notification": {
-        "description": "Send an emergency SMS notification to a manager or owner",
+        "description": "Send an emergency SMS notification to a manager or owner, including tenant urgency and property context",
         "fn": notification_mcp.send_sms_notification
     },
 }

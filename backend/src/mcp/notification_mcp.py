@@ -34,6 +34,9 @@ def send_email_notification(
     request_type: str,
     description: str,
     urgency: str = "medium",
+    property_name: str = "Unknown Property",
+    relevant_property_representative: str = "",
+    relevant_property_contact: str = "",
     vendor_name: str = ""
 ) -> dict:
     """
@@ -48,6 +51,9 @@ def send_email_notification(
         request_type (str): Category of the request.
         description (str): Description or summary of the request.
         urgency (str): Urgency level (low, medium, high). Defaults to "medium".
+        property_name (str): Name of the property tied to the request.
+        relevant_property_representative (str): Representative name for vendor coordination.
+        relevant_property_contact (str): Representative contact details for vendor coordination.
         vendor_name (str): Name of the vendor (only for vendor_dispatch notifications).
 
     Returns:
@@ -60,17 +66,41 @@ def send_email_notification(
 
     success = False
     if notification_type == "request_created":
-        success = send_request_created(recipient_email, tenant_name, request_type, description)
+        success = send_request_created(
+            manager_email=recipient_email,
+            tenant_name=tenant_name,
+            urgency=urgency,
+            property_name=property_name,
+            request_type=request_type,
+            summary=description
+        )
     elif notification_type == "escalation_alert":
-        success = send_escalation_alert(recipient_email, tenant_name, urgency, description)
+        success = send_escalation_alert(
+            recipient_email=recipient_email,
+            tenant_name=tenant_name,
+            urgency=urgency,
+            property_name=property_name,
+            description=description
+        )
     elif notification_type == "vendor_dispatch":
         if not vendor_name:
             log_handler.warning("[notification_mcp] vendor_name required for vendor_dispatch")
             return {"success": False, "error": "vendor_name required for vendor_dispatch"}
+        if not relevant_property_representative or not relevant_property_contact:
+            log_handler.warning(
+                "[notification_mcp] representative name and contact required for vendor_dispatch"
+            )
+            return {
+                "success": False,
+                "error": "relevant_property_representative and relevant_property_contact required for vendor_dispatch"
+            }
         success = send_vendor_dispatch(
-            recipient_email,
-            vendor_name,
-            {"type": request_type, "description": description, "urgency": urgency}
+            vendor_email=recipient_email,
+            vendor_name=vendor_name,
+            request_details={"type": request_type, "description": description, "urgency": urgency},
+            property_name=property_name,
+            relevant_property_representative=relevant_property_representative,
+            relevant_property_contact=relevant_property_contact
         )
 
     if success:
@@ -87,7 +117,8 @@ def send_sms_notification(
     recipient_name: str,
     tenant_name: str,
     urgency: str,
-    description: str
+    description: str,
+    property_name: str = "Unknown Property"
 ) -> dict:
     """
     Send an SMS notification to a specified recipient.
@@ -99,6 +130,7 @@ def send_sms_notification(
         tenant_name (str): Name of the tenant who submitted the request.
         urgency (str): Urgency level (low, medium, high, critical).
         description (str): Description of the issue.
+        property_name (str): Name of the property tied to the request.
 
     Returns:
         dict: Success status with details.
@@ -109,7 +141,13 @@ def send_sms_notification(
     )
 
     message = f"Urgent request from {tenant_name}: {description} (Urgency: {urgency})"
-    success = send_emergency_sms(recipient_phone, message)
+    success = send_emergency_sms(
+        to_number=recipient_phone,
+        message=message,
+        tenant_name=tenant_name,
+        urgency=urgency,
+        property_name=property_name
+    )
 
     if success:
         log_handler.info(f"[notification_mcp] SMS sent successfully to {recipient_phone}")

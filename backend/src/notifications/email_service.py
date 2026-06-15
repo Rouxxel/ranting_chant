@@ -37,6 +37,8 @@ else:
 def send_request_created(
     manager_email: str,
     tenant_name: str,
+    urgency: str,
+    property_name: str,
     request_type: str,
     summary: str
 ) -> bool:
@@ -46,6 +48,8 @@ def send_request_created(
     Parameters:
         manager_email (str): The manager's email address.
         tenant_name (str): The name of the tenant who submitted the request.
+        urgency (str): The urgency level of the request.
+        property_name (str): The name of the property where the request was submitted.
         request_type (str): The category of the request (e.g. maintenance, access).
         summary (str): A brief description or summary of the request.
 
@@ -61,12 +65,13 @@ def send_request_created(
 
         request_type_label = get_request_type_label(request_type)
         html_body = f"""
-        <h2>New Tenant Request — Ranting Chant</h2>
+        <h2>Tenant Request at {property_name} - Ranting Chant</h2>
         <p><strong>Tenant:</strong> {tenant_name}</p>
         <p><strong>Request Type:</strong> {request_type_label}</p>
+        <p><strong>Urgency:</strong> <span style="color: {'#dc2626' if urgency == 'high' else '#d97706'}; font-weight: bold;">{urgency.upper()}</span></p>
         <p><strong>Summary:</strong> {summary}</p>
         <hr>
-        <p style="color: #666; font-size: 12px;">This is an automated notification from Ranting Chant.</p>
+        <p style="color: #666; font-size: 12px;">This is an automated notification from Ranting Chant, access the specific request for details.</p>
         """
 
         params = {
@@ -92,6 +97,7 @@ def send_escalation_alert(
     recipient_email: str,
     tenant_name: str,
     urgency: str,
+    property_name: str,
     description: str
 ) -> bool:
     """
@@ -101,6 +107,7 @@ def send_escalation_alert(
         recipient_email (str): The recipient's email address.
         tenant_name (str): The name of the tenant whose request was escalated.
         urgency (str): The urgency level of the escalated request.
+        property_name (str): The name of the property where the request was submitted.
         description (str): Description of the issue that triggered escalation.
 
     Returns:
@@ -116,13 +123,13 @@ def send_escalation_alert(
         urgency_color = "#dc2626" if urgency == "high" else "#d97706"
 
         html_body = f"""
-        <h2 style="color: {urgency_color};">⚠️ Escalation Alert — Ranting Chant</h2>
+        <h2 style="color: {urgency_color};">⚠️ Escalation Alert - Ranting Chant</h2>
         <p><strong>Tenant:</strong> {tenant_name}</p>
         <p><strong>Urgency:</strong> <span style="color: {urgency_color}; font-weight: bold;">{urgency.upper()}</span></p>
         <p><strong>Description:</strong> {description}</p>
-        <p>This request requires your immediate attention.</p>
+        <p>This request requires your immediate attention at {property_name}.</p>
         <hr>
-        <p style="color: #666; font-size: 12px;">This is an automated escalation alert from Ranting Chant.</p>
+        <p style="color: #666; font-size: 12px;">This is an automated escalation alert from Ranting Chant, access the specific request for details.</p>
         """
 
         params = {
@@ -147,7 +154,10 @@ def send_escalation_alert(
 def send_vendor_dispatch(
     vendor_email: str,
     vendor_name: str,
-    request_details: dict
+    request_details: dict,
+    property_name: str,
+    relevant_property_representative: str,
+    relevant_property_contact: str
 ) -> bool:
     """
     Send a dispatch notification email to a vendor.
@@ -157,7 +167,9 @@ def send_vendor_dispatch(
         vendor_name (str): The vendor's business name.
         request_details (dict): The full request record containing type,
             description, urgency, and tenant information.
-
+        property_name (str): The name of the property where the request was submitted.
+        relevant_property_representative (str): The name of the property representative.
+        relevant_property_contact (str): The contact information for the property representative.
     Returns:
         bool: True if the email was sent successfully, False otherwise.
     """
@@ -174,7 +186,7 @@ def send_vendor_dispatch(
         req_id = request_details.get("id", "N/A")
 
         html_body = f"""
-        <h2>Vendor Dispatch — Ranting Chant</h2>
+        <h2>Vendor Dispatch - Ranting Chant Service</h2>
         <p>Dear <strong>{vendor_name}</strong>,</p>
         <p>You have been assigned to a new service request. Please review the details below:</p>
         <table style="border-collapse: collapse; width: 100%;">
@@ -182,8 +194,9 @@ def send_vendor_dispatch(
             <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Type</strong></td><td style="padding: 8px; border: 1px solid #ddd;">{req_type}</td></tr>
             <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Description</strong></td><td style="padding: 8px; border: 1px solid #ddd;">{req_desc}</td></tr>
             <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Urgency</strong></td><td style="padding: 8px; border: 1px solid #ddd;">{req_urgency.upper()}</td></tr>
+            <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Property</strong></td><td style="padding: 8px; border: 1px solid #ddd;">{property_name}</td></tr>
         </table>
-        <p>Please contact the property manager to coordinate access and scheduling.</p>
+        <p>Please contact {relevant_property_representative} at {relevant_property_contact} to coordinate access and scheduling.</p>
         <hr>
         <p style="color: #666; font-size: 12px;">This is an automated dispatch notification from Ranting Chant.</p>
         """

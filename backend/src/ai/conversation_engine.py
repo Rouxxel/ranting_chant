@@ -273,6 +273,30 @@ class ConversationEngine:
                 f"MANAGER ID: {property_record.get('manager_id', 'N/A')}",
                 f"OWNER ID: {property_record.get('owner_id', 'N/A')}",
             ]
+            representative = property_record.get("representative") or {}
+            representative_type = representative.get("type")
+            representative_id = representative.get("id")
+            representative_record = None
+            if representative_type == "owner":
+                representative_record = property_mcp.get_property_owner(property_record.get("id"))
+            elif representative_type == "property_manager":
+                representative_record = property_mcp.get_property_manager(property_record.get("id"))
+
+            if representative_record:
+                representative_contact = " / ".join(
+                    value
+                    for value in (
+                        representative_record.get("email"),
+                        representative_record.get("phone")
+                    )
+                    if value
+                )
+                lines += [
+                    f"PROPERTY REPRESENTATIVE TYPE: {representative_type}",
+                    f"PROPERTY REPRESENTATIVE ID: {representative_id}",
+                    f"PROPERTY REPRESENTATIVE NAME: {representative_record.get('name', 'N/A')}",
+                    f"PROPERTY REPRESENTATIVE CONTACT: {representative_contact or 'N/A'}",
+                ]
         else:
             lines.append("PROPERTY: Not found")
 

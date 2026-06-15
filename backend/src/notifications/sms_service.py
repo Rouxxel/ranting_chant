@@ -57,7 +57,13 @@ def _get_twilio_client() -> Client | None:
     return _twilio_client
 
 
-def send_emergency_sms(to_number: str, message: str) -> bool:
+def send_emergency_sms(
+    to_number: str, 
+    message: str,
+    tenant_name: str,
+    urgency: str,
+    property_name: str
+    ) -> bool:
     """
     Send an emergency SMS alert to the specified phone number.
 
@@ -86,7 +92,7 @@ def send_emergency_sms(to_number: str, message: str) -> bool:
         log_handler.debug(f"[sms_service] Sending emergency SMS to '{to_number}'")
 
         #Prefix message with emergency indicator
-        full_message = f"[RANTING CHANT ALERT] {message}"
+        full_message = f"URGENT ALERT AT {property_name}, Tenant {tenant_name} has an emergency {urgency} alert: {message}"
 
         sms = client.messages.create(
             body=full_message,

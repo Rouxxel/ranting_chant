@@ -467,6 +467,36 @@ async def send_notifications(request: Request, body: SendNotificationsPayload):
             log_handler.warning(err_msg)
             raise HTTPException(status_code=404, detail=err_msg)
 
+        prop = tenant_mcp.get_tenant_property(tenant_id)
+        property_name = prop.get("name", "Unknown Property") if prop else "Unknown Property"
+        representative_name = "the property representative"
+        representative_contact = "the contact details on file"
+        if prop:
+            representative = prop.get("representative") or {}
+            representative_type = representative.get("type")
+            representative_id = representative.get("id")
+            representative_record = None
+            if representative_type == "owner" and representative_id:
+                representative_record = property_mcp.get_property_owner(prop.get("id"))
+            elif representative_type == "property_manager" and representative_id:
+                representative_record = property_mcp.get_property_manager(prop.get("id"))
+
+            if representative_record:
+                representative_name = representative_record.get("name", representative_name)
+                contact_parts = [
+                    value
+                    for value in (
+                        representative_record.get("email"),
+                        representative_record.get("phone")
+                    )
+                    if value
+                ]
+                representative_contact = (
+                    " / ".join(contact_parts)
+                    if contact_parts
+                    else representative_contact
+                )
+
         # Send notifications to each selected contact
         results = []
         for contact in contacts:
@@ -478,7 +508,9 @@ async def send_notifications(request: Request, body: SendNotificationsPayload):
 
             # Determine notification type based on request urgency and escalation
             notification_type = "request_created"
-            if req.get("escalated", False):
+            if contact_type == "vendor":
+                notification_type = "vendor_dispatch"
+            elif req.get("escalated", False):
                 notification_type = "escalation_alert"
 
             # Send email if email is provided
@@ -492,7 +524,17 @@ async def send_notifications(request: Request, body: SendNotificationsPayload):
                         tenant_name=tenant.get("name"),
                         request_type=req.get("type", "general"),
                         description=req.get("description", reason),
-                        urgency=req.get("urgency", "medium")
+                        urgency=req.get("urgency", "medium"),
+                        property_name=contact.get("property_name") or property_name,
+                        relevant_property_representative=(
+                            contact.get("relevant_property_representative")
+                            or representative_name
+                        ),
+                        relevant_property_contact=(
+                            contact.get("relevant_property_contact")
+                            or representative_contact
+                        ),
+                        vendor_name=contact_name if contact_type == "vendor" else ""
                     )
                     results.append({
                         "contact": contact_name,
@@ -518,7 +560,8 @@ async def send_notifications(request: Request, body: SendNotificationsPayload):
                         recipient_name=contact_name,
                         tenant_name=tenant.get("name"),
                         urgency=req.get("urgency", "high"),
-                        description=req.get("description", reason)
+                        description=req.get("description", reason),
+                        property_name=contact.get("property_name") or property_name
                     )
                     results.append({
                         "contact": contact_name,

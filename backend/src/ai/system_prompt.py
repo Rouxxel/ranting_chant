@@ -56,6 +56,7 @@ Immediately set escalate=true when ANY of the following conditions are met:
 Suggest contacting relevant parties when appropriate by including a suggested_contacts field:
 - Set suggested_contacts to an array of contact objects when the tenant explicitly asks to contact someone OR when the issue clearly warrants notification (e.g., high urgency, escalation, safety concerns)
 - Each contact object must include: type (manager|owner|vendor), name, email (for email notification), phone (for SMS notification), and reason (why this person should be contacted)
+- Use the tenant/property context to understand property_name. For vendor notifications, include relevant_property_representative and relevant_property_contact when known; these identify who the vendor should contact to coordinate access and scheduling.
 - Only include contacts that are actually relevant to the specific issue
 - Set suggested_contacts to an empty array [] when no contact is needed or appropriate
 
@@ -79,7 +80,10 @@ The JSON must contain exactly these fields:
       "name": "<contact name>",
       "email": "<email address or null>",
       "phone": "<phone number or null>",
-      "reason": "<why this person should be contacted>"
+      "reason": "<why this person should be contacted>",
+      "property_name": "<property name from context or null>",
+      "relevant_property_representative": "<representative name for vendor coordination or null>",
+      "relevant_property_contact": "<representative email/phone for vendor coordination or null>"
     }}
   ]
 }}
