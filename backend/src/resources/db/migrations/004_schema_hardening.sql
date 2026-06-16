@@ -4,373 +4,338 @@
 BEGIN;
 
 -- ============================================================================
--- 1. SOFT DELETION SUPPORT
+-- 1. PERFORMANCE INDEXES
 -- ============================================================================
 
-ALTER TABLE owners
-    ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT TRUE,
-    ADD COLUMN deleted_at TIMESTAMPTZ NULL;
+CREATE INDEX IF NOT EXISTS idx_actors_is_active
+    ON actors(is_active)
+    WHERE is_active = TRUE;
 
-ALTER TABLE property_managers
-    ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT TRUE,
-    ADD COLUMN deleted_at TIMESTAMPTZ NULL;
+CREATE INDEX IF NOT EXISTS idx_actors_type
+    ON actors(type);
 
-ALTER TABLE properties
-    ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT TRUE,
-    ADD COLUMN deleted_at TIMESTAMPTZ NULL;
+CREATE INDEX IF NOT EXISTS idx_properties_is_active
+    ON properties(is_active)
+    WHERE is_active = TRUE;
 
-ALTER TABLE tenants
-    ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT TRUE,
-    ADD COLUMN deleted_at TIMESTAMPTZ NULL;
+CREATE INDEX IF NOT EXISTS idx_properties_created_by
+    ON properties(created_by);
 
-ALTER TABLE vendors
-    ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT TRUE,
-    ADD COLUMN deleted_at TIMESTAMPTZ NULL;
+CREATE INDEX IF NOT EXISTS idx_tenants_is_active
+    ON tenants(is_active)
+    WHERE is_active = TRUE;
 
-ALTER TABLE requests
-    ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT TRUE,
-    ADD COLUMN deleted_at TIMESTAMPTZ NULL;
+CREATE INDEX IF NOT EXISTS idx_tenants_unit_id
+    ON tenants(unit_id);
 
-CREATE INDEX idx_owners_is_active ON owners(is_active) WHERE is_active = TRUE;
-CREATE INDEX idx_property_managers_is_active ON property_managers(is_active) WHERE is_active = TRUE;
-CREATE INDEX idx_properties_is_active ON properties(is_active) WHERE is_active = TRUE;
-CREATE INDEX idx_tenants_is_active ON tenants(is_active) WHERE is_active = TRUE;
-CREATE INDEX idx_vendors_is_active ON vendors(is_active) WHERE is_active = TRUE;
-CREATE INDEX idx_requests_is_active ON requests(is_active) WHERE is_active = TRUE;
+CREATE INDEX IF NOT EXISTS idx_requests_is_active
+    ON requests(is_active)
+    WHERE is_active = TRUE;
 
--- ============================================================================
--- 2. UNITS TABLE
--- ============================================================================
+CREATE INDEX IF NOT EXISTS idx_requests_requester_id
+    ON requests(requester_id);
 
-CREATE TABLE units (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    property_id UUID NOT NULL REFERENCES properties(id) ON DELETE CASCADE,
-    unit_number VARCHAR(50) NOT NULL,
-    bedrooms INTEGER,
-    bathrooms NUMERIC(3,1),
-    square_feet INTEGER,
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW(),
-    UNIQUE (property_id, unit_number)
-);
+CREATE INDEX IF NOT EXISTS idx_requests_property_id
+    ON requests(property_id);
 
-CREATE INDEX idx_units_property_id ON units(property_id);
+CREATE INDEX IF NOT EXISTS idx_requests_vendor_id
+    ON requests(vendor_id);
 
-CREATE TRIGGER update_units_updated_at BEFORE UPDATE ON units
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE INDEX IF NOT EXISTS idx_requests_resolved_by
+    ON requests(resolved_by)
+    WHERE resolved_by IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_requests_status
+    ON requests(status);
+
+CREATE INDEX IF NOT EXISTS idx_requests_urgency
+    ON requests(urgency);
+
+CREATE INDEX IF NOT EXISTS idx_requests_created_at
+    ON requests(created_at);
 
 -- ============================================================================
--- 3. TENANT REFACTOR (property_id + unit -> unit_id)
+-- 2. REQUEST ATTACHMENTS
 -- ============================================================================
 
--- Backfill units from existing tenant rows (run after 003_seed_data.sql)
-INSERT INTO units (property_id, unit_number, created_at, updated_at)
-SELECT property_id, unit, MIN(created_at), MAX(updated_at)
-FROM tenants
-WHERE unit IS NOT NULL
-GROUP BY property_id, unit
-ON CONFLICT (property_id, unit_number) DO NOTHING;
-
-ALTER TABLE tenants ADD COLUMN unit_id UUID REFERENCES units(id) ON DELETE RESTRICT;
-
-UPDATE tenants t
-SET unit_id = u.id
-FROM units u
-WHERE u.property_id = t.property_id
-  AND u.unit_number = t.unit;
-
-ALTER TABLE tenants ALTER COLUMN unit_id SET NOT NULL;
-
-DROP INDEX IF EXISTS idx_tenants_property_id;
-
-ALTER TABLE tenants DROP CONSTRAINT tenants_property_id_fkey;
-ALTER TABLE tenants DROP COLUMN property_id;
-ALTER TABLE tenants DROP COLUMN unit;
-
-CREATE INDEX idx_tenants_unit_id ON tenants(unit_id);
-
--- ============================================================================
--- 4. FOREIGN KEY HARDENING
--- ============================================================================
-
-ALTER TABLE properties DROP CONSTRAINT properties_owner_id_fkey;
-ALTER TABLE properties
-    ADD CONSTRAINT properties_owner_id_fkey
-    FOREIGN KEY (owner_id) REFERENCES owners(id) ON DELETE RESTRICT;
-
-ALTER TABLE requests DROP CONSTRAINT requests_requester_id_fkey;
-ALTER TABLE requests
-    ADD CONSTRAINT requests_requester_id_fkey
-    FOREIGN KEY (requester_id) REFERENCES tenants(id) ON DELETE RESTRICT;
-
--- ============================================================================
--- 5. REQUEST ATTACHMENTS
--- ============================================================================
-
-CREATE TABLE request_attachments (
+CREATE TABLE IF NOT EXISTS request_attachments (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     request_id UUID NOT NULL REFERENCES requests(id) ON DELETE CASCADE,
-    uploaded_by UUID,
+    uploaded_by UUID REFERENCES actors(id) ON DELETE SET NULL,
     file_url TEXT NOT NULL,
     file_type VARCHAR(100),
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_request_attachments_request_id ON request_attachments(request_id);
+CREATE INDEX IF NOT EXISTS idx_request_attachments_request_id
+    ON request_attachments(request_id);
+
+CREATE INDEX IF NOT EXISTS idx_request_attachments_uploaded_by
+    ON request_attachments(uploaded_by);
 
 -- ============================================================================
--- 6. REQUEST STATUS HISTORY
+-- 3. REQUEST STATUS HISTORY
 -- ============================================================================
 
-CREATE TABLE request_status_history (
+CREATE TABLE IF NOT EXISTS request_status_history (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     request_id UUID NOT NULL REFERENCES requests(id) ON DELETE CASCADE,
     old_status request_status,
     new_status request_status NOT NULL,
-    changed_by UUID,
+    changed_by UUID REFERENCES actors(id) ON DELETE SET NULL,
     notes TEXT,
     changed_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_request_status_history_request_id ON request_status_history(request_id);
-CREATE INDEX idx_request_status_history_changed_at ON request_status_history(changed_at);
+CREATE INDEX IF NOT EXISTS idx_request_status_history_request_id
+    ON request_status_history(request_id);
+
+CREATE INDEX IF NOT EXISTS idx_request_status_history_changed_by
+    ON request_status_history(changed_by);
+
+CREATE INDEX IF NOT EXISTS idx_request_status_history_changed_at
+    ON request_status_history(changed_at);
 
 -- Backfill initial status history from existing requests
 INSERT INTO request_status_history (request_id, old_status, new_status, changed_at)
-SELECT id, NULL, status, created_at
-FROM requests;
+SELECT r.id, NULL, r.status, r.created_at
+FROM requests r
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM request_status_history rsh
+    WHERE rsh.request_id = r.id
+    AND rsh.old_status IS NULL
+    AND rsh.new_status = r.status
+);
 
 -- ============================================================================
--- 7. VENDOR ASSIGNMENT HISTORY
+-- 4. VENDOR ASSIGNMENT HISTORY
 -- ============================================================================
 
-CREATE TABLE request_assignments (
+CREATE TABLE IF NOT EXISTS request_assignments (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     request_id UUID NOT NULL REFERENCES requests(id) ON DELETE CASCADE,
     vendor_id UUID REFERENCES vendors(id) ON DELETE SET NULL,
-    assigned_by UUID,
+    assigned_by UUID REFERENCES actors(id) ON DELETE SET NULL,
     status VARCHAR(50),
     assigned_at TIMESTAMPTZ DEFAULT NOW(),
     completed_at TIMESTAMPTZ
 );
 
-CREATE INDEX idx_request_assignments_request_id ON request_assignments(request_id);
-CREATE INDEX idx_request_assignments_vendor_id ON request_assignments(vendor_id);
+CREATE INDEX IF NOT EXISTS idx_request_assignments_request_id
+    ON request_assignments(request_id);
+
+CREATE INDEX IF NOT EXISTS idx_request_assignments_vendor_id
+    ON request_assignments(vendor_id);
+
+CREATE INDEX IF NOT EXISTS idx_request_assignments_assigned_by
+    ON request_assignments(assigned_by);
+
+CREATE INDEX IF NOT EXISTS idx_request_assignments_assigned_at
+    ON request_assignments(assigned_at);
 
 -- Backfill current vendor assignments from requests.vendor_id
 INSERT INTO request_assignments (request_id, vendor_id, status, assigned_at)
-SELECT id, vendor_id, 'assigned', updated_at
-FROM requests
-WHERE vendor_id IS NOT NULL;
+SELECT r.id, r.vendor_id, 'assigned', r.updated_at
+FROM requests r
+WHERE r.vendor_id IS NOT NULL
+AND NOT EXISTS (
+    SELECT 1
+    FROM request_assignments ra
+    WHERE ra.request_id = r.id
+    AND ra.vendor_id = r.vendor_id
+    AND ra.status = 'assigned'
+);
 
 -- ============================================================================
--- 8. USER ACCOUNTS (AUTH MAPPING)
+-- 5. USER ACCOUNTS (AUTH MAPPING)
 -- ============================================================================
 
-CREATE TABLE user_accounts (
-    id UUID PRIMARY KEY,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    role VARCHAR(50) NOT NULL,
-    owner_id UUID REFERENCES owners(id) ON DELETE SET NULL,
-    manager_id UUID REFERENCES property_managers(id) ON DELETE SET NULL,
-    tenant_id UUID REFERENCES tenants(id) ON DELETE SET NULL,
-    vendor_id UUID REFERENCES vendors(id) ON DELETE SET NULL,
+CREATE TABLE IF NOT EXISTS user_accounts (
+    auth_user_id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    actor_id UUID UNIQUE NOT NULL REFERENCES actors(id) ON DELETE CASCADE,
+    email CITEXT UNIQUE NOT NULL,
+    username CITEXT UNIQUE,
+    role recipient_type NOT NULL CHECK (role IN ('owner', 'manager')),
+    provider VARCHAR(50) DEFAULT 'email',
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_user_accounts_email ON user_accounts(email);
-CREATE INDEX idx_user_accounts_role ON user_accounts(role);
+CREATE INDEX IF NOT EXISTS idx_user_accounts_email
+    ON user_accounts(email);
+
+CREATE INDEX IF NOT EXISTS idx_user_accounts_username
+    ON user_accounts(username)
+    WHERE username IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_user_accounts_actor_id
+    ON user_accounts(actor_id);
 
 -- ============================================================================
--- 9. RLS FOR NEW TABLES + POLICY FIXES (tenant -> unit -> property)
+-- 6. RLS FOR HARDENING TABLES
 -- ============================================================================
 
-ALTER TABLE units ENABLE ROW LEVEL SECURITY;
 ALTER TABLE request_attachments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE request_status_history ENABLE ROW LEVEL SECURITY;
 ALTER TABLE request_assignments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_accounts ENABLE ROW LEVEL SECURITY;
 
--- Fix properties policy: tenant access via unit
-DROP POLICY IF EXISTS "Tenants can view own property" ON properties;
-CREATE POLICY "Tenants can view own property"
-    ON properties FOR SELECT
-    USING (
-        EXISTS (
-            SELECT 1 FROM tenants t
-            JOIN units u ON u.id = t.unit_id
-            WHERE u.property_id = properties.id
-            AND t.id = auth.uid()::uuid
-        )
-    );
+-- Request attachments
+DROP POLICY IF EXISTS "Actors can view request attachments for accessible requests"
+    ON request_attachments;
 
--- Fix tenant policies: resolve property through units
-DROP POLICY IF EXISTS "Managers can view tenants of managed properties" ON tenants;
-CREATE POLICY "Managers can view tenants of managed properties"
-    ON tenants FOR SELECT
-    USING (
-        EXISTS (
-            SELECT 1 FROM units u
-            JOIN manager_properties mp ON mp.property_id = u.property_id
-            WHERE u.id = tenants.unit_id
-            AND mp.manager_id = auth.uid()::uuid
-        )
-    );
-
-DROP POLICY IF EXISTS "Owners can view tenants of owned properties" ON tenants;
-CREATE POLICY "Owners can view tenants of owned properties"
-    ON tenants FOR SELECT
-    USING (
-        EXISTS (
-            SELECT 1 FROM units u
-            JOIN owner_properties op ON op.property_id = u.property_id
-            WHERE u.id = tenants.unit_id
-            AND op.owner_id = auth.uid()::uuid
-        )
-    );
-
-DROP POLICY IF EXISTS "Managers can update tenants of managed properties" ON tenants;
-CREATE POLICY "Managers can update tenants of managed properties"
-    ON tenants FOR UPDATE
-    USING (
-        EXISTS (
-            SELECT 1 FROM units u
-            JOIN manager_properties mp ON mp.property_id = u.property_id
-            WHERE u.id = tenants.unit_id
-            AND mp.manager_id = auth.uid()::uuid
-        )
-    );
-
--- Units policies
-CREATE POLICY "Tenants can view own unit"
-    ON units FOR SELECT
-    USING (
-        EXISTS (
-            SELECT 1 FROM tenants
-            WHERE tenants.unit_id = units.id
-            AND tenants.id = auth.uid()::uuid
-        )
-    );
-
-CREATE POLICY "Managers can view units of managed properties"
-    ON units FOR SELECT
-    USING (
-        EXISTS (
-            SELECT 1 FROM manager_properties mp
-            WHERE mp.property_id = units.property_id
-            AND mp.manager_id = auth.uid()::uuid
-        )
-    );
-
-CREATE POLICY "Owners can view units of owned properties"
-    ON units FOR SELECT
-    USING (
-        EXISTS (
-            SELECT 1 FROM owner_properties op
-            WHERE op.property_id = units.property_id
-            AND op.owner_id = auth.uid()::uuid
-        )
-    );
-
--- Request child table policies (mirror conversation_messages pattern)
-CREATE POLICY "Tenants can view request attachments"
+CREATE POLICY "Actors can view request attachments for accessible requests"
     ON request_attachments FOR SELECT
-    USING (
-        EXISTS (
-            SELECT 1 FROM requests
-            WHERE requests.id = request_attachments.request_id
-            AND requests.requester_id = auth.uid()::uuid
+    USING (actor_can_access_request(request_id, current_actor_id()));
+
+DROP POLICY IF EXISTS "Actors can create request attachments for accessible requests"
+    ON request_attachments;
+
+CREATE POLICY "Actors can create request attachments for accessible requests"
+    ON request_attachments FOR INSERT
+    WITH CHECK (
+        actor_can_access_request(request_id, current_actor_id())
+        AND (
+            uploaded_by IS NULL
+            OR uploaded_by = current_actor_id()
         )
     );
 
-CREATE POLICY "Managers can view request attachments"
-    ON request_attachments FOR SELECT
+DROP POLICY IF EXISTS "Owners and managers can delete request attachments for related requests"
+    ON request_attachments;
+
+CREATE POLICY "Owners and managers can delete request attachments for related requests"
+    ON request_attachments FOR DELETE
     USING (
         EXISTS (
-            SELECT 1 FROM requests r
-            JOIN manager_properties mp ON r.property_id = mp.property_id
+            SELECT 1
+            FROM requests r
             WHERE r.id = request_attachments.request_id
-            AND mp.manager_id = auth.uid()::uuid
+            AND (
+                actor_can_manage_property(r.property_id, current_actor_id())
+                OR EXISTS (
+                    SELECT 1
+                    FROM tenants t
+                    JOIN units u
+                        ON u.id = t.unit_id
+                    WHERE t.id = r.requester_id
+                    AND actor_can_manage_property(u.property_id, current_actor_id())
+                )
+            )
         )
     );
 
-CREATE POLICY "Owners can view request attachments"
-    ON request_attachments FOR SELECT
-    USING (
-        EXISTS (
-            SELECT 1 FROM requests r
-            JOIN owner_properties op ON r.property_id = op.property_id
-            WHERE r.id = request_attachments.request_id
-            AND op.owner_id = auth.uid()::uuid
-        )
-    );
+-- Request status history
+DROP POLICY IF EXISTS "Actors can view request status history for accessible requests"
+    ON request_status_history;
 
-CREATE POLICY "Tenants can view request status history"
+CREATE POLICY "Actors can view request status history for accessible requests"
     ON request_status_history FOR SELECT
-    USING (
-        EXISTS (
-            SELECT 1 FROM requests
-            WHERE requests.id = request_status_history.request_id
-            AND requests.requester_id = auth.uid()::uuid
+    USING (actor_can_access_request(request_id, current_actor_id()));
+
+DROP POLICY IF EXISTS "Owners and managers can create request status history for related requests"
+    ON request_status_history;
+
+CREATE POLICY "Owners and managers can create request status history for related requests"
+    ON request_status_history FOR INSERT
+    WITH CHECK (
+        (
+            changed_by IS NULL
+            OR changed_by = current_actor_id()
+        )
+        AND EXISTS (
+            SELECT 1
+            FROM requests r
+            WHERE r.id = request_id
+            AND (
+                actor_can_manage_property(r.property_id, current_actor_id())
+                OR EXISTS (
+                    SELECT 1
+                    FROM tenants t
+                    JOIN units u
+                        ON u.id = t.unit_id
+                    WHERE t.id = r.requester_id
+                    AND actor_can_manage_property(u.property_id, current_actor_id())
+                )
+            )
         )
     );
 
-CREATE POLICY "Managers can view request status history"
-    ON request_status_history FOR SELECT
-    USING (
-        EXISTS (
-            SELECT 1 FROM requests r
-            JOIN manager_properties mp ON r.property_id = mp.property_id
-            WHERE r.id = request_status_history.request_id
-            AND mp.manager_id = auth.uid()::uuid
-        )
-    );
+-- Request assignments
+DROP POLICY IF EXISTS "Actors can view request assignments for accessible requests"
+    ON request_assignments;
 
-CREATE POLICY "Owners can view request status history"
-    ON request_status_history FOR SELECT
-    USING (
-        EXISTS (
-            SELECT 1 FROM requests r
-            JOIN owner_properties op ON r.property_id = op.property_id
-            WHERE r.id = request_status_history.request_id
-            AND op.owner_id = auth.uid()::uuid
-        )
-    );
-
-CREATE POLICY "Tenants can view request assignments"
+CREATE POLICY "Actors can view request assignments for accessible requests"
     ON request_assignments FOR SELECT
     USING (
-        EXISTS (
-            SELECT 1 FROM requests
-            WHERE requests.id = request_assignments.request_id
-            AND requests.requester_id = auth.uid()::uuid
-        )
+        actor_can_access_request(request_id, current_actor_id())
+        OR vendor_id = current_actor_id()
     );
 
-CREATE POLICY "Managers can view request assignments"
-    ON request_assignments FOR SELECT
+DROP POLICY IF EXISTS "Owners and managers can manage request assignments for related requests"
+    ON request_assignments;
+
+CREATE POLICY "Owners and managers can manage request assignments for related requests"
+    ON request_assignments FOR ALL
     USING (
         EXISTS (
-            SELECT 1 FROM requests r
-            JOIN manager_properties mp ON r.property_id = mp.property_id
+            SELECT 1
+            FROM requests r
             WHERE r.id = request_assignments.request_id
-            AND mp.manager_id = auth.uid()::uuid
+            AND (
+                actor_can_manage_property(r.property_id, current_actor_id())
+                OR EXISTS (
+                    SELECT 1
+                    FROM tenants t
+                    JOIN units u
+                        ON u.id = t.unit_id
+                    WHERE t.id = r.requester_id
+                    AND actor_can_manage_property(u.property_id, current_actor_id())
+                )
+            )
+        )
+    )
+    WITH CHECK (
+        (
+            assigned_by IS NULL
+            OR assigned_by = current_actor_id()
+        )
+        AND EXISTS (
+            SELECT 1
+            FROM requests r
+            WHERE r.id = request_id
+            AND (
+                actor_can_manage_property(r.property_id, current_actor_id())
+                OR EXISTS (
+                    SELECT 1
+                    FROM tenants t
+                    JOIN units u
+                        ON u.id = t.unit_id
+                    WHERE t.id = r.requester_id
+                    AND actor_can_manage_property(u.property_id, current_actor_id())
+                )
+            )
         )
     );
 
-CREATE POLICY "Owners can view request assignments"
-    ON request_assignments FOR SELECT
-    USING (
-        EXISTS (
-            SELECT 1 FROM requests r
-            JOIN owner_properties op ON r.property_id = op.property_id
-            WHERE r.id = request_assignments.request_id
-            AND op.owner_id = auth.uid()::uuid
-        )
-    );
+-- User accounts
+DROP POLICY IF EXISTS "Users can view own account"
+    ON user_accounts;
 
 CREATE POLICY "Users can view own account"
     ON user_accounts FOR SELECT
-    USING (id = auth.uid()::uuid);
+    USING (auth_user_id = auth.uid());
+
+DROP POLICY IF EXISTS "Users can update own account"
+    ON user_accounts;
+
+CREATE POLICY "Users can update own account"
+    ON user_accounts FOR UPDATE
+    USING (auth_user_id = auth.uid())
+    WITH CHECK (
+        auth_user_id = auth.uid()
+        AND actor_id = current_actor_id()
+        AND role IN ('owner', 'manager')
+    );
 
 COMMIT;
