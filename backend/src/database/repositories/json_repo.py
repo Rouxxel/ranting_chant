@@ -78,13 +78,13 @@ class JSONVendorRepository(BaseVendorRepository):
 
 class JSONManagerRepository(BaseManagerRepository):
     def list(self) -> List[Dict[str, Any]]:
-        return json_store.read_all("property_magament")
+        return json_store.read_all("managers")
 
     def find_by_id(self, manager_id: str) -> Optional[Dict[str, Any]]:
-        return json_store.find_by_id("property_magament", manager_id)
+        return json_store.find_by_id("managers", manager_id)
 
     def update(self, manager_id: str, updates: dict) -> Dict[str, Any]:
-        return json_store.update_record("property_magament", manager_id, updates)
+        return json_store.update_record("managers", manager_id, updates)
 
 
 class JSONOwnerRepository(BaseOwnerRepository):
@@ -99,14 +99,27 @@ class JSONOwnerRepository(BaseOwnerRepository):
 
 
 class JSONRequestRepository(BaseRequestRepository):
+    def _normalize_request(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        # Normalize conversation messages
+        if "conversation_history" in request:
+            for msg in request["conversation_history"]:
+                if "message" in msg:
+                    msg["message"] = msg["message"].replace("\r\n", "\n").replace("\r", "\n").strip()
+        return request
+
     def list(self) -> List[Dict[str, Any]]:
-        return json_store.read_all("requests")
+        requests = json_store.read_all("requests")
+        return [self._normalize_request(r) for r in requests]
 
     def find_by_id(self, request_id: str) -> Optional[Dict[str, Any]]:
-        return json_store.find_by_id("requests", request_id)
+        request = json_store.find_by_id("requests", request_id)
+        if request:
+            return self._normalize_request(request)
+        return None
 
     def find_by_field(self, field: str, value: Any) -> List[Dict[str, Any]]:
-        return json_store.find_by_field("requests", field, value)
+        requests = json_store.find_by_field("requests", field, value)
+        return [self._normalize_request(r) for r in requests]
 
     def create(self, data: dict) -> Dict[str, Any]:
         return json_store.create_record("requests", data)

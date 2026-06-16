@@ -456,10 +456,14 @@ class SupabaseRequestRepository(BaseRequestRepository):
         msgs = []
         raw_msgs = row.get("conversation_messages", []) or []
         for m in sorted(raw_msgs, key=lambda x: x.get("created_at") or ""):
+            # Normalize line endings to \n and trim whitespace
+            message = m.get("message")
+            if message:
+                message = message.replace("\r\n", "\n").replace("\r", "\n").strip()
             msgs.append({
                 "id": m.get("id"),
                 "role": m.get("role"),
-                "message": m.get("message"),
+                "message": message,
                 "timestamp": m.get("created_at")
             })
 
