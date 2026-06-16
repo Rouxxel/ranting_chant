@@ -1,13 +1,13 @@
 [
   {
-    "id": "request_d977968d",
-    "requester_id": "tenant_001",
+    "id": "120c6930-919d-5495-bc33-c20e069c03b0",
+    "requester_id": "b1c4a072-618b-53a2-a16e-d2387c1efa14",
     "type": "plumbing",
     "description": "i have an issue with my plumbing",
     "status": "resolved",
     "urgency": "low",
     "involved_parties": [
-      "tenant_001"
+      "b1c4a072-618b-53a2-a16e-d2387c1efa14"
     ],
     "conversation_history": [
       {
@@ -49,7 +49,7 @@
       {
         "id": "74b39ec1-1850-4ef4-8214-8f3f3dd5176f",
         "role": "ai",
-        "message": "I'm sorry to hear you're having trouble with your shower. To make sure I get the right person out to help, could you please clarify if this is a leak, a clog, or an issue with the water temperature/pressure?\n\nRelevant links:\n- Can a property manager tell me not to use my only shower with no ...: https://www.avvo.com/legal-answers/can-a-property-manager-tell-me-not-to-use-my-only--5507640.html - You are entitled to a rent abatement for the period of time you are living without a tub/shower. See if there is a local health club like...\n- Is it okay to tell your landlord the shower doesn't get hot enough, or ...: https://www.quora.com/Is-it-okay-to-tell-your-landlord-the-shower-doesnt-get-hot-enough-or-is-that-not-their-job - However, do not tell him that the shower does not get hot enough. First call and text your property manager. DO NOT TRY TO FIX IT YOUR SE...\n- Came home from work this afternoon to find my water randomly shut ...: https://www.reddit.com/r/shitrentals/comments/1i1v87x/came_home_from_work_this_afternoon_to_find_my - Property manager suggests going to the local gym to shower. Water comes under urgent repairs in Vic, which means you are legally able to",
+        "message": "I'm sorry to hear you're having trouble with your shower. To make sure I get the right person out to help, could you please clarify if this is a leak, a clog, or an issue with the water temperature/pressure?\n\nRelevant links:\n- Can a property manager tell me not to use my only shower with no ...: https://www.avvo.com/legal-answers/can-a-property-manager-tell-me-not-to-use-my-only--5507640.html - You are entitled to a rent abatement for the period of time you are living without a tub/shower. See if there is a local health club like...\n- Is it okay to tell your landlord the shower doesn't get hot enough, or ...: https://www.quora.com/Is-it-okay-to-tell-your-landlord-the-shower-doesn-t-get-hot-enough-or-is-that-not-their-job - However, do not tell him that the shower does not get hot enough. First call and text your property manager. DO NOT TRY TO FIX IT YOUR SE...\n- Came home from work this afternoon to find my water randomly shut ...: https://www.reddit.com/r/shitrentals/comments/1i1v87x/came-home-from-work-this-afternoon-to-find-my - Property manager suggests going to the local gym to shower. Water comes under urgent repairs in Vic, which means you are legally able to",
         "timestamp": "2026-06-04T22:59:15.215Z",
         "web_results": {
           "query": "Isolated to the shower only, can you contact the property manager and relevant party?",
@@ -63,19 +63,19 @@
             },
             {
               "title": "Is it okay to tell your landlord the shower doesn't get hot enough, or ...",
-              "url": "https://www.quora.com/Is-it-okay-to-tell-your-landlord-the-shower-doesnt-get-hot-enough-or-is-that-not-their-job",
+              "url": "https://www.quora.com/Is-it-okay-to-tell-your-landlord-the-shower-doesn-t-get-hot-enough-or-is-that-not-their-job",
               "content_snippet": "However, do not tell him that the shower does not get hot enough. First call and text your property manager. DO NOT TRY TO FIX IT YOUR SELF if",
               "score": 0.1902425
             },
             {
               "title": "Came home from work this afternoon to find my water randomly shut ...",
-              "url": "https://www.reddit.com/r/shitrentals/comments/1i1v87x/came_home_from_work_this_afternoon_to_find_my",
+              "url": "https://www.reddit.com/r/shitrentals/comments/1i1v87x/came-home-from-work-this-afternoon-to-find-my",
               "content_snippet": "Property manager suggests going to the local gym to shower. Water comes under urgent repairs in Vic, which means you are legally able to",
               "score": 0.1527768
             },
             {
               "title": "What to do when shower isn't available to tenants? - BiggerPockets",
-              "url": "https://www.biggerpockets.com/forums/52/topics/948155-what-to-do-when-shower-isnt-available-to-tenants",
+              "url": "https://www.biggerpockets.com/forums/52/topics/948155-what-to-do-when-shower-isn-t-available-to-tenants",
               "content_snippet": "Staying in communication with the tenant is key - so they know you are on top of it. The shower makes up less than 10% of the functional",
               "score": 0.14563736
             },
@@ -104,22 +104,22 @@
       }
     ],
     "notification_pending": true,
-    "property_id": "property_001",
-    "property": "Sunset Apartments",
+    "property_id": "7c76dd08-6949-55f2-a211-9d7a342b8a7d",
+    "property": "Sunset Apartment",
     "summary": "The tenant is experiencing low water pressure specifically in their shower and has requested that the property manager be notified to arrange a repair. The AI is currently seeking additional clarification on the nature of the issue before escalating the request to the property management team.",
     "resolved_at": "2026-06-06T15:55:09.863676+00:00",
-    "resolved_by": "manager_001",
+    "resolved_by": "ab7a3be3-4950-50b1-a1b6-6783aa7a4725",
     "resolution_note": "Skill issue lil bro"
   },
   {
-    "id": "request_9285b9eb",
-    "requester_id": "tenant_001",
+    "id": "f635bdb9-bf83-5f87-aad4-7e03c9146375",
+    "requester_id": "b1c4a072-618b-53a2-a16e-d2387c1efa14",
     "type": "general",
     "description": "I have an electrical issue, there is no power and i need it for my respiratory system",
     "status": "pending",
     "urgency": "low",
     "involved_parties": [
-      "tenant_001"
+      "b1c4a072-618b-53a2-a16e-d2387c1efa14"
     ],
     "conversation_history": [
       {
@@ -135,7 +135,7 @@
         "timestamp": "2026-06-04T23:40:41.042Z"
       },
       {
-        "id": "cb96fdc8-9288-4a99-9008-482ca5a6d565",
+        "id": "cb96fdc8-9288-4a99-9008-4826b0babdda",
         "role": "ai",
         "message": "I am very sorry to hear this, John. Because this involves your medical equipment, this is being treated as an emergency. Please prioritize your safety and seek medical assistance if needed. I have escalated this to the property manager immediately to restore power as a top priority.",
         "timestamp": "2026-06-04T23:40:42.176Z"
@@ -147,9 +147,9 @@
         "timestamp": "2026-06-04T23:41:31.848Z"
       },
       {
-        "id": "13ec70dd-54b2-4a2b-86ce-9c9ea07313e4",
+        "id": "13ec70dd-54b2-4a62-86ce-9c9ea07313e4",
         "role": "ai",
-        "message": "I'm sorry, but I'm not sure I understand your request. As a property operations coordinator for Ranting Chant, I am here to assist with maintenance, lease, or building-related issues at your apartment. If you are experiencing a medical emergency, please contact local emergency services immediately. Otherwise, could you please clarify how I can help you with your property?\n\nRelevant links:\n- Respiratory System: Organs, Facts, Anatomy & Function: https://my.clevelandclinic.org/health/body/21205-respiratory-system - # Respiratory System. Your respiratory system is made up of your lungs, airways (trachea, bronchi and bronchioles), diaphragm, voice box,...\n- How We Breathe - Craig Hospital: https://craighospital.org/resources/how-we-breathe - The role of the respiratory system is to breathe in oxygen and breathe out carbon dioxide. This is known as respiration.\n- How the Lungs Work - The Respiratory System | NHLBI, NIH: https://www.nhlbi.nih.gov/health/lungs/respiratory-system - An official website of the United States government. A **.gov** website belongs to an official government organization in the United Stat...",
+        "message": "I'm sorry, but I'm not sure I understand your request. As a property operations coordinator for Ranting Chant, I am here to assist with maintenance, lease, or building-related issues at your apartment. If you are experiencing a medical emergency, please contact local emergency services immediately. Otherwise, could you please clarify how I can help you with your property?\n\nRelevant links:\n- Respiratory System: Organs, Facts, Anatomy & Function: https://my.clevelandclinic.org/health/body/21205-respiratory-system - # Respiratory System. Your respiratory system is made up of your lungs, airways (trachea, bronchi and bronchioles), diaphragm, voice box, ...\n- How We Breathe - Craig Hospital: https://craighospital.org/resources/how-we-breathe - The role of the respiratory system is to breathe in oxygen and breathe out carbon dioxide. This is known as respiration.\n- How the Lungs Work - The Respiratory System | NHLBI, NIH: https://www.nhlbi.nih.gov/health/lungs/respiratory-system - An official website of the United States government. A **.gov** website belongs to an official government organization in the United Stat...",
         "timestamp": "2026-06-04T23:41:35.689Z",
         "web_results": {
           "query": "provide me with some information on the internet on how to give power to my respiratory system?",
@@ -158,31 +158,31 @@
             {
               "title": "Respiratory System: Organs, Facts, Anatomy & Function",
               "url": "https://my.clevelandclinic.org/health/body/21205-respiratory-system",
-              "content_snippet": "# Respiratory System. Your respiratory system is made up of your lungs, airways (trachea, bronchi and bronchioles), diaphragm, voice box, throat, nose and mouth. Its main function is to breathe in oxygen and breathe out carbon dioxide. Your respiratory system is the organs and structures in your body that allow you to breathe. These parts work together to bring oxygen into your body when you inhale and get rid of carbon dioxide when you exhale. ### What is the main function of your respiratory system? The main function of your respiratory system is to pull in oxygen for your body’s cells and get rid of carbon dioxide, a waste product. ### What are the parts of the respiratory system? The main organs of your respiratory system are your lungs. The main job of your respiratory system is to bring oxygen into your lungs and move carbon dioxide out of them (gas exchange).",
-              "score": 0.9730365
+              "content_snippet": "# Respiratory System. Your respiratory system is made up of your lungs, airways (trachea, bronchi and bronchioles), diaphragm, voice box, throat, nose and mouth. Its main function is to breathe in oxygen and breathe out carbon dioxide. Your respiratory system is the organs and structures in your body that allow you to breathe. These parts work together to bring oxygen into your body when you inhale and get rid of carbon dioxide when you exhale. ### What is the main function of your respiratory system? The main function of your respiratory system is to pull in oxygen for your body's cells and get rid of carbon dioxide, a waste product.",
+              "score": 0.9998511
             },
             {
               "title": "How We Breathe - Craig Hospital",
               "url": "https://craighospital.org/resources/how-we-breathe",
               "content_snippet": "The role of the respiratory system is to breathe in oxygen and breathe out carbon dioxide. This is known as respiration.",
-              "score": 0.8624676
+              "score": 0.8688268
             },
             {
               "title": "How the Lungs Work - The Respiratory System | NHLBI, NIH",
               "url": "https://www.nhlbi.nih.gov/health/lungs/respiratory-system",
-              "content_snippet": "An official website of the United States government. A **.gov** website belongs to an official government organization in the United States. * < Back To How the Lungs Work. * How Your Body Controls Breathing. * How to Keep Your Lungs Healthy. # How the Lungs Work The Respiratory System ---. Your lungs are on each side of your heart, inside your chest cavity. When you breathe in, air enters your airways and travels down into the air sacs, or alveoli, in your lungs. The circulatory system, which is made up of the heart and blood vessels, supports the respiratory system by bringing blood to and from the lungs. The circulatory system helps deliver nutrients and oxygen from the lungs to tissues and organs throughout the body. The image shows an enlarged view of the airways and lungs, as well as the trachea; bronchial tubes, or bronchi; and bronchioles. The airways are pipes that carry oxygen-rich air to the alveoli in your lungs.",
+              "content_snippet": "An official website of the United States government. A **.gov** website belongs to an official government organization in the United Stat...",
               "score": 0.7826625
             },
             {
               "title": "How to Increase Lung Capacity: Breathing Exercises",
               "url": "https://www.healthline.com/health/how-to-increase-lung-capacity",
-              "content_snippet": "# Breathing Exercises to Increase Lung Capacity. Lung capacity shows how much air your lungs can hold. Performing breathing exercises can improve your lung capacity over time. Your lung capacity is the total amount of air your lungs can hold. Some conditions, such as asthma, can significantly speed up the loss of lung capacity and function. This leads to difficulty in breathing and shortness of breath. Exercises exist that can help maintain lung capacity, making it easier to keep your lungs healthy and get your body the oxygen it needs. Diaphragmatic breathing, or “belly breathing,” engages the diaphragm, which is supposed to do most of the heavy lifting when it comes to breathing. If you have COPD, ask a doctor or respiratory therapist to show you how to use this exercise for the best results. This breathing exercise is often easier for beginners than diaphragmatic breathing, and you can do it at home even if no one has shown you how.",
+              "content_snippet": "# Breathing Exercises to Increase Lung Capacity. Lung capacity shows how much air your lungs can hold. Performing breathing exercises can improve your lung capacity over time. Your lung capacity is the total amount of air your lungs can hold. Some conditions, such as asthma, can significantly speed up the loss of lung capacity and function. This leads to difficulty in breathing and shortness of breath. Exercises exist that can help maintain lung capacity, making it easier to keep your lungs healthy and get your body the oxygen it needs. Diaphragmatic breathing, or \"belly breathing\", engages the diaphragm, which is supposed to do most of the heavy lifting when it comes to breathing. If you have COPD, ask a doctor or respiratory therapist to show you how to use this exercise for the best results. This breathing exercise is often easier for beginners than diaphragmatic breathing, and you can do it at home even if no one has shown you how.",
               "score": 0.70416015
             },
             {
               "title": "7 Tips for Healthy Lungs",
               "url": "https://www.ouhealth.com/blog/2024/november/7-tips-for-healthy-lungs",
-              "content_snippet": "# 7 Tips for Healthy Lungs. The lungs are essential parts of the respiratory system, which helps you breathe. They provide oxygen to your body and remove carbon dioxide. The respiratory system brings in fresh air and gets rid of waste gases. When you breathe in, oxygen goes into your lungs and then into your bloodstream, which carries it to your cells. At the cells, oxygen is swapped for carbon dioxide, which the blood brings back to the lungs to be exhaled. After 35, it’s normal for lung function to gradually decline, making breathing a bit harder as you age. Despite the natural decline of lungs as you age, the good news is that you can maintain healthy lungs. One of these chemicals, carbon monoxide, displaces oxygen in your blood, depriving your organs of the oxygen they need. Smoking also damages the cilia, the tiny hairs in your airways that help keep dirt and mucus out of your lungs.",
+              "content_snippet": "# 7 Tips for Healthy Lungs. The lungs are essential parts of the respiratory system, which helps you breathe. They provide oxygen to your body and remove carbon dioxide. The respiratory system brings in fresh air and gets rid of waste gases. When you breathe in, oxygen goes into your lungs and then into your bloodstream, which carries it to your cells. At the cells, oxygen is swapped for carbon dioxide, which the blood brings back to the lungs to be exhaled. After 35, it's normal for lung function to gradually decline, making breathing a bit harder as you age. Despite the natural decline of lungs as you age, the good news is that you can maintain healthy lungs. One of these chemicals, carbon monoxide, displaces oxygen in your blood, depriving your organs of the oxygen they need. Smoking also damages the cilia, the tiny hairs in your airways that help keep dirt and mucus out of your lungs.",
               "score": 0.3539863
             }
           ]
@@ -197,19 +197,19 @@
     "vendor_id": null,
     "notifications_sent": [],
     "notification_pending": true,
-    "property_id": "property_001",
-    "property": "Sunset Apartments",
+    "property_id": "7c76dd08-6949-55f2-a211-9d7a342b8a7d",
+    "property": "Sunset Apartment",
     "summary": "The tenant reported a total loss of power in their apartment, which is particularly concerning due to their reliance on medical equipment. The issue has been escalated to the property manager as an emergency, and the tenant was advised to seek external medical assistance if necessary."
   },
   {
-    "id": "request_7eedc058",
-    "requester_id": "tenant_001",
+    "id": "150d4621-859d-5b23-8937-8ef8eeed4612",
+    "requester_id": "b1c4a072-618b-53a2-a16e-d2387c1efa14",
     "type": "emergency",
     "description": "i have an issue, there is a small gas leak i can smell it",
     "status": "pending",
     "urgency": "high",
     "involved_parties": [
-      "tenant_001"
+      "b1c4a072-618b-53a2-a16e-d2387c1efa14"
     ],
     "conversation_history": [
       {
@@ -239,48 +239,48 @@
     "vendor_id": null,
     "notifications_sent": [],
     "notification_pending": true,
-    "property_id": "property_001",
-    "property": "Sunset Apartments",
+    "property_id": "7c76dd08-6949-55f2-a211-9d7a342b8a7d",
+    "property": "Sunset Apartment",
     "summary": "The tenant reported a suspected gas leak inside their apartment at Spandauer Damm. The AI instructed the tenant to evacuate the building immediately and contact emergency services, while simultaneously escalating the issue to the property manager as a priority emergency."
   },
   {
-    "id": "request_bf92d101",
-    "requester_id": "tenant_003",
+    "id": "b7d42924-0c76-59cb-a5d3-8ec22b876a32",
+    "requester_id": "7b668b94-8223-5104-9e69-3d210db1bddb",
     "type": "hvac",
     "description": "The heating system is not working and the apartment is very cold.",
     "status": "pending",
     "urgency": "medium",
     "involved_parties": [
-      "tenant_003",
-      "manager_002"
+      "7b668b94-8223-5104-9e69-3d210db1bddb",
+      "2fa6c4e0-be26-5f52-bd7f-286d7dd34b80"
     ],
     "conversation_history": [
       {
-        "id": "msg_001",
+        "id": "msg_020",
         "role": "ai",
         "message": "Hello Michael Brown. How can I assist you today?",
         "timestamp": "2026-06-01T08:15:00Z"
       },
       {
-        "id": "msg_002",
+        "id": "msg_021",
         "role": "tenant",
         "message": "The heating system is not working and the apartment is very cold.",
         "timestamp": "2026-06-01T08:16:10Z"
       },
       {
-        "id": "msg_003",
+        "id": "msg_022",
         "role": "ai",
         "message": "I'm sorry to hear that. Has the thermostat been adjusted recently, and are other residents experiencing similar issues?",
         "timestamp": "2026-06-01T08:16:35Z"
       },
       {
-        "id": "msg_004",
+        "id": "msg_023",
         "role": "tenant",
         "message": "My neighbors say theirs is working fine.",
         "timestamp": "2026-06-01T08:17:01Z"
       },
       {
-        "id": "msg_005",
+        "id": "msg_024",
         "role": "ai",
         "message": "Thank you. I have escalated this issue to the property manager and assigned an HVAC vendor for inspection.",
         "timestamp": "2026-06-01T08:17:20Z"
@@ -291,7 +291,7 @@
     "escalated": true,
     "sentiment": "negative",
     "confidence": 0.98,
-    "vendor_id": "vendor_004",
+    "vendor_id": "2e72d98f-663c-5729-bdc4-97dd5d3fe122",
     "notifications_sent": [
       {
         "type": "email",
@@ -307,42 +307,42 @@
       }
     ],
     "notification_pending": false,
-    "property_id": "property_002",
+    "property_id": "401c94a1-6f14-52ac-a9bb-cfa4b2f60c34",
     "property": "Riverbend Residences",
     "summary": "Tenant reported a heating failure isolated to their apartment. The issue was escalated to the property manager and HVAC contractor."
   },
   {
-    "id": "request_ae81f223",
-    "requester_id": "tenant_004",
+    "id": "f42d7e74-0782-5895-9217-33ae12a6155a",
+    "requester_id": "5803e546-c51d-50b5-965a-862e45879d09",
     "type": "electrical",
     "description": "Half of the outlets in my apartment stopped working.",
     "status": "in_progress",
     "urgency": "medium",
     "involved_parties": [
-      "tenant_004",
-      "manager_002"
+      "5803e546-c51d-50b5-965a-862e45879d09",
+      "2fa6c4e0-be26-5f52-bd7f-286d7dd34b80"
     ],
     "conversation_history": [
       {
-        "id": "msg_006",
+        "id": "msg_025",
         "role": "tenant",
         "message": "Half of the outlets in my apartment stopped working.",
         "timestamp": "2026-06-02T13:45:00Z"
       },
       {
-        "id": "msg_007",
+        "id": "msg_026",
         "role": "ai",
         "message": "Have you checked the circuit breaker panel for any tripped breakers?",
         "timestamp": "2026-06-02T13:45:25Z"
       },
       {
-        "id": "msg_008",
+        "id": "msg_027",
         "role": "tenant",
         "message": "Yes, everything appears normal.",
         "timestamp": "2026-06-02T13:46:02Z"
       },
       {
-        "id": "msg_009",
+        "id": "msg_028",
         "role": "ai",
         "message": "Thank you. An electrician has been notified and the property manager has been informed.",
         "timestamp": "2026-06-02T13:46:30Z"
@@ -353,7 +353,7 @@
     "escalated": true,
     "sentiment": "neutral",
     "confidence": 0.96,
-    "vendor_id": "vendor_003",
+    "vendor_id": "1826caf4-711c-5f17-b943-9bfb98f9b80d",
     "notifications_sent": [
       {
         "type": "email",
@@ -369,36 +369,36 @@
       }
     ],
     "notification_pending": false,
-    "property_id": "property_002",
+    "property_id": "401c94a1-6f14-52ac-a9bb-cfa4b2f60c34",
     "property": "Riverbend Residences",
     "summary": "Several electrical outlets stopped functioning despite no visible breaker issue. Escalated to electrical contractor."
   },
   {
-    "id": "request_c4471d91",
-    "requester_id": "tenant_005",
+    "id": "d3277eb0-d021-50c4-b2cd-bf229e9175d5",
+    "requester_id": "0414e2e5-7f9e-5034-8066-793217eb84c5",
     "type": "pest_control",
     "description": "I have noticed cockroaches in the kitchen for the past week.",
     "status": "pending",
     "urgency": "low",
     "involved_parties": [
-      "tenant_005",
-      "manager_003"
+      "0414e2e5-7f9e-5034-8066-793217eb84c5",
+      "128b8f0f-5f80-5ded-a75d-06936e394c51"
     ],
     "conversation_history": [
       {
-        "id": "msg_010",
+        "id": "msg_029",
         "role": "tenant",
         "message": "I have noticed cockroaches in the kitchen for the past week.",
         "timestamp": "2026-06-03T10:10:00Z"
       },
       {
-        "id": "msg_011",
+        "id": "msg_030",
         "role": "ai",
         "message": "Thank you for reporting this. Approximately how many have you seen and at what times?",
         "timestamp": "2026-06-03T10:10:30Z"
       },
       {
-        "id": "msg_012",
+        "id": "msg_031",
         "role": "tenant",
         "message": "Usually a few at night around the sink.",
         "timestamp": "2026-06-03T10:11:11Z"
@@ -409,7 +409,7 @@
     "escalated": true,
     "sentiment": "negative",
     "confidence": 0.94,
-    "vendor_id": "vendor_007",
+    "vendor_id": "1463aaa1-c326-5eb8-aae4-c2a1ce29b368",
     "notifications_sent": [
       {
         "type": "email",
@@ -419,42 +419,42 @@
       }
     ],
     "notification_pending": true,
-    "property_id": "property_003",
+    "property_id": "e9ef9ad0-0c28-5c81-aeb7-d5089542b6af",
     "property": "Maple Heights",
     "summary": "Tenant reported recurring cockroach activity in the kitchen area. Pest control service requested."
   },
   {
-    "id": "request_d5f4a882",
-    "requester_id": "tenant_006",
+    "id": "51ad8c00-3497-57e6-b239-a20d1059d2e0",
+    "requester_id": "3dc7f9be-4c50-5a9b-a1c5-0b7f4c929f4f",
     "type": "locksmith",
     "description": "My apartment key broke inside the lock.",
     "status": "in_progress",
     "urgency": "high",
     "involved_parties": [
-      "tenant_006",
-      "manager_004"
+      "3dc7f9be-4c50-5a9b-a1c5-0b7f4c929f4f",
+      "197fb109-9e81-5763-a647-a71bdff88efd"
     ],
     "conversation_history": [
       {
-        "id": "msg_013",
+        "id": "msg_032",
         "role": "tenant",
         "message": "My apartment key broke inside the lock and I cannot enter.",
         "timestamp": "2026-06-04T18:00:00Z"
       },
       {
-        "id": "msg_014",
+        "id": "msg_033",
         "role": "ai",
         "message": "Are you currently locked out of your apartment?",
         "timestamp": "2026-06-04T18:00:14Z"
       },
       {
-        "id": "msg_015",
+        "id": "msg_034",
         "role": "tenant",
         "message": "Yes.",
         "timestamp": "2026-06-04T18:00:25Z"
       },
       {
-        "id": "msg_016",
+        "id": "msg_035",
         "role": "ai",
         "message": "This has been escalated as an urgent access issue and a locksmith has been contacted.",
         "timestamp": "2026-06-04T18:00:40Z"
@@ -465,7 +465,7 @@
     "escalated": true,
     "sentiment": "negative",
     "confidence": 1,
-    "vendor_id": "vendor_001",
+    "vendor_id": "fbb4dc23-6e4a-5ee1-9919-e805f4ded107",
     "notifications_sent": [
       {
         "type": "email",
@@ -481,36 +481,36 @@
       }
     ],
     "notification_pending": false,
-    "property_id": "property_004",
+    "property_id": "202f36cc-9314-5de1-9ac8-ac84408c4a62",
     "property": "Willow Creek Lofts",
     "summary": "Tenant is locked out after a key snapped inside the lock. Emergency locksmith dispatched."
   },
   {
-    "id": "request_e88c1194",
-    "requester_id": "tenant_007",
-    "type": "glass_repair",
+    "id": "7bf4f762-48b6-5ce1-a962-e7b6b2e6a0c3",
+    "requester_id": "b7df001e-0002-507a-9da9-6ac3c990ba6e",
+    "type": "general",
     "description": "Bedroom window cracked after a storm.",
     "status": "pending",
     "urgency": "medium",
     "involved_parties": [
-      "tenant_007",
-      "manager_004"
+      "b7df001e-0002-507a-9da9-6ac3c990ba6e",
+      "197fb109-9e81-5763-a647-a71bdff88efd"
     ],
     "conversation_history": [
       {
-        "id": "msg_017",
+        "id": "msg_036",
         "role": "tenant",
         "message": "My bedroom window cracked after yesterday's storm.",
         "timestamp": "2026-06-05T09:30:00Z"
       },
       {
-        "id": "msg_018",
+        "id": "msg_037",
         "role": "ai",
         "message": "Thank you for reporting this. Is the glass intact or are there loose shards present?",
         "timestamp": "2026-06-05T09:30:18Z"
       },
       {
-        "id": "msg_019",
+        "id": "msg_038",
         "role": "tenant",
         "message": "The glass is still intact but the crack is spreading.",
         "timestamp": "2026-06-05T09:31:00Z"
@@ -521,7 +521,7 @@
     "escalated": true,
     "sentiment": "neutral",
     "confidence": 0.95,
-    "vendor_id": "vendor_006",
+    "vendor_id": "224f93f2-1b5f-5369-88f9-15fd12024616",
     "notifications_sent": [
       {
         "type": "email",
@@ -531,36 +531,36 @@
       }
     ],
     "notification_pending": true,
-    "property_id": "property_004",
+    "property_id": "202f36cc-9314-5de1-9ac8-ac84408c4a62",
     "property": "Willow Creek Lofts",
     "summary": "Tenant reported a cracked bedroom window that may worsen. Glass repair vendor recommended."
   },
   {
-    "id": "request_f9017c61",
-    "requester_id": "tenant_008",
+    "id": "91c09665-7f79-5ce6-b5bd-b4f3b9521da3",
+    "requester_id": "f6e89e70-803d-5763-845c-edf4402dee60",
     "type": "appliance_repair",
     "description": "The refrigerator is not cooling properly.",
     "status": "pending",
     "urgency": "medium",
     "involved_parties": [
-      "tenant_008",
-      "manager_004"
+      "f6e89e70-803d-5763-845c-edf4402dee60",
+      "197fb109-9e81-5763-a647-a71bdff88efd"
     ],
     "conversation_history": [
       {
-        "id": "msg_020",
+        "id": "msg_039",
         "role": "tenant",
         "message": "The refrigerator is not cooling properly.",
         "timestamp": "2026-06-05T16:15:00Z"
       },
       {
-        "id": "msg_021",
+        "id": "msg_040",
         "role": "ai",
         "message": "Are both the refrigerator and freezer compartments affected?",
         "timestamp": "2026-06-05T16:15:21Z"
       },
       {
-        "id": "msg_022",
+        "id": "msg_041",
         "role": "tenant",
         "message": "The freezer still works but the refrigerator section is warm.",
         "timestamp": "2026-06-05T16:16:00Z"
@@ -571,7 +571,7 @@
     "escalated": true,
     "sentiment": "neutral",
     "confidence": 0.97,
-    "vendor_id": "vendor_009",
+    "vendor_id": "e510e1ea-be40-5246-835b-f9482ec29999",
     "notifications_sent": [
       {
         "type": "email",
@@ -581,36 +581,36 @@
       }
     ],
     "notification_pending": true,
-    "property_id": "property_004",
+    "property_id": "202f36cc-9314-5de1-9ac8-ac84408c4a62",
     "property": "Willow Creek Lofts",
     "summary": "Refrigerator compartment has lost cooling while freezer remains operational. Appliance repair requested."
   },
   {
-    "id": "request_g312a774",
-    "requester_id": "tenant_010",
+    "id": "c3734d16-675e-5dff-85f5-265ed8522bc9",
+    "requester_id": "d6bdc23b-349c-5314-97ec-adaa065ca11b",
     "type": "plumbing",
     "description": "Kitchen sink drain is completely clogged.",
     "status": "in_progress",
     "urgency": "medium",
     "involved_parties": [
-      "tenant_010",
-      "owner_005"
+      "d6bdc23b-349c-5314-97ec-adaa065ca11b",
+      "ed84c333-2c85-5ae5-9916-60f4d6c9921b"
     ],
     "conversation_history": [
       {
-        "id": "msg_023",
+        "id": "msg_042",
         "role": "tenant",
         "message": "The kitchen sink drain is completely clogged.",
         "timestamp": "2026-06-05T12:00:00Z"
       },
       {
-        "id": "msg_024",
+        "id": "msg_043",
         "role": "ai",
         "message": "Is any water draining at all or is it completely blocked?",
         "timestamp": "2026-06-05T12:00:15Z"
       },
       {
-        "id": "msg_025",
+        "id": "msg_044",
         "role": "tenant",
         "message": "No water is draining.",
         "timestamp": "2026-06-05T12:00:45Z"
@@ -621,7 +621,7 @@
     "escalated": true,
     "sentiment": "negative",
     "confidence": 0.99,
-    "vendor_id": "vendor_008",
+    "vendor_id": "1b583821-f90d-5e5e-aa8d-e31039c66a9f",
     "notifications_sent": [
       {
         "type": "email",
@@ -637,42 +637,42 @@
       }
     ],
     "notification_pending": false,
-    "property_id": "property_005",
+    "property_id": "3f5a13f0-ca00-5a91-aabd-33cdecf388e2",
     "property": "Poplar Gardens",
     "summary": "Tenant reported a fully blocked kitchen sink drain. Drain cleaning vendor assigned."
   },
   {
-    "id": "request_h842e991",
-    "requester_id": "tenant_010",
-    "type": "security",
+    "id": "785b41e2-f04e-5baa-8221-a67f7f88c46e",
+    "requester_id": "d6bdc23b-349c-5314-97ec-adaa065ca11b",
+    "type": "access_control",
     "description": "The main building entrance access keypad is malfunctioning.",
     "status": "pending",
     "urgency": "high",
     "involved_parties": [
-      "tenant_010",
-      "owner_005"
+      "d6bdc23b-349c-5314-97ec-adaa065ca11b",
+      "ed84c333-2c85-5ae5-9916-60f4d6c9921b"
     ],
     "conversation_history": [
       {
-        "id": "msg_026",
+        "id": "msg_045",
         "role": "tenant",
         "message": "The entrance keypad is not unlocking the main door.",
         "timestamp": "2026-06-06T06:20:00Z"
       },
       {
-        "id": "msg_027",
+        "id": "msg_046",
         "role": "ai",
         "message": "Are all residents affected or only your access code?",
         "timestamp": "2026-06-06T06:20:22Z"
       },
       {
-        "id": "msg_028",
+        "id": "msg_047",
         "role": "tenant",
         "message": "Several residents are having the same issue.",
         "timestamp": "2026-06-06T06:21:00Z"
       },
       {
-        "id": "msg_029",
+        "id": "msg_048",
         "role": "ai",
         "message": "Thank you. This has been escalated as a building access issue and the owner has been notified.",
         "timestamp": "2026-06-06T06:21:15Z"
@@ -683,7 +683,7 @@
     "escalated": true,
     "sentiment": "neutral",
     "confidence": 0.98,
-    "vendor_id": "vendor_010",
+    "vendor_id": "090f9c13-33df-5895-b3ff-c9f0617f0816",
     "notifications_sent": [
       {
         "type": "email",
@@ -699,19 +699,19 @@
       }
     ],
     "notification_pending": false,
-    "property_id": "property_005",
+    "property_id": "3f5a13f0-ca00-5a91-aabd-33cdecf388e2",
     "property": "Poplar Gardens",
     "summary": "Multiple residents are unable to use the building access keypad. Security systems vendor assigned for urgent review."
   },
   {
-    "id": "request_cc61eea1",
-    "requester_id": "tenant_001",
+    "id": "705aa687-9ba1-5234-902b-2310d1c4a020",
+    "requester_id": "b1c4a072-618b-53a2-a16e-d2387c1efa14",
     "type": "electrical",
     "description": "I have a problem with the electricity in my apartment, please send an email to the manager my apartment",
     "status": "pending",
     "urgency": "high",
     "involved_parties": [
-      "tenant_001"
+      "b1c4a072-618b-53a2-a16e-d2387c1efa14"
     ],
     "conversation_history": [
       {
@@ -729,7 +729,7 @@
       {
         "id": "fdb8bce6-3208-41ed-9417-2826b0babdda",
         "role": "ai",
-        "message": "I'm sorry to hear you're having electrical issues, John. To make sure I get the right help to you, could you please clarify if you have a total power loss, or if it's just specific outlets or lights that aren't working? Also, are you currently safe?\n\nRelevant links:\n- I have an electrical problem in my apartment that my electric would ...: https://www.quora.com/I-have-an-electrical-problem-in-my-apartment-that-my-electric-would-shut-off-starting-mid-afternoon-all-thru-the-night-and-my-landlord-won-t-do-anything-about-it-What-can-I-do-to-get-it-taken-seriously-and-fix-it - Learn where the apartment breakers are, and reset them yourself. Or call an electrician, and bill the landlord- in some cases, having\n- Power Outage Email Templates - TextExpander: https://textexpander.com/templates/energy-power-outage-email - This article presents a series of unique power outage email templates designed to help you effectively communicate during such disruptions.\n- The 7 Most Common Calls for Electrical Repairs in Apartments: https://gladiatorelectric.com/electrical-repairs-apartments - From faulty wiring in older units to frequent breaker trips, outlet failures, lighting problems in shared spaces, and power surges that d...",
+        "message": "I'm sorry to hear you're having electrical issues, John. To make sure I get the right help to you, could you please clarify if you have a total power loss, or if it's just specific outlets or lights that aren't working? Also, are you currently safe?\n\nRelevant links:\n- I have an electrical problem in my apartment that my electric would ...: https://www.quora.com/I-have-an-electrical-problem-in-my-apartment-that-my-electric-would-shut-off-starting-mid-afternoon-all-thru-the-night-and-my-landlord-won-t-do-anything-about-it-What-can-I-do-to-get-it-taken-seriously-and-fix-it - Learn where the apartment breakers are, and reset them yourself. Or call an electrician, and bill the landlord- in some cases, having...\n- Power Outage Email Templates - TextExpander: https://textexpander.com/templates/energy-power-outage-email - This article presents a series of unique power outage email templates designed to help you effectively communicate during such disruptions.\n- The 7 Most Common Calls for Electrical Repairs in Apartments: https://gladiatorelectric.com/electrical-repairs-apartments - From faulty wiring in older units to frequent breaker trips, outlet failures, lighting problems in shared spaces, and power surges that damage...",
         "timestamp": "2026-06-06T09:14:02.530Z",
         "web_results": {
           "query": "I have a problem with the electricity in my apartment, please send an email to the manager my apartment",
@@ -761,7 +761,7 @@
             },
             {
               "title": "Property Manager demands that I keep power on after I move out",
-              "url": "https://www.reddit.com/r/TenantHelp/comments/1lgpuaz/property_manager_demands_that_i_keep_power_on",
+              "url": "https://www.reddit.com/r/TenantHelp/comments/1lgpuaz/property-manager-demands-that-i-keep-power-on",
               "content_snippet": "She stated (in an email) that I will not be held to the standard move-out policy as long as I leave the place the way it was when I moved in and",
               "score": 0.85195273
             }
@@ -771,11 +771,11 @@
       {
         "id": "de3dda66-11f7-45d7-9671-45f00649a45e",
         "role": "tenant",
-        "message": "the breaker keeps turningn off a portion of the house, even when i put it back on, as soon as i connect something it shorts and turns off right away, there must be something shorting off and making the mechanical safety feature engage, please send an email to my manager",
+        "message": "the breaker keeps turning off a portion of the house, even when i put it back on, as soon as i connect something it shorts and turns off right away, there must be something shorting off and making the mechanical safety feature engage, please send an email to my manager",
         "timestamp": "2026-06-06T09:15:44.741Z"
       },
       {
-        "id": "0bf93520-3411-4ae8-893d-45953e6d79b6",
+        "id": "0bf93520-3411-4ae8-893d-45f00649d79b6",
         "role": "ai",
         "message": "I am very sorry to hear about this electrical issue, John. Since the breaker is tripping immediately upon use, this indicates a potential short circuit which poses a fire risk. Please keep that circuit turned off and avoid plugging anything into those outlets until a professional can inspect it. I am escalating this to your property manager immediately to ensure an electrician is dispatched as soon as possible.",
         "timestamp": "2026-06-06T09:15:54.105Z"
@@ -789,19 +789,19 @@
     "vendor_id": null,
     "notifications_sent": [],
     "notification_pending": true,
-    "property_id": "property_001",
+    "property_id": "7c76dd08-6949-55f2-a211-9d7a342b8a7d",
     "property": "Sunset Apartment",
     "summary": "John Tenant is experiencing a recurring electrical short circuit in his apartment that causes the breaker to trip whenever appliances are plugged in. The AI coordinator has advised him to stop using the affected outlets for safety and has escalated the issue to the property manager to arrange for a professional electrician."
   },
   {
-    "id": "request_3334b7ed",
-    "requester_id": "tenant_001",
+    "id": "645f7295-3a7c-5deb-a037-9b5b634bbf45",
+    "requester_id": "b1c4a072-618b-53a2-a16e-d2387c1efa14",
     "type": "emergency",
     "description": "I have a gas leak",
     "status": "resolved",
     "urgency": "high",
     "involved_parties": [
-      "tenant_001"
+      "b1c4a072-618b-53a2-a16e-d2387c1efa14"
     ],
     "conversation_history": [
       {
@@ -811,7 +811,7 @@
         "timestamp": "2026-06-06T11:32:35.498Z"
       },
       {
-        "id": "c38b2f3a-601c-40b7-ba9a-2771941a6b6a",
+        "id": "c38b2f3a-601c-407f-ba9a-2771941a6b6a",
         "role": "tenant",
         "message": "I have a gas leak",
         "timestamp": "2026-06-06T11:32:43.842Z"
@@ -819,7 +819,7 @@
       {
         "id": "43cfc1b7-742c-4e68-a681-a92b5e971eed",
         "role": "ai",
-        "message": "I am very sorry to hear this. Please evacuate the building immediately and move to a safe location. Do not use any light switches, electronics, or open flames. Once you are in a safe place, please call the local emergency services (112 in Germany) and your gas provider immediately. I have escalated this to your property manager as an emergency.",
+        "message": "I am very sorry to hear this. Please evacuate the building immediately and move to a safe location. Do not use any light switches, electronics, or open flames. Once you are in a safe location, please call the local emergency services (112 in Germany) and your gas provider immediately. I have escalated this to your property manager as an emergency.",
         "timestamp": "2026-06-06T11:33:01.192Z"
       }
     ],
@@ -844,11 +844,11 @@
       }
     ],
     "notification_pending": false,
-    "property_id": "property_001",
+    "property_id": "7c76dd08-6949-55f2-a211-9d7a342b8a7d",
     "property": "Sunset Apartment",
     "summary": "The tenant reported a gas leak at their apartment building, which is a critical safety hazard. The AI instructed the tenant to evacuate and contact emergency services immediately, and the issue has been escalated to the property manager as an emergency.",
     "resolved_at": "2026-06-06T15:57:18.629779+00:00",
-    "resolved_by": "manager_001",
-    "resolution_note": "skill issue lil bro"
+    "resolved_by": "ab7a3be3-4950-50b1-a1b6-6783aa7a4725",
+    "resolution_note": "Skill issue lil bro"
   }
 ]
