@@ -138,22 +138,22 @@ PostgreSQL schema for production is defined separately under `src/resources/db/m
 
 | Migration | Purpose |
 |-----------|---------|
-| `001_initial_schema.sql` | Base tables, enums, indexes, triggers |
-| `002_rls_policies.sql` | Row Level Security policies |
-| `003_seed_data.sql` | Sample data from mock JSON |
-| `004_schema_hardening.sql` | Soft delete, `units`, audit tables, FK hardening |
+| `001_initial_schema.sql` | Base tables, enums, auth mapping, normalized units, resolution fields |
+| `002_rls_policies.sql` | Row Level Security policies and auth helpers |
+| `003_seed_data.sql` | Normalized seed data generated from mock JSON |
+| `004_schema_hardening.sql` | Indexes, request audit tables, attachments, assignment history |
 
 Apply migrations in numeric order against PostgreSQL. Full table definitions, entity relationships, JSON-to-SQL mapping, and deletion strategy: **`src/resources/README.md`**.
 
-**Schema highlights (004):**
+**Schema highlights:**
 
 - Soft delete (`is_active`, `deleted_at`) on core entities
 - `units` table; tenants link via `unit_id` (property derived: tenant → unit → property)
 - `request_attachments`, `request_status_history`, `request_assignments` for files, status audit, and vendor assignment history
-- `user_accounts` for auth-to-entity mapping
-- `ON DELETE RESTRICT` on `properties.owner_id` and `requests.requester_id` to preserve history
+- `user_accounts` maps Supabase Auth users to owner/manager actors
+- `ON DELETE RESTRICT` on `requests.requester_id` to preserve history
 
-Mock JSON files are unchanged and still match the runtime API. SQL seeding backfills `units` from tenant `property_id` + `unit` in migration 004.
+Mock JSON files are unchanged and still match the runtime API. SQL seeding normalizes tenants from JSON `property_id` + `unit` into `units` plus `tenants.unit_id`.
 
 ## Project Structure
 
@@ -226,7 +226,7 @@ async def example_endpoint(request: Request):
 - The conversation and classifier prompts are generated from the backend request type definitions.
 - The JSON mock data in `src/resources/mock_db_jsons/requests.json` should always use canonical request type values.
 - The `notifications_sent` field in mock data uses a detailed format: `[{type, recipient, status, timestamp}]` instead of simple ID strings.
-- Backend authentication is not implemented yet; frontend logout is currently client-side only. The `user_accounts` table in `004_schema_hardening.sql` is ready for future auth integration.
+- Backend authentication is not implemented yet; frontend logout is currently client-side only. The `user_accounts` table in `001_initial_schema.sql` is ready for owner/manager Supabase auth integration.
 - When migrating runtime code from JSON to PostgreSQL, follow `src/resources/README.md` for the canonical schema; do not mirror SQL-only tables (`request_status_history`, `request_assignments`) in mock JSON until the API layer supports them.
 
 ## Google Cloud OAuth Setup (Future)

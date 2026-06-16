@@ -1,47 +1,81 @@
 # Resources folder
 
-Static data and database definitions for the Ranting Chant property management system.
+Static data and PostgreSQL database definitions for the Ranting Chant property management system.
 
-- **SQL migrations** — PostgreSQL schema, RLS policies, seed data, and production hardening
-- **Mock JSON files** — Flat-file reference data (string IDs, nested structures)
+- **SQL migrations** - canonical PostgreSQL schema, RLS policies, seed data, and production hardening
+- **Mock JSON files** - flat-file runtime/reference data used by the local backend
 
 ## Directory structure
 
-```
+```text
 resources/
-├── README.md
-├── db/
-│   └── migrations/
-│       ├── 001_initial_schema.sql    # Base tables, enums, indexes, triggers
-│       ├── 002_rls_policies.sql      # Row Level Security policies
-│       ├── 003_seed_data.sql         # Sample data from mock JSON
-│       └── 004_schema_hardening.sql  # Soft delete, units, audit tables, FK hardening
-└── mock_db_jsons/
-    ├── owners.json
-    ├── property_magament.json
-    ├── properties.json
-    ├── tenants.json
-    ├── vendors.json
-    └── requests.json
+|-- README.md
+|-- db/
+|   `-- migrations/
+|       |-- 001_initial_schema.sql    # Canonical actor-based schema and auth mapping
+|       |-- 002_rls_policies.sql      # Row Level Security policies and auth helpers
+|       |-- 003_seed_data.sql         # Normalized UUID seed data
+|       `-- 004_schema_hardening.sql  # Indexes, audit tables, attachments, account indexes
+`-- mock_db_jsons/
+    |-- owners.json
+    |-- property_magament.json
+    |-- properties.json
+    |-- tenants.json
+    |-- vendors.json
+    `-- requests.json
 ```
 
-### Migration order
+## Migration order
+
+Apply migrations in numeric order:
 
 1. `001_initial_schema.sql`
 2. `002_rls_policies.sql`
 3. `003_seed_data.sql`
-4. `004_schema_hardening.sql` — backfills `units` from seeded tenants; apply after seed
+4. `004_schema_hardening.sql`
 
----
+`001_initial_schema.sql` is the canonical schema. Later migrations must not recreate base tables or reintroduce deprecated columns.
 
-## Database schema
+## Current schema model
 
-Base schema: `001_initial_schema.sql`. Production changes: `004_schema_hardening.sql`.
+The production schema uses a unified identity layer:
 
-### Enum types
+```text
+actors
+|-- owners
+|-- property_managers
+|-- tenants
+`-- vendors
+```
+
+All people and organizations that can participate in a request are stored in `actors`.
+Only owners and managers get Supabase login accounts in `user_accounts`; tenants are
+manager/owner-provisioned contact and tenancy records, not self-signup users.
+Role-specific tables use the same UUID as the actor:
+
+| Role table | Key |
+|---|---|
+| `owners.id` | FK to `actors.id` |
+| `property_managers.id` | FK to `actors.id` |
+| `tenants.id` | FK to `actors.id` |
+| `vendors.id` | FK to `actors.id` |
+
+Supabase auth maps to actor identity through `user_accounts`:
+
+```text
+auth.uid() = user_accounts.auth_user_id
+user_accounts.actor_id = actors.id
+```
+
+Passwords are stored by Supabase Auth in `auth.users`, not in the application schema.
+Username login is supported by storing a unique `user_accounts.username` and resolving it
+to the account email before calling Supabase password sign-in.
+
+## Enum types
 
 | Enum | Values |
-|------|--------|
+|---|---|
+| `recipient_type` | `tenant`, `owner`, `manager`, `vendor` |
 | `request_status` | `pending`, `in_progress`, `pending_approval`, `escalated`, `resolved`, `cancelled` |
 | `request_urgency` | `low`, `medium`, `high`, `critical` |
 | `request_type` | `plumbing`, `electrical`, `hvac`, `appliance`, `pest_control`, `lockout`, `access_control`, `noise`, `lease_question`, `rent_payment`, `emergency`, `general` |
@@ -49,316 +83,340 @@ Base schema: `001_initial_schema.sql`. Production changes: `004_schema_hardening
 | `notification_type` | `email`, `sms` |
 | `notification_status` | `pending`, `sent`, `failed` |
 | `message_role` | `ai`, `tenant` |
-| `representative_type` | `property_manager`, `owner` |
 
-### Soft-delete columns
+There is no `representative_type` enum in the canonical schema.
 
-All major entities include:
+## Core tables
 
-| Column | Type | Default |
-|--------|------|---------|
-| `is_active` | BOOLEAN NOT NULL | `TRUE` |
-| `deleted_at` | TIMESTAMPTZ | `NULL` |
+### `actors`
 
-Applies to: `owners`, `property_managers`, `properties`, `tenants`, `vendors`, `requests`.
+| Column | Type | Notes |
+|---|---|---|
+| `id` | UUID | Primary key |
+| `type` | `recipient_type` | Actor role |
+| `display_name` | VARCHAR(255) | Required |
+| `email` | CITEXT | Optional, case-insensitive |
+| `phone` | VARCHAR(50) | Optional |
+| `is_active` | BOOLEAN | Default `TRUE` |
+| `created_at` | TIMESTAMPTZ | Default `NOW()` |
+| `updated_at` | TIMESTAMPTZ | Default `NOW()` |
 
-Production workflows should **soft-delete** (`is_active = FALSE`, `deleted_at = NOW()`) instead of physical `DELETE`. Physical deletion of tenants with requests is blocked by `ON DELETE RESTRICT`.
+### Role tables
 
-### Core tables
+| Table | Purpose |
+|---|---|
+| `owners` | Owner role row for an actor |
+| `property_managers` | Property manager role row for an actor |
+| `tenants` | Tenant role row for an actor; references `units.id` |
+| `vendors` | Vendor role row for an actor; includes `emergency_available` |
 
-#### `owners`
+Names, emails, and phones live in `actors`, not role tables.
 
-| Column | Type | Constraints |
-|--------|------|-------------|
-| `id` | UUID | PRIMARY KEY, default `uuid_generate_v4()` |
-| `name` | VARCHAR(255) | NOT NULL |
-| `email` | VARCHAR(255) | UNIQUE, NOT NULL |
-| `phone` | VARCHAR(50) | |
-| `is_active` | BOOLEAN | NOT NULL, default `TRUE` |
-| `deleted_at` | TIMESTAMPTZ | |
-| `created_at` | TIMESTAMPTZ | default `NOW()` |
-| `updated_at` | TIMESTAMPTZ | default `NOW()` |
+### `user_accounts`
 
-#### `property_managers`
+| Column | Type | Notes |
+|---|---|---|
+| `auth_user_id` | UUID | PK and FK to `auth.users(id)` |
+| `actor_id` | UUID | Unique FK to `actors(id)` |
+| `email` | CITEXT | Unique, required, case-insensitive |
+| `username` | CITEXT | Unique, optional, case-insensitive |
+| `role` | `recipient_type` | Required; only `owner` or `manager` |
+| `provider` | VARCHAR(50) | Default `email` |
+| `created_at` | TIMESTAMPTZ | Default `NOW()` |
 
-Same soft-delete columns as `owners`.
+`user_accounts` is the only table that marks an actor as login-capable. A trigger
+ensures the mapped actor exists and has a matching `owner` or `manager` role. Tenant
+actors do not receive rows in this table under the current product model.
 
-#### `properties`
+### `properties`
 
-| Column | Type | Constraints |
-|--------|------|-------------|
-| `id` | UUID | PRIMARY KEY |
-| `name` | VARCHAR(255) | NOT NULL |
-| `address` | TEXT | NOT NULL |
-| `year_built` | INTEGER | |
-| `property_type` | `property_type` | NOT NULL |
-| `unit_count` | INTEGER | NOT NULL |
-| `owner_id` | UUID | NOT NULL, FK → `owners(id)` **ON DELETE RESTRICT** |
-| `manager_id` | UUID | FK → `property_managers(id)` ON DELETE SET NULL |
-| `representative_type` | `representative_type` | NOT NULL |
-| `representative_id` | UUID | NOT NULL (trigger-validated) |
-| `is_active` | BOOLEAN | NOT NULL, default `TRUE` |
-| `deleted_at` | TIMESTAMPTZ | |
-| `created_at` | TIMESTAMPTZ | default `NOW()` |
-| `updated_at` | TIMESTAMPTZ | default `NOW()` |
+| Column | Type | Notes |
+|---|---|---|
+| `id` | UUID | Primary key |
+| `name` | VARCHAR(255) | Required |
+| `address` | TEXT | Required |
+| `year_built` | INTEGER | Optional |
+| `property_type` | `property_type` | Required |
+| `unit_count` | INTEGER | Required, non-negative |
+| `created_by` | UUID | FK to `actors(id)`, used to attach the creator's first owner/manager relationship |
+| `is_active` | BOOLEAN | Default `TRUE` |
+| `deleted_at` | TIMESTAMPTZ | Optional |
+| `created_at` | TIMESTAMPTZ | Default `NOW()` |
+| `updated_at` | TIMESTAMPTZ | Default `NOW()` |
 
-#### `units`
+Properties do not contain `owner_id`, `manager_id`, `representative_type`, or `representative_id`.
 
-| Column | Type | Constraints |
-|--------|------|-------------|
-| `id` | UUID | PRIMARY KEY, default `uuid_generate_v4()` |
-| `property_id` | UUID | NOT NULL, FK → `properties(id)` ON DELETE CASCADE |
-| `unit_number` | VARCHAR(50) | NOT NULL |
-| `bedrooms` | INTEGER | |
-| `bathrooms` | NUMERIC(3,1) | |
-| `square_feet` | INTEGER | |
-| `created_at` | TIMESTAMPTZ | default `NOW()` |
-| `updated_at` | TIMESTAMPTZ | default `NOW()` |
-| | | UNIQUE (`property_id`, `unit_number`) |
+Ownership and management are represented only by:
 
-#### `tenants`
+| Table | Meaning |
+|---|---|
+| `owner_properties(owner_id, property_id)` | Owners related to properties |
+| `manager_properties(manager_id, property_id)` | Managers related to properties |
 
-| Column | Type | Constraints |
-|--------|------|-------------|
-| `id` | UUID | PRIMARY KEY |
-| `name` | VARCHAR(255) | NOT NULL |
-| `email` | VARCHAR(255) | UNIQUE, NOT NULL |
-| `phone` | VARCHAR(50) | |
-| `address` | TEXT | |
-| `unit_id` | UUID | NOT NULL, FK → `units(id)` ON DELETE RESTRICT |
-| `is_active` | BOOLEAN | NOT NULL, default `TRUE` |
-| `deleted_at` | TIMESTAMPTZ | |
-| `created_at` | TIMESTAMPTZ | default `NOW()` |
-| `updated_at` | TIMESTAMPTZ | default `NOW()` |
+When an owner or manager creates a property through RLS-protected database access,
+the insert must set `properties.created_by` to the current actor ID. That creator can
+then insert their first `owner_properties` or `manager_properties` row for the property.
 
-Property is derived: `tenant → unit → property`.
+### `units`
 
-#### `vendors`
+`units` exists in `001_initial_schema.sql`.
 
-Core columns plus `is_active`, `deleted_at` (same pattern as `owners`).
+| Column | Type | Notes |
+|---|---|---|
+| `id` | UUID | Primary key |
+| `property_id` | UUID | FK to `properties(id)` |
+| `unit_number` | VARCHAR(50) | Required |
+| `bedrooms` | INTEGER | Optional |
+| `bathrooms` | NUMERIC(3,1) | Optional |
+| `square_feet` | INTEGER | Optional |
+| `created_at` | TIMESTAMPTZ | Default `NOW()` |
+| `updated_at` | TIMESTAMPTZ | Default `NOW()` |
 
-#### `requests`
+Unique constraint: `(property_id, unit_number)`.
 
-| Column | Type | Constraints |
-|--------|------|-------------|
-| `id` | UUID | PRIMARY KEY |
-| `requester_id` | UUID | NOT NULL, FK → `tenants(id)` **ON DELETE RESTRICT** |
-| `property_id` | UUID | FK → `properties(id)` ON DELETE SET NULL |
-| `vendor_id` | UUID | FK → `vendors(id)` ON DELETE SET NULL — **current** vendor |
-| `type` | `request_type` | NOT NULL |
-| `description` | TEXT | |
-| `status` | `request_status` | default `pending` |
-| `urgency` | `request_urgency` | default `medium` |
-| `escalated` | BOOLEAN | default `false` |
-| `sentiment` | VARCHAR(50) | |
-| `confidence` | DECIMAL(3,2) | |
-| `notification_pending` | BOOLEAN | default `false` |
-| `summary` | TEXT | |
-| `is_active` | BOOLEAN | NOT NULL, default `TRUE` |
-| `deleted_at` | TIMESTAMPTZ | |
-| `created_at` | TIMESTAMPTZ | default `NOW()` |
-| `updated_at` | TIMESTAMPTZ | default `NOW()` |
+### `tenants`
 
-`requests.vendor_id` holds the **currently assigned** vendor. Full assignment history lives in `request_assignments`.
+| Column | Type | Notes |
+|---|---|---|
+| `id` | UUID | PK and FK to `actors(id)` |
+| `unit_id` | UUID | FK to `units(id)` |
+| `is_active` | BOOLEAN | Default `TRUE` |
+| `deleted_at` | TIMESTAMPTZ | Optional |
+| `created_at` | TIMESTAMPTZ | Default `NOW()` |
+| `updated_at` | TIMESTAMPTZ | Default `NOW()` |
 
-#### `conversation_messages`
+Tenants do not contain `property_id` or a string `unit` field.
+Tenant property access is always derived through:
 
-| Column | Type | Constraints |
-|--------|------|-------------|
-| `id` | UUID | PRIMARY KEY |
-| `request_id` | UUID | NOT NULL, FK → `requests(id)` ON DELETE CASCADE |
-| `role` | `message_role` | NOT NULL |
-| `message` | TEXT | NOT NULL |
-| `timestamp` | TIMESTAMPTZ | default `NOW()` |
-
-#### `notifications`
-
-| Column | Type | Constraints |
-|--------|------|-------------|
-| `id` | UUID | PRIMARY KEY |
-| `request_id` | UUID | NOT NULL, FK → `requests(id)` ON DELETE CASCADE |
-| `type` | `notification_type` | NOT NULL |
-| `recipient` | VARCHAR(255) | NOT NULL |
-| `recipient_type` | VARCHAR(50) | |
-| `status` | `notification_status` | default `pending` |
-| `timestamp` | TIMESTAMPTZ | default `NOW()` |
-
-#### `request_attachments`
-
-| Column | Type | Constraints |
-|--------|------|-------------|
-| `id` | UUID | PRIMARY KEY |
-| `request_id` | UUID | NOT NULL, FK → `requests(id)` ON DELETE CASCADE |
-| `uploaded_by` | UUID | |
-| `file_url` | TEXT | NOT NULL |
-| `file_type` | VARCHAR(100) | |
-| `created_at` | TIMESTAMPTZ | default `NOW()` |
-
-#### `request_status_history`
-
-| Column | Type | Constraints |
-|--------|------|-------------|
-| `id` | UUID | PRIMARY KEY |
-| `request_id` | UUID | NOT NULL, FK → `requests(id)` ON DELETE CASCADE |
-| `old_status` | `request_status` | |
-| `new_status` | `request_status` | NOT NULL |
-| `changed_by` | UUID | |
-| `notes` | TEXT | |
-| `changed_at` | TIMESTAMPTZ | default `NOW()` |
-
-Every status transition must insert a row here.
-
-#### `request_assignments`
-
-| Column | Type | Constraints |
-|--------|------|-------------|
-| `id` | UUID | PRIMARY KEY |
-| `request_id` | UUID | NOT NULL, FK → `requests(id)` ON DELETE CASCADE |
-| `vendor_id` | UUID | FK → `vendors(id)` ON DELETE SET NULL |
-| `assigned_by` | UUID | |
-| `status` | VARCHAR(50) | e.g. `assigned`, `completed` |
-| `assigned_at` | TIMESTAMPTZ | default `NOW()` |
-| `completed_at` | TIMESTAMPTZ | |
-
-Tracks vendor reassignment history. Update `requests.vendor_id` on each new assignment.
-
-#### `user_accounts`
-
-| Column | Type | Constraints |
-|--------|------|-------------|
-| `id` | UUID | PRIMARY KEY (from auth provider) |
-| `email` | VARCHAR(255) | UNIQUE, NOT NULL |
-| `role` | VARCHAR(50) | NOT NULL |
-| `owner_id` | UUID | FK → `owners(id)` ON DELETE SET NULL |
-| `manager_id` | UUID | FK → `property_managers(id)` ON DELETE SET NULL |
-| `tenant_id` | UUID | FK → `tenants(id)` ON DELETE SET NULL |
-| `vendor_id` | UUID | FK → `vendors(id)` ON DELETE SET NULL |
-| `created_at` | TIMESTAMPTZ | default `NOW()` |
-
-Maps auth users to business entities. Exactly one entity FK should be set per role.
-
-### Junction tables
-
-| Table | PK | ON DELETE |
-|-------|-----|-----------|
-| `owner_properties` | (`owner_id`, `property_id`) | CASCADE |
-| `manager_properties` | (`manager_id`, `property_id`) | CASCADE |
-| `vendor_services` | (`vendor_id`, `service_name`) | CASCADE |
-| `request_involved_parties` | (`request_id`, `party_id`, `party_type`) | CASCADE |
-
-### Schema features
-
-- UUID primary keys
-- `updated_at` triggers on `owners`, `property_managers`, `properties`, `units`, `tenants`, `vendors`, `requests`
-- Partial indexes on `is_active` for core entities
-- `properties.representative_id` validated by trigger
-
-### Row Level Security
-
-`002_rls_policies.sql` enables base RLS. `004_schema_hardening.sql` adds policies for new tables and updates tenant/property policies for the `unit_id` model.
-
-Policies use `auth.uid()` mapped via `user_accounts` or direct entity UUID.
-
----
-
-## Data retention and deletion strategy
-
-**Core entities** (`owners`, `property_managers`, `properties`, `tenants`, `vendors`, `requests`) are **soft-deleted**:
-
-```sql
-UPDATE tenants SET is_active = FALSE, deleted_at = NOW() WHERE id = $1;
+```text
+tenants.unit_id -> units.id -> units.property_id -> properties.id
 ```
 
-**Operational child records** (messages, notifications, attachments, status history, assignments) remain fully dependent on requests and use `ON DELETE CASCADE`.
+### `requests`
 
-**FK rules preventing accidental data loss:**
+| Column | Type | Notes |
+|---|---|---|
+| `id` | UUID | Primary key |
+| `requester_id` | UUID | FK to `tenants(id)` |
+| `property_id` | UUID | FK to `properties(id)`, nullable |
+| `vendor_id` | UUID | Current assigned vendor, FK to `vendors(id)`, nullable |
+| `type` | `request_type` | Required |
+| `description` | TEXT | Optional |
+| `status` | `request_status` | Default `pending` |
+| `urgency` | `request_urgency` | Default `medium` |
+| `escalated` | BOOLEAN | Default `false` |
+| `sentiment` | VARCHAR(50) | Optional |
+| `confidence` | DECIMAL(3,2) | Optional |
+| `notification_pending` | BOOLEAN | Default `false` |
+| `summary` | TEXT | Optional |
+| `resolved_at` | TIMESTAMPTZ | Optional resolution timestamp |
+| `resolved_by` | UUID | FK to `actors(id)`, nullable |
+| `resolution_note` | TEXT | Optional manager/owner resolution note |
+| `is_active` | BOOLEAN | Default `TRUE` |
+| `deleted_at` | TIMESTAMPTZ | Optional |
+| `created_at` | TIMESTAMPTZ | Default `NOW()` |
+| `updated_at` | TIMESTAMPTZ | Default `NOW()` |
 
-| Relationship | ON DELETE |
-|--------------|-----------|
-| `properties.owner_id` → `owners` | RESTRICT |
-| `requests.requester_id` → `tenants` | RESTRICT |
-| `tenants.unit_id` → `units` | RESTRICT |
-| `properties.manager_id` → `property_managers` | SET NULL |
-| `requests.vendor_id` → `vendors` | SET NULL |
-| Request child tables → `requests` | CASCADE |
-| Junction tables | CASCADE |
+`requests.vendor_id` stores the current assignment. Full assignment history is stored in `request_assignments`.
 
----
+### Request participants
+
+`request_involved_parties` uses the clean actor model:
+
+| Column | Type | Notes |
+|---|---|---|
+| `request_id` | UUID | FK to `requests(id)` |
+| `actor_id` | UUID | FK to `actors(id)` |
+
+Primary key: `(request_id, actor_id)`.
+
+There is no `party_type` or `party_id`.
+
+### Messages and notifications
+
+`conversation_messages`:
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | UUID | Primary key |
+| `request_id` | UUID | FK to `requests(id)` |
+| `role` | `message_role` | `ai` or `tenant` |
+| `message` | TEXT | Required |
+| `created_at` | TIMESTAMPTZ | Default `NOW()` |
+
+`notifications`:
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | UUID | Primary key |
+| `request_id` | UUID | FK to `requests(id)` |
+| `type` | `notification_type` | `email` or `sms` |
+| `recipient_actor_id` | UUID | FK to `actors(id)`, nullable |
+| `recipient_type` | `recipient_type` | Required |
+| `status` | `notification_status` | Default `pending` |
+| `created_at` | TIMESTAMPTZ | Default `NOW()` |
+
+## Hardening migration
+
+`004_schema_hardening.sql` only adds production hardening that is not already present in `001_initial_schema.sql`:
+
+- Performance indexes
+- `request_attachments`
+- `request_status_history`
+- `request_assignments`
+- Additional `user_accounts` indexes and RLS refresh
+- RLS policies for the hardening tables
+- Backfills for initial request status history and current vendor assignments
+
+It does not recreate `units`, does not backfill tenants from legacy `property_id`/`unit` columns, and does not alter ownership fields on `properties`.
+
+### `request_attachments`
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | UUID | Primary key |
+| `request_id` | UUID | FK to `requests(id)` |
+| `uploaded_by` | UUID | FK to `actors(id)`, nullable |
+| `file_url` | TEXT | Required |
+| `file_type` | VARCHAR(100) | Optional |
+| `created_at` | TIMESTAMPTZ | Default `NOW()` |
+
+### `request_status_history`
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | UUID | Primary key |
+| `request_id` | UUID | FK to `requests(id)` |
+| `old_status` | `request_status` | Optional |
+| `new_status` | `request_status` | Required |
+| `changed_by` | UUID | FK to `actors(id)`, nullable |
+| `notes` | TEXT | Optional |
+| `changed_at` | TIMESTAMPTZ | Default `NOW()` |
+
+### `request_assignments`
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | UUID | Primary key |
+| `request_id` | UUID | FK to `requests(id)` |
+| `vendor_id` | UUID | FK to `vendors(id)`, nullable |
+| `assigned_by` | UUID | FK to `actors(id)`, nullable |
+| `status` | VARCHAR(50) | Optional |
+| `assigned_at` | TIMESTAMPTZ | Default `NOW()` |
+| `completed_at` | TIMESTAMPTZ | Optional |
+
+## Row Level Security
+
+`002_rls_policies.sql` enables base RLS and defines actor-centric helper functions:
+
+| Helper | Purpose |
+|---|---|
+| `current_actor_id()` | Resolves `auth.uid()` to the owner/manager actor ID in `user_accounts` |
+| `current_actor_is_manager_or_owner()` | Checks whether the logged-in actor can manage operational data |
+| `actor_can_access_request(request_id, actor_id)` | Request access through requester, vendor assignment, involved parties, owner relationships, or manager relationships |
+| `actor_can_access_property(property_id, actor_id)` | Property access through ownership, management, tenancy, or accessible requests |
+| `actor_can_manage_property(property_id, actor_id)` | Property management through owner/manager junction tables |
+| `actor_can_access_actor(visible_actor_id, actor_id)` | Actor visibility through self, property relationships, or shared request access |
+
+RLS rules follow these principles:
+
+- `auth.uid()` maps to `user_accounts.auth_user_id`, then to `actors.id`.
+- Only owners and managers have `user_accounts` rows.
+- Tenants are created and managed by owners/managers; tenant self-signup is not represented in RLS.
+- Tenant property access always goes through `tenants -> units -> properties`.
+- Owners access properties and requests through `owner_properties`.
+- Managers access properties and requests through `manager_properties`.
+- Tenant-facing request creation should go through the backend/conversation service or another trusted server path.
+
+`004_schema_hardening.sql` adds RLS for its new tables and reuses the helper functions from `002_rls_policies.sql`.
+
+## Seed data
+
+`003_seed_data.sql` normalizes mock data into the production schema:
+
+| Mock source | SQL target |
+|---|---|
+| owners | `actors`, `owners` |
+| property managers | `actors`, `property_managers` |
+| tenants | `actors`, `units`, `tenants` |
+| vendors | `actors`, `vendors`, `vendor_services` |
+| properties | `properties`, `owner_properties`, `manager_properties` |
+| requests | `requests`, `request_involved_parties`, `conversation_messages` |
+
+The seed migration uses UUIDs only and preserves mock data semantics while matching the normalized schema.
 
 ## Mock JSON data
 
+The JSON files remain a runtime/mock format and are not the production schema.
+
 | File | Records |
-|------|---------|
+|---|---|
 | `owners.json` | 5 |
 | `property_magament.json` | 4 |
 | `properties.json` | 5 |
-| `tenants.json` | 10 |
+| `tenants.json` | 11 |
 | `vendors.json` | 10 |
-| `requests.json` | 2 |
+| `requests.json` | 13 |
 
-### `tenants.json`
+Important differences:
 
-JSON still uses `property_id` + `unit` (flat mock format). SQL normalizes to `units` + `tenants.unit_id`:
-
-```json
-{
-  "id": "tenant_001",
-  "name": "John Tenant",
-  "email": "john@gmail.com",
-  "phone": "+14155552673",
-  "address": "Spandauer Damm 10-22, 14059 Berlin, Germany",
-  "unit": "4B",
-  "property_id": "property_001"
-}
-```
-
-SQL mapping: `unit` + `property_id` → `units` row; tenant references `unit_id`.
-
-### `requests.json`
-
-Unchanged JSON shape. New SQL tables have no JSON equivalents yet:
-
-| SQL table | JSON source |
-|-----------|-------------|
-| `units` | `tenants[].unit` + `tenants[].property_id` |
-| `owner_properties` | `owners[].owned_properties` |
-| `manager_properties` | `property_magament[].managed_properties` |
-| `vendor_services` | `vendors[].services` |
-| `request_involved_parties` | `requests[].involved_parties` |
-| `conversation_messages` | `requests[].conversation_history` |
-| `request_attachments` | *(no JSON — app uploads)* |
-| `request_status_history` | *(app writes on status change)* |
-| `request_assignments` | *(app writes on vendor assign/reassign)* |
-
-**JSON-only fields:** `property` (denormalized name), `notifications_sent`, `conversation_history[].web_results`.
-
-### JSON vs SQL identifiers
-
-Mock JSON uses string IDs. `003_seed_data.sql` maps to UUIDs. `004` backfills `units` from seeded tenant rows. Match by email/name when comparing.
-
----
+- JSON tenant records still include string `property_id` and `unit`; SQL maps those to `units` plus `tenants.unit_id`.
+- JSON property records may include representative metadata; SQL does not store representative columns on `properties`.
+- JSON request records may contain denormalized fields like `property`, `notifications_sent`, and `conversation_history`; SQL stores normalized request, notification, and message rows.
+- JSON uses string IDs like `tenant_001`; SQL seed data uses UUIDs only.
 
 ## Entity relationships
 
+```text
+actors
+|-- owners -------- owner_properties -------- properties -------- units -------- tenants
+|-- property_managers -- manager_properties -----|
+|-- vendors -------- vendor_services
+`-- tenants
+
+auth.users
+`-- user_accounts -------- actors
+
+requests
+|-- requester_id -> tenants.id -> actors.id
+|-- property_id -> properties.id
+|-- vendor_id -> vendors.id -> actors.id
+|-- request_involved_parties(request_id, actor_id)
+|-- conversation_messages
+|-- notifications
+|-- request_attachments
+|-- request_status_history
+`-- request_assignments
+
+user_accounts.auth_user_id -> auth.users.id
+user_accounts.actor_id -> actors.id
 ```
-owners ──────────────┬── owner_properties ── properties ── units
-                     │                                    │
-property_managers ───┼── manager_properties ───────────────┤
-                     │                                    │
-                     └── (representative) ─────────────────┘
-                                                          │
-tenants ─────────────────────────────────── unit_id ──────┘
-     │
-requests ──┬── request_involved_parties
-           ├── conversation_messages
-           ├── notifications
-           ├── request_attachments
-           ├── request_status_history
-           └── request_assignments
 
-vendors ─── vendor_services
-     │
-     └── requests.vendor_id (current) + request_assignments (history)
+## Data retention
 
-user_accounts ──► owners | property_managers | tenants | vendors
+Soft-delete fields are part of the base schema for:
+
+- `actors`
+- `properties`
+- `tenants`
+- `requests`
+
+Operational child records remain dependent on requests and use `ON DELETE CASCADE`.
+
+Key FK behavior:
+
+| Relationship | ON DELETE |
+|---|---|
+| role tables -> `actors` | CASCADE |
+| `owner_properties` / `manager_properties` | CASCADE |
+| `units.property_id` -> `properties` | CASCADE |
+| `tenants.unit_id` -> `units` | RESTRICT |
+| `requests.requester_id` -> `tenants` | RESTRICT |
+| `requests.property_id` -> `properties` | SET NULL |
+| `requests.vendor_id` -> `vendors` | SET NULL |
+| `requests.resolved_by` -> `actors` | SET NULL |
+| request child tables -> `requests` | CASCADE |
+| actor references in hardening tables | SET NULL |
+| `user_accounts.auth_user_id` -> `auth.users` | CASCADE |
+| `user_accounts.actor_id` -> `actors` | CASCADE |
 ```

@@ -21,14 +21,16 @@ The project has two main applications:
 
 ## Data Flow Workflow
 
-This is the high-level flow of data through the app, from login to request resolution.
+This is the high-level flow of data through the app, from staff login to request resolution.
 
 ```text
-User login
-  -> Frontend AppContext stores tenant / manager / owner session
-  -> Route guards allow access to role-specific screens
+Manager/owner login
+  -> Supabase Auth verifies email or username-backed email + password
+  -> App resolves auth user to an owner/manager actor through user_accounts
+  -> Route guards allow access to staff screens
 
 Tenant starts chat
+  -> Tenant is identified from a manager/owner-provisioned tenant record
   -> POST /conversation/start
   -> Backend looks up tenant + property context
   -> Frontend receives a session_id and greeting
@@ -142,7 +144,7 @@ VITE_PROD_BACKEND=https://your-production-backend.example.com
 
 ### Frontend
 
-- Login flow for tenants, managers, and owners.
+- Login flow for managers and owners; tenants are provisioned by staff rather than self-registering.
 - Authenticated layout with shared header, role-aware navigation, avatar, and client-side logout.
 - Route guards for `/chat`, `/dashboard`, `/management`, `/vendors`, and `/profile`.
 - Tenant chat flow with text and voice input.
