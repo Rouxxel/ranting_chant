@@ -39,6 +39,7 @@ from src.api_endpoints.routers.property_routers.properties_router import router 
 from src.api_endpoints.routers.vendor_routers.vendors_router import router as vendors_router
 from src.api_endpoints.routers.owner_manager_routers.managers_router import router as managers_router
 from src.api_endpoints.routers.owner_manager_routers.owners_router import router as owners_router
+from src.api_endpoints.routers.owner_manager_routers.auth_router import router as auth_router
 from src.api_endpoints.routers.conver_reque_routers.requests_router import router as requests_router
 from src.api_endpoints.routers.mcp_routers.mcp_router import router as mcp_router
 from src.api_endpoints.routers.conver_reque_routers.conversation_router import router as conversation_router
@@ -97,6 +98,7 @@ app.include_router(properties_router)
 app.include_router(vendors_router)
 app.include_router(managers_router)
 app.include_router(owners_router)
+app.include_router(auth_router)
 app.include_router(requests_router)
 app.include_router(mcp_router)
 app.include_router(conversation_router)
