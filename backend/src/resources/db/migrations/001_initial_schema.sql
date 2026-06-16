@@ -1,8 +1,9 @@
 -- Initial Schema for Ranting Chant
 -- This migration creates all tables for the property management system
 
--- Enable UUID extension
+-- Enable UUID and case-insensitive text extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS citext;
 
 -- =========================
 -- ENUMS
@@ -68,12 +69,52 @@ CREATE TABLE actors (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     type recipient_type NOT NULL,
     display_name VARCHAR(255) NOT NULL,
-    email VARCHAR(255),
+    email CITEXT,
     phone VARCHAR(50),
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- =========================
+-- USER ACCOUNTS
+-- =========================
+-- Supabase stores passwords in auth.users. This table maps login-capable
+-- Supabase users to owner/manager actors in the application model.
+
+CREATE TABLE user_accounts (
+    auth_user_id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    actor_id UUID UNIQUE NOT NULL REFERENCES actors(id) ON DELETE CASCADE,
+    email CITEXT UNIQUE NOT NULL,
+    username CITEXT UNIQUE,
+    role recipient_type NOT NULL CHECK (role IN ('owner', 'manager')),
+    provider VARCHAR(50) DEFAULT 'email',
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE OR REPLACE FUNCTION validate_user_account_actor_role()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM actors a
+        WHERE a.id = NEW.actor_id
+        AND a.type = NEW.role
+        AND a.type IN ('owner', 'manager')
+    ) THEN
+        RAISE EXCEPTION 'user_accounts.actor_id must reference an owner or manager actor with a matching role';
+    END IF;
+
+    RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER trg_validate_user_account_actor_role
+    BEFORE INSERT OR UPDATE ON user_accounts
+    FOR EACH ROW
+    EXECUTE FUNCTION validate_user_account_actor_role();
 
 -- =========================
 -- OWNERS
@@ -114,6 +155,7 @@ CREATE TABLE properties (
     year_built INTEGER,
     property_type property_type NOT NULL,
     unit_count INTEGER NOT NULL CHECK (unit_count >= 0),
+    created_by UUID REFERENCES actors(id) ON DELETE SET NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     deleted_at TIMESTAMPTZ,
     created_at TIMESTAMPTZ DEFAULT NOW(),
