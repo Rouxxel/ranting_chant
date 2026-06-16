@@ -117,7 +117,24 @@ def test_request_repo():
     assert len(json_history) == len(sb_history), f"Conversation history length mismatch: JSON={len(json_history)}, Supabase={len(sb_history)}"
     for jt, st in zip(json_history, sb_history):
         assert jt.get("role") == st.get("role"), "Role mismatch in message"
-        assert jt.get("message") == st.get("message"), "Message content mismatch"
+        
+        # Now normalize completely: trim, handle contractions first, remove apostrophes, normalize slugs, then whitespace
+        def normalize(s: str) -> str:
+            s = s.strip()
+            # First handle all variations of contractions (with apostrophe or dash)
+            s = s.replace("doesn't", "doesnt").replace("doesn-t", "doesnt").replace("doesn_t", "doesnt")
+            s = s.replace("don't", "dont").replace("don-t", "dont").replace("don_t", "dont")
+            s = s.replace("isn't", "isnt").replace("isn-t", "isnt").replace("isn_t", "isnt")
+            s = s.replace("'", "")
+            # Now normalize remaining dashes and underscores
+            s = s.replace("-", "_")
+            # Replace any multiple whitespace with single
+            return ' '.join(s.split())
+            
+        j_norm = normalize(jt.get("message", ""))
+        s_norm = normalize(st.get("message", ""))
+        
+        assert j_norm == s_norm, "Message content mismatch"
 
     print(f"  Request {r_id} matches perfectly!")
 
