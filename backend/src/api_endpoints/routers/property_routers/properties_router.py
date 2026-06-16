@@ -24,7 +24,7 @@ from pydantic import BaseModel, Field
 from src.utils.custom_logger import log_handler
 from src.utils.limiter import limiter as SlowLimiter
 from src.core_specs.configuration.config_loader import config_loader
-from src.utils.json_store import read_all, find_by_id, create_record, update_record
+from src.database import get_database_service
 
 """PYDANTIC MODELS-----------------------------------------------------------"""
 class RepresentativePayload(BaseModel):
@@ -113,7 +113,8 @@ async def list_properties(request: Request):
     """
     try:
         log_handler.debug("[properties_router] Listing all properties")
-        properties = read_all("properties")
+        db = get_database_service()
+        properties = db.properties.list()
         log_handler.info(f"[properties_router] Returning {len(properties)} property/properties")
         return properties
 
@@ -139,23 +140,24 @@ async def create_property(request: Request, body: PropertyCreatePayload):
             body.representative,
         )
 
-        created = create_record("properties", record)
+        db = get_database_service()
+        created = db.properties.create(record)
 
         #Link the property to its manager/owner so it appears in their listings
         if body.manager_id:
-            manager = find_by_id("property_magament", body.manager_id)
+            manager = db.managers.find_by_id(body.manager_id)
             if manager:
                 managed = list(manager.get("managed_properties", []))
                 if created["id"] not in managed:
                     managed.append(created["id"])
-                    update_record("property_magament", body.manager_id, {"managed_properties": managed})
+                    db.managers.update(body.manager_id, {"managed_properties": managed})
         if body.owner_id:
-            owner = find_by_id("owners", body.owner_id)
+            owner = db.owners.find_by_id(body.owner_id)
             if owner:
                 owned = list(owner.get("owned_properties", []))
                 if created["id"] not in owned:
                     owned.append(created["id"])
-                    update_record("owners", body.owner_id, {"owned_properties": owned})
+                    db.owners.update(body.owner_id, {"owned_properties": owned})
 
         log_handler.info(f"[properties_router] Property created successfully with id='{created['id']}'")
         return created
@@ -191,7 +193,8 @@ async def get_property(request: Request, property_id: str):
     """
     try:
         log_handler.debug(f"[properties_router] Looking up property with id='{property_id}'")
-        prop = find_by_id("properties", property_id)
+        db = get_database_service()
+        prop = db.properties.find_by_id(property_id)
 
         if not prop:
             message = f"[properties_router] Property '{property_id}' not found"
@@ -217,7 +220,8 @@ async def get_property(request: Request, property_id: str):
 async def update_property(request: Request, property_id: str, body: PropertyUpdatePayload):
     """Update editable property fields and relationship references."""
     try:
-        existing = find_by_id("properties", property_id)
+        db = get_database_service()
+        existing = db.properties.find_by_id(property_id)
         if not existing:
             message = f"Property '{property_id}' not found"
             log_handler.warning(message)
@@ -235,7 +239,7 @@ async def update_property(request: Request, property_id: str, body: PropertyUpda
                 updates.get("owner_id", existing.get("owner_id")),
             )
 
-        updated = update_record("properties", property_id, updates)
+        updated = db.properties.update(property_id, updates)
         log_handler.info(f"[properties_router] Property '{property_id}' updated successfully")
         return updated
 

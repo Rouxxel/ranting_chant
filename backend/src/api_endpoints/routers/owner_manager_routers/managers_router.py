@@ -23,7 +23,7 @@ from pydantic import BaseModel
 from src.utils.custom_logger import log_handler
 from src.utils.limiter import limiter as SlowLimiter
 from src.core_specs.configuration.config_loader import config_loader
-from src.utils.json_store import read_all, find_by_id, update_record
+from src.database import get_database_service
 from src.utils.validators import validate_email_format, validate_phone_format
 
 """PYDANTIC MODELS-----------------------------------------------------------"""
@@ -60,12 +60,12 @@ async def list_managers(request: Request):
         list: A list of all property manager records in the data store.
 
     Note:
-        The collection name is 'property_magament' to match the seed filename.
         If the rate limit is exceeded, the rate_limit_handler() handles the response.
     """
     try:
         log_handler.debug("[managers_router] Listing all property managers")
-        managers = read_all("property_magament")
+        db = get_database_service()
+        managers = db.managers.list()
         log_handler.info(f"[managers_router] Returning {len(managers)} manager(s)")
         return managers
 
@@ -83,7 +83,8 @@ async def list_managers(request: Request):
 async def update_manager_profile(request: Request, manager_id: str, body: ManagerProfileUpdatePayload):
     """Update manager profile fields without changing managed properties."""
     try:
-        existing = find_by_id("property_magament", manager_id)
+        db = get_database_service()
+        existing = db.managers.find_by_id(manager_id)
         if not existing:
             message = f"Manager '{manager_id}' not found"
             log_handler.warning(message)
@@ -99,7 +100,7 @@ async def update_manager_profile(request: Request, manager_id: str, body: Manage
         if "phone" in updates:
             validate_phone_format(updates["phone"])
 
-        updated = update_record("property_magament", manager_id, updates)
+        updated = db.managers.update(manager_id, updates)
         log_handler.info(f"[managers_router] Manager profile '{manager_id}' updated successfully")
         return updated
 
@@ -136,7 +137,8 @@ async def get_manager(request: Request, manager_id: str):
     """
     try:
         log_handler.debug(f"[managers_router] Looking up manager with id='{manager_id}'")
-        manager = find_by_id("property_magament", manager_id)
+        db = get_database_service()
+        manager = db.managers.find_by_id(manager_id)
 
         if not manager:
             message = f"[managers_router] Manager '{manager_id}' not found"

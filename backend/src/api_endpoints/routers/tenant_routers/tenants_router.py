@@ -24,7 +24,7 @@ from pydantic import BaseModel
 from src.utils.custom_logger import log_handler
 from src.utils.limiter import limiter as SlowLimiter
 from src.core_specs.configuration.config_loader import config_loader
-from src.utils.json_store import read_all, find_by_id, find_by_field, create_record, update_record
+from src.database import get_database_service
 from src.utils.validators import validate_email_format, validate_phone_format
 
 """PYDANTIC MODELS-----------------------------------------------------------"""
@@ -68,24 +68,25 @@ def _sync_property_tenant_ids(
     new_property_id: str | None,
 ) -> None:
     """Move a tenant id between property tenant_ids lists when needed."""
+    db = get_database_service()
     if old_property_id and old_property_id != new_property_id:
-        old_property = find_by_id("properties", old_property_id)
+        old_property = db.properties.find_by_id(old_property_id)
         if old_property:
             tenant_ids = [
                 existing_id for existing_id in old_property.get("tenant_ids", [])
                 if existing_id != tenant_id
             ]
-            update_record("properties", old_property_id, {"tenant_ids": tenant_ids})
+            db.properties.update(old_property_id, {"tenant_ids": tenant_ids})
 
     if new_property_id:
-        new_property = find_by_id("properties", new_property_id)
+        new_property = db.properties.find_by_id(new_property_id)
         if not new_property:
             raise HTTPException(status_code=404, detail=f"Property '{new_property_id}' not found")
 
         tenant_ids = list(new_property.get("tenant_ids", []))
         if tenant_id not in tenant_ids:
             tenant_ids.append(tenant_id)
-            update_record("properties", new_property_id, {"tenant_ids": tenant_ids})
+            db.properties.update(new_property_id, {"tenant_ids": tenant_ids})
 
 """API ROUTER-----------------------------------------------------------"""
 #Get API router
@@ -101,10 +102,7 @@ router = APIRouter(
     f"{config_loader['endpoints']['tenants_endpoint']['request_limit']}/"
     f"{config_loader['endpoints']['tenants_endpoint']['unit_of_time_for_limit']}"
 )
-async def list_tenants(
-    request: Request,
-    property_id: Optional[str] = Query(None, description="Filter tenants by property ID")
-):
+async def list_tenants(request: Request, property_id: Optional[str] = Query(None, description="Filter tenants by property ID")):
     """
     List all tenants, with an optional filter by property.
 
@@ -121,14 +119,15 @@ async def list_tenants(
         If the rate limit is exceeded, the rate_limit_handler() handles the response.
     """
     try:
+        db = get_database_service()
         if property_id:
             log_handler.debug(f"[tenants_router] Listing tenants filtered by property_id='{property_id}'")
-            results = find_by_field("tenants", "property_id", property_id)
+            results = db.tenants.find_by_field("property_id", property_id)
             log_handler.info(f"[tenants_router] Found {len(results)} tenant(s) for property '{property_id}'")
             return results
 
         log_handler.debug("[tenants_router] Listing all tenants")
-        tenants = read_all("tenants")
+        tenants = db.tenants.list()
         log_handler.info(f"[tenants_router] Returning {len(tenants)} tenant(s)")
         return tenants
 
@@ -157,7 +156,8 @@ async def create_tenant(request: Request, body: TenantCreatePayload):
 
         record = body.model_dump()
         record["id"] = tenant_id
-        created = create_record("tenants", record)
+        db = get_database_service()
+        created = db.tenants.create(record)
         log_handler.info(f"[tenants_router] Tenant created successfully with id='{created['id']}'")
         return created
 
@@ -177,7 +177,8 @@ async def create_tenant(request: Request, body: TenantCreatePayload):
 async def update_tenant_profile(request: Request, tenant_id: str, body: TenantProfileUpdatePayload):
     """Update tenant-owned profile fields without allowing housing changes."""
     try:
-        existing = find_by_id("tenants", tenant_id)
+        db = get_database_service()
+        existing = db.tenants.find_by_id(tenant_id)
         if not existing:
             message = f"Tenant '{tenant_id}' not found"
             log_handler.warning(message)
@@ -193,7 +194,7 @@ async def update_tenant_profile(request: Request, tenant_id: str, body: TenantPr
         if "phone" in updates:
             validate_phone_format(updates["phone"])
 
-        updated = update_record("tenants", tenant_id, updates)
+        updated = db.tenants.update(tenant_id, updates)
         log_handler.info(f"[tenants_router] Tenant profile '{tenant_id}' updated successfully")
         return updated
 
@@ -230,7 +231,8 @@ async def get_tenant(request: Request, tenant_id: str):
     """
     try:
         log_handler.debug(f"[tenants_router] Looking up tenant with id='{tenant_id}'")
-        tenant = find_by_id("tenants", tenant_id)
+        db = get_database_service()
+        tenant = db.tenants.find_by_id(tenant_id)
 
         if not tenant:
             message = f"[tenants_router] Tenant '{tenant_id}' not found"
@@ -256,7 +258,8 @@ async def get_tenant(request: Request, tenant_id: str):
 async def update_tenant(request: Request, tenant_id: str, body: TenantUpdatePayload):
     """Update a tenant and keep property tenant_ids relationships in sync."""
     try:
-        existing = find_by_id("tenants", tenant_id)
+        db = get_database_service()
+        existing = db.tenants.find_by_id(tenant_id)
         if not existing:
             message = f"Tenant '{tenant_id}' not found"
             log_handler.warning(message)
@@ -275,7 +278,7 @@ async def update_tenant(request: Request, tenant_id: str, body: TenantUpdatePayl
         if "property_id" in updates and updates["property_id"] != existing.get("property_id"):
             _sync_property_tenant_ids(tenant_id, existing.get("property_id"), updates["property_id"])
 
-        updated = update_record("tenants", tenant_id, updates)
+        updated = db.tenants.update(tenant_id, updates)
         log_handler.info(f"[tenants_router] Tenant '{tenant_id}' updated successfully")
         return updated
 

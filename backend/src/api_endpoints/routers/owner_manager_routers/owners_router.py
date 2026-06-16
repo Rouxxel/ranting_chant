@@ -23,7 +23,7 @@ from pydantic import BaseModel
 from src.utils.custom_logger import log_handler
 from src.utils.limiter import limiter as SlowLimiter
 from src.core_specs.configuration.config_loader import config_loader
-from src.utils.json_store import read_all, find_by_id, update_record
+from src.database import get_database_service
 from src.utils.validators import validate_email_format, validate_phone_format
 
 """PYDANTIC MODELS-----------------------------------------------------------"""
@@ -59,12 +59,12 @@ async def list_owners(request: Request):
         list: A list of all property owner records in the data store.
 
     Note:
-        The collection name is 'owners' to match the seed filename.
         If the rate limit is exceeded, the rate_limit_handler() handles the response.
     """
     try:
         log_handler.debug("[owners_router] Listing all property owners")
-        owners = read_all("owners")
+        db = get_database_service()
+        owners = db.owners.list()
         log_handler.info(f"[owners_router] Returning {len(owners)} owner(s)")
         return owners
 
@@ -82,7 +82,8 @@ async def list_owners(request: Request):
 async def update_owner_profile(request: Request, owner_id: str, body: OwnerProfileUpdatePayload):
     """Update owner profile fields without changing owned properties."""
     try:
-        existing = find_by_id("owners", owner_id)
+        db = get_database_service()
+        existing = db.owners.find_by_id(owner_id)
         if not existing:
             message = f"Owner '{owner_id}' not found"
             log_handler.warning(message)
@@ -98,7 +99,7 @@ async def update_owner_profile(request: Request, owner_id: str, body: OwnerProfi
         if "phone" in updates:
             validate_phone_format(updates["phone"])
 
-        updated = update_record("owners", owner_id, updates)
+        updated = db.owners.update(owner_id, updates)
         log_handler.info(f"[owners_router] Owner profile '{owner_id}' updated successfully")
         return updated
 
@@ -135,7 +136,8 @@ async def get_owner(request: Request, owner_id: str):
     """
     try:
         log_handler.debug(f"[owners_router] Looking up owner with id='{owner_id}'")
-        owner = find_by_id("owners", owner_id)
+        db = get_database_service()
+        owner = db.owners.find_by_id(owner_id)
 
         if not owner:
             message = f"[owners_router] Owner '{owner_id}' not found"
