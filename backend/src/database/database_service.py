@@ -52,6 +52,39 @@ class DatabaseService:
             f"[database_service] Persistence backend: {self._backend}"
         )
 
+        # Initialize concrete repository instances
+        from src.database.repositories.json_repo import (
+            JSONTenantRepository,
+            JSONPropertyRepository,
+            JSONVendorRepository,
+            JSONManagerRepository,
+            JSONOwnerRepository,
+            JSONRequestRepository,
+        )
+        from src.database.repositories.supabase_repo import (
+            SupabaseTenantRepository,
+            SupabasePropertyRepository,
+            SupabaseVendorRepository,
+            SupabaseManagerRepository,
+            SupabaseOwnerRepository,
+            SupabaseRequestRepository,
+        )
+
+        if self.is_supabase:
+            self.tenants = SupabaseTenantRepository(self.supabase)
+            self.properties = SupabasePropertyRepository(self.supabase)
+            self.vendors = SupabaseVendorRepository(self.supabase)
+            self.managers = SupabaseManagerRepository(self.supabase)
+            self.owners = SupabaseOwnerRepository(self.supabase)
+            self.requests = SupabaseRequestRepository(self.supabase)
+        else:
+            self.tenants = JSONTenantRepository()
+            self.properties = JSONPropertyRepository()
+            self.vendors = JSONVendorRepository()
+            self.managers = JSONManagerRepository()
+            self.owners = JSONOwnerRepository()
+            self.requests = JSONRequestRepository()
+
     # ------------------------------------------------------------------
     # Public properties
     # ------------------------------------------------------------------
