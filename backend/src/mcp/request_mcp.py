@@ -18,9 +18,7 @@ from datetime import datetime, timezone
 
 #Other files imports
 from src.utils.custom_logger import log_handler
-from src.utils.json_store import (
-    find_by_id, find_by_field, read_all, create_record, update_record
-)
+from src.database import get_database_service
 from src.models.request import normalize_request_type
 
 """TOOLS-----------------------------------------------------------"""
@@ -64,7 +62,8 @@ def create_request(data: dict) -> dict:
         "summary": data.get("summary", None)
     }
 
-    created = create_record("requests", record)
+    db = get_database_service()
+    created = db.requests.create(record)
     log_handler.info(f"[request_mcp] Request created with id='{created['id']}'")
 
     # Notifications will be sent on user confirmation, not automatically
@@ -100,8 +99,9 @@ def update_request(request_id: str, updates: dict) -> dict:
     """
     log_handler.debug(f"[request_mcp] Updating request_id='{request_id}'")
 
+    db = get_database_service()
     # Confirm the record exists and fetch current status
-    req = find_by_id("requests", request_id)
+    req = db.requests.find_by_id(request_id)
     if not req:
         raise ValueError(f"Request '{request_id}' not found")
 
@@ -140,7 +140,7 @@ def update_request(request_id: str, updates: dict) -> dict:
     # Pop temporary is_complete helper if present so it is not persisted
     updates.pop("is_complete", None)
 
-    updated = update_record("requests", request_id, updates)
+    updated = db.requests.update(request_id, updates)
     log_handler.info(
         f"[request_mcp] Request '{request_id}' updated successfully. "
         f"Status: {current_status} -> {new_status}"
@@ -159,7 +159,8 @@ def get_request(request_id: str) -> dict | None:
         dict | None: The request record, or None if not found.
     """
     log_handler.debug(f"[request_mcp] Looking up request_id='{request_id}'")
-    req = find_by_id("requests", request_id)
+    db = get_database_service()
+    req = db.requests.find_by_id(request_id)
     if not req:
         log_handler.warning(f"[request_mcp] Request '{request_id}' not found")
     return req
@@ -178,7 +179,8 @@ def list_requests_by_tenant(tenant_id: str) -> list:
         list: A (possibly empty) list of request records for this tenant.
     """
     log_handler.debug(f"[request_mcp] Listing requests for tenant_id='{tenant_id}'")
-    results = find_by_field("requests", "requester_id", tenant_id)
+    db = get_database_service()
+    results = db.requests.find_by_field("requester_id", tenant_id)
     log_handler.info(
         f"[request_mcp] Found {len(results)} request(s) for tenant '{tenant_id}'"
     )
@@ -193,7 +195,8 @@ def list_all_requests() -> list:
         list: The complete list of request records.
     """
     log_handler.debug("[request_mcp] Listing all requests")
-    requests = read_all("requests")
+    db = get_database_service()
+    requests = db.requests.list()
     log_handler.info(f"[request_mcp] Returning {len(requests)} request(s)")
     return requests
 
@@ -219,8 +222,9 @@ def escalate_request(request_id: str, reason: str) -> dict:
         f"[request_mcp] Escalating request_id='{request_id}', reason='{reason}'"
     )
 
+    db = get_database_service()
     #Fetch existing record to get current conversation history
-    req = find_by_id("requests", request_id)
+    req = db.requests.find_by_id(request_id)
     if not req:
         raise ValueError(f"Request '{request_id}' not found")
 
@@ -240,7 +244,7 @@ def escalate_request(request_id: str, reason: str) -> dict:
         "updated_at": now
     }
 
-    updated = update_record("requests", request_id, updates)
+    updated = db.requests.update(request_id, updates)
     log_handler.info(f"[request_mcp] Request '{request_id}' escalated successfully")
 
     # Notifications will be sent on user confirmation, not automatically
@@ -275,7 +279,8 @@ def append_conversation_turn(request_id: str, role: str, message: str) -> dict:
         f"[request_mcp] Appending turn to request_id='{request_id}', role='{role}'"
     )
 
-    req = find_by_id("requests", request_id)
+    db = get_database_service()
+    req = db.requests.find_by_id(request_id)
     if not req:
         raise ValueError(f"Request '{request_id}' not found")
 
@@ -287,7 +292,7 @@ def append_conversation_turn(request_id: str, role: str, message: str) -> dict:
         "timestamp": now
     })
 
-    updated = update_record("requests", request_id, {
+    updated = db.requests.update(request_id, {
         "conversation_history": history,
         "updated_at": now
     })

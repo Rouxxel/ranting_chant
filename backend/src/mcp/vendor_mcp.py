@@ -13,7 +13,7 @@ It supports service-category filtering and emergency vendor lookup.
 
 #Other files imports
 from src.utils.custom_logger import log_handler
-from src.utils.json_store import find_by_id, read_all
+from src.database import get_database_service
 
 """TOOLS-----------------------------------------------------------"""
 def find_vendors_by_service(service_category: str) -> list:
@@ -30,7 +30,8 @@ def find_vendors_by_service(service_category: str) -> list:
         list: A (possibly empty) list of vendor records offering the service.
     """
     log_handler.debug(f"[vendor_mcp] Finding vendors for service='{service_category}'")
-    all_vendors = read_all("vendors")
+    db = get_database_service()
+    all_vendors = db.vendors.list()
 
     results = [
         v for v in all_vendors
@@ -80,7 +81,8 @@ def get_vendor(vendor_id: str) -> dict | None:
         dict | None: The vendor record, or None if not found.
     """
     log_handler.debug(f"[vendor_mcp] Looking up vendor_id='{vendor_id}'")
-    vendor = find_by_id("vendors", vendor_id)
+    db = get_database_service()
+    vendor = db.vendors.find_by_id(vendor_id)
     if not vendor:
         log_handler.warning(f"[vendor_mcp] Vendor '{vendor_id}' not found")
     return vendor
