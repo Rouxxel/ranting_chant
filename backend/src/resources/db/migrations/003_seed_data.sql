@@ -4,6 +4,30 @@
 
 BEGIN;
 
+-- Compatibility for databases that already ran an older 001_initial_schema.sql
+-- before request resolution fields were added.
+ALTER TABLE requests
+    ADD COLUMN IF NOT EXISTS resolved_at TIMESTAMPTZ,
+    ADD COLUMN IF NOT EXISTS resolved_by UUID,
+    ADD COLUMN IF NOT EXISTS resolution_note TEXT;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conname = 'requests_resolved_by_fkey'
+        AND conrelid = 'requests'::regclass
+    ) THEN
+        ALTER TABLE requests
+            ADD CONSTRAINT requests_resolved_by_fkey
+            FOREIGN KEY (resolved_by)
+            REFERENCES actors(id)
+            ON DELETE SET NULL;
+    END IF;
+END;
+$$;
+
 -- Insert Actors
 INSERT INTO actors (id, type, display_name, email, phone, created_at, updated_at) VALUES
 ('943c73d1-ceda-5578-abb0-db914d931f46', 'owner'::recipient_type, 'John Owner', 'johnowner@gmail.com', '+14155552673', NOW(), NOW()),
