@@ -1,0 +1,22 @@
+[
+  {
+    "id": "vendor_crud_001",
+    "name": "CRUD Vendor",
+    "email": "vendor@gmail.com",
+    "phone": "+16505552222",
+    "services": [
+      "plumbing"
+    ],
+    "emergency_available": true
+  },
+  {
+    "id": "vendor_crud_002",
+    "name": "CRUD Vendor 2",
+    "email": "vendor2@gmail.com",
+    "phone": "+16505553333",
+    "services": [
+      "electrical"
+    ],
+    "emergency_available": false
+  }
+]

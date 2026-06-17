@@ -1,0 +1,11 @@
+[
+  {
+    "id": "tenant_existing",
+    "name": "Existing Tenant",
+    "email": "tenant.changed@gmail.com",
+    "phone": "+1",
+    "address": "Unit 1",
+    "unit": "1A",
+    "property_id": "property_old"
+  }
+]

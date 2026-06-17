@@ -7,11 +7,11 @@ import pytest
 from fastapi import HTTPException
 from starlette.requests import Request
 
-from backend.src.api_endpoints.routers.owner_manager_routers import managers_router, owners_router
-from backend.src.api_endpoints.routers.property_routers import properties_router
-from backend.src.api_endpoints.routers.tenant_routers import tenants_router
-from backend.src.api_endpoints.routers.vendor_routers import vendors_router
-from backend.src.api_endpoints.routers.conver_reque_routers import (
+from src.api_endpoints.routers.owner_manager_routers import managers_router, owners_router
+from src.api_endpoints.routers.property_routers import properties_router
+from src.api_endpoints.routers.tenant_routers import tenants_router
+from src.api_endpoints.routers.vendor_routers import vendors_router
+from src.api_endpoints.routers.conver_reque_routers import (
     requests_router,
 )
 from src.utils import json_store
@@ -144,13 +144,13 @@ def temp_store(tmp_path, monkeypatch):
     )
     write_collection(
         tmp_path,
-        "property_magament",
+        "managers",
         [
             {
                 "id": "manager_001",
                 "name": "Manager One",
-                "email": "manager@example.com",
-                "phone": "+4",
+                "email": "manager@gmail.com",
+                "phone": "+16505554321",
                 "managed_properties": ["property_old"],
             }
         ],
@@ -162,8 +162,8 @@ def temp_store(tmp_path, monkeypatch):
             {
                 "id": "owner_001",
                 "name": "Owner One",
-                "email": "owner@example.com",
-                "phone": "+5",
+                "email": "owner@gmail.com",
+                "phone": "+16505559876",
                 "owned_properties": ["property_old"],
             }
         ],
@@ -221,8 +221,8 @@ def test_tenant_create_update_and_property_relationship_sync(temp_store):
             make_request("POST", "/tenants"),
             tenants_router.TenantCreatePayload(
                 name="New Tenant",
-                email="new@example.com",
-                phone="+6",
+                email="new@gmail.com",
+                phone="+16505551234",
                 address="2 New St Unit 2",
                 unit="2B",
                 property_id="property_new",
@@ -251,8 +251,8 @@ def test_vendor_create_update_delete_conflict(temp_store):
             make_request("POST", "/vendors"),
             vendors_router.VendorCreatePayload(
                 name="Created Vendor",
-                email="created@example.com",
-                phone="+7",
+                email="created@gmail.com",
+                phone="+16505557890",
                 services=["electrical"],
                 emergency_available=True,
             ),
@@ -292,30 +292,30 @@ def test_editable_profile_endpoints(temp_store):
         tenants_router.update_tenant_profile(
             make_request("PATCH", "/tenants/tenant_existing/profile"),
             "tenant_existing",
-            tenants_router.TenantProfileUpdatePayload(email="tenant.changed@example.com"),
+            tenants_router.TenantProfileUpdatePayload(email="tenant.changed@gmail.com"),
         )
     )
-    assert tenant["email"] == "tenant.changed@example.com"
+    assert tenant["email"] == "tenant.changed@gmail.com"
     assert tenant["property_id"] == "property_old"
 
     manager = asyncio.run(
         managers_router.update_manager_profile(
             make_request("PATCH", "/managers/manager_001/profile"),
             "manager_001",
-            managers_router.ManagerProfileUpdatePayload(phone="+44", department="Operations"),
+            managers_router.ManagerProfileUpdatePayload(phone="+447911123456", department="Operations"),
         )
     )
-    assert manager["phone"] == "+44"
+    assert manager["phone"] == "+447911123456"
     assert manager["department"] == "Operations"
 
     owner = asyncio.run(
         owners_router.update_owner_profile(
             make_request("PATCH", "/owners/owner_001/profile"),
             "owner_001",
-            owners_router.OwnerProfileUpdatePayload(email="owner.changed@example.com"),
+            owners_router.OwnerProfileUpdatePayload(email="owner.changed@gmail.com"),
         )
     )
-    assert owner["email"] == "owner.changed@example.com"
+    assert owner["email"] == "owner.changed@gmail.com"
 
 
 def test_request_cancel_and_complete_workflows(temp_store):

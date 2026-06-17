@@ -1,0 +1,11 @@
+[
+  {
+    "id": "manager_crud_001",
+    "name": "CRUD Manager",
+    "email": "manager@gmail.com",
+    "phone": "+16505554444",
+    "managed_properties": [
+      "property_crud_001"
+    ]
+  }
+]

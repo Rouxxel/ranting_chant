@@ -1,0 +1,12 @@
+[
+  {
+    "id": "manager_001",
+    "name": "Manager One",
+    "email": "manager@gmail.com",
+    "phone": "+447911123456",
+    "managed_properties": [
+      "property_old"
+    ],
+    "department": "Operations"
+  }
+]

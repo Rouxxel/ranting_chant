@@ -1,0 +1,12 @@
+[
+  {
+    "id": "owner_001",
+    "name": "Owner One",
+    "email": "owner@gmail.com",
+    "phone": "+16505559876",
+    "owned_properties": [
+      "property_old",
+      "property_b92135b3"
+    ]
+  }
+]

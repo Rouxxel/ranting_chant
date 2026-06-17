@@ -1,0 +1,20 @@
+[
+  {
+    "id": "tenant_existing",
+    "name": "Existing Tenant",
+    "email": "existing@example.com",
+    "phone": "+1",
+    "address": "Unit 1",
+    "unit": "1A",
+    "property_id": "property_old"
+  },
+  {
+    "name": "New Tenant",
+    "unit": "1B",
+    "property_id": "property_old",
+    "email": "new@gmail.com",
+    "phone": "+16505551234",
+    "address": "2 New St Unit 2",
+    "id": "tenant_f66e09b6"
+  }
+]

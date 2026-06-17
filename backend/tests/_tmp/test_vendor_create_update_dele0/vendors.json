@@ -1,0 +1,23 @@
+[
+  {
+    "id": "vendor_open",
+    "name": "Open Vendor",
+    "email": "open@example.com",
+    "phone": "+2",
+    "services": [
+      "plumbing"
+    ],
+    "emergency_available": true
+  },
+  {
+    "name": "Created Vendor",
+    "email": "created@gmail.com",
+    "phone": "+16505557890",
+    "services": [
+      "electrical",
+      "hvac"
+    ],
+    "emergency_available": true,
+    "id": "vendor_60f18101"
+  }
+]

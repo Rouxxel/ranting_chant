@@ -9,6 +9,7 @@ __pycache__/
 # Specifics
 *.log
 logs/
+.pytest_tmp/
 
 # Distribution / packaging
 .Python

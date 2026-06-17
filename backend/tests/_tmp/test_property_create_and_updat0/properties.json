@@ -1,0 +1,49 @@
+[
+  {
+    "id": "property_old",
+    "name": "Old House",
+    "address": "1 Old St",
+    "year_built": 1990,
+    "property_type": "apartment_building",
+    "unit_count": 10,
+    "owner_id": "owner_001",
+    "manager_id": "manager_001",
+    "tenant_ids": [
+      "tenant_existing"
+    ],
+    "representative": {
+      "type": "property_manager",
+      "id": "manager_001"
+    }
+  },
+  {
+    "id": "property_new",
+    "name": "New House",
+    "address": "2 New St",
+    "year_built": 2000,
+    "property_type": "loft_building",
+    "unit_count": 8,
+    "owner_id": "owner_002",
+    "manager_id": "manager_002",
+    "tenant_ids": [],
+    "representative": {
+      "type": "property_manager",
+      "id": "manager_002"
+    }
+  },
+  {
+    "name": "Renamed Place",
+    "address": "3 Created St",
+    "year_built": 2020,
+    "property_type": "apartment_building",
+    "unit_count": 12,
+    "owner_id": "owner_001",
+    "manager_id": "owner_001",
+    "tenant_ids": [],
+    "id": "property_b92135b3",
+    "representative": {
+      "type": "owner",
+      "id": "owner_001"
+    }
+  }
+]
