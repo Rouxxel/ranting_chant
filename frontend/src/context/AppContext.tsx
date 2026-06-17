@@ -2,7 +2,7 @@
 // Based on TASKS.md Phase 8.8
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { getVoiceProviders } from '../services/api';
+import { getVoiceProviders, authGetMe, authLogout } from '../services/api';
 import type { Tenant, Manager, Owner, VoiceProviderCapability, VoiceProviderId } from '../types';
 
 interface AppContextType {
@@ -17,6 +17,7 @@ interface AppContextType {
   setVoiceProvider: (provider: VoiceProviderId) => void;
   refreshVoiceProviders: () => Promise<void>;
   clearUser: () => void;
+  logout: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -68,7 +69,48 @@ export function AppProvider({ children }: { children: ReactNode }) {
     refreshVoiceProviders();
   }, []);
 
-  // Save user data to localStorage when it changes
+  // Stale-while-revalidate: if auth_token exists, refresh manager profile from /auth/me in background
+  useEffect(() => {
+    const token = localStorage.getItem('auth_token');
+    if (!token) return;
+
+    authGetMe()
+      .then((profile) => {
+        const role = profile.role as 'manager' | 'owner';
+        // Build a manager/owner shape from the profile
+        const actor: Manager | Owner = role === 'owner'
+          ? {
+              id: profile.id,
+              name: profile.name,
+              email: profile.email ?? '',
+              phone: profile.phone ?? '',
+              owned_properties: profile.owned_properties ?? [],
+            }
+          : {
+              id: profile.id,
+              name: profile.name,
+              email: profile.email ?? '',
+              phone: profile.phone ?? '',
+              managed_properties: profile.managed_properties ?? [],
+            };
+
+        localStorage.setItem('current_manager', JSON.stringify(actor));
+        localStorage.setItem('user_role', role);
+        setCurrentManager(actor);
+        setUserRole(role);
+      })
+      .catch(() => {
+        // 401 or network failure — clear auth state but keep voice_provider and tenant session
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('auth_refresh_token');
+        localStorage.removeItem('current_manager');
+        localStorage.removeItem('user_role');
+        setCurrentManager(null);
+        setUserRole(null);
+      });
+  }, []);
+
+  // Persist currentTenant to localStorage when it changes
   useEffect(() => {
     if (currentTenant) {
       localStorage.setItem('current_tenant', JSON.stringify(currentTenant));
@@ -106,6 +148,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('user_role');
   };
 
+  // Manager/owner logout: invalidates backend session, clears auth state.
+  // Does NOT clear tenant session or voice_provider.
+  const logout = async (): Promise<void> => {
+    await authLogout(); // fire and forget — never throws
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('auth_refresh_token');
+    localStorage.removeItem('current_manager');
+    localStorage.removeItem('user_role');
+    setCurrentManager(null);
+    setUserRole(null);
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -119,7 +173,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setUserRole,
         setVoiceProvider,
         refreshVoiceProviders,
-        clearUser
+        clearUser,
+        logout
       }}
     >
       {children}
