@@ -42,6 +42,11 @@ export function ManagementProperties() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+  // Namespaced cache key so manager_A and manager_B don't share a property list.
+  const propertiesCacheKey = currentManager
+    ? `properties_${userRole}_${currentManager.id}`
+    : 'properties';
+
   // A property belongs to the current manager/owner if it's in their managed/owned
   // list OR its manager_id/owner_id points at them (covers freshly created properties
   // whose ids aren't yet in the cached user record).
@@ -61,25 +66,26 @@ export function ManagementProperties() {
     setIsRefreshing(true);
     try {
       const allProperties = await getProperties();
-      localStorage.setItem('properties', JSON.stringify(allProperties));
-      setProperties(allProperties.filter(ownsProperty));
+      const mine = allProperties.filter(ownsProperty);
+      localStorage.setItem(propertiesCacheKey, JSON.stringify(mine));
+      setProperties(mine);
     } catch (error) {
       console.error("Failed to load properties:", error);
     } finally {
       setIsRefreshing(false);
       setIsLoading(false);
     }
-  }, [ownsProperty]);
+  }, [ownsProperty, propertiesCacheKey]);
 
   useEffect(() => {
     // Show cached data immediately, then refresh from the API.
-    const cachedProperties = localStorage.getItem('properties');
-    if (cachedProperties) {
-      setProperties((JSON.parse(cachedProperties) as Property[]).filter(ownsProperty));
+    const cached = localStorage.getItem(propertiesCacheKey);
+    if (cached) {
+      setProperties((JSON.parse(cached) as Property[]).filter(ownsProperty));
       setIsLoading(false);
     }
     fetchProperties();
-  }, [ownsProperty, fetchProperties]);
+  }, [ownsProperty, fetchProperties, propertiesCacheKey]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,7 +101,9 @@ export function ManagementProperties() {
         }
       }
       const newProperty = await createProperty(payload);
-      setProperties([...properties, newProperty]);
+      const next = [...properties, newProperty];
+      setProperties(next);
+      localStorage.setItem(propertiesCacheKey, JSON.stringify(next));
       setIsCreateDialogOpen(false);
       setCreateForm({ name: "", address: "" });
     } catch (error) {
@@ -126,7 +134,9 @@ export function ManagementProperties() {
     setIsSubmitting(true);
     try {
       const updatedProperty = await updateProperty(selected.id, changes);
-      setProperties(properties.map(p => p.id === selected.id ? updatedProperty : p));
+      const next = properties.map(p => p.id === selected.id ? updatedProperty : p);
+      setProperties(next);
+      localStorage.setItem(propertiesCacheKey, JSON.stringify(next));
       setSelected(updatedProperty);
       setIsEditDialogOpen(false);
       setEditForm({});

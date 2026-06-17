@@ -29,6 +29,12 @@ function ManagementPage() {
   const navigate = useNavigate();
   const { currentManager } = useApp();
 
+  // Build role-namespaced cache keys so different managers sharing a browser
+  // don't bleed each other's filtered request lists.
+  const requestsCacheKey = currentManager
+    ? `requests_${(currentManager as any).managed_properties ? 'manager' : 'owner'}_${currentManager.id}`
+    : 'requests';
+
   const [activeTab, setActiveTab] = useState<"requests" | "properties" | "tenants" | "vendors" | "profile">("requests");
   const [rows, setRows] = useState<Request[]>([]);
   const [typeF, setTypeF] = useState<RequestType | "all">("all");
@@ -38,43 +44,28 @@ function ManagementPage() {
   const [selected, setSelected] = useState<Request | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const filterForManager = (allRequests: Request[]) =>
+    allRequests.filter(r => {
+      if (!currentManager || !r.property_id) return false;
+      const properties = (currentManager as any).managed_properties || (currentManager as any).owned_properties;
+      return Array.isArray(properties) && properties.includes(r.property_id);
+    });
+
   useEffect(() => {
     const loadRequests = async () => {
       try {
-        // Check localStorage for cached requests
-        const cachedRequests = localStorage.getItem('requests');
-        if (cachedRequests) {
-          const parsedRequests = JSON.parse(cachedRequests) as Request[];
-          // Filter requests for current manager/owner by property_id
-          const filteredRequests = parsedRequests.filter((r: Request) => {
-            // Get properties from currentManager (could be manager or owner)
-            if (!currentManager || !r.property_id) return false;
-
-            // Handle both managers (managed_properties) and owners (owned_properties)
-            const properties = (currentManager as any).managed_properties || (currentManager as any).owned_properties;
-            if (!properties) return false;
-
-            return properties.includes(r.property_id);
-          });
-          setRows(filteredRequests);
+        // Stale-while-revalidate: show cached filtered list immediately
+        const cached = localStorage.getItem(requestsCacheKey);
+        if (cached) {
+          setRows(JSON.parse(cached) as Request[]);
           setIsLoading(false);
         }
 
-        // Fetch fresh data
+        // Fetch fresh data, filter, update state + cache
         const allRequests = await getRequests();
-        localStorage.setItem('requests', JSON.stringify(allRequests));
-        // Filter requests for current manager/owner by property_id
-        const filteredRequests = allRequests.filter(r => {
-          // Get properties from currentManager (could be manager or owner)
-          if (!currentManager || !r.property_id) return false;
-
-          // Handle both managers (managed_properties) and owners (owned_properties)
-          const properties = (currentManager as any).managed_properties || (currentManager as any).owned_properties;
-          if (!properties) return false;
-
-          return properties.includes(r.property_id);
-        });
-        setRows(filteredRequests);
+        const filtered = filterForManager(allRequests);
+        localStorage.setItem(requestsCacheKey, JSON.stringify(filtered));
+        setRows(filtered);
       } catch (error) {
         console.error("Failed to load requests:", error);
         setRows([]);
@@ -84,7 +75,7 @@ function ManagementPage() {
     };
 
     loadRequests();
-  }, [currentManager]);
+  }, [currentManager, requestsCacheKey]);
 
   const properties = useMemo(() => Array.from(new Set(rows.map((r) => r.property))), [rows]);
 
@@ -105,7 +96,9 @@ function ManagementPage() {
   async function approve(id: string) {
     try {
       await updateRequest(id, { status: "in_progress" });
-      setRows((rs) => rs.map((r) => (r.id === id ? { ...r, status: "in_progress" } : r)));
+      const next = rows.map((r) => (r.id === id ? { ...r, status: "in_progress" as Status } : r));
+      setRows(next);
+      localStorage.setItem(requestsCacheKey, JSON.stringify(next));
       if (selected?.id === id) setSelected({ ...selected, status: "in_progress" });
     } catch (error) {
       console.error("Failed to approve request:", error);
@@ -116,7 +109,9 @@ function ManagementPage() {
     if (!currentManager) return;
     try {
       const updated = await completeRequest(id, { resolved_by: currentManager.id, resolution_note: resolutionNote });
-      setRows((rs) => rs.map((r) => (r.id === id ? { ...r, ...updated } : r)));
+      const next = rows.map((r) => (r.id === id ? { ...r, ...updated } : r));
+      setRows(next);
+      localStorage.setItem(requestsCacheKey, JSON.stringify(next));
       if (selected?.id === id) setSelected((prev) => (prev ? { ...prev, ...updated } : prev));
     } catch (error) {
       console.error("Failed to complete request:", error);

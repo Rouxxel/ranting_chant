@@ -19,7 +19,7 @@ import { ConfirmDialog } from "@/components/ConfirmDialog";
 import type { Tenant, TenantCreateRequest, TenantUpdateRequest, Property } from "@/types";
 
 export function ManagementTenants() {
-  const { currentManager } = useApp();
+  const { currentManager, userRole } = useApp();
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [properties, setProperties] = useState<Property[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -36,6 +36,12 @@ export function ManagementTenants() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Namespaced cache keys for tenant and property lists.
+  const propertiesCacheKey = currentManager
+    ? `properties_${userRole}_${currentManager.id}`
+    : 'properties';
+  const tenantsCacheKey = 'tenants'; // tenants list is shared; filtering is client-side
 
   // A property belongs to the current manager/owner if it's in their managed/owned
   // list OR its manager_id/owner_id points at them (covers freshly created properties
@@ -63,8 +69,9 @@ export function ManagementTenants() {
     setIsRefreshing(true);
     try {
       const [allTenants, allProperties] = await Promise.all([getTenants(), getProperties()]);
-      localStorage.setItem('tenants', JSON.stringify(allTenants));
-      localStorage.setItem('properties', JSON.stringify(allProperties));
+      localStorage.setItem(tenantsCacheKey, JSON.stringify(allTenants));
+      const myProperties = allProperties.filter(ownsProperty);
+      localStorage.setItem(propertiesCacheKey, JSON.stringify(myProperties));
       applyData(allTenants, allProperties);
     } catch (error) {
       console.error("Failed to load data:", error);
@@ -72,25 +79,30 @@ export function ManagementTenants() {
       setIsRefreshing(false);
       setIsLoading(false);
     }
-  }, [applyData]);
+  }, [applyData, ownsProperty, propertiesCacheKey, tenantsCacheKey]);
 
   useEffect(() => {
     // Show cached data immediately, then refresh from the API.
-    const cachedTenants = localStorage.getItem('tenants');
-    const cachedProperties = localStorage.getItem('properties');
+    const cachedTenants = localStorage.getItem(tenantsCacheKey);
+    const cachedProperties = localStorage.getItem(propertiesCacheKey);
     if (cachedTenants && cachedProperties) {
       applyData(JSON.parse(cachedTenants), JSON.parse(cachedProperties));
       setIsLoading(false);
     }
     fetchData();
-  }, [applyData, fetchData]);
+  }, [applyData, fetchData, propertiesCacheKey, tenantsCacheKey]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
       const newTenant = await createTenant(createForm);
-      setTenants([...tenants, newTenant]);
+      const next = [...tenants, newTenant];
+      setTenants(next);
+      // Update shared tenants cache
+      const allCached = localStorage.getItem(tenantsCacheKey);
+      const all: Tenant[] = allCached ? JSON.parse(allCached) : tenants;
+      localStorage.setItem(tenantsCacheKey, JSON.stringify([...all, newTenant]));
       setIsCreateDialogOpen(false);
       setCreateForm({ name: "", unit: "", property_id: "" });
     } catch (error) {
@@ -122,7 +134,16 @@ export function ManagementTenants() {
     setIsSubmitting(true);
     try {
       const updatedTenant = await updateTenant(selected.id, changes);
-      setTenants(tenants.map(t => t.id === selected.id ? updatedTenant : t));
+      const next = tenants.map(t => t.id === selected.id ? updatedTenant : t);
+      setTenants(next);
+      // Update shared tenants cache
+      const allCached = localStorage.getItem(tenantsCacheKey);
+      if (allCached) {
+        const all: Tenant[] = JSON.parse(allCached);
+        localStorage.setItem(tenantsCacheKey, JSON.stringify(
+          all.map(t => t.id === selected.id ? updatedTenant : t)
+        ));
+      }
       setSelected(updatedTenant);
       setIsEditDialogOpen(false);
       setEditForm({});
@@ -148,7 +169,16 @@ export function ManagementTenants() {
     setIsDeleting(true);
     try {
       await deleteTenant(selected.id);
-      setTenants(tenants.filter(t => t.id !== selected.id));
+      const next = tenants.filter(t => t.id !== selected.id);
+      setTenants(next);
+      // Update shared tenants cache
+      const allCached = localStorage.getItem(tenantsCacheKey);
+      if (allCached) {
+        const all: Tenant[] = JSON.parse(allCached);
+        localStorage.setItem(tenantsCacheKey, JSON.stringify(
+          all.filter(t => t.id !== selected.id)
+        ));
+      }
       setSelected(null);
       setIsDeleteDialogOpen(false);
     } catch (error) {
