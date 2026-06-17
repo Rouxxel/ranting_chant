@@ -1246,5 +1246,71 @@
     "property_id": null,
     "property": null,
     "summary": null
+  },
+  {
+    "id": "request_32169487",
+    "requester_id": "tenant_001",
+    "type": "emergency",
+    "description": "There is a burning smell and no power",
+    "status": "pending",
+    "urgency": "high",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "tenant",
+        "message": "There is a burning smell and no power"
+      },
+      {
+        "role": "ai",
+        "message": "This is an emergency! Please evacuate immediately.",
+        "timestamp": "2026-06-17T10:57:25.386654+00:00"
+      }
+    ],
+    "created_at": "2026-06-17T10:57:25.386654+00:00",
+    "updated_at": "2026-06-17T10:57:25.386654+00:00",
+    "escalated": true,
+    "sentiment": "angry",
+    "confidence": 0.98,
+    "vendor_id": null,
+    "notifications_sent": [],
+    "notification_pending": true,
+    "property_id": null,
+    "property": null,
+    "summary": null
+  },
+  {
+    "id": "request_0b89d7d9",
+    "requester_id": "tenant_001",
+    "type": "access_control",
+    "description": "I lost my key",
+    "status": "pending",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_001"
+    ],
+    "conversation_history": [
+      {
+        "role": "tenant",
+        "message": "I lost my key"
+      },
+      {
+        "role": "ai",
+        "message": "I have logged your key replacement request.",
+        "timestamp": "2026-06-17T10:57:25.402981+00:00"
+      }
+    ],
+    "created_at": "2026-06-17T10:57:25.402981+00:00",
+    "updated_at": "2026-06-17T10:57:25.402981+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 0.92,
+    "vendor_id": null,
+    "notifications_sent": [],
+    "notification_pending": true,
+    "property_id": null,
+    "property": null,
+    "summary": null
   }
 ]

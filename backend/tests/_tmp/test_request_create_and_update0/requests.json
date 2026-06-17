@@ -38,7 +38,7 @@
     "notifications_sent": []
   },
   {
-    "id": "request_3bce45c8",
+    "id": "request_f21e3fe5",
     "requester_id": "tenant_crud_001",
     "type": "general",
     "description": "Test create request",
@@ -46,8 +46,8 @@
     "urgency": "low",
     "involved_parties": [],
     "conversation_history": [],
-    "created_at": "2026-06-17T10:43:41.513085+00:00",
-    "updated_at": "2026-06-17T10:43:41.513085+00:00",
+    "created_at": "2026-06-17T10:57:25.942715+00:00",
+    "updated_at": "2026-06-17T10:57:25.942715+00:00",
     "escalated": false,
     "sentiment": "neutral",
     "confidence": 0.0,
