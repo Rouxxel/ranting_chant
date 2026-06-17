@@ -126,3 +126,23 @@ class JSONRequestRepository(BaseRequestRepository):
 
     def update(self, request_id: str, updates: dict) -> Dict[str, Any]:
         return json_store.update_record("requests", request_id, updates)
+
+    def record_status_history(
+        self,
+        request_id: str,
+        old_status: str,
+        new_status: str,
+        changed_by: Optional[str] = None,
+        notes: Optional[str] = None,
+    ) -> None:
+        # JSON backend does not persist status history separately — no-op
+        pass
+
+    def record_vendor_assignment(
+        self,
+        request_id: str,
+        vendor_id: Optional[str],
+        assigned_by: Optional[str] = None,
+    ) -> None:
+        # JSON backend does not persist vendor assignments separately — no-op
+        pass

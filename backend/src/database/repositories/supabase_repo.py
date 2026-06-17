@@ -678,3 +678,40 @@ class SupabaseRequestRepository(BaseRequestRepository):
             self.supabase.table("requests").update(req_updates).eq("id", request_id).execute()
 
         return self.find_by_id(request_id)
+
+    def record_status_history(
+        self,
+        request_id: str,
+        old_status: str,
+        new_status: str,
+        changed_by: Optional[str] = None,
+        notes: Optional[str] = None,
+    ) -> None:
+        """Insert a row into request_status_history to track a status transition."""
+        data: Dict[str, Any] = {
+            "request_id": request_id,
+            "old_status": old_status,
+            "new_status": new_status,
+        }
+        if changed_by:
+            data["changed_by"] = changed_by
+        if notes:
+            data["notes"] = notes
+        self.supabase.table("request_status_history").insert(data).execute()
+
+    def record_vendor_assignment(
+        self,
+        request_id: str,
+        vendor_id: Optional[str],
+        assigned_by: Optional[str] = None,
+    ) -> None:
+        """Insert a row into request_assignments when a vendor is assigned."""
+        if not vendor_id:
+            return
+        data: Dict[str, Any] = {
+            "request_id": request_id,
+            "vendor_id": vendor_id,
+        }
+        if assigned_by:
+            data["assigned_by"] = assigned_by
+        self.supabase.table("request_assignments").insert(data).execute()

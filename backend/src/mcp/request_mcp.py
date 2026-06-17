@@ -140,6 +140,26 @@ def update_request(request_id: str, updates: dict) -> dict:
     # Pop temporary is_complete helper if present so it is not persisted
     updates.pop("is_complete", None)
 
+    # Record status history if status changed
+    if new_status != current_status:
+        try:
+            db.requests.record_status_history(request_id, current_status, new_status)
+        except Exception as hist_err:
+            log_handler.error(
+                f"[request_mcp] record_status_history failed for '{request_id}': {hist_err}"
+            )
+
+    # Record vendor assignment if vendor_id changed
+    current_vendor = req.get("vendor_id")
+    new_vendor = updates.get("vendor_id")
+    if "vendor_id" in updates and new_vendor != current_vendor:
+        try:
+            db.requests.record_vendor_assignment(request_id, new_vendor)
+        except Exception as assign_err:
+            log_handler.error(
+                f"[request_mcp] record_vendor_assignment failed for '{request_id}': {assign_err}"
+            )
+
     updated = db.requests.update(request_id, updates)
     log_handler.info(
         f"[request_mcp] Request '{request_id}' updated successfully. "

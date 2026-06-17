@@ -430,6 +430,27 @@ async def update_request(request: Request, request_id: str, body: RequestUpdateP
         updates["updated_at"] = datetime.now(timezone.utc).isoformat()
 
         updated = db.requests.update(request_id, updates)
+
+        # Record status history if status changed
+        existing_status = existing.get("status", "")
+        new_status = body.status
+        if new_status and new_status != existing_status:
+            try:
+                db.requests.record_status_history(request_id, existing_status, new_status)
+            except Exception as hist_err:
+                log_handler.error(
+                    f"[requests_router] record_status_history failed for '{request_id}': {hist_err}"
+                )
+
+        # Record vendor assignment if vendor_id changed
+        if body.vendor_id is not None and body.vendor_id != existing.get("vendor_id"):
+            try:
+                db.requests.record_vendor_assignment(request_id, body.vendor_id)
+            except Exception as assign_err:
+                log_handler.error(
+                    f"[requests_router] record_vendor_assignment failed for '{request_id}': {assign_err}"
+                )
+
         log_handler.info(f"[requests_router] Request '{request_id}' updated successfully")
         return updated
 
@@ -476,6 +497,14 @@ async def cancel_request(request: Request, request_id: str, body: RequestCancelP
             updates["cancellation_reason"] = body.cancellation_reason
 
         updated = db.requests.update(request_id, updates)
+        try:
+            db.requests.record_status_history(
+                request_id, req.get("status", ""), "cancelled", body.cancelled_by
+            )
+        except Exception as hist_err:
+            log_handler.error(
+                f"[requests_router] record_status_history failed for '{request_id}': {hist_err}"
+            )
         log_handler.info(f"[requests_router] Request '{request_id}' cancelled successfully")
         return updated
 
@@ -519,6 +548,18 @@ async def complete_request(request: Request, request_id: str, body: RequestCompl
             updates["resolution_note"] = body.resolution_note
 
         updated = db.requests.update(request_id, updates)
+        try:
+            db.requests.record_status_history(
+                request_id,
+                req.get("status", ""),
+                "resolved",
+                body.resolved_by,
+                body.resolution_note,
+            )
+        except Exception as hist_err:
+            log_handler.error(
+                f"[requests_router] record_status_history failed for '{request_id}': {hist_err}"
+            )
         log_handler.info(f"[requests_router] Request '{request_id}' completed successfully")
         return updated
 

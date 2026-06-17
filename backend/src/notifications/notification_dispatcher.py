@@ -18,7 +18,7 @@ from datetime import datetime, timezone
 
 #Other files imports
 from src.utils.custom_logger import log_handler
-from src.utils.json_store import find_by_id
+from src.database import get_database_service
 from src.notifications.email_service import (
     send_request_created,
     send_escalation_alert,
@@ -66,18 +66,19 @@ def _resolve_request_context(request: dict) -> tuple[dict | None, dict | None, d
     Returns:
         tuple: tenant, property, and manager records; each may be None.
     """
+    db = get_database_service()
     tenant_id = request.get("requester_id", "")
-    tenant = find_by_id("tenants", tenant_id)
+    tenant = db.tenants.find_by_id(tenant_id)
     if not tenant:
         return None, None, None
 
     property_id = request.get("property_id") or tenant.get("property_id", "")
-    prop = find_by_id("properties", property_id)
+    prop = db.properties.find_by_id(property_id)
     if not prop:
         return tenant, None, None
 
     manager_id = prop.get("manager_id", "")
-    manager = find_by_id("property_magament", manager_id) if manager_id else None
+    manager = db.managers.find_by_id(manager_id) if manager_id else None
     return tenant, prop, manager
 
 
@@ -92,15 +93,16 @@ def _resolve_property_representative(prop: dict, fallback_manager: dict | None =
     Returns:
         tuple[str, str]: Representative name and contact string.
     """
+    db = get_database_service()
     representative = prop.get("representative") or {}
     rep_type = representative.get("type")
     rep_id = representative.get("id")
     rep_record = None
 
     if rep_type == "owner" and rep_id:
-        rep_record = find_by_id("owners", rep_id)
+        rep_record = db.owners.find_by_id(rep_id)
     elif rep_type == "property_manager" and rep_id:
-        rep_record = find_by_id("property_magament", rep_id)
+        rep_record = db.managers.find_by_id(rep_id)
 
     if not rep_record:
         rep_record = fallback_manager
@@ -272,8 +274,9 @@ def dispatch_on_escalate(request: dict) -> list[dict]:
                 )
 
         #Notify owner via email + SMS
+        db = get_database_service()
         owner_id = prop.get("owner_id", "")
-        owner = find_by_id("owners", owner_id)
+        owner = db.owners.find_by_id(owner_id)
         if owner:
             owner_email = owner.get("email", "")
             owner_phone = owner.get("phone", "")
@@ -305,7 +308,7 @@ def dispatch_on_escalate(request: dict) -> list[dict]:
         req_type = request.get("type", "")
         vendor_id = request.get("vendor_id")
         if "emergency" in req_type.lower() and vendor_id:
-            vendor = find_by_id("vendors", vendor_id)
+            vendor = db.vendors.find_by_id(vendor_id)
             if vendor:
                 vendor_events = dispatch_vendor_dispatch(request, vendor)
                 events.extend(vendor_events)

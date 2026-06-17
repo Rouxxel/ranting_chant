@@ -134,3 +134,23 @@ class BaseRequestRepository(ABC):
     @abstractmethod
     def update(self, request_id: str, updates: dict) -> Dict[str, Any]:
         pass
+
+    @abstractmethod
+    def record_status_history(
+        self,
+        request_id: str,
+        old_status: str,
+        new_status: str,
+        changed_by: Optional[str] = None,
+        notes: Optional[str] = None,
+    ) -> None:
+        """Record a status transition in the request_status_history table (no-op for JSON)."""
+
+    @abstractmethod
+    def record_vendor_assignment(
+        self,
+        request_id: str,
+        vendor_id: Optional[str],
+        assigned_by: Optional[str] = None,
+    ) -> None:
+        """Record a vendor assignment in the request_assignments table (no-op for JSON)."""
