@@ -287,3 +287,51 @@ async def update_tenant(request: Request, tenant_id: str, body: TenantUpdatePayl
     except Exception as e:
         log_handler.error(f"[tenants_router] Unexpected error updating tenant '{tenant_id}': {e}")
         raise HTTPException(status_code=500, detail="Internal server error while updating tenant")
+
+
+#Soft-delete a tenant (manager/owner action)
+@router.delete(config_loader['endpoints']['tenants_endpoint']['detail_route'])
+@SlowLimiter.limit(
+    f"{config_loader['endpoints']['tenants_endpoint']['request_limit']}/"
+    f"{config_loader['endpoints']['tenants_endpoint']['unit_of_time_for_limit']}"
+)
+async def delete_tenant(request: Request, tenant_id: str):
+    """
+    Soft-delete a tenant record.
+
+    Sets is_active=False and deleted_at on the tenant row. The tenant's
+    actor, unit, and request history are preserved. Removes the tenant
+    from their property's tenant_ids list.
+
+    Parameters:
+        request (Request): The incoming HTTP request for rate limit tracking.
+        tenant_id (str): The unique identifier of the tenant to remove.
+
+    Returns:
+        dict: The tenant record as it was before deletion.
+
+    Raises:
+        HTTPException 404: If no tenant with the given ID exists.
+        HTTPException 500: If an unexpected error occurs during deletion.
+    """
+    try:
+        log_handler.debug(f"[tenants_router] Soft-deleting tenant with id='{tenant_id}'")
+        db = get_database_service()
+        existing = db.tenants.find_by_id(tenant_id)
+        if not existing:
+            message = f"Tenant '{tenant_id}' not found"
+            log_handler.warning(message)
+            raise HTTPException(status_code=404, detail=message)
+
+        #Remove tenant from their property's tenant_ids list before deleting
+        _sync_property_tenant_ids(tenant_id, existing.get("property_id"), None)
+
+        deleted = db.tenants.delete(tenant_id)
+        log_handler.info(f"[tenants_router] Tenant '{tenant_id}' soft-deleted successfully")
+        return deleted
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        log_handler.error(f"[tenants_router] Unexpected error deleting tenant '{tenant_id}': {e}")
+        raise HTTPException(status_code=500, detail="Internal server error while deleting tenant")

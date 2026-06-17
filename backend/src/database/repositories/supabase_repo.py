@@ -141,8 +141,17 @@ class SupabaseTenantRepository(BaseTenantRepository):
 
     def delete(self, tenant_id: str) -> Dict[str, Any]:
         tenant_info = self.find_by_id(tenant_id)
-        # Cascade delete is handled by database when we delete the actor
-        self.supabase.table("actors").delete().eq("id", tenant_id).execute()
+        # Soft delete: set is_active=False and deleted_at timestamp on both
+        # tenants and actors rows so the record is preserved but hidden.
+        now = datetime.now(timezone.utc).isoformat()
+        self.supabase.table("tenants").update({
+            "is_active": False,
+            "deleted_at": now
+        }).eq("id", tenant_id).execute()
+        self.supabase.table("actors").update({
+            "is_active": False,
+            "updated_at": now
+        }).eq("id", tenant_id).execute()
         return tenant_info
 
 
