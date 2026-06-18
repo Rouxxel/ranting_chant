@@ -278,6 +278,14 @@ CREATE POLICY "Actors can view accessible actor records"
     ON actors FOR SELECT
     USING (actor_can_access_actor(id, current_actor_id()));
 
+-- Managers and owners can read vendor actor records for the vendor directory
+CREATE POLICY "Managers and owners can view vendor actors"
+    ON actors FOR SELECT
+    USING (
+        type = 'vendor'
+        AND current_actor_is_manager_or_owner()
+    );
+
 -- Actors can update their own identity record
 CREATE POLICY "Actors can update own record"
     ON actors FOR UPDATE
