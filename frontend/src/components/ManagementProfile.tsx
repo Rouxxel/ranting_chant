@@ -23,9 +23,10 @@ export function ManagementProfile() {
     if (editForm.name !== undefined && editForm.name !== displayName) {
       changes.name = editForm.name;
     }
-    if (editForm.email !== undefined && editForm.email !== email) {
-      changes.email = editForm.email;
-    }
+    // Commented out to prevent mismatch between actors table and auth table
+    // if (editForm.email !== undefined && editForm.email !== email) {
+    //   changes.email = editForm.email;
+    // }
     if (editForm.phone !== undefined && editForm.phone !== phone) {
       changes.phone = editForm.phone;
     }
@@ -77,16 +78,17 @@ export function ManagementProfile() {
 
           <div>
             <label className="block text-xs uppercase tracking-wider text-ranting-muted mb-1">Email</label>
-            {isEditing ? (
+            {/* Commented out to prevent mismatch between actors table and auth table */}
+            {/* {isEditing ? (
               <input
                 type="email"
                 defaultValue={email}
                 onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
                 className="aero-input w-full px-3 py-2 text-sm"
               />
-            ) : (
+            ) : ( */}
               <div className="text-sm text-ranting-ice">{email || "-"}</div>
-            )}
+            {/* )} */}
           </div>
 
           <div>
