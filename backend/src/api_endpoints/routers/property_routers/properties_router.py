@@ -135,6 +135,7 @@ async def create_property(request: Request, body: PropertyCreatePayload, current
     try:
         record = body.model_dump(exclude={"representative"})
         record["id"] = str(uuid.uuid4())
+        record["created_by"] = current_actor["id"]
         record["representative"] = _build_representative(
             body.manager_id,
             body.owner_id,
@@ -256,7 +257,7 @@ async def update_property(request: Request, property_id: str, body: PropertyUpda
 @SlowLimiter.limit(
     f"{config_loader['endpoints']['properties_endpoint']['request_limit']}/"
     f"{config_loader['endpoints']['properties_endpoint']['unit_of_time_for_limit']}"
-)
+)#TODO: see how to manage a property deletion compared to tenants and their units
 async def delete_property(request: Request, property_id: str, current_actor: dict = Depends(require_manager_or_owner)):
     """
     Soft-delete a property record.

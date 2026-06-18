@@ -300,6 +300,14 @@ CREATE POLICY "Owners and managers can create tenant actors"
         AND type = 'tenant'
     );
 
+-- Owners and managers can create vendor contact records
+CREATE POLICY "Owners and managers can create vendor actors"
+    ON actors FOR INSERT
+    WITH CHECK (
+        current_actor_is_manager_or_owner()
+        AND type = 'vendor'
+    );
+
 -- Owners and managers can update tenant contact records for related properties
 CREATE POLICY "Owners and managers can update related tenant actors"
     ON actors FOR UPDATE
