@@ -184,6 +184,20 @@
             "me_route": "/me",
             "logout_route": "/logout",
             "refresh_route": "/refresh"
+        },
+        "managers_signup_endpoint": {
+            "request_limit": 5,
+            "unit_of_time_for_limit": "m",
+            "endpoint_prefix": "/managers",
+            "endpoint_tag": "Managers",
+            "signup_route": "/signup"
+        },
+        "owners_signup_endpoint": {
+            "request_limit": 5,
+            "unit_of_time_for_limit": "m",
+            "endpoint_prefix": "/owners",
+            "endpoint_tag": "Owners",
+            "signup_route": "/signup"
         }
     }
 }

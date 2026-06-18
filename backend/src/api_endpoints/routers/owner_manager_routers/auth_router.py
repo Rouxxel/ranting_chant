@@ -367,14 +367,14 @@ async def refresh_token(request: Request, refresh_token: str) -> AuthResponse:
             }
         
         log_handler.info(f"[auth] Token refresh successful for {role}")
-        
+
         return AuthResponse(
             access_token=auth_response.session.access_token if auth_response.session else "",
             refresh_token=auth_response.session.refresh_token if auth_response.session else None,
             role=role,
             actor=actor_profile
         )
-        
+
     except Exception as e:
         log_handler.error(f"[auth] Token refresh failed: {e}")
         raise HTTPException(

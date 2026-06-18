@@ -124,12 +124,37 @@ The backend includes routers for:
 - **Tenants**: tenant reads, create, update, and profile update
 - **Properties**: property reads, create, and update
 - **Vendors**: vendor reads, create, update, delete, and service-category lookup
-- **Managers**: manager reads and profile update
-- **Owners**: owner reads and profile update
+- **Managers**: manager reads, profile update, and sign-up
+- **Owners**: owner reads, profile update, and sign-up
 - **Requests**: request listing, detail, summary, create, update, cancel, complete, and notification dispatch
 - **Conversation**: AI-powered chat sessions, message processing, history, save-conversation, and send-notifications
 - **Voice**: transcription, voice session start, and voice response
 - **MCP**: tool discovery and MCP-style operations (property, tenant, vendor, request, notification)
+- **Authentication**: login, logout, refresh, and current user endpoints
+
+### Sign-Up Endpoints
+
+The backend provides self-registration endpoints for new managers and owners:
+
+- **POST /managers/signup**: Register a new property manager
+  - Payload: `{ email, password, name, phone?, username? }`
+  - Creates Supabase auth user with email confirmation
+  - Creates actor record with type='manager'
+  - Creates property_manager record
+  - Creates user_accounts mapping
+  - Rate limited: 5 requests per minute
+  - Returns: `{ message, email }`
+
+- **POST /owners/signup**: Register a new property owner
+  - Payload: `{ email, password, name, phone?, username? }`
+  - Creates Supabase auth user with email confirmation
+  - Creates actor record with type='owner'
+  - Creates owner record
+  - Creates user_accounts mapping
+  - Rate limited: 5 requests per minute
+  - Returns: `{ message, email }`
+
+New users start with no property access and must be assigned properties by existing managers/owners or create their own properties.
 
 ## Data & Persistence
 
