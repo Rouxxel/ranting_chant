@@ -25,6 +25,7 @@ from src.utils.limiter import limiter as SlowLimiter
 from src.core_specs.configuration.config_loader import config_loader
 from src.database import get_database_service
 from src.utils.validators import validate_email_format, validate_phone_format
+from src.api_endpoints.routers.owner_manager_routers.auth_router import require_manager_or_owner
 
 """PYDANTIC MODELS-----------------------------------------------------------"""
 class OwnerProfileUpdatePayload(BaseModel):
@@ -79,7 +80,7 @@ async def list_owners(request: Request):
     f"{config_loader['endpoints']['owners_endpoint']['request_limit']}/"
     f"{config_loader['endpoints']['owners_endpoint']['unit_of_time_for_limit']}"
 )
-async def update_owner_profile(request: Request, owner_id: str, body: OwnerProfileUpdatePayload):
+async def update_owner_profile(request: Request, owner_id: str, body: OwnerProfileUpdatePayload, current_actor: dict = Depends(require_manager_or_owner)):
     """Update owner profile fields without changing owned properties."""
     try:
         db = get_database_service()

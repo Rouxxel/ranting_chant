@@ -25,6 +25,7 @@ from src.utils.custom_logger import log_handler
 from src.utils.limiter import limiter as SlowLimiter
 from src.core_specs.configuration.config_loader import config_loader
 from src.database import get_database_service
+from src.api_endpoints.routers.owner_manager_routers.auth_router import require_manager_or_owner
 
 """PYDANTIC MODELS-----------------------------------------------------------"""
 class RepresentativePayload(BaseModel):
@@ -129,7 +130,7 @@ async def list_properties(request: Request):
     f"{config_loader['endpoints']['properties_endpoint']['request_limit']}/"
     f"{config_loader['endpoints']['properties_endpoint']['unit_of_time_for_limit']}"
 )
-async def create_property(request: Request, body: PropertyCreatePayload):
+async def create_property(request: Request, body: PropertyCreatePayload, current_actor: dict = Depends(require_manager_or_owner)):
     """Create a property record for manager/owner workflows."""
     try:
         record = body.model_dump(exclude={"representative"})
@@ -217,7 +218,7 @@ async def get_property(request: Request, property_id: str):
     f"{config_loader['endpoints']['properties_endpoint']['request_limit']}/"
     f"{config_loader['endpoints']['properties_endpoint']['unit_of_time_for_limit']}"
 )
-async def update_property(request: Request, property_id: str, body: PropertyUpdatePayload):
+async def update_property(request: Request, property_id: str, body: PropertyUpdatePayload, current_actor: dict = Depends(require_manager_or_owner)):
     """Update editable property fields and relationship references."""
     try:
         db = get_database_service()

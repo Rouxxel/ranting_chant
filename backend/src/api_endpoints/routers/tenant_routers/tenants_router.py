@@ -26,6 +26,7 @@ from src.utils.limiter import limiter as SlowLimiter
 from src.core_specs.configuration.config_loader import config_loader
 from src.database import get_database_service
 from src.utils.validators import validate_email_format, validate_phone_format
+from src.api_endpoints.routers.owner_manager_routers.auth_router import require_manager_or_owner
 
 """PYDANTIC MODELS-----------------------------------------------------------"""
 class TenantCreatePayload(BaseModel):
@@ -142,7 +143,7 @@ async def list_tenants(request: Request, property_id: Optional[str] = Query(None
     f"{config_loader['endpoints']['tenants_endpoint']['request_limit']}/"
     f"{config_loader['endpoints']['tenants_endpoint']['unit_of_time_for_limit']}"
 )
-async def create_tenant(request: Request, body: TenantCreatePayload):
+async def create_tenant(request: Request, body: TenantCreatePayload, current_actor: dict = Depends(require_manager_or_owner)):
     """Create a tenant and attach them to the target property."""
     try:
         #Validate contact fields when provided
@@ -255,7 +256,7 @@ async def get_tenant(request: Request, tenant_id: str):
     f"{config_loader['endpoints']['tenants_endpoint']['request_limit']}/"
     f"{config_loader['endpoints']['tenants_endpoint']['unit_of_time_for_limit']}"
 )
-async def update_tenant(request: Request, tenant_id: str, body: TenantUpdatePayload):
+async def update_tenant(request: Request, tenant_id: str, body: TenantUpdatePayload, current_actor: dict = Depends(require_manager_or_owner)):
     """Update a tenant and keep property tenant_ids relationships in sync."""
     try:
         db = get_database_service()
@@ -295,7 +296,7 @@ async def update_tenant(request: Request, tenant_id: str, body: TenantUpdatePayl
     f"{config_loader['endpoints']['tenants_endpoint']['request_limit']}/"
     f"{config_loader['endpoints']['tenants_endpoint']['unit_of_time_for_limit']}"
 )
-async def delete_tenant(request: Request, tenant_id: str):
+async def delete_tenant(request: Request, tenant_id: str, current_actor: dict = Depends(require_manager_or_owner)):
     """
     Soft-delete a tenant record.
 

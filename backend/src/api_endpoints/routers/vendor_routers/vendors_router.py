@@ -26,6 +26,7 @@ from src.utils.limiter import limiter as SlowLimiter
 from src.core_specs.configuration.config_loader import config_loader
 from src.database import get_database_service
 from src.utils.validators import validate_email_format, validate_phone_format
+from src.api_endpoints.routers.owner_manager_routers.auth_router import require_manager_or_owner
 
 """PYDANTIC MODELS-----------------------------------------------------------"""
 class VendorCreatePayload(BaseModel):
@@ -95,7 +96,7 @@ async def list_vendors(request: Request):
     f"{config_loader['endpoints']['vendors_endpoint']['request_limit']}/"
     f"{config_loader['endpoints']['vendors_endpoint']['unit_of_time_for_limit']}"
 )
-async def create_vendor(request: Request, body: VendorCreatePayload):
+async def create_vendor(request: Request, body: VendorCreatePayload, current_actor: dict = Depends(require_manager_or_owner)):
     """Create a vendor record."""
     try:
         #Validate contact fields against config-driven rules
@@ -216,7 +217,7 @@ async def get_vendor(request: Request, vendor_id: str):
     f"{config_loader['endpoints']['vendors_endpoint']['request_limit']}/"
     f"{config_loader['endpoints']['vendors_endpoint']['unit_of_time_for_limit']}"
 )
-async def update_vendor(request: Request, vendor_id: str, body: VendorUpdatePayload):
+async def update_vendor(request: Request, vendor_id: str, body: VendorUpdatePayload, current_actor: dict = Depends(require_manager_or_owner)):
     """Update vendor details and service categories."""
     try:
         db = get_database_service()
@@ -253,7 +254,7 @@ async def update_vendor(request: Request, vendor_id: str, body: VendorUpdatePayl
     f"{config_loader['endpoints']['vendors_endpoint']['request_limit']}/"
     f"{config_loader['endpoints']['vendors_endpoint']['unit_of_time_for_limit']}"
 )
-async def remove_vendor(request: Request, vendor_id: str):
+async def remove_vendor(request: Request, vendor_id: str, current_actor: dict = Depends(require_manager_or_owner)):
     """Delete a vendor unless currently assigned to an open request."""
     try:
         db = get_database_service()
