@@ -104,6 +104,11 @@ export function ManagementProperties() {
       const next = [...properties, newProperty];
       setProperties(next);
       localStorage.setItem(propertiesCacheKey, JSON.stringify(next));
+      // Invalidate requests cache since property changes may affect request filtering
+      if (currentManager) {
+        const role = (currentManager as any).managed_properties ? 'manager' : 'owner';
+        localStorage.removeItem(`requests_${role}_${currentManager.id}`);
+      }
       setIsCreateDialogOpen(false);
       setCreateForm({ name: "", address: "" });
     } catch (error) {
@@ -137,6 +142,11 @@ export function ManagementProperties() {
       const next = properties.map(p => p.id === selected.id ? updatedProperty : p);
       setProperties(next);
       localStorage.setItem(propertiesCacheKey, JSON.stringify(next));
+      // Invalidate requests cache since property changes may affect request filtering
+      if (currentManager) {
+        const role = (currentManager as any).managed_properties ? 'manager' : 'owner';
+        localStorage.removeItem(`requests_${role}_${currentManager.id}`);
+      }
       setSelected(updatedProperty);
       setIsEditDialogOpen(false);
       setEditForm({});

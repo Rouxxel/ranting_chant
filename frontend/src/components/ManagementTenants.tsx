@@ -103,6 +103,11 @@ export function ManagementTenants() {
       const allCached = localStorage.getItem(tenantsCacheKey);
       const all: Tenant[] = allCached ? JSON.parse(allCached) : tenants;
       localStorage.setItem(tenantsCacheKey, JSON.stringify([...all, newTenant]));
+      // Invalidate requests cache since tenant changes may affect request filtering
+      if (currentManager) {
+        const role = userRole === 'owner' ? 'owner' : 'manager';
+        localStorage.removeItem(`requests_${role}_${currentManager.id}`);
+      }
       setIsCreateDialogOpen(false);
       setCreateForm({ name: "", unit: "", property_id: "" });
     } catch (error) {
@@ -144,6 +149,11 @@ export function ManagementTenants() {
           all.map(t => t.id === selected.id ? updatedTenant : t)
         ));
       }
+      // Invalidate requests cache since tenant changes may affect request filtering
+      if (currentManager) {
+        const role = userRole === 'owner' ? 'owner' : 'manager';
+        localStorage.removeItem(`requests_${role}_${currentManager.id}`);
+      }
       setSelected(updatedTenant);
       setIsEditDialogOpen(false);
       setEditForm({});
@@ -178,6 +188,11 @@ export function ManagementTenants() {
         localStorage.setItem(tenantsCacheKey, JSON.stringify(
           all.filter(t => t.id !== selected.id)
         ));
+      }
+      // Invalidate requests cache since tenant changes may affect request filtering
+      if (currentManager) {
+        const role = userRole === 'owner' ? 'owner' : 'manager';
+        localStorage.removeItem(`requests_${role}_${currentManager.id}`);
       }
       setSelected(null);
       setIsDeleteDialogOpen(false);

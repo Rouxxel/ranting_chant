@@ -35,11 +35,11 @@ function RequestsPage() {
       const allRequests = await getRequests();
       const tenantRequests = allRequests.filter(r => r.requester_id === tenantId);
       setRequests(tenantRequests);
-      localStorage.setItem(`requests_${tenantId}`, JSON.stringify(tenantRequests));
+      localStorage.setItem(`requests_tenant_${tenantId}`, JSON.stringify(tenantRequests));
     } catch (error) {
       console.error("Failed to load requests:", error);
       // Keep whatever is cached on failure
-      const cachedRequests = localStorage.getItem(`requests_${tenantId}`);
+      const cachedRequests = localStorage.getItem(`requests_tenant_${tenantId}`);
       setRequests(cachedRequests ? JSON.parse(cachedRequests) : []);
     } finally {
       setIsRefreshing(false);
@@ -54,7 +54,7 @@ function RequestsPage() {
     // Cache-first: if we already have this tenant's requests cached, use them
     // and DON'T hit the network. The cache is invalidated on create (chat) and
     // updated on cancel, and the Reload button forces a fresh fetch.
-    const cachedRequests = localStorage.getItem(`requests_${tenantId}`);
+    const cachedRequests = localStorage.getItem(`requests_tenant_${tenantId}`);
     if (cachedRequests) {
       setRequests(JSON.parse(cachedRequests));
       setIsLoading(false);
@@ -68,7 +68,7 @@ function RequestsPage() {
   const handleCancel = (requestId: string) => {
     const next = requests.filter(r => r.id !== requestId);
     setRequests(next);
-    localStorage.setItem(`requests_${tenantId}`, JSON.stringify(next));
+    localStorage.setItem(`requests_tenant_${tenantId}`, JSON.stringify(next));
   };
 
   return (
