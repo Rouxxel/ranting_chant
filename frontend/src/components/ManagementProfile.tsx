@@ -77,7 +77,7 @@ export function ManagementProfile() {
           </div>
 
           <div>
-            <label className="block text-xs uppercase tracking-wider text-ranting-muted mb-1">Email</label>
+            <label className="block text-xs uppercase tracking-wider text-ranting-muted mb-1">Email (not editable)</label>
             {/* Commented out to prevent mismatch between actors table and auth table */}
             {/* {isEditing ? (
               <input
