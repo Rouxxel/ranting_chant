@@ -41,7 +41,7 @@ def create_request(data: dict) -> dict:
     now = datetime.now(timezone.utc).isoformat()
 
     record = {
-        "id": f"request_{uuid.uuid4().hex[:8]}",
+        "id": str(uuid.uuid4()),
         "requester_id": data.get("requester_id", ""),
         "type": normalize_request_type(data.get("type")),
         "description": data.get("description", ""),

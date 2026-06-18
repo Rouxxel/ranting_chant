@@ -167,7 +167,9 @@ async def send_message(request: Request, body: ConversationMessagePayload):
         log_handler.debug(f"[conversation_router] Processing message from tenant='{tenant_id}' with id='{request_id_or_session_id}'")
 
         # Check if this is a session_id (first message) or request_id (subsequent message)
-        is_first_message = request_id_or_session_id.startswith("session_")
+        # Try to look up as a request first; if not found, treat as session ID
+        req = request_mcp.get_request(request_id_or_session_id)
+        is_first_message = req is None
 
         if is_first_message:
             # First message: process with AI but don't create request yet
