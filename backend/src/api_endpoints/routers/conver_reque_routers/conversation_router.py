@@ -108,7 +108,7 @@ async def start_conversation(request: Request, body: ConversationStartPayload):
         greeting = f"Hello {tenant.get('name')}. We are delighted to have you at {address}. How can I assist you today?, please detail your request as much as you can for best results."
 
         # 4. Generate a temporary session ID (no request created yet)
-        session_id = f"session_{uuid.uuid4().hex[:8]}"
+        session_id = str(uuid.uuid4())
 
         log_handler.info(
             f"[conversation_router] Successfully started conversation session for tenant '{tenant_id}'. "
