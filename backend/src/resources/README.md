@@ -2,8 +2,8 @@
 
 Static data and PostgreSQL database definitions for the Ranting Chant property management system.
 
-- **SQL migrations** - canonical PostgreSQL schema, RLS policies, seed data, and production hardening
-- **Mock JSON files** - flat-file runtime/reference data used by the local backend
+- **SQL migrations** - canonical PostgreSQL schema, RLS policies, seed data, and production hardening (primary database)
+- **Mock JSON files** - flat-file runtime/reference data used as fallback for local development
 
 ## Directory structure
 
