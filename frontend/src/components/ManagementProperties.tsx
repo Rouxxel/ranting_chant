@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { useApp } from "@/context/AppContext";
-import { getProperties, createProperty, updateProperty, describeValidationError } from "@/services/api";
+import { getProperties, createProperty, updateProperty, deleteProperty, describeValidationError } from "@/services/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import type { Property, PropertyCreateRequest, PropertyUpdateRequest } from "@/types";
 import { getPropertyTypeLabel, PROPERTY_TYPES, propertyTypeLabels } from "@/types";
 
@@ -34,12 +35,14 @@ export function ManagementProperties() {
   const [selected, setSelected] = useState<Property | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [createForm, setCreateForm] = useState<PropertyCreateRequest>({
     name: "",
     address: "",
   });
   const [editForm, setEditForm] = useState<PropertyUpdateRequest>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Namespaced cache key so manager_A and manager_B don't share a property list.
@@ -168,6 +171,30 @@ export function ManagementProperties() {
       unit_count: selected.unit_count,
     });
     setIsEditDialogOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!selected) return;
+    setIsDeleting(true);
+    try {
+      await deleteProperty(selected.id);
+      const next = properties.filter(p => p.id !== selected.id);
+      setProperties(next);
+      localStorage.setItem(propertiesCacheKey, JSON.stringify(next));
+      // Invalidate requests cache since property changes may affect request filtering
+      if (currentManager) {
+        const role = (currentManager as any).managed_properties ? 'manager' : 'owner';
+        localStorage.removeItem(`requests_${role}_${currentManager.id}`);
+      }
+      setSelected(null);
+      setIsDeleteDialogOpen(false);
+      toast.success("Property deleted successfully");
+    } catch (error) {
+      console.error("Failed to delete property:", error);
+      toast.error(describeValidationError(error, "Failed to delete property. Please try again."));
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   if (isLoading) {
@@ -321,11 +348,11 @@ export function ManagementProperties() {
                 Edit
               </Button>
               <Button
-                onClick={() => setSelected(null)}
+                onClick={() => setIsDeleteDialogOpen(true)}
                 variant="ghost"
-                className="glossy-btn-ghost px-3 py-1.5 text-xs"
+                className="glossy-btn-ghost px-3 py-1.5 text-xs text-red-400 hover:text-red-300"
               >
-                Close
+                Delete
               </Button>
             </div>
           </div>
@@ -421,6 +448,17 @@ export function ManagementProperties() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        title="Delete Property"
+        message={`Are you sure you want to delete "${selected?.name}"? This action cannot be undone.`}
+        onConfirm={handleDelete}
+        isDeleting={isDeleting}
+        confirmLabel="Delete"
+        confirmingLabel="Deleting..."
+      />
     </div>
   );
 }

@@ -299,6 +299,10 @@ export const deleteTenant = async (tenantId: string): Promise<void> => {
   await apiClient.delete(`/tenants/${tenantId}`);
 };
 
+export const deleteProperty = async (propertyId: string): Promise<void> => {
+  await apiClient.delete(`/properties/${propertyId}`);
+};
+
 // ==================== Managers ====================
 
 export const getManagers = async (): Promise<Manager[]> => {

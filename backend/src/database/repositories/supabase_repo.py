@@ -274,7 +274,8 @@ class SupabasePropertyRepository(BasePropertyRepository):
 
     def delete(self, property_id: str) -> Dict[str, Any]:
         prop_info = self.find_by_id(property_id)
-        self.supabase.table("properties").update({"is_active": False, "deleted_at": datetime.now(timezone.utc).isoformat()}).eq("id", property_id).execute()
+        # Hard delete: actually remove the row from the database
+        self.supabase.table("properties").delete().eq("id", property_id).execute()
         return prop_info
 
 
