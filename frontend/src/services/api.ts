@@ -518,6 +518,38 @@ export const authGetMe = async (): Promise<{
   return response.data;
 };
 
+// POST /managers/signup
+export const signupManager = async (data: {
+  email: string;
+  password: string;
+  name: string;
+  phone?: string;
+  username?: string;
+}): Promise<{ message: string; email: string }> => {
+  const response = await apiClient.post<{ message: string; email: string }>(
+    '/managers/signup',
+    data,
+    { suppressErrorToast: true }
+  );
+  return response.data;
+};
+
+// POST /owners/signup
+export const signupOwner = async (data: {
+  email: string;
+  password: string;
+  name: string;
+  phone?: string;
+  username?: string;
+}): Promise<{ message: string; email: string }> => {
+  const response = await apiClient.post<{ message: string; email: string }>(
+    '/owners/signup',
+    data,
+    { suppressErrorToast: true }
+  );
+  return response.data;
+};
+
 // @deprecated — kept for backward compatibility. Use authLogin instead.
 export const login = async (email: string, password: string, role: 'tenant' | 'manager') => {
   // TODO: Remove once all callers migrated to authLogin
