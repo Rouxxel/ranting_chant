@@ -15,6 +15,8 @@ from src.database.repositories.base import (
     BaseManagerRepository,
     BaseOwnerRepository,
     BaseRequestRepository,
+    BaseConversationMessageRepository,
+    BaseNotificationRepository,
 )
 
 
@@ -724,3 +726,35 @@ class SupabaseRequestRepository(BaseRequestRepository):
         if assigned_by:
             data["assigned_by"] = assigned_by
         self.supabase.table("request_assignments").insert(data).execute()
+
+
+class SupabaseConversationMessageRepository(BaseConversationMessageRepository):
+    def __init__(self, supabase_client):
+        self.supabase = supabase_client
+
+    def list_by_request(self, request_id: str) -> List[Dict[str, Any]]:
+        res = self.supabase.table("conversation_messages").select("*").eq("request_id", request_id).execute()
+        return res.data
+
+    def create(self, data: dict) -> Dict[str, Any]:
+        res = self.supabase.table("conversation_messages").insert(data).execute()
+        return res.data[0] if res.data else {}
+
+    def delete_by_request(self, request_id: str) -> None:
+        self.supabase.table("conversation_messages").delete().eq("request_id", request_id).execute()
+
+
+class SupabaseNotificationRepository(BaseNotificationRepository):
+    def __init__(self, supabase_client):
+        self.supabase = supabase_client
+
+    def list_by_request(self, request_id: str) -> List[Dict[str, Any]]:
+        res = self.supabase.table("notifications").select("*, actors(email, phone, display_name)").eq("request_id", request_id).execute()
+        return res.data
+
+    def create(self, data: dict) -> Dict[str, Any]:
+        res = self.supabase.table("notifications").insert(data).execute()
+        return res.data[0] if res.data else {}
+
+    def delete_by_request(self, request_id: str) -> None:
+        self.supabase.table("notifications").delete().eq("request_id", request_id).execute()

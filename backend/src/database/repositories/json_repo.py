@@ -13,6 +13,8 @@ from src.database.repositories.base import (
     BaseManagerRepository,
     BaseOwnerRepository,
     BaseRequestRepository,
+    BaseConversationMessageRepository,
+    BaseNotificationRepository,
 )
 
 
@@ -146,3 +148,63 @@ class JSONRequestRepository(BaseRequestRepository):
     ) -> None:
         # JSON backend does not persist vendor assignments separately — no-op
         pass
+
+
+class JSONConversationMessageRepository(BaseConversationMessageRepository):
+    def list_by_request(self, request_id: str) -> List[Dict[str, Any]]:
+        # JSON backend stores messages within the request object
+        request = json_store.find_by_id("requests", request_id)
+        if not request:
+            return []
+        return request.get("conversation_history", [])
+
+    def create(self, data: dict) -> Dict[str, Any]:
+        # JSON backend stores messages within the request object
+        request_id = data.get("request_id")
+        if not request_id:
+            raise ValueError("request_id is required")
+        
+        request = json_store.find_by_id("requests", request_id)
+        if not request:
+            raise ValueError(f"Request {request_id} not found")
+        
+        conversation_history = request.get("conversation_history", [])
+        conversation_history.append(data)
+        json_store.update_record("requests", request_id, {"conversation_history": conversation_history})
+        return data
+
+    def delete_by_request(self, request_id: str) -> None:
+        # JSON backend stores messages within the request object
+        request = json_store.find_by_id("requests", request_id)
+        if request:
+            json_store.update_record("requests", request_id, {"conversation_history": []})
+
+
+class JSONNotificationRepository(BaseNotificationRepository):
+    def list_by_request(self, request_id: str) -> List[Dict[str, Any]]:
+        # JSON backend stores notifications within the request object
+        request = json_store.find_by_id("requests", request_id)
+        if not request:
+            return []
+        return request.get("notifications_sent", [])
+
+    def create(self, data: dict) -> Dict[str, Any]:
+        # JSON backend stores notifications within the request object
+        request_id = data.get("request_id")
+        if not request_id:
+            raise ValueError("request_id is required")
+        
+        request = json_store.find_by_id("requests", request_id)
+        if not request:
+            raise ValueError(f"Request {request_id} not found")
+        
+        notifications_sent = request.get("notifications_sent", [])
+        notifications_sent.append(data)
+        json_store.update_record("requests", request_id, {"notifications_sent": notifications_sent})
+        return data
+
+    def delete_by_request(self, request_id: str) -> None:
+        # JSON backend stores notifications within the request object
+        request = json_store.find_by_id("requests", request_id)
+        if request:
+            json_store.update_record("requests", request_id, {"notifications_sent": []})

@@ -154,3 +154,31 @@ class BaseRequestRepository(ABC):
         assigned_by: Optional[str] = None,
     ) -> None:
         """Record a vendor assignment in the request_assignments table (no-op for JSON)."""
+
+
+class BaseConversationMessageRepository(ABC):
+    @abstractmethod
+    def list_by_request(self, request_id: str) -> List[Dict[str, Any]]:
+        pass
+
+    @abstractmethod
+    def create(self, data: dict) -> Dict[str, Any]:
+        pass
+
+    @abstractmethod
+    def delete_by_request(self, request_id: str) -> None:
+        pass
+
+
+class BaseNotificationRepository(ABC):
+    @abstractmethod
+    def list_by_request(self, request_id: str) -> List[Dict[str, Any]]:
+        pass
+
+    @abstractmethod
+    def create(self, data: dict) -> Dict[str, Any]:
+        pass
+
+    @abstractmethod
+    def delete_by_request(self, request_id: str) -> None:
+        pass
