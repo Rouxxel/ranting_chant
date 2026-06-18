@@ -134,7 +134,7 @@ async def create_property(request: Request, body: PropertyCreatePayload, current
     """Create a property record for manager/owner workflows."""
     try:
         record = body.model_dump(exclude={"representative"})
-        record["id"] = f"property_{uuid.uuid4().hex[:8]}"
+        record["id"] = str(uuid.uuid4())
         record["representative"] = _build_representative(
             body.manager_id,
             body.owner_id,
@@ -249,3 +249,47 @@ async def update_property(request: Request, property_id: str, body: PropertyUpda
     except Exception as e:
         log_handler.error(f"[properties_router] Unexpected error updating property '{property_id}': {e}")
         raise HTTPException(status_code=500, detail="Internal server error while updating property")
+
+
+#Soft-delete a property (manager/owner action)
+@router.delete(config_loader['endpoints']['properties_endpoint']['detail_route'])
+@SlowLimiter.limit(
+    f"{config_loader['endpoints']['properties_endpoint']['request_limit']}/"
+    f"{config_loader['endpoints']['properties_endpoint']['unit_of_time_for_limit']}"
+)
+async def delete_property(request: Request, property_id: str, current_actor: dict = Depends(require_manager_or_owner)):
+    """
+    Soft-delete a property record.
+
+    Sets is_active=False and deleted_at on the property row. The property's
+    units, tenants, and request history are preserved.
+
+    Parameters:
+        request (Request): The incoming HTTP request for rate limit tracking.
+        property_id (str): The unique identifier of the property to remove.
+
+    Returns:
+        dict: The property record as it was before deletion.
+
+    Raises:
+        HTTPException 404: If no property with the given ID exists.
+        HTTPException 500: If an unexpected error occurs during deletion.
+    """
+    try:
+        log_handler.debug(f"[properties_router] Soft-deleting property with id='{property_id}'")
+        db = get_database_service()
+        existing = db.properties.find_by_id(property_id)
+        if not existing:
+            message = f"Property '{property_id}' not found"
+            log_handler.warning(message)
+            raise HTTPException(status_code=404, detail=message)
+
+        deleted = db.properties.delete(property_id)
+        log_handler.info(f"[properties_router] Property '{property_id}' deleted successfully")
+        return deleted
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        log_handler.error(f"[properties_router] Unexpected error deleting property '{property_id}': {e}")
+        raise HTTPException(status_code=500, detail="Internal server error while deleting property")

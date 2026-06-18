@@ -104,7 +104,7 @@ async def create_vendor(request: Request, body: VendorCreatePayload, current_act
         validate_phone_format(body.phone)
 
         record = body.model_dump()
-        record["id"] = f"vendor_{uuid.uuid4().hex[:8]}"
+        record["id"] = str(uuid.uuid4())
 
         db = get_database_service()
         created = db.vendors.create(record)
