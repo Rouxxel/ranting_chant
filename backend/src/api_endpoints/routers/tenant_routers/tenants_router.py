@@ -152,7 +152,7 @@ async def create_tenant(request: Request, body: TenantCreatePayload, current_act
         if body.phone is not None:
             validate_phone_format(body.phone)
 
-        tenant_id = f"tenant_{uuid.uuid4().hex[:8]}"
+        tenant_id = str(uuid.uuid4())
         _sync_property_tenant_ids(tenant_id, None, body.property_id)
 
         record = body.model_dump()
