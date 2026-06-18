@@ -334,6 +334,18 @@ CREATE POLICY "Owners and managers can update related tenant actors"
         )
     );
 
+-- Owners and managers can update vendor contact records
+CREATE POLICY "Owners and managers can update vendor actors"
+    ON actors FOR UPDATE
+    USING (
+        type = 'vendor'
+        AND current_actor_is_manager_or_owner()
+    )
+    WITH CHECK (
+        type = 'vendor'
+        AND current_actor_is_manager_or_owner()
+    );
+
 -- ============================================================================
 -- USER ACCOUNTS TABLE POLICIES
 -- ============================================================================
