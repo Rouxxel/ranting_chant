@@ -16,7 +16,7 @@ lookup by manager ID.
 from typing import Optional
 
 #Third-party imports
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 
 #Other files imports

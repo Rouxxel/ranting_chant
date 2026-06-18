@@ -17,7 +17,7 @@ from typing import Optional
 import uuid
 
 #Third-party imports
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
 #Other files imports
