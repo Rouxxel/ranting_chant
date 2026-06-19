@@ -88,6 +88,10 @@ function LoginPage() {
         localStorage.setItem('auth_refresh_token', result.refresh_token);
       }
 
+      // Clear tenant data when logging in as manager/owner
+      localStorage.removeItem('current_tenant');
+      setCurrentTenant(null);
+
       // Persist actor + role synchronously so route guard passes on first navigation
       localStorage.setItem('current_manager', JSON.stringify(result.actor));
       localStorage.setItem('user_role', result.role);
@@ -149,6 +153,18 @@ function LoginPage() {
               <button type="submit" className="glossy-btn mt-2 px-4 py-2.5 text-sm" disabled={isLoading}>
                 {isLoading ? "Signing in..." : "Enter Dashboard"}
               </button>
+              <div className="text-center">
+                <p className="text-color-black text-xs">
+                  No account? {" "}
+                  <button
+                    type="button"
+                    onClick={() => navigate({ to: "/signup" })}
+                    className="text-color-black text-xs underline"
+                  >
+                    Sign up
+                  </button>
+                </p>
+              </div>
             </form>
           </TabsContent>
         </Tabs>

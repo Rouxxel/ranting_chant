@@ -1,11 +1,21 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
 import { Logo } from "@/components/Logo";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { signupManager, signupOwner } from "@/services/api";
 import { User, Building2, Mail, Lock, UserCircle, Phone, CheckCircle, AlertCircle, ArrowLeft } from "lucide-react";
 
 export const Route = createFileRoute("/signup")({
+  beforeLoad: () => {
+    // Redirect authenticated users away from sign-up page
+    const token = localStorage.getItem('auth_token');
+    const currentManager = localStorage.getItem('current_manager');
+    const userRole = localStorage.getItem('user_role');
+
+    if (token && (currentManager || userRole)) {
+      throw redirect({ to: "/management" as any });
+    }
+  },
   head: () => ({ meta: [{ title: "Ranting Chant — Sign Up" }] }),
   component: SignupPage,
 });
@@ -108,7 +118,7 @@ function SignupPage() {
 
       setSuccess(true);
     } catch (err: unknown) {
-      const isAxiosError = (e: unknown): e is { response?: { data?: { detail?: string } } } =>
+      const isAxiosError = (e: unknown): e is { response?: { data?: { detail?: string }; status?: number } } =>
         typeof e === "object" && e !== null && "response" in e;
 
       if (isAxiosError(err) && err.response?.data?.detail) {
@@ -413,11 +423,11 @@ function SignupPage() {
         </Tabs>
 
         <div className="mt-6 text-center">
-          <p className="text-ranting-muted text-xs">
+          <p className="text-color-black text-xs">
             Already have an account?{" "}
             <button
               onClick={() => navigate({ to: "/" })}
-              className="text-ranting-sky hover:underline"
+              className="text-color-blue underline"
             >
               Sign In
             </button>

@@ -15,6 +15,7 @@ import { Route as RequestsRouteImport } from './routes/requests'
 import { Route as ChatRouteImport } from './routes/chat'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as SignupRouteImport } from './routes/signup'
 import type { getRouter } from './router.tsx'
 import type { startInstance } from './start.ts'
 declare module '@tanstack/react-start' {
@@ -55,6 +56,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -62,6 +68,7 @@ export interface FileRoutesByFullPath {
   '/management': typeof ManagementRoute
   '/profile': typeof ProfileRoute
   '/requests': typeof RequestsRoute
+  '/signup': typeof SignupRoute
   '/vendors': typeof VendorsRoute
 }
 export interface FileRoutesByTo {
@@ -70,6 +77,7 @@ export interface FileRoutesByTo {
   '/management': typeof ManagementRoute
   '/profile': typeof ProfileRoute
   '/requests': typeof RequestsRoute
+  '/signup': typeof SignupRoute
   '/vendors': typeof VendorsRoute
 }
 export interface FileRoutesById {
@@ -79,14 +87,15 @@ export interface FileRoutesById {
   '/management': typeof ManagementRoute
   '/profile': typeof ProfileRoute
   '/requests': typeof RequestsRoute
+  '/signup': typeof SignupRoute
   '/vendors': typeof VendorsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/chat' | '/management' | '/profile' | '/requests' | '/vendors'
+  fullPaths: '/' | '/chat' | '/management' | '/profile' | '/requests' | '/signup' | '/vendors'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/chat' | '/management' | '/profile' | '/requests' | '/vendors'
-  id: '__root__' | '/' | '/chat' | '/management' | '/profile' | '/requests' | '/vendors'
+  to: '/' | '/chat' | '/management' | '/profile' | '/requests' | '/signup' | '/vendors'
+  id: '__root__' | '/' | '/chat' | '/management' | '/profile' | '/requests' | '/signup' | '/vendors'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -95,6 +104,7 @@ export interface RootRouteChildren {
   ManagementRoute: typeof ManagementRoute
   ProfileRoute: typeof ProfileRoute
   RequestsRoute: typeof RequestsRoute
+  SignupRoute: typeof SignupRoute
   VendorsRoute: typeof VendorsRoute
 }
 
@@ -105,6 +115,13 @@ declare module '@tanstack/react-router' {
       path: '/vendors'
       fullPath: '/vendors'
       preLoaderRoute: typeof VendorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/requests': {
@@ -151,6 +168,7 @@ const rootRouteChildren: RootRouteChildren = {
   ManagementRoute: ManagementRoute,
   ProfileRoute: ProfileRoute,
   RequestsRoute: RequestsRoute,
+  SignupRoute: SignupRoute,
   VendorsRoute: VendorsRoute,
 }
 export const routeTree = rootRouteImport

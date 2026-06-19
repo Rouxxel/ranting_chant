@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState, useEffect } from "react";
+import { RefreshCw } from "lucide-react";
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { RequestTable } from "@/components/RequestTable";
 import { RequestDetailPanel } from "@/components/RequestDetailPanel";
@@ -43,6 +44,7 @@ function ManagementPage() {
   const [propertyF, setPropertyF] = useState<string>("all");
   const [selected, setSelected] = useState<Request | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const filterForManager = (allRequests: Request[]) =>
     allRequests.filter(r => {
@@ -76,6 +78,20 @@ function ManagementPage() {
 
     loadRequests();
   }, [currentManager, requestsCacheKey]);
+
+  const handleReload = async () => {
+    setIsRefreshing(true);
+    try {
+      const allRequests = await getRequests();
+      const filtered = filterForManager(allRequests);
+      localStorage.setItem(requestsCacheKey, JSON.stringify(filtered));
+      setRows(filtered);
+    } catch (error) {
+      console.error("Failed to reload requests:", error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const properties = useMemo(() => Array.from(new Set(rows.map((r) => r.property))), [rows]);
 
@@ -153,11 +169,22 @@ function ManagementPage() {
         {activeTab === "requests" && (
           <>
             {/* Stats */}
-            <div className="mb-5 grid grid-cols-2 gap-4 md:grid-cols-4">
-              <StatCard label="Total Requests" value={stats.total} accent="sky" />
-              <StatCard label="Escalated" value={stats.escalated} accent="red" />
-              <StatCard label="Pending Approval" value={stats.pendingApproval} accent="purple" />
-              <StatCard label="Resolved" value={stats.resolved} accent="green" />
+            <div className="mb-5 flex items-center justify-between">
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                <StatCard label="Total Requests" value={stats.total} accent="sky" />
+                <StatCard label="Escalated" value={stats.escalated} accent="red" />
+                <StatCard label="Pending Approval" value={stats.pendingApproval} accent="purple" />
+                <StatCard label="Resolved" value={stats.resolved} accent="green" />
+              </div>
+              <button
+                onClick={handleReload}
+                disabled={isRefreshing}
+                className="glossy-btn-ghost inline-flex items-center gap-2 px-4 py-2.5 text-sm disabled:opacity-60"
+                title="Reload requests from the server"
+              >
+                <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+                {isRefreshing ? "Reloading..." : "Reload"}
+              </button>
             </div>
 
             {/* Filters */}

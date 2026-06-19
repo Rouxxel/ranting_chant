@@ -106,11 +106,31 @@ async def list_requests(
         if tenant_id:
             log_handler.debug(f"[requests_router] Listing requests filtered by tenant_id='{tenant_id}'")
             results = db.requests.find_by_field("requester_id", tenant_id)
+            # Populate tenant_name and resolved_by_name for each request
+            for req in results:
+                if req.get("requester_id"):
+                    tenant = db.tenants.find_by_id(req["requester_id"])
+                    if tenant:
+                        req["tenant_name"] = tenant.get("name", "Tenant")
+                if req.get("resolved_by"):
+                    resolver = db.actors.find_by_id(req["resolved_by"])
+                    if resolver:
+                        req["resolved_by_name"] = resolver.get("display_name", "Unknown")
             log_handler.info(f"[requests_router] Found {len(results)} request(s) for tenant '{tenant_id}'")
             return results
 
         log_handler.debug(f"[requests_router] Listing all requests")
         requests = db.requests.list()
+        # Populate tenant_name and resolved_by_name for each request
+        for req in requests:
+            if req.get("requester_id"):
+                tenant = db.tenants.find_by_id(req["requester_id"])
+                if tenant:
+                    req["tenant_name"] = tenant.get("name", "Tenant")
+            if req.get("resolved_by"):
+                resolver = db.actors.find_by_id(req["resolved_by"])
+                if resolver:
+                    req["resolved_by_name"] = resolver.get("display_name", "Unknown")
         log_handler.info(f"[requests_router] Returning {len(requests)} request(s)")
         return requests
 
