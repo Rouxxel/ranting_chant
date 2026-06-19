@@ -416,8 +416,10 @@ CREATE POLICY "Managers can create vendors"
     WITH CHECK (
         EXISTS (
             SELECT 1
-            FROM property_managers pm
-            WHERE pm.id = current_actor_id()
+            FROM actors a
+            WHERE a.id = current_actor_id()
+            AND a.type IN ('owner', 'manager')
+            AND a.is_active = true
         )
     );
 
@@ -469,8 +471,7 @@ CREATE POLICY "Owners and managers can update related properties"
 CREATE POLICY "Owners and managers can create properties"
     ON properties FOR INSERT
     WITH CHECK (
-        current_actor_is_manager_or_owner()
-        AND created_by = current_actor_id()
+        created_by = current_actor_id()
     );
 
 -- ============================================================================
@@ -679,6 +680,20 @@ CREATE POLICY "Owners and managers can update related property requests"
             WHERE t.id = requests.requester_id
             AND actor_can_manage_property(u.property_id, current_actor_id())
         )
+    );
+
+-- Tenants can create requests for themselves
+CREATE POLICY "Tenants can create requests for themselves"
+    ON requests FOR INSERT
+    WITH CHECK (
+        requester_id = current_actor_id()
+    );
+
+-- Owners and managers can create requests for properties they manage
+CREATE POLICY "Owners and managers can create requests for related properties"
+    ON requests FOR INSERT
+    WITH CHECK (
+        actor_can_manage_property(property_id, current_actor_id())
     );
 
 -- ============================================================================
