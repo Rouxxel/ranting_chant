@@ -574,6 +574,16 @@ export const refreshToken = async () => {
   return response.data;
 };
 
+export const forgotPassword = async (email: string) => {
+  const response = await apiClient.post('/auth/forgot-password', { email });
+  return response.data;
+};
+
+export const resetPassword = async (token: string, password: string) => {
+  const response = await apiClient.post('/auth/reset-password', { token, password });
+  return response.data;
+};
+
 // ==================== Export API client for custom requests ====================
 
 export default apiClient;

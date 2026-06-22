@@ -32,6 +32,13 @@ class LoginRequest(BaseModel):
     identifier: str  # Can be email OR username
     password: str
 
+class ForgotPasswordRequest(BaseModel):
+    email: str
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    password: str
+
 class AuthResponse(BaseModel):
     access_token: str
     refresh_token: Optional[str] = None
@@ -163,6 +170,56 @@ async def login(request: Request, credentials: LoginRequest) -> AuthResponse:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid credentials"
+        )
+
+
+@router.post("/forgot-password")
+@SlowLimiter.limit("5/minute")
+async def forgot_password(request: Request, body: ForgotPasswordRequest):
+    """
+    Send a password reset email to the user.
+    """
+    log_handler.info(f"[auth] Password reset request for email: {body.email}")
+
+    try:
+        # Send password reset email via Supabase
+        # Note: redirect_to parameter is not supported in Python client
+        # Configure redirect URL in Supabase Dashboard: Authentication > URL Configuration
+        supabase_client.auth.reset_password_for_email(body.email)
+
+        log_handler.info(f"[auth] Password reset email sent to: {body.email}")
+        return {"message": "Password reset email sent if the email exists"}
+
+    except Exception as e:
+        log_handler.error(f"[auth] Password reset failed: {e}")
+        # Always return success to prevent email enumeration
+        return {"message": "Password reset email sent if the email exists"}
+
+
+@router.post("/reset-password")
+async def reset_password(request: Request, body: ResetPasswordRequest):
+    """
+    Reset the user's password using the access token from the email link.
+    """
+    log_handler.info(f"[auth] Password reset attempt")
+
+    try:
+        # Set the access token to authenticate the user
+        supabase_client.auth.set_session(body.token, "")
+
+        # Update the user's password
+        supabase_client.auth.update_user({
+            "password": body.password
+        })
+
+        log_handler.info(f"[auth] Password reset successful")
+        return {"message": "Password reset successful"}
+
+    except Exception as e:
+        log_handler.error(f"[auth] Password reset failed: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired token"
         )
 
 
