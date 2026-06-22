@@ -484,13 +484,18 @@ class SupabaseRequestRepository(BaseRequestRepository):
         raw_notifs = row.get("notifications", []) or []
         for n in sorted(raw_notifs, key=lambda x: x.get("created_at") or ""):
             recipient_str = ""
-            recipient_actor = n.get("actors")
-            if recipient_actor:
-                if n.get("type") == "email":
-                    recipient_str = recipient_actor.get("email") or recipient_actor.get("display_name") or ""
-                else:
-                    recipient_str = recipient_actor.get("phone") or recipient_actor.get("display_name") or ""
+            recipient_actor_id = n.get("recipient_actor_id")
+            if recipient_actor_id:
+                # Fetch actor details to get email/phone
+                actor_res = self.supabase.table("actors").select("email, phone, display_name").eq("id", recipient_actor_id).execute()
+                if actor_res.data:
+                    recipient_actor = actor_res.data[0]
+                    if n.get("type") == "email":
+                        recipient_str = recipient_actor.get("email") or recipient_actor.get("display_name") or ""
+                    else:
+                        recipient_str = recipient_actor.get("phone") or recipient_actor.get("display_name") or ""
             notifs.append({
+                "id": n.get("id"),
                 "type": n.get("type"),
                 "recipient": recipient_str,
                 "status": n.get("status"),
@@ -520,6 +525,7 @@ class SupabaseRequestRepository(BaseRequestRepository):
             "resolved_at": row.get("resolved_at"),
             "resolved_by": row.get("resolved_by"),
             "resolution_note": row.get("resolution_note"),
+            "tenant_name": row.get("tenants", {}).get("display_name") if row.get("tenants") else None,
         }
 
     def list(self) -> List[Dict[str, Any]]:
