@@ -6,9 +6,9 @@ export function AeroBackground() {
       {/* Base photo: sky / clouds / city / grass */}
       <div
         className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: "url('/src/public/aero_wallpaper.jpg')" }}
-        //style={{ backgroundImage: "url('/src/public/aero_wallpaper_2.jpg')" }}
-        //style={{ backgroundImage: "url('/src/public/asadal_stock_33.jpg')" }}
+        style={{ backgroundImage: "url('/aero_wallpaper.jpg')" }}
+        //style={{ backgroundImage: "url('/aero_wallpaper_2.jpg')" }}
+        //style={{ backgroundImage: "url('/asadal_stock_33.jpg')" }}
       />
       {/* Soft sky tint to unify with palette */}
       <div
