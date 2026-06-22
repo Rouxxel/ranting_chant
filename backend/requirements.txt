@@ -14,6 +14,6 @@ faster-whisper==1.2.1
 huggingface_hub==1.16.1
 python-multipart==0.0.26
 gradium==0.5.12
-supabase==2.10.0
+supabase>=2.15.0
 psycopg2-binary==2.9.10
 phonenumbers==9.0.31
