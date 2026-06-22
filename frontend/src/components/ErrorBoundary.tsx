@@ -23,7 +23,6 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: any) {
     console.error('ErrorBoundary caught an error:', error, errorInfo)
-    // TODO: Send error to logging service
   }
 
   handleReset = () => {
