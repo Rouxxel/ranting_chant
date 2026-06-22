@@ -149,6 +149,7 @@ function LoginPage() {
             <form onSubmit={managerSubmit} className="flex flex-col gap-3">
               <input className="aero-input px-3.5 py-2.5 text-sm" placeholder="Email" value={mIdentifier} onChange={(e) => setMIdentifier(e.target.value)} disabled={isLoading} autoComplete="username" />
               <input className="aero-input px-3.5 py-2.5 text-sm" type="password" placeholder="Password" value={mPassword} onChange={(e) => setMPassword(e.target.value)} disabled={isLoading} autoComplete="current-password" />
+              {/* TODO: Disabled until database is correctly configured
               <div className="text-right">
                 <button
                   type="button"
@@ -158,6 +159,7 @@ function LoginPage() {
                   Forgot password?
                 </button>
               </div>
+              */}
               {err && <p className="text-xs text-red-300">{err}</p>}
               <button type="submit" className="glossy-btn mt-2 px-4 py-2.5 text-sm" disabled={isLoading}>
                 {isLoading ? "Signing in..." : "Enter Dashboard"}
