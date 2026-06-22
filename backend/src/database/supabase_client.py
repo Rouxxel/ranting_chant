@@ -95,27 +95,26 @@ def get_supabase_client() -> SupabaseClient:
 
 
 # ---------------------------------------------------------------------------
-# User-scoped client factory
+# Auth-only client factory
 # ---------------------------------------------------------------------------
 
-def get_user_client(access_token: str) -> Client:
+def get_auth_client() -> Client:
     """
-    Create a Supabase client scoped to a specific user JWT.
+    Create a fresh Supabase client using the **anon key** for auth-only operations.
 
-    This client uses the **anon key** combined with the user's access token
-    so that Supabase applies Row Level Security policies based on the
-    authenticated user's identity (``auth.uid()``).
+    This client is intentionally NOT a singleton — it is created fresh for each
+    use so that ``auth.sign_in_with_password``, ``auth.sign_out``,
+    ``auth.refresh_session``, and ``auth.get_user`` calls never mutate the
+    shared service-role client's internal session state.
 
-    Args:
-        access_token: A valid Supabase access token (JWT) obtained from
-                      ``/auth/login`` or ``/auth/refresh``.
+    The service-role client (``get_supabase_client()``) must never be used for
+    auth operations; doing so would replace its internal JWT with the user's
+    token and cause all subsequent table operations to run under RLS instead
+    of bypassing it.
 
     Returns:
-        A ``supabase.Client`` with the user's JWT set in the auth headers.
+        A ``supabase.Client`` backed by the anon key with no session set.
     """
     url = _require_env("SUPABASE_URL")
     anon_key = _require_env("SUPABASE_ANON_KEY")
-    client = create_client(url, anon_key)
-    client.auth.set_session(access_token, "")
-    log_handler.debug("[supabase_client] User-scoped client created")
-    return client
+    return create_client(url, anon_key)

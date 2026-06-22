@@ -25,7 +25,7 @@ from pydantic import BaseModel
 from src.utils.custom_logger import log_handler
 from src.utils.limiter import limiter as SlowLimiter
 from src.core_specs.configuration.config_loader import config_loader
-from src.database.supabase_client import get_supabase_client
+from src.database.supabase_client import get_supabase_client, get_auth_client
 
 """PYDANTIC MODELS-----------------------------------------------------------"""
 class LoginRequest(BaseModel):
@@ -53,7 +53,7 @@ router = APIRouter(
 )
 
 security = HTTPBearer()
-supabase_client = get_supabase_client()
+supabase_client = get_supabase_client()  # service-role client for data reads only
 
 """ENDPOINTS-----------------------------------------------------------"""
 @router.post(config_loader['endpoints']['auth_endpoint']['login_route'])
