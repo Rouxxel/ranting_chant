@@ -1,0 +1,11 @@
+[
+  {
+    "id": "owner_crud_001",
+    "name": "CRUD Owner",
+    "email": "owner@gmail.com",
+    "phone": "+16505555555",
+    "owned_properties": [
+      "property_crud_001"
+    ]
+  }
+]

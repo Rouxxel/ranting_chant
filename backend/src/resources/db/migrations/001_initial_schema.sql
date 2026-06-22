@@ -42,11 +42,14 @@ CREATE TYPE request_type AS ENUM (
 
 CREATE TYPE property_type AS ENUM (
     'apartment_building',
-    'loft_building',
-    'modern_apartment_complex',
+    'condominium',
     'single_family_home',
     'townhouse',
-    'condominium'
+    'commercial',
+    'mixed_use',
+    'industrial',
+    'retail',
+    'office'
 );
 
 CREATE TYPE notification_type AS ENUM ('email', 'sms');

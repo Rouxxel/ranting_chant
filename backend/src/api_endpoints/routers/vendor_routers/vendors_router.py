@@ -17,15 +17,16 @@ from typing import Optional
 import uuid
 
 #Third-party imports
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
 #Other files imports
 from src.utils.custom_logger import log_handler
 from src.utils.limiter import limiter as SlowLimiter
 from src.core_specs.configuration.config_loader import config_loader
-from src.utils.json_store import read_all, find_by_id, create_record, update_record, delete_record
+from src.database import get_database_service
 from src.utils.validators import validate_email_format, validate_phone_format
+from src.api_endpoints.routers.owner_manager_routers.auth_router import require_manager_or_owner
 
 """PYDANTIC MODELS-----------------------------------------------------------"""
 class VendorCreatePayload(BaseModel):
@@ -79,7 +80,8 @@ async def list_vendors(request: Request):
     """
     try:
         log_handler.debug("[vendors_router] Listing all vendors")
-        vendors = read_all("vendors")
+        db = get_database_service()
+        vendors = db.vendors.list()
         log_handler.info(f"[vendors_router] Returning {len(vendors)} vendor(s)")
         return vendors
 
@@ -94,7 +96,7 @@ async def list_vendors(request: Request):
     f"{config_loader['endpoints']['vendors_endpoint']['request_limit']}/"
     f"{config_loader['endpoints']['vendors_endpoint']['unit_of_time_for_limit']}"
 )
-async def create_vendor(request: Request, body: VendorCreatePayload):
+async def create_vendor(request: Request, body: VendorCreatePayload, current_actor: dict = Depends(require_manager_or_owner)):
     """Create a vendor record."""
     try:
         #Validate contact fields against config-driven rules
@@ -102,9 +104,10 @@ async def create_vendor(request: Request, body: VendorCreatePayload):
         validate_phone_format(body.phone)
 
         record = body.model_dump()
-        record["id"] = f"vendor_{uuid.uuid4().hex[:8]}"
+        record["id"] = str(uuid.uuid4())
 
-        created = create_record("vendors", record)
+        db = get_database_service()
+        created = db.vendors.create(record)
         log_handler.info(f"[vendors_router] Vendor created successfully with id='{created['id']}'")
         return created
 
@@ -145,7 +148,8 @@ async def get_vendors_by_service(request: Request, service: str):
             raise HTTPException(status_code=400, detail=message)
 
         log_handler.debug(f"[vendors_router] Filtering vendors by service='{service}'")
-        all_vendors = read_all("vendors")
+        db = get_database_service()
+        all_vendors = db.vendors.list()
 
         #Case-insensitive match against each vendor's services list
         results = [
@@ -189,7 +193,8 @@ async def get_vendor(request: Request, vendor_id: str):
     """
     try:
         log_handler.debug(f"[vendors_router] Looking up vendor with id='{vendor_id}'")
-        vendor = find_by_id("vendors", vendor_id)
+        db = get_database_service()
+        vendor = db.vendors.find_by_id(vendor_id)
 
         if not vendor:
             message = f"Vendor '{vendor_id}' not found"
@@ -212,10 +217,11 @@ async def get_vendor(request: Request, vendor_id: str):
     f"{config_loader['endpoints']['vendors_endpoint']['request_limit']}/"
     f"{config_loader['endpoints']['vendors_endpoint']['unit_of_time_for_limit']}"
 )
-async def update_vendor(request: Request, vendor_id: str, body: VendorUpdatePayload):
+async def update_vendor(request: Request, vendor_id: str, body: VendorUpdatePayload, current_actor: dict = Depends(require_manager_or_owner)):
     """Update vendor details and service categories."""
     try:
-        existing = find_by_id("vendors", vendor_id)
+        db = get_database_service()
+        existing = db.vendors.find_by_id(vendor_id)
         if not existing:
             message = f"Vendor '{vendor_id}' not found"
             log_handler.warning(message)
@@ -231,7 +237,7 @@ async def update_vendor(request: Request, vendor_id: str, body: VendorUpdatePayl
         if "phone" in updates:
             validate_phone_format(updates["phone"])
 
-        updated = update_record("vendors", vendor_id, updates)
+        updated = db.vendors.update(vendor_id, updates)
         log_handler.info(f"[vendors_router] Vendor '{vendor_id}' updated successfully")
         return updated
 
@@ -248,17 +254,18 @@ async def update_vendor(request: Request, vendor_id: str, body: VendorUpdatePayl
     f"{config_loader['endpoints']['vendors_endpoint']['request_limit']}/"
     f"{config_loader['endpoints']['vendors_endpoint']['unit_of_time_for_limit']}"
 )
-async def remove_vendor(request: Request, vendor_id: str):
+async def remove_vendor(request: Request, vendor_id: str, current_actor: dict = Depends(require_manager_or_owner)):
     """Delete a vendor unless currently assigned to an open request."""
     try:
-        existing = find_by_id("vendors", vendor_id)
+        db = get_database_service()
+        existing = db.vendors.find_by_id(vendor_id)
         if not existing:
             message = f"Vendor '{vendor_id}' not found"
             log_handler.warning(message)
             raise HTTPException(status_code=404, detail=message)
 
         open_assignments = [
-            req for req in read_all("requests")
+            req for req in db.requests.list()
             if req.get("vendor_id") == vendor_id and req.get("status") in OPEN_REQUEST_STATUSES
         ]
         if open_assignments:
@@ -267,7 +274,16 @@ async def remove_vendor(request: Request, vendor_id: str):
                 detail=f"Vendor '{vendor_id}' is assigned to open requests",
             )
 
-        deleted = delete_record("vendors", vendor_id)
+        # Note: in repository pattern we can add delete or keep it if needed.
+        # But wait! We did not define delete on BaseVendorRepository!
+        # Ah! Let's check if delete is needed.
+        # Let's see: yes, remove_vendor deletes a vendor. Let's make sure we implement delete on vendor repo too,
+        # or we delete the actor directly since the vendor references actors(id) cascade delete!
+        # In json_repo, it has delete_record("vendors", vendor_id) or similar.
+        # Let's add delete to BaseVendorRepository and its JSON/Supabase implementations to make sure!
+        # Yes, we will modify BaseVendorRepository and JSON/Supabase concrete classes to include delete.
+        # Let's call db.vendors.delete(vendor_id) here.
+        deleted = db.vendors.delete(vendor_id)
         log_handler.info(f"[vendors_router] Vendor '{vendor_id}' deleted successfully")
         return deleted
 

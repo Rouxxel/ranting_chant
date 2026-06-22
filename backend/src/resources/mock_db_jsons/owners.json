@@ -1,37 +1,37 @@
 [
   {
-    "id": "owner_001",
+    "id": "943c73d1-ceda-5578-abb0-db914d931f46",
     "name": "John Owner",
     "email": "johnowner@gmail.com",
     "phone": "+14155552673",
-    "owned_properties": ["property_001"]
+    "owned_properties": ["7c76dd08-6949-55f2-a211-9d7a342b8a7d"]
   },
   {
-    "id": "owner_002",
+    "id": "078b51eb-4966-5e7f-8eae-d5151b79032e",
     "name": "Michael Sterling",
     "email": "michael.sterling@gmail.com",
     "phone": "+14155552673",
-    "owned_properties": ["property_002"]
+    "owned_properties": ["401c94a1-6f14-52ac-a9bb-cfa4b2f60c34"]
   },
   {
-    "id": "owner_003",
+    "id": "2089cded-11ce-5f91-99ed-df5af744494f",
     "name": "Olivia Bennett",
     "email": "olivia.bennett@hotmail.com",
     "phone": "+14155552673",
-    "owned_properties": ["property_003"]
+    "owned_properties": ["e9ef9ad0-0c28-5c81-aeb7-d5089542b6af"]
   },
   {
-    "id": "owner_004",
+    "id": "20616874-23e7-57f1-a558-b935495d6d5b",
     "name": "Robert Hayes",
     "email": "hayesrobert@gmail.com",
     "phone": "+14155552673",
-    "owned_properties": ["property_004"]
+    "owned_properties": ["202f36cc-9314-5de1-9ac8-ac84408c4a62"]
   },
   {
-    "id": "owner_005",
+    "id": "ed84c333-2c85-5ae5-9916-60f4d6c9921b",
     "name": "Sophia Reynolds",
     "email": "sreynolds@gmail.com",
     "phone": "+14155552673",
-    "owned_properties": ["property_005"]
+    "owned_properties": ["3f5a13f0-ca00-5a91-aabd-33cdecf388e2"]
   }
 ]

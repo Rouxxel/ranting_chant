@@ -1,0 +1,40 @@
+[
+  {
+    "id": "request_crud_001",
+    "requester_id": "tenant_crud_001",
+    "type": "plumbing",
+    "description": "Leaking pipe",
+    "status": "pending",
+    "urgency": "medium",
+    "involved_parties": [
+      "tenant_crud_001"
+    ],
+    "conversation_history": [],
+    "created_at": "2026-01-01T00:00:00+00:00",
+    "updated_at": "2026-01-01T00:00:00+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 0.8,
+    "vendor_id": null,
+    "notifications_sent": []
+  },
+  {
+    "id": "request_crud_002",
+    "requester_id": "tenant_crud_001",
+    "type": "general",
+    "description": "A question",
+    "status": "in_progress",
+    "urgency": "low",
+    "involved_parties": [
+      "tenant_crud_001"
+    ],
+    "conversation_history": [],
+    "created_at": "2026-01-01T00:00:00+00:00",
+    "updated_at": "2026-01-01T00:00:00+00:00",
+    "escalated": false,
+    "sentiment": "neutral",
+    "confidence": 0.5,
+    "vendor_id": "vendor_crud_001",
+    "notifications_sent": []
+  }
+]

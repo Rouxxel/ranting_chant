@@ -1,6 +1,6 @@
 # Ranting Chant Backend
 
-FastAPI backend for Ranting Chant, an AI-assisted property operations platform. The backend owns request intake, request classification, voice services, notification dispatch, MCP-style data tools, and JSON-backed mock persistence. Production-ready PostgreSQL schema definitions live in `src/resources/db/migrations/` (see `src/resources/README.md`).
+FastAPI backend for Ranting Chant, an AI-assisted property operations platform. The backend uses Supabase PostgreSQL as the primary database with Row Level Security (RLS) policies, and JSON-backed mock data as fallback for local development. Production-ready PostgreSQL schema definitions live in `src/resources/db/migrations/` (see `src/resources/README.md`).
 
 ## Features
 
@@ -13,7 +13,8 @@ FastAPI backend for Ranting Chant, an AI-assisted property operations platform. 
 - **MCP-style tools** for property, tenant, vendor, request, and notification workflows.
 - **AI-suggested contacts** for notifications with user confirmation flow.
 - **Request completion endpoint** with optional resolution note stored separately.
-- **JSON mock data store** with per-collection locking (current runtime persistence).
+- **Supabase PostgreSQL database** as primary persistence with RLS policies.
+- **JSON mock data store** as fallback for local development.
 - **PostgreSQL schema** — migrations for entities, units, soft delete, request audit tables, RLS, and seed data.
 - **Rate limiting**, structured logging, Pydantic validation, and Docker support.
 
@@ -123,18 +124,43 @@ The backend includes routers for:
 - **Tenants**: tenant reads, create, update, and profile update
 - **Properties**: property reads, create, and update
 - **Vendors**: vendor reads, create, update, delete, and service-category lookup
-- **Managers**: manager reads and profile update
-- **Owners**: owner reads and profile update
+- **Managers**: manager reads, profile update, and sign-up
+- **Owners**: owner reads, profile update, and sign-up
 - **Requests**: request listing, detail, summary, create, update, cancel, complete, and notification dispatch
 - **Conversation**: AI-powered chat sessions, message processing, history, save-conversation, and send-notifications
 - **Voice**: transcription, voice session start, and voice response
 - **MCP**: tool discovery and MCP-style operations (property, tenant, vendor, request, notification)
+- **Authentication**: login, logout, refresh, and current user endpoints
+
+### Sign-Up Endpoints
+
+The backend provides self-registration endpoints for new managers and owners:
+
+- **POST /managers/signup**: Register a new property manager
+  - Payload: `{ email, password, name, phone?, username? }`
+  - Creates Supabase auth user with email confirmation
+  - Creates actor record with type='manager'
+  - Creates property_manager record
+  - Creates user_accounts mapping
+  - Rate limited: 5 requests per minute
+  - Returns: `{ message, email }`
+
+- **POST /owners/signup**: Register a new property owner
+  - Payload: `{ email, password, name, phone?, username? }`
+  - Creates Supabase auth user with email confirmation
+  - Creates actor record with type='owner'
+  - Creates owner record
+  - Creates user_accounts mapping
+  - Rate limited: 5 requests per minute
+  - Returns: `{ message, email }`
+
+New users start with no property access and must be assigned properties by existing managers/owners or create their own properties.
 
 ## Data & Persistence
 
-The backend currently reads and writes through `src/utils/json_store.py` against `src/resources/mock_db_jsons/`. Routers, MCP tools, and notifications use the denormalized JSON shape (e.g. `tenants.property_id` + `unit`, `properties.tenant_ids`).
+The backend uses Supabase PostgreSQL as the primary database with Row Level Security (RLS) policies. JSON-backed mock data through `src/utils/json_store.py` is available as fallback for local development. Routers, MCP tools, and notifications use the denormalized JSON shape (e.g. `tenants.property_id` + `unit`, `properties.tenant_ids`) which is mapped to the normalized PostgreSQL schema.
 
-PostgreSQL schema for production is defined separately under `src/resources/db/migrations/`:
+PostgreSQL schema is defined under `src/resources/db/migrations/`:
 
 | Migration | Purpose |
 |-----------|---------|
@@ -226,7 +252,7 @@ async def example_endpoint(request: Request):
 - The conversation and classifier prompts are generated from the backend request type definitions.
 - The JSON mock data in `src/resources/mock_db_jsons/requests.json` should always use canonical request type values.
 - The `notifications_sent` field in mock data uses a detailed format: `[{type, recipient, status, timestamp}]` instead of simple ID strings.
-- Backend authentication is not implemented yet; frontend logout is currently client-side only. The `user_accounts` table in `001_initial_schema.sql` is ready for owner/manager Supabase auth integration.
+- Backend authentication uses Supabase Auth for managers/owners with JWT token validation. The `user_accounts` table maps Supabase auth users to application actors.
 - When migrating runtime code from JSON to PostgreSQL, follow `src/resources/README.md` for the canonical schema; do not mirror SQL-only tables (`request_status_history`, `request_assignments`) in mock JSON until the API layer supports them.
 
 ## Google Cloud OAuth Setup (Future)

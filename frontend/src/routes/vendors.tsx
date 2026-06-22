@@ -130,6 +130,12 @@ function VendorListPage() {
       const newVendor = await createVendor(createForm);
       setVendors([...vendors, newVendor]);
       localStorage.setItem('vendors', JSON.stringify([...vendors, newVendor]));
+      // Invalidate all requests cache since vendor changes may affect request data
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('requests_')) {
+          localStorage.removeItem(key);
+        }
+      });
       setIsCreateDialogOpen(false);
       setCreateForm({
         name: "",
@@ -174,6 +180,12 @@ function VendorListPage() {
       const updatedVendor = await updateVendor(selected.id, changes);
       setVendors(vendors.map(v => v.id === selected.id ? updatedVendor : v));
       localStorage.setItem('vendors', JSON.stringify(vendors.map(v => v.id === selected.id ? updatedVendor : v)));
+      // Invalidate all requests cache since vendor changes may affect request data
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('requests_')) {
+          localStorage.removeItem(key);
+        }
+      });
       setSelected(updatedVendor);
       setIsEditDialogOpen(false);
       setEditForm({});
@@ -192,6 +204,12 @@ function VendorListPage() {
       await deleteVendor(vendorToDelete);
       setVendors(vendors.filter(v => v.id !== vendorToDelete));
       localStorage.setItem('vendors', JSON.stringify(vendors.filter(v => v.id !== vendorToDelete)));
+      // Invalidate all requests cache since vendor changes may affect request data
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('requests_')) {
+          localStorage.removeItem(key);
+        }
+      });
       if (selected?.id === vendorToDelete) setSelected(null);
       setIsDeleteDialogOpen(false);
       setVendorToDelete(null);

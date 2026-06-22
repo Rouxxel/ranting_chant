@@ -49,7 +49,6 @@ INSERT INTO actors (id, type, display_name, email, phone, created_at, updated_at
 ('f6e89e70-803d-5763-845c-edf4402dee60', 'tenant'::recipient_type, 'Isabella Anderson', 'isabella.anderson@example.com', '+15558901', NOW(), NOW()),
 ('510cf5de-eea0-5dda-98b0-4ce9dbbc1d29', 'tenant'::recipient_type, 'Ethan Thomas', 'ethan.thomas@example.com', '+15559012', NOW(), NOW()),
 ('d6bdc23b-349c-5314-97ec-adaa065ca11b', 'tenant'::recipient_type, 'Ava Taylor', 'ava.taylor@example.com', '+15550123', NOW(), NOW()),
-('31e4f9be-37c6-5bbd-89aa-747f5db47268', 'tenant'::recipient_type, 'Sebastian Russo', 'sebasruse03@gmail.com', '+15256856658', NOW(), NOW()),
 ('fbb4dc23-6e4a-5ee1-9919-e805f4ded107', 'vendor'::recipient_type, 'QuickFix Locksmith', 'quickfixdispatch@gmail.com', '+14155552673', NOW(), NOW()),
 ('c6566547-c23f-5fdf-9059-f8af17368cd6', 'vendor'::recipient_type, 'AquaFlow Plumbing', 'flowaquasupport@gmail.com', '+14155552673', NOW(), NOW()),
 ('1826caf4-711c-5f17-b943-9bfb98f9b80d', 'vendor'::recipient_type, 'VoltPro Electrical Services', 'voltprocontact@gmail.com', '+14155552673', NOW(), NOW()),

@@ -16,7 +16,7 @@ Ranting Chant is a full-stack property management solution that enables:
 
 The project has two main applications:
 
-- **Backend** (`/backend`) - FastAPI REST API with AI classification, conversation orchestration, voice services, JSON-backed mock data (runtime), PostgreSQL schema definitions (`backend/src/resources/db/migrations/`), MCP-style tools, and notifications.
+- **Backend** (`/backend`) - FastAPI REST API with AI classification, conversation orchestration, voice services, Supabase PostgreSQL database (primary), JSON-backed mock data (fallback), MCP-style tools, and notifications.
 - **Frontend** (`/frontend`) - React 19 + TypeScript app using Vite, TanStack Router, Tailwind v4, shadcn/ui, and a Frutiger Aero design system.
 
 ## Data Flow Workflow
@@ -27,6 +27,7 @@ This is the high-level flow of data through the app, from staff login to request
 Manager/owner login
   -> Supabase Auth verifies email or username-backed email + password
   -> App resolves auth user to an owner/manager actor through user_accounts
+  -> Backend validates JWT token and returns actor profile
   -> Route guards allow access to staff screens
 
 Tenant starts chat
@@ -49,11 +50,11 @@ Tenant sends message
 
 Request is saved or updated
   -> If the user chooses End & Save, frontend calls POST /conversation/save-conversation
-  -> Backend creates a request record in mock JSON storage
+  -> Backend creates a request record in Supabase PostgreSQL
   -> Request stores conversation history, type, urgency, status, escalation state,
      property_id, involved parties, vendor_id, notifications, and summary data
-     (PostgreSQL schema also defines request_attachments, request_status_history,
-     and request_assignments for production use — see backend/src/resources/README.md)
+     (PostgreSQL schema includes request_attachments, request_status_history,
+     and request_assignments — see backend/src/resources/README.md)
   -> Frontend clears cached tenant request data so dashboards refresh
 
 Notifications and vendor routing
@@ -138,14 +139,15 @@ VITE_PROD_BACKEND=https://your-production-backend.example.com
 - MCP-style tools for sending email and SMS notifications via Resend and Twilio.
 - AI-suggested contacts for notifications with user confirmation flow.
 - Request completion endpoint with optional resolution note stored separately.
-- JSON-backed mock data through `json_store` (current runtime persistence).
+- Supabase PostgreSQL database as primary persistence with RLS policies.
+- JSON-backed mock data through `json_store` as fallback for local development.
 - PostgreSQL migrations in `src/resources/db/migrations/` — base schema, RLS, seed data, and production hardening (soft delete, units, audit tables, `user_accounts`).
 - Rate limiting, logging, validation, and Docker support.
 
 ### Frontend
 
-- Login flow for managers and owners; tenants are provisioned by staff rather than self-registering.
-- Authenticated layout with shared header, role-aware navigation, avatar, and client-side logout.
+- Login flow for managers and owners using Supabase Auth with email/password; tenants are provisioned by staff rather than self-registering.
+- Authenticated layout with shared header, role-aware navigation, avatar, and backend logout.
 - Route guards for `/chat`, `/dashboard`, `/management`, `/vendors`, and `/profile`.
 - Tenant chat flow with text and voice input.
 - AI-suggested contacts display with toggles and Send button for notification confirmation.
@@ -269,12 +271,14 @@ For Vercel:
 
 ## Data Model
 
-Runtime APIs use denormalized JSON (`property_id` + `unit` on tenants, `tenant_ids` on properties). The PostgreSQL schema normalizes this for production:
+The backend uses Supabase PostgreSQL as the primary database with Row Level Security (RLS) policies:
 
 - Tenants belong to **units**; property is derived via `tenant → unit → property`
 - Core entities use **soft delete** (`is_active`, `deleted_at`)
 - Requests keep **status history**, **vendor assignment history**, and **file attachments** in dedicated tables
 - `requests.vendor_id` holds the current vendor; `request_assignments` stores full history
+- Manager/owner authentication uses Supabase Auth with `user_accounts` mapping
+- JSON mock data is available as fallback for local development
 
 Apply migrations `001` through `004` in order. Details: `backend/src/resources/README.md`.
 

@@ -50,9 +50,9 @@ VITE_PROD_BACKEND=https://your-production-backend.example.com
 - `src/context/AppContext.tsx` stores `currentTenant`, `currentManager`, and `userRole` in localStorage.
 - `src/components/AuthenticatedLayout.tsx` provides the shared authenticated header with logo, role-aware navigation, avatar, and logout.
 - `src/lib/auth.ts` provides route guards for tenant-only, manager/owner-only, and any-authenticated-user routes.
-- Logout is client-side: it clears the current user plus cached request/vendor keys, then navigates to `/`.
+- Logout calls backend `/auth/logout`, clears auth token and cached request/vendor keys, then navigates to `/`.
 
-Backend authentication is not implemented yet, so protected frontend routes rely on persisted app context.
+Backend authentication uses Supabase Auth for managers/owners with JWT token validation. Protected frontend routes validate the auth token and fetch user profile from `/auth/me`.
 
 ### Routes
 
@@ -246,8 +246,8 @@ src/
 ### Login (`/`)
 
 - Tenant login: name + unit matched against `GET /tenants`
-- Manager/owner login: name matched against `GET /managers` and `GET /owners`
-- Stores current user and role in `AppContext`
+- Manager/owner login: email or username + password via `POST /auth/login` using Supabase Auth
+- Stores auth token and current user profile in `AppContext`
 
 ### Chat (`/chat`)
 

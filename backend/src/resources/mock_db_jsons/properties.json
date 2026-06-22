@@ -1,93 +1,93 @@
 [
   {
-    "id": "property_001",
+    "id": "7c76dd08-6949-55f2-a211-9d7a342b8a7d",
     "name": "Sunset Apartment",
     "address": "Spandauer Damm 10-22, 14059 Berlin, Germany",
     "year_built": 2026,
     "property_type": "apartment_building",
     "unit_count": 21,
-    "owner_id": "owner_001",
-    "manager_id": "manager_001",
+    "owner_id": "943c73d1-ceda-5578-abb0-db914d931f46",
+    "manager_id": "ab7a3be3-4950-50b1-a1b6-6783aa7a4725",
     "tenant_ids": [
-      "tenant_001",
-      "tenant_002",
-      "tenant_009",
-      "tenant_24eb6eef"
+      "b1c4a072-618b-53a2-a16e-d2387c1efa14",
+      "63d3338d-9a5c-5fd2-a51b-d99483e9b25e",
+      "510cf5de-eea0-5dda-98b0-4ce9dbbc1d29",
+      "31e4f9be-37c6-5bbd-89aa-747f5db47268"
     ],
     "representative": {
       "type": "property_manager",
-      "id": "manager_001"
+      "id": "ab7a3be3-4950-50b1-a1b6-6783aa7a4725"
     }
   },
   {
-    "id": "property_002",
+    "id": "401c94a1-6f14-52ac-a9bb-cfa4b2f60c34",
     "name": "Riverbend Residences",
     "address": "Hardenbergpl. 8, 10787 Berlin, Germany",
     "year_built": 2005,
     "property_type": "apartment_building",
     "unit_count": 36,
-    "owner_id": "owner_002",
-    "manager_id": "manager_002",
+    "owner_id": "078b51eb-4966-5e7f-8eae-d5151b79032e",
+    "manager_id": "2fa6c4e0-be26-5f52-bd7f-286d7dd34b80",
     "tenant_ids": [
-      "tenant_003",
-      "tenant_004"
+      "7b668b94-8223-5104-9e69-3d210db1bddb",
+      "5803e546-c51d-50b5-965a-862e45879d09"
     ],
     "representative": {
       "type": "property_manager",
-      "id": "manager_002"
+      "id": "2fa6c4e0-be26-5f52-bd7f-286d7dd34b80"
     }
   },
   {
-    "id": "property_003",
+    "id": "e9ef9ad0-0c28-5c81-aeb7-d5089542b6af",
     "name": "Maple Heights",
     "address": "Pariser Platz, 10117 Berlin, Germany",
     "year_built": 2010,
     "property_type": "apartment_building",
     "unit_count": 18,
-    "owner_id": "owner_003",
-    "manager_id": "manager_003",
+    "owner_id": "2089cded-11ce-5f91-99ed-df5af744494f",
+    "manager_id": "128b8f0f-5f80-5ded-a75d-06936e394c51",
     "tenant_ids": [
-      "tenant_005"
+      "0414e2e5-7f9e-5034-8066-793217eb84c5"
     ],
     "representative": {
       "type": "property_manager",
-      "id": "manager_003"
+      "id": "128b8f0f-5f80-5ded-a75d-06936e394c51"
     }
   },
   {
-    "id": "property_004",
+    "id": "202f36cc-9314-5de1-9ac8-ac84408c4a62",
     "name": "Willow Creek Lofts",
     "address": "Prenzlauer Allee 80, 10405 Berlin, Germany",
     "year_built": 2015,
     "property_type": "loft_building",
     "unit_count": 12,
-    "owner_id": "owner_004",
-    "manager_id": "manager_004",
+    "owner_id": "20616874-23e7-57f1-a558-b935495d6d5b",
+    "manager_id": "197fb109-9e81-5753-a647-a71bdff88efd",
     "tenant_ids": [
-      "tenant_006",
-      "tenant_007",
-      "tenant_008"
+      "3dc7f9be-4c50-5a9b-a1c5-0b7f4c929f4f",
+      "b7df001e-0002-507a-9da9-6ac3c990ba6e",
+      "f6e89e70-803d-5763-845c-edf4402dee60"
     ],
     "representative": {
       "type": "property_manager",
-      "id": "manager_004"
+      "id": "197fb109-9e81-5753-a647-a71bdff88efd"
     }
   },
   {
-    "id": "property_005",
+    "id": "3f5a13f0-ca00-5a91-aabd-33cdecf388e2",
     "name": "Poplar Gardens",
     "address": "Osloer Str. 12, 13359 Berlin, Germany",
     "year_built": 2020,
     "property_type": "modern_apartment_complex",
     "unit_count": 42,
-    "owner_id": "owner_005",
-    "manager_id": "owner_005",
+    "owner_id": "ed84c333-2c85-5ae5-9916-60f4d6c9921b",
+    "manager_id": "ed84c333-2c85-5ae5-9916-60f4d6c9921b",
     "tenant_ids": [
-      "tenant_010"
+      "d6bdc23b-349c-5314-97ec-adaa065ca11b"
     ],
     "representative": {
       "type": "owner",
-      "id": "owner_005"
+      "id": "ed84c333-2c85-5ae5-9916-60f4d6c9921b"
     }
   }
 ]

@@ -1,0 +1,11 @@
+[
+  {
+    "id": "tenant_crud_001",
+    "name": "CRUD Tenant",
+    "email": "crud@gmail.com",
+    "phone": "+16505551111",
+    "address": "1 CRUD St",
+    "unit": "1A",
+    "property_id": "property_crud_001"
+  }
+]

@@ -25,9 +25,7 @@ from pydantic import BaseModel, Field
 from src.utils.custom_logger import log_handler
 from src.utils.limiter import limiter as SlowLimiter
 from src.core_specs.configuration.config_loader import config_loader
-from src.utils.json_store import (
-    read_all, find_by_id, find_by_field, create_record, update_record
-)
+from src.database import get_database_service
 from src.ai.gemini_client import get_client
 from src.models.request import RequestType, normalize_request_type
 
@@ -104,14 +102,15 @@ async def list_requests(
         If the rate limit is exceeded, the rate_limit_handler() handles the response.
     """
     try:
+        db = get_database_service()
         if tenant_id:
             log_handler.debug(f"[requests_router] Listing requests filtered by tenant_id='{tenant_id}'")
-            results = find_by_field("requests", "requester_id", tenant_id)
+            results = db.requests.find_by_field("requester_id", tenant_id)
             log_handler.info(f"[requests_router] Found {len(results)} request(s) for tenant '{tenant_id}'")
             return results
 
         log_handler.debug(f"[requests_router] Listing all requests")
-        requests = read_all("requests")
+        requests = db.requests.list()
         log_handler.info(f"[requests_router] Returning {len(requests)} request(s)")
         return requests
 
@@ -147,7 +146,8 @@ async def get_request_notifications(request: Request, request_id: str):
     """
     try:
         log_handler.debug(f"[requests_router] Fetching notifications for request_id='{request_id}'")
-        req = find_by_id("requests", request_id)
+        db = get_database_service()
+        req = db.requests.find_by_id(request_id)
 
         if not req:
             message = f"Request '{request_id}' not found"
@@ -193,7 +193,8 @@ async def get_request_summary(request: Request, request_id: str):
     """
     try:
         log_handler.debug(f"[requests_router] Generating summary for request_id='{request_id}'")
-        req = find_by_id("requests", request_id)
+        db = get_database_service()
+        req = db.requests.find_by_id(request_id)
 
         if not req:
             message = f"Request '{request_id}' not found"
@@ -250,7 +251,7 @@ async def get_request_summary(request: Request, request_id: str):
             )
 
         # Cache the summary in the request
-        update_record("requests", request_id, {"summary": summary})
+        db.requests.update(request_id, {"summary": summary})
         log_handler.info(f"[requests_router] Successfully generated and cached summary for request '{request_id}'")
         return {"summary": summary}
 
@@ -288,7 +289,8 @@ async def get_request(request: Request, request_id: str):
     """
     try:
         log_handler.debug(f"[requests_router] Looking up request with id='{request_id}'")
-        req = find_by_id("requests", request_id)
+        db = get_database_service()
+        req = db.requests.find_by_id(request_id)
 
         if not req:
             message = f"[requests_router] Request '{request_id}' not found"
@@ -361,7 +363,8 @@ async def create_request(request: Request, body: RequestCreatePayload):
             "notifications_sent": []
         }
 
-        created = create_record("requests", record)
+        db = get_database_service()
+        created = db.requests.create(record)
         log_handler.info(f"[requests_router] Request created successfully with id='{created['id']}'")
         return created
 
@@ -412,8 +415,9 @@ async def update_request(request: Request, request_id: str, body: RequestUpdateP
     try:
         log_handler.debug(f"[requests_router] Updating request with id='{request_id}'")
 
+        db = get_database_service()
         #Confirm the record exists before attempting update
-        existing = find_by_id("requests", request_id)
+        existing = db.requests.find_by_id(request_id)
         if not existing:
             message = f"Request '{request_id}' not found"
             log_handler.warning(message)
@@ -425,7 +429,28 @@ async def update_request(request: Request, request_id: str, body: RequestUpdateP
             updates["type"] = normalize_request_type(updates["type"])
         updates["updated_at"] = datetime.now(timezone.utc).isoformat()
 
-        updated = update_record("requests", request_id, updates)
+        updated = db.requests.update(request_id, updates)
+
+        # Record status history if status changed
+        existing_status = existing.get("status", "")
+        new_status = body.status
+        if new_status and new_status != existing_status:
+            try:
+                db.requests.record_status_history(request_id, existing_status, new_status)
+            except Exception as hist_err:
+                log_handler.error(
+                    f"[requests_router] record_status_history failed for '{request_id}': {hist_err}"
+                )
+
+        # Record vendor assignment if vendor_id changed
+        if body.vendor_id is not None and body.vendor_id != existing.get("vendor_id"):
+            try:
+                db.requests.record_vendor_assignment(request_id, body.vendor_id)
+            except Exception as assign_err:
+                log_handler.error(
+                    f"[requests_router] record_vendor_assignment failed for '{request_id}': {assign_err}"
+                )
+
         log_handler.info(f"[requests_router] Request '{request_id}' updated successfully")
         return updated
 
@@ -445,7 +470,8 @@ async def update_request(request: Request, request_id: str, body: RequestUpdateP
 async def cancel_request(request: Request, request_id: str, body: RequestCancelPayload):
     """Cancel a request by status update rather than physical deletion."""
     try:
-        req = find_by_id("requests", request_id)
+        db = get_database_service()
+        req = db.requests.find_by_id(request_id)
         if not req:
             message = f"Request '{request_id}' not found"
             log_handler.warning(message)
@@ -470,7 +496,15 @@ async def cancel_request(request: Request, request_id: str, body: RequestCancelP
         if body.cancellation_reason is not None:
             updates["cancellation_reason"] = body.cancellation_reason
 
-        updated = update_record("requests", request_id, updates)
+        updated = db.requests.update(request_id, updates)
+        try:
+            db.requests.record_status_history(
+                request_id, req.get("status", ""), "cancelled", body.cancelled_by
+            )
+        except Exception as hist_err:
+            log_handler.error(
+                f"[requests_router] record_status_history failed for '{request_id}': {hist_err}"
+            )
         log_handler.info(f"[requests_router] Request '{request_id}' cancelled successfully")
         return updated
 
@@ -490,7 +524,8 @@ async def cancel_request(request: Request, request_id: str, body: RequestCancelP
 async def complete_request(request: Request, request_id: str, body: RequestCompletePayload):
     """Mark a request resolved and capture who completed it."""
     try:
-        req = find_by_id("requests", request_id)
+        db = get_database_service()
+        req = db.requests.find_by_id(request_id)
         if not req:
             message = f"Request '{request_id}' not found"
             log_handler.warning(message)
@@ -512,7 +547,19 @@ async def complete_request(request: Request, request_id: str, body: RequestCompl
         if body.resolution_note is not None:
             updates["resolution_note"] = body.resolution_note
 
-        updated = update_record("requests", request_id, updates)
+        updated = db.requests.update(request_id, updates)
+        try:
+            db.requests.record_status_history(
+                request_id,
+                req.get("status", ""),
+                "resolved",
+                body.resolved_by,
+                body.resolution_note,
+            )
+        except Exception as hist_err:
+            log_handler.error(
+                f"[requests_router] record_status_history failed for '{request_id}': {hist_err}"
+            )
         log_handler.info(f"[requests_router] Request '{request_id}' completed successfully")
         return updated
 
@@ -556,8 +603,9 @@ async def send_notifications(request: Request, request_id: str):
     try:
         log_handler.debug(f"[requests_router] Sending notifications for request_id='{request_id}'")
 
+        db = get_database_service()
         #Fetch the request
-        req = find_by_id("requests", request_id)
+        req = db.requests.find_by_id(request_id)
         if not req:
             message = f"[requests_router] Request '{request_id}' not found"
             log_handler.warning(message)
@@ -580,7 +628,7 @@ async def send_notifications(request: Request, request_id: str):
             events = dispatch_on_create(req)
 
         #Mark notifications as no longer pending
-        updated = update_record("requests", request_id, {
+        updated = db.requests.update(request_id, {
             "notification_pending": False,
             "updated_at": datetime.now(timezone.utc).isoformat()
         })

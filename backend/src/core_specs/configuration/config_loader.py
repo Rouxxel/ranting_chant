@@ -14,6 +14,7 @@ for other modules to access essential settings.
 #Native imports
 import json
 import sys
+import os
 
 """METHOD-----------------------------------------------------------"""
 def read_data_from_config_json(file_path: str, exit_on_error: bool = True) -> dict:
@@ -46,7 +47,7 @@ def read_data_from_config_json(file_path: str, exit_on_error: bool = True) -> di
 
 """VARIABLES-----------------------------------------------------------"""
 #Path to your config JSON file
-CONFIG_FILE_PATH = "src/core_specs/configuration/config_file.json" #Put file beside this one
+CONFIG_FILE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "config_file.json"))
 
 #Load the entire configuration data, the one to be used
 config_loader = read_data_from_config_json(CONFIG_FILE_PATH, exit_on_error=True)

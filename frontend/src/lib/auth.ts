@@ -27,8 +27,10 @@ export function requireTenantAuth() {
 
 export function requireManagerOrOwnerAuth() {
   const role = getStoredRole();
-  if ((role !== "manager" && role !== "owner") || !hasStoredManager()) {
-    throw redirect({ to: "/" });
+  const hasToken = Boolean(localStorage.getItem('auth_token'));
+  // Must have either a token (real auth) OR a stored manager (legacy/JSON mode)
+  if ((role !== 'manager' && role !== 'owner') || (!hasToken && !hasStoredManager())) {
+    throw redirect({ to: '/' });
   }
 }
 

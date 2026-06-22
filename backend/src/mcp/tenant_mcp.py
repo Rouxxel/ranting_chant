@@ -13,7 +13,7 @@ All functions read from the JSON data store and return plain dicts.
 
 #Other files imports
 from src.utils.custom_logger import log_handler
-from src.utils.json_store import find_by_id, find_by_field, read_all
+from src.database import get_database_service
 
 """TOOLS-----------------------------------------------------------"""
 def lookup_tenant(tenant_id: str) -> dict | None:
@@ -27,7 +27,8 @@ def lookup_tenant(tenant_id: str) -> dict | None:
         dict | None: The tenant record, or None if not found.
     """
     log_handler.debug(f"[tenant_mcp] Looking up tenant_id='{tenant_id}'")
-    tenant = find_by_id("tenants", tenant_id)
+    db = get_database_service()
+    tenant = db.tenants.find_by_id(tenant_id)
     if not tenant:
         log_handler.warning(f"[tenant_mcp] Tenant '{tenant_id}' not found")
     return tenant
@@ -48,7 +49,8 @@ def get_tenant_by_name_and_unit(name: str, unit: str) -> dict | None:
         dict | None: The first matching tenant record, or None if not found.
     """
     log_handler.debug(f"[tenant_mcp] Searching tenant by name='{name}', unit='{unit}'")
-    all_tenants = read_all("tenants")
+    db = get_database_service()
+    all_tenants = db.tenants.list()
 
     for tenant in all_tenants:
         name_match = name.lower().strip() in tenant.get("name", "").lower()
@@ -76,7 +78,8 @@ def get_tenant_property(tenant_id: str) -> dict | None:
             property is not found.
     """
     log_handler.debug(f"[tenant_mcp] Getting property for tenant_id='{tenant_id}'")
-    tenant = find_by_id("tenants", tenant_id)
+    db = get_database_service()
+    tenant = db.tenants.find_by_id(tenant_id)
     if not tenant:
         log_handler.warning(f"[tenant_mcp] Tenant '{tenant_id}' not found")
         return None
@@ -86,7 +89,7 @@ def get_tenant_property(tenant_id: str) -> dict | None:
         log_handler.warning(f"[tenant_mcp] Tenant '{tenant_id}' has no property_id")
         return None
 
-    prop = find_by_id("properties", property_id)
+    prop = db.properties.find_by_id(property_id)
     if not prop:
         log_handler.warning(f"[tenant_mcp] Property '{property_id}' not found")
     return prop
