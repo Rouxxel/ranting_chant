@@ -4,32 +4,40 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
+.Python
 
 # Virtual environments
 venv/
 env/
-.env/
 .venv/
+ENV/
+env.bak/
+venv.bak/
 
 # Environment files (keep .env for backend)
 .env.local
 .env.production
 .env.development
+.env.test
+.env.example
 
 # OS files
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # Git
 .git/
 .gitignore
 .gitattributes
+.gitmodules
 
 # Docker files
 DOCKERFILE
 .dockerignore
 docker-compose.yml
 docker-compose.*.yml
+.docker/
 
 # IDE/Editor files
 .vscode/
@@ -37,32 +45,68 @@ docker-compose.*.yml
 *.swp
 *.swo
 *~
+.project
+.pydevproject
+.settings/
+*.sublime-*
 
 # Documentation
 README.md
 *.md
 docs/
+documentation/
+IMPLEMENTATION_PLAN.md
+TODO_COMPLETE.md
+VISUAL_FIX.md
 
 # Test files
 tests/
 test_*.py
 *_test.py
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.mypy_cache/
+.pylintrc
+.ruff_cache/
 
 # Logs (will be created in container)
 logs/
 *.log
+*.log.*
 
-# Development tools
-.pytest_cache/
-.coverage
-.tox/
-.mypy_cache/
-.pylintrc
+# Database
+*.db
+*.sqlite
+*.sqlite3
 
 # Node.js (if any frontend assets)
 node_modules/
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
 
 # Temporary files
 *.tmp
 *.temp
+*.bak
+*.swp
+*~
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+.eggs/
+*.egg
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Environment
+.env
+.env.*

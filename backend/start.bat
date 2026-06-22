@@ -1,8 +1,10 @@
 @echo off
 REM Ranting Chant Backend - Development Startup Script (Windows)
+REM Supports AI (Gemini), Voice (ElevenLabs), and Notification (Resend/Twilio) services
+REM Uses Supabase PostgreSQL as primary database with JSON mock data fallback
 
 echo 🚀 Ranting Chant Backend - Development Setup
-echo ========================================
+echo ==========================================
 
 REM Check if Python is installed
 python --version >nul 2>&1
@@ -35,6 +37,14 @@ if not exist ".env" (
     echo ⚙️  Creating .env from .env.example...
     copy .env.example .env
     echo ✅ .env created - please update with your API keys and configuration
+    echo.
+    echo 📝 Required environment variables:
+    echo    - GEMINI_API_KEY (for AI services)
+    echo    - ELEVENLABS_API_KEY (for voice services)
+    echo    - RESEND_API_KEY (for email notifications)
+    echo    - TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN (for SMS notifications)
+    echo    - SUPABASE_URL, SUPABASE_KEY (for PostgreSQL database)
+    echo.
 )
 
 REM Create logs directory if it doesn't exist
