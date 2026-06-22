@@ -31,7 +31,13 @@ from src.core_specs.configuration.config_loader import config_loader
 
 """VARIABLES-----------------------------------------------------------"""
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "")
+HF_API_KEY = os.getenv("HF_API_KEY", "")
 ELEVENLABS_CONFIG = config_loader["voice_provider"]["elevenlabs"]
+
+# Set HF_TOKEN for Hugging Face Hub authentication (used by faster-whisper)
+if HF_API_KEY:
+    os.environ["HF_TOKEN"] = HF_API_KEY
+    log_handler.debug("[stt_service] HF_TOKEN set for Hugging Face Hub authentication")
 
 # Initialize ElevenLabs client
 client = None
@@ -40,8 +46,8 @@ if ELEVENLABS_API_KEY:
     try:
         client = ElevenLabs(api_key=ELEVENLABS_API_KEY)
         whisper_model = WhisperModel(
-            ELEVENLABS_CONFIG["stt"]["default_model"], 
-            device=ELEVENLABS_CONFIG["stt"]["device"], 
+            ELEVENLABS_CONFIG["stt"]["default_model"],
+            device=ELEVENLABS_CONFIG["stt"]["device"],
             compute_type=ELEVENLABS_CONFIG["stt"]["compute_type"],
             cpu_threads=ELEVENLABS_CONFIG["stt"]["cpu_threads"],
             num_workers=ELEVENLABS_CONFIG["stt"]["num_workers"]

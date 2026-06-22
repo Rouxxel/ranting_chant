@@ -58,7 +58,7 @@ async def root_endpoint(request: Request):
     db_service = get_database_service()
 
     return {
+        #"persistence": db_service.health_info(),
         "message": "Backend running successfully, ready to use other endpoints",
-        "persistence": db_service.health_info(),
     }
 
