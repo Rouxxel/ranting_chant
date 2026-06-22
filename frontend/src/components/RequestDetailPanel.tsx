@@ -200,6 +200,7 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
           </section>
 
           <section>
+            {/*TODO: for some reason notified parties contacts are not displayed*/}
             <SectionTitle>Notified parties</SectionTitle>
             {req.notifications_sent?.length > 0 ? (
               <ul className="space-y-1.5 glass-panel p-3">

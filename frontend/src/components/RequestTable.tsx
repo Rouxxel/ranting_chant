@@ -27,6 +27,7 @@ export function RequestTable({ requests, onRowClick, onApprove }: RequestTablePr
           >
             <div><RequestTypeBadge type={r.type} /></div>
             <div className="flex items-center gap-2">
+              {/*TODO: For some reason, the actual tenant name does not show*/}
               <Avatar name={r.tenant_name || "Tenant"} size={22} glow={false} />
               <span className="truncate">{r.tenant_name || "Tenant"}</span>
             </div>

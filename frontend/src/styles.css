@@ -107,15 +107,25 @@
   .glass-panel {
     position: relative;
     background:
-      linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.18) 45%, rgba(126,200,227,0.18) 100%);
+      linear-gradient(
+        180deg,
+        rgba(255,255,255,0.85) 0%,   /* was 0.55 */
+        rgba(255,255,255,0.35) 45%,  /* was 0.18 */
+        rgba(126,200,227,0.30) 100%  /* was 0.18 */
+      );
+
     backdrop-filter: blur(18px) saturate(140%);
     -webkit-backdrop-filter: blur(18px) saturate(140%);
-    border: 1px solid rgba(255, 255, 255, 0.7);
+
+    border: 1px solid rgba(255, 255, 255, 0.9); /* more solid */
+
     border-radius: 20px;
+
     box-shadow:
-      0 10px 36px rgba(20, 70, 120, 0.28),
+      0 10px 36px rgba(20, 70, 120, 0.35),
       inset 0 1px 0 rgba(255, 255, 255, 0.95),
-      inset 0 -1px 0 rgba(45, 143, 214, 0.18);
+      inset 0 -1px 0 rgba(45, 143, 214, 0.25);
+
     color: var(--ranting-navy);
   }
   .glass-panel::before {
