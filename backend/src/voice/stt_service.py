@@ -24,6 +24,7 @@ from io import BytesIO
 #Third-party imports
 from elevenlabs.client import ElevenLabs
 from faster_whisper import WhisperModel
+from huggingface_hub import login
 
 #Other files imports
 from src.utils.custom_logger import log_handler
@@ -37,7 +38,9 @@ ELEVENLABS_CONFIG = config_loader["voice_provider"]["elevenlabs"]
 # Set HF_TOKEN for Hugging Face Hub authentication (used by faster-whisper)
 if HF_API_KEY:
     os.environ["HF_TOKEN"] = HF_API_KEY
-    log_handler.debug("[stt_service] HF_TOKEN set for Hugging Face Hub authentication")
+    os.environ["HUGGINGFACE_HUB_TOKEN"] = HF_API_KEY
+    login(token=HF_API_KEY)
+    log_handler.debug("[stt_service] HF token set and logged infor Hugging Face Hub authentication")
 
 # Initialize ElevenLabs client
 client = None

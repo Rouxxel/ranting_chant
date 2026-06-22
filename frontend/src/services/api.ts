@@ -52,10 +52,11 @@ import type {
 } from '../types';
 
 // Fallback endpoints from environment variables
+// Try deployed backend first, fall back to local backend
 const ENDPOINTS = [
-  import.meta.env.VITE_LOCAL_BACKEND || 'http://localhost:8000',
-  import.meta.env.VITE_PROD_BACKEND || 'https://ranting-chant.onrender.com'
-];
+  import.meta.env.VITE_DEPLOYED_BACKEND,
+  import.meta.env.VITE_LOCAL_BACKEND || 'http://localhost:8000'
+].filter(Boolean);
 
 let currentEndpointIndex = 0;
 let hasShownConnectionError = false;
@@ -91,14 +92,14 @@ apiClient.interceptors.response.use(
     if ((error.code === 'ERR_NETWORK' || !error.response) && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      // Try next endpoint
-      const nextIndex = (currentEndpointIndex + 1) % ENDPOINTS.length;
-      
-      if (nextIndex !== currentEndpointIndex) {
+      // Try next endpoint (only move forward, don't cycle)
+      const nextIndex = currentEndpointIndex + 1;
+
+      if (nextIndex < ENDPOINTS.length) {
         currentEndpointIndex = nextIndex;
         originalRequest.baseURL = ENDPOINTS[currentEndpointIndex];
         console.log(`Retrying with endpoint: ${ENDPOINTS[currentEndpointIndex]}`);
-        
+
         try {
           return await apiClient(originalRequest);
         } catch (retryError) {
@@ -109,7 +110,7 @@ apiClient.interceptors.response.use(
               description: 'We are having some troubles, please try again later',
               duration: 10000,
             });
-            
+
             // Reset flag after 30 seconds to allow showing error again
             setTimeout(() => {
               hasShownConnectionError = false;
