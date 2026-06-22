@@ -10,7 +10,6 @@ export function ConnectionStatus({ className = '' }: ConnectionStatusProps) {
   const [isReconnecting, setIsReconnecting] = useState(false)
 
   useEffect(() => {
-    // TODO: Wire to WebSocket or SSE connection status
     // Monitor connection state and update accordingly
     const checkConnection = () => {
       // Mock connection check
