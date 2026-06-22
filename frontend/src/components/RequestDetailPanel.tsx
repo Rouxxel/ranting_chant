@@ -258,7 +258,7 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
               <div className="glass-panel space-y-2 p-3">
                 <p className="text-sm text-ranting-ice/90">{req.resolution_note}</p>
                 <div className="text-[11px] italic text-ranting-deep">
-                  Resolved on {new Date(req.resolved_at || "").toLocaleDateString()} by {partyNames[req.resolved_by || ""] || "Unknown"}
+                  Resolved on {new Date(req.resolved_at || "").toLocaleDateString()} by {req.resolved_by_name || partyNames[req.resolved_by || ""] || "Unknown"}
                 </div>
               </div>
             </section>

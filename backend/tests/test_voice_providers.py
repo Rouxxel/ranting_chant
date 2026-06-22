@@ -5,7 +5,7 @@ Voice provider selection tests.
 import unittest
 from unittest.mock import patch
 
-from backend.src.api_endpoints.routers.voice_routers.voice_router import _provider_exception_to_http
+from src.api_endpoints.routers.voice_routers.voice_router import _provider_exception_to_http
 from src.voice.providers.base import InvalidVoiceRequestError, ProviderUnavailableError
 from src.voice.providers.factory import get_voice_provider, list_voice_provider_voices, list_voice_providers
 

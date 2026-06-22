@@ -35,18 +35,22 @@ function getNavLinks(role: AppRole) {
 
 export function AuthenticatedLayout({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
-  const { currentTenant, currentManager, userRole, clearUser } = useApp();
+  const { currentTenant, currentManager, userRole, clearUser, logout } = useApp();
   const role = userRole as AppRole;
 
   const displayName = currentTenant?.name || currentManager?.name || "User";
   const roleLabel = role === "tenant" ? "Tenant" : role === "owner" ? "Owner" : "Manager";
   const navLinks = getNavLinks(role);
 
-  function handleLogout() {
-    clearUser();
+  async function handleLogout() {
+    if (role === 'manager' || role === 'owner') {
+      await logout(); // invalidates backend session, clears auth_token + manager state
+    } else {
+      clearUser(); // full session clear for tenants
+    }
 
     const keysToClear = Object.keys(localStorage).filter(
-      (key) => key.startsWith("requests_") || key === "vendors" || key === "properties" || key === "tenants" || key === "requests" || key === "managers" || key === "owners" || key === "auth_token",
+      (key) => key.startsWith("requests_") || key === "vendors" || key === "properties" || key === "tenants" || key === "requests" || key === "managers" || key === "owners",
     );
     keysToClear.forEach((key) => localStorage.removeItem(key));
 

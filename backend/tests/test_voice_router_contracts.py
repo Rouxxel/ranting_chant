@@ -9,8 +9,8 @@ from unittest.mock import MagicMock, patch
 
 from starlette.requests import Request
 
-from backend.src.api_endpoints.routers.voice_routers import voice_router
-from backend.src.api_endpoints.routers.voice_routers.voice_router import VoiceRespondPayload
+from src.api_endpoints.routers.voice_routers import voice_router
+from src.api_endpoints.routers.voice_routers.voice_router import VoiceRespondPayload
 from src.voice.providers.base import AudioBytesResult, TranscriptionResult
 
 
@@ -42,7 +42,7 @@ def make_request() -> Request:
 
 
 class TestVoiceEndpointContracts(unittest.TestCase):
-    @patch("src.api_endpoints.routers.voice_router.get_voice_provider", return_value=FakeProvider())
+    @patch("src.api_endpoints.routers.voice_routers.voice_router.get_voice_provider", return_value=FakeProvider())
     def test_transcribe_response_shape_unchanged(self, mock_get_voice_provider):
         response = asyncio.run(
             voice_router.transcribe_audio(request=make_request(), audio=FakeUpload(), provider="elevenlabs")
@@ -51,9 +51,9 @@ class TestVoiceEndpointContracts(unittest.TestCase):
         self.assertEqual(set(response.keys()), {"transcript"})
         self.assertEqual(response["transcript"], "hello there")
 
-    @patch("src.api_endpoints.routers.voice_router.get_voice_provider", return_value=FakeProvider())
-    @patch("src.api_endpoints.routers.voice_router.request_mcp.update_request")
-    @patch("src.api_endpoints.routers.voice_router.request_mcp.get_request")
+    @patch("src.api_endpoints.routers.voice_routers.voice_router.get_voice_provider", return_value=FakeProvider())
+    @patch("src.api_endpoints.routers.voice_routers.voice_router.request_mcp.update_request")
+    @patch("src.api_endpoints.routers.voice_routers.voice_router.request_mcp.get_request")
     @patch.object(voice_router.conversation_engine, "process_message")
     def test_respond_response_shape_unchanged(
         self,

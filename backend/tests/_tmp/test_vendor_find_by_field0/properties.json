@@ -1,0 +1,16 @@
+[
+  {
+    "id": "property_crud_001",
+    "name": "CRUD Property",
+    "address": "1 Prop St",
+    "owner_id": "owner_crud_001",
+    "manager_id": "manager_crud_001",
+    "tenant_ids": [
+      "tenant_crud_001"
+    ],
+    "representative": {
+      "type": "property_manager",
+      "id": "manager_crud_001"
+    }
+  }
+]

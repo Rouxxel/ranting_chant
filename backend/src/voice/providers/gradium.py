@@ -1,7 +1,6 @@
 """
 Gradium adapter for the shared voice provider interface.
 
-TODO: Elevenlabs API claims to have a ban on for "abuse"
 TODO: Gradium is not being able to process STT requests
 """
 

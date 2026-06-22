@@ -13,7 +13,7 @@ including lookups for the associated manager and owner.
 
 #Other files imports
 from src.utils.custom_logger import log_handler
-from src.utils.json_store import find_by_id
+from src.database import get_database_service
 
 """TOOLS-----------------------------------------------------------"""
 def lookup_property(property_id: str) -> dict | None:
@@ -27,7 +27,8 @@ def lookup_property(property_id: str) -> dict | None:
         dict | None: The property record, or None if not found.
     """
     log_handler.debug(f"[property_mcp] Looking up property_id='{property_id}'")
-    prop = find_by_id("properties", property_id)
+    db = get_database_service()
+    prop = db.properties.find_by_id(property_id)
     if not prop:
         log_handler.warning(f"[property_mcp] Property '{property_id}' not found")
     return prop
@@ -48,7 +49,8 @@ def get_property_manager(property_id: str) -> dict | None:
             or manager is not found.
     """
     log_handler.debug(f"[property_mcp] Getting manager for property_id='{property_id}'")
-    prop = find_by_id("properties", property_id)
+    db = get_database_service()
+    prop = db.properties.find_by_id(property_id)
     if not prop:
         log_handler.warning(f"[property_mcp] Property '{property_id}' not found")
         return None
@@ -58,7 +60,7 @@ def get_property_manager(property_id: str) -> dict | None:
         log_handler.warning(f"[property_mcp] Property '{property_id}' has no manager_id")
         return None
 
-    manager = find_by_id("property_magament", manager_id)
+    manager = db.managers.find_by_id(manager_id)
     if not manager:
         log_handler.warning(f"[property_mcp] Manager '{manager_id}' not found")
     return manager
@@ -79,7 +81,8 @@ def get_property_owner(property_id: str) -> dict | None:
             owner is not found.
     """
     log_handler.debug(f"[property_mcp] Getting owner for property_id='{property_id}'")
-    prop = find_by_id("properties", property_id)
+    db = get_database_service()
+    prop = db.properties.find_by_id(property_id)
     if not prop:
         log_handler.warning(f"[property_mcp] Property '{property_id}' not found")
         return None
@@ -89,7 +92,7 @@ def get_property_owner(property_id: str) -> dict | None:
         log_handler.warning(f"[property_mcp] Property '{property_id}' has no owner_id")
         return None
 
-    owner = find_by_id("owners", owner_id)
+    owner = db.owners.find_by_id(owner_id)
     if not owner:
         log_handler.warning(f"[property_mcp] Owner '{owner_id}' not found")
     return owner

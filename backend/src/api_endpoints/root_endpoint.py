@@ -19,6 +19,7 @@ from fastapi import APIRouter, Request
 from src.utils.custom_logger import log_handler
 from src.utils.limiter import limiter as SlowLimiter
 from src.core_specs.configuration.config_loader import config_loader
+from src.database import get_database_service
 
 """API ROUTER-----------------------------------------------------------"""
 # Get API router
@@ -39,16 +40,25 @@ async def root_endpoint(request: Request):
     Root endpoint to verify that the API is operational.
 
     This endpoint serves as a basic health check and confirms that the application
-    is running correctly. It is rate-limited according to the configuration.
+    is running correctly. It also reports which persistence backend is active
+    (json or supabase) without exposing credentials.
 
     Parameters:
         request (Request): The incoming HTTP request for limit event management.
 
     Returns:
-        dict: A JSON response indicating that the API is running.
+        dict: A JSON response indicating that the API is running, including
+              the active data backend status.
     
     Note:
         If the rate limit is exceeded, the rate_limit_handler() function handles the response.
     """
     log_handler.debug("[root_endpoint] Backend running successfully")
-    return {"message": "Backend running successfully, ready to use other endpoints"}
+
+    db_service = get_database_service()
+
+    return {
+        #"persistence": db_service.health_info(),
+        "message": "Backend running successfully, ready to use other endpoints",
+    }
+

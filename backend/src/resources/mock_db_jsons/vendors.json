@@ -1,6 +1,6 @@
 [
   {
-    "id": "vendor_001",
+    "id": "fbb4dc23-6e4a-5ee1-9919-e805f4ded107",
     "name": "QuickFix Locksmith",
     "email": "quickfixdispatch@gmail.com",
     "phone": "+14155552673",
@@ -11,7 +11,7 @@
     "emergency_available": true
   },
   {
-    "id": "vendor_002",
+    "id": "c6566547-c23f-5fdf-9059-f8af17368cd6",
     "name": "AquaFlow Plumbing",
     "email": "flowaquasupport@gmail.com",
     "phone": "+14155552673",
@@ -21,7 +21,7 @@
     "emergency_available": true
   },
   {
-    "id": "vendor_003",
+    "id": "1826caf4-711c-5f17-b943-9bfb98f9b80d",
     "name": "VoltPro Electrical Services",
     "email": "voltprocontact@gmail.com",
     "phone": "+14155552673",
@@ -31,7 +31,7 @@
     "emergency_available": true
   },
   {
-    "id": "vendor_004",
+    "id": "2e72d98f-663c-5729-bdc4-97dd5d3fe122",
     "name": "ArcticAir HVAC Solutions Co.",
     "email": "arcticservice@gmail.com",
     "phone": "+14155552673",
@@ -41,7 +41,7 @@
     "emergency_available": true
   },
   {
-    "id": "vendor_005",
+    "id": "8c391a97-0118-5638-908d-a21a16c72732",
     "name": "HandyHero Maintenance",
     "email": "handyhelp@gmail.com",
     "phone": "+14155552673",
@@ -52,7 +52,7 @@
     "emergency_available": false
   },
   {
-    "id": "vendor_006",
+    "id": "224f93f2-1b5f-5369-88f9-15fd12024616",
     "name": "RapidGlass & Door Repair",
     "email": "rapidglassdispatch@gmail.com",
     "phone": "+14155552673",
@@ -64,7 +64,7 @@
     "emergency_available": true
   },
   {
-    "id": "vendor_007",
+    "id": "1463aaa1-c326-5eb8-aae4-c2a1ce29b368",
     "name": "Safe Pest Control",
     "email": "Safesupport@gmail.com",
     "phone": "+14155552673",
@@ -74,7 +74,7 @@
     "emergency_available": false
   },
   {
-    "id": "vendor_008",
+    "id": "1b583821-f90d-5e5e-aa8d-e31039c66a9f",
     "name": "ClearFlow Drain Services",
     "email": "clearflowservice@gmail.com",
     "phone": "+14155552673",
@@ -85,7 +85,7 @@
     "emergency_available": true
   },
   {
-    "id": "vendor_009",
+    "id": "e510e1ea-be40-5246-835b-f9482ec29999",
     "name": "BrightSpark Appliance Repair",
     "email": "brightsparkrepair@gmail.com",
     "phone": "+14155552673",
@@ -95,7 +95,7 @@
     "emergency_available": false
   },
   {
-    "id": "vendor_010",
+    "id": "090f9c13-33df-5899-b3ff-c9f0617f0816",
     "name": "SecureAccess Systems",
     "email": "SecureAccessSupport@gmail.com",
     "phone": "+14155552673",

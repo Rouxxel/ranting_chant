@@ -17,14 +17,15 @@ from typing import Optional
 import uuid
 
 #Third-party imports
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
 #Other files imports
 from src.utils.custom_logger import log_handler
 from src.utils.limiter import limiter as SlowLimiter
 from src.core_specs.configuration.config_loader import config_loader
-from src.utils.json_store import read_all, find_by_id, create_record, update_record
+from src.database import get_database_service
+from src.api_endpoints.routers.owner_manager_routers.auth_router import require_manager_or_owner
 
 """PYDANTIC MODELS-----------------------------------------------------------"""
 class RepresentativePayload(BaseModel):
@@ -113,7 +114,8 @@ async def list_properties(request: Request):
     """
     try:
         log_handler.debug("[properties_router] Listing all properties")
-        properties = read_all("properties")
+        db = get_database_service()
+        properties = db.properties.list()
         log_handler.info(f"[properties_router] Returning {len(properties)} property/properties")
         return properties
 
@@ -128,34 +130,36 @@ async def list_properties(request: Request):
     f"{config_loader['endpoints']['properties_endpoint']['request_limit']}/"
     f"{config_loader['endpoints']['properties_endpoint']['unit_of_time_for_limit']}"
 )
-async def create_property(request: Request, body: PropertyCreatePayload):
+async def create_property(request: Request, body: PropertyCreatePayload, current_actor: dict = Depends(require_manager_or_owner)):
     """Create a property record for manager/owner workflows."""
     try:
         record = body.model_dump(exclude={"representative"})
-        record["id"] = f"property_{uuid.uuid4().hex[:8]}"
+        record["id"] = str(uuid.uuid4())
+        record["created_by"] = current_actor["id"]
         record["representative"] = _build_representative(
             body.manager_id,
             body.owner_id,
             body.representative,
         )
 
-        created = create_record("properties", record)
+        db = get_database_service()
+        created = db.properties.create(record)
 
         #Link the property to its manager/owner so it appears in their listings
         if body.manager_id:
-            manager = find_by_id("property_magament", body.manager_id)
+            manager = db.managers.find_by_id(body.manager_id)
             if manager:
                 managed = list(manager.get("managed_properties", []))
                 if created["id"] not in managed:
                     managed.append(created["id"])
-                    update_record("property_magament", body.manager_id, {"managed_properties": managed})
+                    db.managers.update(body.manager_id, {"managed_properties": managed})
         if body.owner_id:
-            owner = find_by_id("owners", body.owner_id)
+            owner = db.owners.find_by_id(body.owner_id)
             if owner:
                 owned = list(owner.get("owned_properties", []))
                 if created["id"] not in owned:
                     owned.append(created["id"])
-                    update_record("owners", body.owner_id, {"owned_properties": owned})
+                    db.owners.update(body.owner_id, {"owned_properties": owned})
 
         log_handler.info(f"[properties_router] Property created successfully with id='{created['id']}'")
         return created
@@ -191,7 +195,8 @@ async def get_property(request: Request, property_id: str):
     """
     try:
         log_handler.debug(f"[properties_router] Looking up property with id='{property_id}'")
-        prop = find_by_id("properties", property_id)
+        db = get_database_service()
+        prop = db.properties.find_by_id(property_id)
 
         if not prop:
             message = f"[properties_router] Property '{property_id}' not found"
@@ -214,10 +219,11 @@ async def get_property(request: Request, property_id: str):
     f"{config_loader['endpoints']['properties_endpoint']['request_limit']}/"
     f"{config_loader['endpoints']['properties_endpoint']['unit_of_time_for_limit']}"
 )
-async def update_property(request: Request, property_id: str, body: PropertyUpdatePayload):
+async def update_property(request: Request, property_id: str, body: PropertyUpdatePayload, current_actor: dict = Depends(require_manager_or_owner)):
     """Update editable property fields and relationship references."""
     try:
-        existing = find_by_id("properties", property_id)
+        db = get_database_service()
+        existing = db.properties.find_by_id(property_id)
         if not existing:
             message = f"Property '{property_id}' not found"
             log_handler.warning(message)
@@ -235,7 +241,7 @@ async def update_property(request: Request, property_id: str, body: PropertyUpda
                 updates.get("owner_id", existing.get("owner_id")),
             )
 
-        updated = update_record("properties", property_id, updates)
+        updated = db.properties.update(property_id, updates)
         log_handler.info(f"[properties_router] Property '{property_id}' updated successfully")
         return updated
 
@@ -244,3 +250,47 @@ async def update_property(request: Request, property_id: str, body: PropertyUpda
     except Exception as e:
         log_handler.error(f"[properties_router] Unexpected error updating property '{property_id}': {e}")
         raise HTTPException(status_code=500, detail="Internal server error while updating property")
+
+
+#Soft-delete a property (manager/owner action)
+@router.delete(config_loader['endpoints']['properties_endpoint']['detail_route'])
+@SlowLimiter.limit(
+    f"{config_loader['endpoints']['properties_endpoint']['request_limit']}/"
+    f"{config_loader['endpoints']['properties_endpoint']['unit_of_time_for_limit']}"
+)#TODO: see how to manage a property deletion compared to tenants and their units
+async def delete_property(request: Request, property_id: str, current_actor: dict = Depends(require_manager_or_owner)):
+    """
+    Soft-delete a property record.
+
+    Sets is_active=False and deleted_at on the property row. The property's
+    units, tenants, and request history are preserved.
+
+    Parameters:
+        request (Request): The incoming HTTP request for rate limit tracking.
+        property_id (str): The unique identifier of the property to remove.
+
+    Returns:
+        dict: The property record as it was before deletion.
+
+    Raises:
+        HTTPException 404: If no property with the given ID exists.
+        HTTPException 500: If an unexpected error occurs during deletion.
+    """
+    try:
+        log_handler.debug(f"[properties_router] Soft-deleting property with id='{property_id}'")
+        db = get_database_service()
+        existing = db.properties.find_by_id(property_id)
+        if not existing:
+            message = f"Property '{property_id}' not found"
+            log_handler.warning(message)
+            raise HTTPException(status_code=404, detail=message)
+
+        deleted = db.properties.delete(property_id)
+        log_handler.info(f"[properties_router] Property '{property_id}' deleted successfully")
+        return deleted
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        log_handler.error(f"[properties_router] Unexpected error deleting property '{property_id}': {e}")
+        raise HTTPException(status_code=500, detail="Internal server error while deleting property")

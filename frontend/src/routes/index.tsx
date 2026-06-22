@@ -3,8 +3,8 @@ import { useState } from "react";
 import { Logo } from "@/components/Logo";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useApp } from "@/context/AppContext";
-import { getTenants, getManagers, getOwners } from "@/services/api";
-import { Tenant, Manager, Owner } from "@/types";
+import { getTenants, authLogin } from "@/services/api";
+import { Tenant } from "@/types";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [{ title: "Ranting Chant — Sign in" }] }),
@@ -16,7 +16,8 @@ function LoginPage() {
   const { setCurrentTenant, setCurrentManager, setUserRole } = useApp();
   const [tName, setTName] = useState("");
   const [tUnit, setTUnit] = useState("");
-  const [mName, setMName] = useState("");
+  const [mIdentifier, setMIdentifier] = useState("");
+  const [mPassword, setMPassword] = useState("");
   const [err, setErr] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -74,63 +75,41 @@ function LoginPage() {
 
   async function managerSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!mName.trim()) return setErr("Please enter your name.");
+    if (!mIdentifier.trim() || !mPassword.trim()) return setErr("Please enter your email/username and password.");
     setErr(null);
     setIsLoading(true);
 
     try {
-      // 1. Try cache first
-      let managers: Manager[] = [];
-      let owners: Owner[] = [];
-      const cachedManagers = localStorage.getItem('managers');
-      const cachedOwners = localStorage.getItem('owners');
+      const result = await authLogin(mIdentifier.trim(), mPassword);
 
-      if (cachedManagers) {
-        try { managers = JSON.parse(cachedManagers); } catch { }
-      }
-      if (cachedOwners) {
-        try { owners = JSON.parse(cachedOwners); } catch { }
+      // Store tokens
+      localStorage.setItem('auth_token', result.access_token);
+      if (result.refresh_token) {
+        localStorage.setItem('auth_refresh_token', result.refresh_token);
       }
 
-      let matchedManager = managers.find(
-        m => m.name.toLowerCase() === mName.trim().toLowerCase()
-      );
-      let matchedOwner = owners.find(
-        o => o.name.toLowerCase() === mName.trim().toLowerCase()
-      );
+      // Clear tenant data when logging in as manager/owner
+      localStorage.removeItem('current_tenant');
+      setCurrentTenant(null);
 
-      // 2. Fetch fresh from network if not cached or lookup failed
-      if (!matchedManager && !matchedOwner) {
-        const [freshManagers, freshOwners] = await Promise.all([getManagers(), getOwners()]);
-        localStorage.setItem('managers', JSON.stringify(freshManagers));
-        localStorage.setItem('owners', JSON.stringify(freshOwners));
+      // Persist actor + role synchronously so route guard passes on first navigation
+      localStorage.setItem('current_manager', JSON.stringify(result.actor));
+      localStorage.setItem('user_role', result.role);
+      setCurrentManager(result.actor);
+      setUserRole(result.role as 'manager' | 'owner');
 
-        matchedManager = freshManagers.find(
-          m => m.name.toLowerCase() === mName.trim().toLowerCase()
-        );
-        matchedOwner = freshOwners.find(
-          o => o.name.toLowerCase() === mName.trim().toLowerCase()
-        );
-      }
+      navigate({ to: "/management" });
+    } catch (error: unknown) {
+      const isAxiosError = (e: unknown): e is { response?: { status?: number } } =>
+        typeof e === 'object' && e !== null && 'response' in e;
 
-      if (matchedManager) {
-        // Persist synchronously so the route guard (which reads localStorage) passes on first click.
-        localStorage.setItem('current_manager', JSON.stringify(matchedManager));
-        localStorage.setItem('user_role', 'manager');
-        setCurrentManager(matchedManager);
-        setUserRole('manager');
-        navigate({ to: "/management" });
-      } else if (matchedOwner) {
-        localStorage.setItem('current_manager', JSON.stringify(matchedOwner));
-        localStorage.setItem('user_role', 'owner');
-        setCurrentManager(matchedOwner);
-        setUserRole('owner');
-        navigate({ to: "/management" });
+      if (isAxiosError(error) && error.response?.status === 401) {
+        setErr("Invalid credentials. Please check your email and password.");
+      } else if (isAxiosError(error) && !error.response) {
+        setErr("Failed to connect to server. Please try again.");
       } else {
-        setErr("No manager or owner found with that name. Please check your information.");
+        setErr("Failed to connect to server. Please try again.");
       }
-    } catch (error) {
-      setErr("Failed to connect to server. Please try again.");
       console.error("Manager/Owner login error:", error);
     } finally {
       setIsLoading(false);
@@ -168,11 +147,35 @@ function LoginPage() {
 
           <TabsContent value="manager">
             <form onSubmit={managerSubmit} className="flex flex-col gap-3">
-              <input className="aero-input px-3.5 py-2.5 text-sm" placeholder="Full name" value={mName} onChange={(e) => setMName(e.target.value)} disabled={isLoading} />
+              <input className="aero-input px-3.5 py-2.5 text-sm" placeholder="Email" value={mIdentifier} onChange={(e) => setMIdentifier(e.target.value)} disabled={isLoading} autoComplete="username" />
+              <input className="aero-input px-3.5 py-2.5 text-sm" type="password" placeholder="Password" value={mPassword} onChange={(e) => setMPassword(e.target.value)} disabled={isLoading} autoComplete="current-password" />
+              {/* TODO: Disabled until database is correctly configured
+              <div className="text-right">
+                <button
+                  type="button"
+                  onClick={() => navigate({ to: "/forgot-password" })}
+                  className="text-color-black text-xs underline"
+                >
+                  Forgot password?
+                </button>
+              </div>
+              */}
               {err && <p className="text-xs text-red-300">{err}</p>}
               <button type="submit" className="glossy-btn mt-2 px-4 py-2.5 text-sm" disabled={isLoading}>
                 {isLoading ? "Signing in..." : "Enter Dashboard"}
               </button>
+              <div className="text-center">
+                <p className="text-color-black text-xs">
+                  No account? {" "}
+                  <button
+                    type="button"
+                    onClick={() => navigate({ to: "/signup" })}
+                    className="text-color-black text-xs underline"
+                  >
+                    Sign up
+                  </button>
+                </p>
+              </div>
             </form>
           </TabsContent>
         </Tabs>

@@ -1,0 +1,38 @@
+[
+  {
+    "id": "ab7a3be3-4950-50b1-a1b6-6783aa7a4725",
+    "name": "Sara Johnson",
+    "email": "sarah@gmail.com",
+    "phone": "+14155552673",
+    "managed_properties": [
+      "7c76dd08-6949-55f2-a211-9d7a342b8a7d"
+    ]
+  },
+  {
+    "id": "2fa6c4e0-be26-5f52-bd7f-286d7dd34b80",
+    "name": "David Reynolds",
+    "email": "david.reynolds@gmail.com",
+    "phone": "+14155552673",
+    "managed_properties": [
+      "401c94a1-6f14-52ac-a9bb-cfa4b2f60c34"
+    ]
+  },
+  {
+    "id": "128b8f0f-5f80-5ded-a75d-06936e394c51",
+    "name": "Laura Mitchell",
+    "email": "laura.mitchell@gmail.com",
+    "phone": "+15552224",
+    "managed_properties": [
+      "e9ef9ad0-0c28-5c81-aeb7-d5089542b6af"
+    ]
+  },
+  {
+    "id": "197fb109-9e81-5763-a647-a71bdff88efd",
+    "name": "Kevin Thompson",
+    "email": "kevin.thompson@gmail.com",
+    "phone": "+15552225",
+    "managed_properties": [
+      "202f36cc-9314-5de1-9ac8-ac84408c4a62"
+    ]
+  }
+]

@@ -136,7 +136,7 @@ function ChatPage() {
       if (response.request_id && requestId.startsWith("session_")) {
         setRequestId(response.request_id);
         // Invalidate requests cache since a new request was created
-        localStorage.removeItem(`requests_${tenantId}`);
+        localStorage.removeItem(`requests_tenant_${tenantId}`);
       }
 
       // Backend returns reply, not conversation array
@@ -187,7 +187,7 @@ function ChatPage() {
       setRequestId(savedRequest.id);
       setIsSaved(true);
       // Invalidate requests cache since a new request was created
-      localStorage.removeItem(`requests_${tenantId}`);
+      localStorage.removeItem(`requests_tenant_${tenantId}`);
 
       toast.success("Conversation saved successfully!");
     } catch (error) {

@@ -52,10 +52,11 @@ import type {
 } from '../types';
 
 // Fallback endpoints from environment variables
+// Try deployed backend first, fall back to local backend
 const ENDPOINTS = [
-  import.meta.env.VITE_LOCAL_BACKEND || 'http://localhost:8000',
-  import.meta.env.VITE_PROD_BACKEND || 'https://ranting-chant.onrender.com'
-];
+  import.meta.env.VITE_DEPLOYED_BACKEND,
+  import.meta.env.VITE_LOCAL_BACKEND || 'http://localhost:8000'
+].filter(Boolean);
 
 let currentEndpointIndex = 0;
 let hasShownConnectionError = false;
@@ -91,14 +92,14 @@ apiClient.interceptors.response.use(
     if ((error.code === 'ERR_NETWORK' || !error.response) && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      // Try next endpoint
-      const nextIndex = (currentEndpointIndex + 1) % ENDPOINTS.length;
-      
-      if (nextIndex !== currentEndpointIndex) {
+      // Try next endpoint (only move forward, don't cycle)
+      const nextIndex = currentEndpointIndex + 1;
+
+      if (nextIndex < ENDPOINTS.length) {
         currentEndpointIndex = nextIndex;
         originalRequest.baseURL = ENDPOINTS[currentEndpointIndex];
         console.log(`Retrying with endpoint: ${ENDPOINTS[currentEndpointIndex]}`);
-        
+
         try {
           return await apiClient(originalRequest);
         } catch (retryError) {
@@ -109,7 +110,7 @@ apiClient.interceptors.response.use(
               description: 'We are having some troubles, please try again later',
               duration: 10000,
             });
-            
+
             // Reset flag after 30 seconds to allow showing error again
             setTimeout(() => {
               hasShownConnectionError = false;
@@ -137,8 +138,11 @@ apiClient.interceptors.response.use(
     const status = error.response?.status;
     
     if (status === 401) {
-      // Unauthorized - clear token and redirect to login
+      // Unauthorized - clear session and redirect to login
       localStorage.removeItem('auth_token');
+      localStorage.removeItem('auth_refresh_token');
+      localStorage.removeItem('current_manager');
+      localStorage.removeItem('user_role');
       window.location.href = '/';
     } else if (status && status >= 400 && status < 600) {
       const message = error.response?.data?.detail || error.message || 'An error occurred';
@@ -294,6 +298,10 @@ export const deleteVendor = async (vendorId: string): Promise<void> => {
 
 export const deleteTenant = async (tenantId: string): Promise<void> => {
   await apiClient.delete(`/tenants/${tenantId}`);
+};
+
+export const deleteProperty = async (propertyId: string): Promise<void> => {
+  await apiClient.delete(`/properties/${propertyId}`);
 };
 
 // ==================== Managers ====================
@@ -461,26 +469,119 @@ export const getMCPTools = async (): Promise<MCPToolsResponse> => {
   return response.data;
 };
 
-// ==================== Authentication (to be implemented in backend) ====================
+// ==================== Authentication ====================
 
+// POST /auth/login
+export const authLogin = async (
+  identifier: string,
+  password: string
+): Promise<{ access_token: string; refresh_token?: string; role: string; actor: Manager | Owner }> => {
+  const response = await apiClient.post(
+    '/auth/login',
+    { identifier, password },
+    { suppressErrorToast: true }
+  );
+  return response.data;
+};
+
+// POST /auth/logout — fire and forget, never throws
+export const authLogout = async (): Promise<void> => {
+  try {
+    await apiClient.post('/auth/logout');
+  } catch {
+    // ignore — token may already be expired
+  }
+};
+
+// POST /auth/refresh
+export const authRefresh = async (
+  refreshToken: string
+): Promise<{ access_token: string; refresh_token?: string; role: string; actor: Manager | Owner }> => {
+  const response = await apiClient.post(
+    `/auth/refresh`,
+    null,
+    { params: { refresh_token: refreshToken }, suppressErrorToast: true }
+  );
+  return response.data;
+};
+
+// GET /auth/me
+export const authGetMe = async (): Promise<{
+  id: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  role: string;
+  managed_properties?: string[];
+  owned_properties?: string[];
+}> => {
+  const response = await apiClient.get('/auth/me');
+  return response.data;
+};
+
+// POST /managers/signup
+export const signupManager = async (data: {
+  email: string;
+  password: string;
+  name: string;
+  phone?: string;
+  username?: string;
+}): Promise<{ message: string; email: string }> => {
+  const response = await apiClient.post<{ message: string; email: string }>(
+    '/managers/signup',
+    data,
+    { suppressErrorToast: true }
+  );
+  return response.data;
+};
+
+// POST /owners/signup
+export const signupOwner = async (data: {
+  email: string;
+  password: string;
+  name: string;
+  phone?: string;
+  username?: string;
+}): Promise<{ message: string; email: string }> => {
+  const response = await apiClient.post<{ message: string; email: string }>(
+    '/owners/signup',
+    data,
+    { suppressErrorToast: true }
+  );
+  return response.data;
+};
+
+// @deprecated — kept for backward compatibility. Use authLogin instead.
 export const login = async (email: string, password: string, role: 'tenant' | 'manager') => {
-  // TODO: Wire to backend authentication endpoint when implemented
+  // TODO: Remove once all callers migrated to authLogin
   // POST /api/auth/login
   const response = await apiClient.post('/api/auth/login', { email, password, role });
   return response.data;
 };
 
+// @deprecated — kept for backward compatibility. Use authLogout instead.
 export const logout = async () => {
-  // TODO: Wire to backend logout endpoint when implemented
+  // TODO: Remove once all callers migrated to authLogout
   // POST /api/auth/logout
   const response = await apiClient.post('/api/auth/logout');
   return response.data;
 };
 
+// @deprecated — kept for backward compatibility. Use authRefresh instead.
 export const refreshToken = async () => {
-  // TODO: Wire to backend refresh token endpoint when implemented
+  // TODO: Remove once all callers migrated to authRefresh
   // POST /api/auth/refresh
   const response = await apiClient.post('/api/auth/refresh');
+  return response.data;
+};
+
+export const forgotPassword = async (email: string) => {
+  const response = await apiClient.post('/auth/forgot-password', { email });
+  return response.data;
+};
+
+export const resetPassword = async (token: string, password: string) => {
+  const response = await apiClient.post('/auth/reset-password', { token, password });
   return response.data;
 };
 

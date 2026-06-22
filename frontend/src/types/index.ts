@@ -176,6 +176,7 @@ export interface Request {
   cancelled_at?: string;
   resolved_at?: string;
   resolved_by?: string;
+  resolved_by_name?: string;
   resolution_note?: string;
   involved_parties: string[];
   conversation_history: ConversationMessage[];
