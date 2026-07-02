@@ -143,9 +143,10 @@ async def list_tenants(request: Request, property_id: Optional[str] = Query(None
     f"{config_loader['endpoints']['tenants_endpoint']['request_limit']}/"
     f"{config_loader['endpoints']['tenants_endpoint']['unit_of_time_for_limit']}"
 )
-async def create_tenant(request: Request, body: TenantCreatePayload, current_actor: dict = Depends(require_manager_or_owner)):
+async def create_tenant(request: Request, body: TenantCreatePayload, auth_tuple: tuple = Depends(require_manager_or_owner)):
     """Create a tenant and attach them to the target property."""
     try:
+        current_actor, access_token = auth_tuple
         #Validate contact fields when provided
         if body.email is not None:
             validate_email_format(body.email)
@@ -158,7 +159,8 @@ async def create_tenant(request: Request, body: TenantCreatePayload, current_act
         record = body.model_dump()
         record["id"] = tenant_id
         db = get_database_service()
-        created = db.tenants.create(record)
+        user_client = db.get_user_scoped_client(access_token)
+        created = db.tenants.create(record, client=user_client)
         log_handler.info(f"[tenants_router] Tenant created successfully with id='{created['id']}'")
         return created
 
@@ -256,11 +258,13 @@ async def get_tenant(request: Request, tenant_id: str):
     f"{config_loader['endpoints']['tenants_endpoint']['request_limit']}/"
     f"{config_loader['endpoints']['tenants_endpoint']['unit_of_time_for_limit']}"
 )
-async def update_tenant(request: Request, tenant_id: str, body: TenantUpdatePayload, current_actor: dict = Depends(require_manager_or_owner)):
+async def update_tenant(request: Request, tenant_id: str, body: TenantUpdatePayload, auth_tuple: tuple = Depends(require_manager_or_owner)):
     """Update a tenant and keep property tenant_ids relationships in sync."""
     try:
+        current_actor, access_token = auth_tuple
         db = get_database_service()
-        existing = db.tenants.find_by_id(tenant_id)
+        user_client = db.get_user_scoped_client(access_token)
+        existing = db.tenants.find_by_id(tenant_id, client=user_client)
         if not existing:
             message = f"Tenant '{tenant_id}' not found"
             log_handler.warning(message)
@@ -279,7 +283,7 @@ async def update_tenant(request: Request, tenant_id: str, body: TenantUpdatePayl
         if "property_id" in updates and updates["property_id"] != existing.get("property_id"):
             _sync_property_tenant_ids(tenant_id, existing.get("property_id"), updates["property_id"])
 
-        updated = db.tenants.update(tenant_id, updates)
+        updated = db.tenants.update(tenant_id, updates, client=user_client)
         log_handler.info(f"[tenants_router] Tenant '{tenant_id}' updated successfully")
         return updated
 
@@ -296,7 +300,7 @@ async def update_tenant(request: Request, tenant_id: str, body: TenantUpdatePayl
     f"{config_loader['endpoints']['tenants_endpoint']['request_limit']}/"
     f"{config_loader['endpoints']['tenants_endpoint']['unit_of_time_for_limit']}"
 )
-async def delete_tenant(request: Request, tenant_id: str, current_actor: dict = Depends(require_manager_or_owner)):
+async def delete_tenant(request: Request, tenant_id: str, auth_tuple: tuple = Depends(require_manager_or_owner)):
     """
     Soft-delete a tenant record.
 
@@ -316,9 +320,11 @@ async def delete_tenant(request: Request, tenant_id: str, current_actor: dict = 
         HTTPException 500: If an unexpected error occurs during deletion.
     """
     try:
+        current_actor, access_token = auth_tuple
         log_handler.debug(f"[tenants_router] Soft-deleting tenant with id='{tenant_id}'")
         db = get_database_service()
-        existing = db.tenants.find_by_id(tenant_id)
+        user_client = db.get_user_scoped_client(access_token)
+        existing = db.tenants.find_by_id(tenant_id, client=user_client)
         if not existing:
             message = f"Tenant '{tenant_id}' not found"
             log_handler.warning(message)
@@ -327,7 +333,7 @@ async def delete_tenant(request: Request, tenant_id: str, current_actor: dict = 
         #Remove tenant from their property's tenant_ids list before deleting
         _sync_property_tenant_ids(tenant_id, existing.get("property_id"), None)
 
-        deleted = db.tenants.delete(tenant_id)
+        deleted = db.tenants.delete(tenant_id, client=user_client)
         log_handler.info(f"[tenants_router] Tenant '{tenant_id}' soft-deleted successfully")
         return deleted
 
