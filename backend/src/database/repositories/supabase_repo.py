@@ -44,8 +44,9 @@ class SupabaseTenantRepository(BaseTenantRepository):
         ).eq("is_active", True).execute()
         return [self._map_row(row) for row in res.data]
 
-    def find_by_id(self, tenant_id: str) -> Optional[Dict[str, Any]]:
-        res = self.supabase.table("tenants").select(
+    def find_by_id(self, tenant_id: str, client=None) -> Optional[Dict[str, Any]]:
+        sb = client if client else self.supabase
+        res = sb.table("tenants").select(
             "id, is_active, units(id, unit_number, property_id, properties(name, address)), actors(display_name, email, phone)"
         ).eq("id", tenant_id).execute()
         if not res.data:
@@ -70,16 +71,17 @@ class SupabaseTenantRepository(BaseTenantRepository):
             all_tenants = self.list()
             return [t for t in all_tenants if t.get(field) == value]
 
-    def create(self, data: dict) -> Dict[str, Any]:
+    def create(self, data: dict, client=None) -> Dict[str, Any]:
+        sb = client if client else self.supabase
         property_id = data.get("property_id")
         unit_number = data.get("unit")
         
         # 1. Resolve unit_id (find or create)
-        unit_res = self.supabase.table("units").select("id").eq("property_id", property_id).eq("unit_number", unit_number).execute()
+        unit_res = sb.table("units").select("id").eq("property_id", property_id).eq("unit_number", unit_number).execute()
         if unit_res.data:
             unit_id = unit_res.data[0]["id"]
         else:
-            insert_res = self.supabase.table("units").insert({
+            insert_res = sb.table("units").insert({
                 "property_id": property_id,
                 "unit_number": unit_number
             }).execute()
@@ -94,19 +96,20 @@ class SupabaseTenantRepository(BaseTenantRepository):
         }
         if "id" in data:
             actor_data["id"] = data["id"]
-        actor_res = self.supabase.table("actors").insert(actor_data).execute()
+        actor_res = sb.table("actors").insert(actor_data).execute()
         actor_id = actor_res.data[0]["id"]
 
         # 3. Insert into tenants
-        self.supabase.table("tenants").insert({
+        sb.table("tenants").insert({
             "id": actor_id,
             "unit_id": unit_id,
             "is_active": True
         }).execute()
 
-        return self.find_by_id(actor_id)
+        return self.find_by_id(actor_id, client=client)
 
-    def update(self, tenant_id: str, updates: dict) -> Dict[str, Any]:
+    def update(self, tenant_id: str, updates: dict, client=None) -> Dict[str, Any]:
+        sb = client if client else self.supabase
         # Update actor table fields if provided
         actor_updates = {}
         if "name" in updates:
@@ -117,40 +120,41 @@ class SupabaseTenantRepository(BaseTenantRepository):
             actor_updates["phone"] = updates["phone"]
         
         if actor_updates:
-            self.supabase.table("actors").update(actor_updates).eq("id", tenant_id).execute()
+            sb.table("actors").update(actor_updates).eq("id", tenant_id).execute()
 
         # Update unit relationship if unit or property_id changes
         if "unit" in updates or "property_id" in updates:
-            tenant_info = self.find_by_id(tenant_id)
+            tenant_info = self.find_by_id(tenant_id, client=client)
             if tenant_info:
                 new_property_id = updates.get("property_id", tenant_info["property_id"])
                 new_unit = updates.get("unit", tenant_info["unit"])
                 
                 # Resolve unit_id
-                unit_res = self.supabase.table("units").select("id").eq("property_id", new_property_id).eq("unit_number", new_unit).execute()
+                unit_res = sb.table("units").select("id").eq("property_id", new_property_id).eq("unit_number", new_unit).execute()
                 if unit_res.data:
                     unit_id = unit_res.data[0]["id"]
                 else:
-                    insert_res = self.supabase.table("units").insert({
+                    insert_res = sb.table("units").insert({
                         "property_id": new_property_id,
                         "unit_number": new_unit
                     }).execute()
                     unit_id = insert_res.data[0]["id"]
                 
-                self.supabase.table("tenants").update({"unit_id": unit_id}).eq("id", tenant_id).execute()
+                sb.table("tenants").update({"unit_id": unit_id}).eq("id", tenant_id).execute()
 
-        return self.find_by_id(tenant_id)
+        return self.find_by_id(tenant_id, client=client)
 
-    def delete(self, tenant_id: str) -> Dict[str, Any]:
-        tenant_info = self.find_by_id(tenant_id)
+    def delete(self, tenant_id: str, client=None) -> Dict[str, Any]:
+        sb = client if client else self.supabase
+        tenant_info = self.find_by_id(tenant_id, client=client)
         # Soft delete: set is_active=False and deleted_at timestamp on both
         # tenants and actors rows so the record is preserved but hidden.
         now = datetime.now(timezone.utc).isoformat()
-        self.supabase.table("tenants").update({
+        sb.table("tenants").update({
             "is_active": False,
             "deleted_at": now
         }).eq("id", tenant_id).execute()
-        self.supabase.table("actors").update({
+        sb.table("actors").update({
             "is_active": False,
             "updated_at": now
         }).eq("id", tenant_id).execute()
@@ -200,8 +204,9 @@ class SupabasePropertyRepository(BasePropertyRepository):
         ).eq("is_active", True).execute()
         return [self._map_row(row) for row in res.data]
 
-    def find_by_id(self, property_id: str) -> Optional[Dict[str, Any]]:
-        res = self.supabase.table("properties").select(
+    def find_by_id(self, property_id: str, client=None) -> Optional[Dict[str, Any]]:
+        sb = client if client else self.supabase
+        res = sb.table("properties").select(
             "*, owner_properties(owner_id), manager_properties(manager_id), units(id, tenants(id))"
         ).eq("id", property_id).execute()
         if not res.data:
@@ -212,7 +217,8 @@ class SupabasePropertyRepository(BasePropertyRepository):
         all_properties = self.list()
         return [p for p in all_properties if p.get(field) == value]
 
-    def create(self, data: dict) -> Dict[str, Any]:
+    def create(self, data: dict, client=None) -> Dict[str, Any]:
+        sb = client if client else self.supabase
         prop_data = {
             "name": data.get("name"),
             "address": data.get("address"),
@@ -224,58 +230,60 @@ class SupabasePropertyRepository(BasePropertyRepository):
         if "id" in data:
             prop_data["id"] = data["id"]
             
-        res = self.supabase.table("properties").insert(prop_data).execute()
+        res = sb.table("properties").insert(prop_data).execute()
         prop_id = res.data[0]["id"]
 
         # Insert owner property relationship if provided
         if data.get("owner_id"):
-            self.supabase.table("owner_properties").insert({
+            sb.table("owner_properties").insert({
                 "owner_id": data["owner_id"],
                 "property_id": prop_id
             }).execute()
 
         # Insert manager property relationship if provided
         if data.get("manager_id"):
-            self.supabase.table("manager_properties").insert({
+            sb.table("manager_properties").insert({
                 "manager_id": data["manager_id"],
                 "property_id": prop_id
             }).execute()
 
-        return self.find_by_id(prop_id)
+        return self.find_by_id(prop_id, client=client)
 
-    def update(self, property_id: str, updates: dict) -> Dict[str, Any]:
+    def update(self, property_id: str, updates: dict, client=None) -> Dict[str, Any]:
+        sb = client if client else self.supabase
         prop_updates = {}
         for k in ["name", "address", "year_built", "property_type", "unit_count", "is_active"]:
             if k in updates:
                 prop_updates[k] = updates[k]
                 
         if prop_updates:
-            self.supabase.table("properties").update(prop_updates).eq("id", property_id).execute()
+            sb.table("properties").update(prop_updates).eq("id", property_id).execute()
 
         # Update owner_id relationship if provided
         if "owner_id" in updates:
-            self.supabase.table("owner_properties").delete().eq("property_id", property_id).execute()
+            sb.table("owner_properties").delete().eq("property_id", property_id).execute()
             if updates["owner_id"]:
-                self.supabase.table("owner_properties").insert({
+                sb.table("owner_properties").insert({
                     "owner_id": updates["owner_id"],
                     "property_id": property_id
                 }).execute()
 
         # Update manager_id relationship if provided
         if "manager_id" in updates:
-            self.supabase.table("manager_properties").delete().eq("property_id", property_id).execute()
+            sb.table("manager_properties").delete().eq("property_id", property_id).execute()
             if updates["manager_id"]:
-                self.supabase.table("manager_properties").insert({
+                sb.table("manager_properties").insert({
                     "manager_id": updates["manager_id"],
                     "property_id": property_id
                 }).execute()
 
-        return self.find_by_id(property_id)
+        return self.find_by_id(property_id, client=client)
 
-    def delete(self, property_id: str) -> Dict[str, Any]:
-        prop_info = self.find_by_id(property_id)
+    def delete(self, property_id: str, client=None) -> Dict[str, Any]:
+        sb = client if client else self.supabase
+        prop_info = self.find_by_id(property_id, client=client)
         # Hard delete: actually remove the row from the database
-        self.supabase.table("properties").delete().eq("id", property_id).execute()
+        sb.table("properties").delete().eq("id", property_id).execute()
         return prop_info
 
 
@@ -301,8 +309,9 @@ class SupabaseVendorRepository(BaseVendorRepository):
         ).execute()
         return [self._map_row(row) for row in res.data]
 
-    def find_by_id(self, vendor_id: str) -> Optional[Dict[str, Any]]:
-        res = self.supabase.table("vendors").select(
+    def find_by_id(self, vendor_id: str, client=None) -> Optional[Dict[str, Any]]:
+        sb = client if client else self.supabase
+        res = sb.table("vendors").select(
             "id, emergency_available, actors(display_name, email, phone), vendor_services(service_name)"
         ).eq("id", vendor_id).execute()
         if not res.data:
@@ -313,7 +322,8 @@ class SupabaseVendorRepository(BaseVendorRepository):
         all_vendors = self.list()
         return [v for v in all_vendors if v.get(field) == value]
 
-    def create(self, data: dict) -> Dict[str, Any]:
+    def create(self, data: dict, client=None) -> Dict[str, Any]:
+        sb = client if client else self.supabase
         # 1. Insert into actors
         actor_data = {
             "type": "vendor",
@@ -323,11 +333,11 @@ class SupabaseVendorRepository(BaseVendorRepository):
         }
         if "id" in data:
             actor_data["id"] = data["id"]
-        actor_res = self.supabase.table("actors").insert(actor_data).execute()
+        actor_res = sb.table("actors").insert(actor_data).execute()
         actor_id = actor_res.data[0]["id"]
 
         # 2. Insert into vendors
-        self.supabase.table("vendors").insert({
+        sb.table("vendors").insert({
             "id": actor_id,
             "emergency_available": data.get("emergency_available", False)
         }).execute()
@@ -336,11 +346,12 @@ class SupabaseVendorRepository(BaseVendorRepository):
         services = data.get("services", [])
         if services:
             services_data = [{"vendor_id": actor_id, "service_name": s} for s in services]
-            self.supabase.table("vendor_services").insert(services_data).execute()
+            sb.table("vendor_services").insert(services_data).execute()
 
-        return self.find_by_id(actor_id)
+        return self.find_by_id(actor_id, client=client)
 
-    def update(self, vendor_id: str, updates: dict) -> Dict[str, Any]:
+    def update(self, vendor_id: str, updates: dict, client=None) -> Dict[str, Any]:
+        sb = client if client else self.supabase
         # Update actor fields
         actor_updates = {}
         if "name" in updates:
@@ -350,25 +361,26 @@ class SupabaseVendorRepository(BaseVendorRepository):
         if "phone" in updates:
             actor_updates["phone"] = updates["phone"]
         if actor_updates:
-            self.supabase.table("actors").update(actor_updates).eq("id", vendor_id).execute()
+            sb.table("actors").update(actor_updates).eq("id", vendor_id).execute()
 
         # Update emergency_available
         if "emergency_available" in updates:
-            self.supabase.table("vendors").update({"emergency_available": updates["emergency_available"]}).eq("id", vendor_id).execute()
+            sb.table("vendors").update({"emergency_available": updates["emergency_available"]}).eq("id", vendor_id).execute()
 
         # Update services
         if "services" in updates:
-            self.supabase.table("vendor_services").delete().eq("vendor_id", vendor_id).execute()
+            sb.table("vendor_services").delete().eq("vendor_id", vendor_id).execute()
             services_data = [{"vendor_id": vendor_id, "service_name": s} for s in updates["services"]]
             if services_data:
-                self.supabase.table("vendor_services").insert(services_data).execute()
+                sb.table("vendor_services").insert(services_data).execute()
 
-        return self.find_by_id(vendor_id)
+        return self.find_by_id(vendor_id, client=client)
 
-    def delete(self, vendor_id: str) -> Dict[str, Any]:
-        vendor_info = self.find_by_id(vendor_id)
+    def delete(self, vendor_id: str, client=None) -> Dict[str, Any]:
+        sb = client if client else self.supabase
+        vendor_info = self.find_by_id(vendor_id, client=client)
         # Cascade delete is handled by database when we delete the actor
-        self.supabase.table("actors").delete().eq("id", vendor_id).execute()
+        sb.table("actors").delete().eq("id", vendor_id).execute()
         return vendor_info
 
 

@@ -154,6 +154,44 @@ class DatabaseService:
 
         return info
 
+    # ------------------------------------------------------------------
+    # User-scoped client factory
+    # ------------------------------------------------------------------
+
+    def get_user_scoped_client(self, access_token: str):
+        """
+        Create a Supabase client with user authentication context for RLS.
+
+        Uses the anon key (not service key) to create a client, then sets the
+        Authorization header with the user's access token. This enables RLS
+        policies to identify the current user via auth.uid().
+
+        Args:
+            access_token: The user's JWT access token from the auth response.
+
+        Returns:
+            A supabase.Client instance configured with user context.
+
+        Raises:
+            RuntimeError: If called when the backend is ``json``.
+        """
+        if not self.is_supabase:
+            raise RuntimeError(
+                "User-scoped client is not available when DATA_BACKEND='json'. "
+                "Set DATA_BACKEND='supabase' in backend/.env to enable it."
+            )
+
+        from supabase import create_client
+        from src.database.supabase_client import _require_env
+
+        url = _require_env("SUPABASE_URL")
+        anon_key = _require_env("SUPABASE_ANON_KEY")
+
+        client = create_client(url, anon_key)
+        # Set the Authorization header directly on PostgREST for RLS
+        client.postgrest.auth(access_token)
+        return client
+
 
 @lru_cache(maxsize=1)
 def get_database_service() -> DatabaseService:
