@@ -85,8 +85,11 @@ async def login(request: Request, credentials: LoginRequest) -> AuthResponse:
         auth_email = result.data[0]["email"]
     
     try:
-        # Step 2: Authenticate with Supabase Auth
-        auth_response = supabase_client.auth.sign_in_with_password({
+        # Step 2: Authenticate with Supabase Auth using the auth-only client
+        # (must NOT use the service-role singleton — signing in would overwrite
+        #  its internal session with the user's JWT and break subsequent RLS-bypassed calls)
+        auth_only_client = get_auth_client()
+        auth_response = auth_only_client.auth.sign_in_with_password({
             "email": auth_email,
             "password": credentials.password
         })
@@ -204,11 +207,10 @@ async def reset_password(request: Request, body: ResetPasswordRequest):
     log_handler.info(f"[auth] Password reset attempt")
 
     try:
-        # Set the access token to authenticate the user
-        supabase_client.auth.set_session(body.token, "")
-
-        # Update the user's password
-        supabase_client.auth.update_user({
+        # Use auth-only client to avoid contaminating the service-role singleton session
+        auth_only_client = get_auth_client()
+        auth_only_client.auth.set_session(body.token, "")
+        auth_only_client.auth.update_user({
             "password": body.password
         })
 
@@ -361,9 +363,12 @@ async def logout(request: Request, auth_tuple: tuple[dict, str] = Depends(get_cu
     """
     Logout the current user (invalidate the session on Supabase).
     """
-    current_actor, _ = auth_tuple
+    current_actor, access_token = auth_tuple
     try:
-        supabase_client.auth.sign_out()
+        # Use auth-only client to avoid contaminating the service-role singleton session
+        auth_only_client = get_auth_client()
+        auth_only_client.auth.set_session(access_token, "")
+        auth_only_client.auth.sign_out()
         log_handler.info(f"[auth] Logout successful for {current_actor['role']}: {current_actor['email']}")
         return {"message": "Logged out successfully"}
     except Exception as e:
@@ -381,7 +386,9 @@ async def refresh_token(request: Request, refresh_token: str) -> AuthResponse:
     Refresh an expired access token using a valid refresh token.
     """
     try:
-        auth_response = supabase_client.auth.refresh_session(refresh_token)
+        # Use auth-only client for token refresh to avoid contaminating the service-role singleton
+        auth_only_client = get_auth_client()
+        auth_response = auth_only_client.auth.refresh_session(refresh_token)
         if not auth_response.user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

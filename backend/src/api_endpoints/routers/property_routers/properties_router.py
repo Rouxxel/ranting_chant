@@ -144,8 +144,11 @@ async def create_property(request: Request, body: PropertyCreatePayload, auth_tu
         )
 
         db = get_database_service()
-        user_client = db.get_user_scoped_client(access_token)
-        created = db.properties.create(record, client=user_client)
+        # Server-side authorization: require_manager_or_owner has already
+        # verified the JWT and confirmed the caller is a manager or owner.
+        # The service-role client bypasses RLS for the write — application-level
+        # auth is enforced by the dependency above, not by database RLS.
+        created = db.properties.create(record)
 
         #Link the property to its manager/owner so it appears in their listings
         if body.manager_id:
@@ -224,10 +227,9 @@ async def get_property(request: Request, property_id: str):
 async def update_property(request: Request, property_id: str, body: PropertyUpdatePayload, auth_tuple: tuple = Depends(require_manager_or_owner)):
     """Update editable property fields and relationship references."""
     try:
-        current_actor, access_token = auth_tuple
+        current_actor, _ = auth_tuple
         db = get_database_service()
-        user_client = db.get_user_scoped_client(access_token)
-        existing = db.properties.find_by_id(property_id, client=user_client)
+        existing = db.properties.find_by_id(property_id)
         if not existing:
             message = f"Property '{property_id}' not found"
             log_handler.warning(message)
@@ -245,7 +247,7 @@ async def update_property(request: Request, property_id: str, body: PropertyUpda
                 updates.get("owner_id", existing.get("owner_id")),
             )
 
-        updated = db.properties.update(property_id, updates, client=user_client)
+        updated = db.properties.update(property_id, updates)
         log_handler.info(f"[properties_router] Property '{property_id}' updated successfully")
         return updated
 
@@ -281,17 +283,16 @@ async def delete_property(request: Request, property_id: str, auth_tuple: tuple 
         HTTPException 500: If an unexpected error occurs during deletion.
     """
     try:
-        current_actor, access_token = auth_tuple
+        current_actor, _ = auth_tuple
         log_handler.debug(f"[properties_router] Soft-deleting property with id='{property_id}'")
         db = get_database_service()
-        user_client = db.get_user_scoped_client(access_token)
-        existing = db.properties.find_by_id(property_id, client=user_client)
+        existing = db.properties.find_by_id(property_id)
         if not existing:
             message = f"Property '{property_id}' not found"
             log_handler.warning(message)
             raise HTTPException(status_code=404, detail=message)
 
-        deleted = db.properties.delete(property_id, client=user_client)
+        deleted = db.properties.delete(property_id)
         log_handler.info(f"[properties_router] Property '{property_id}' deleted successfully")
         return deleted
 

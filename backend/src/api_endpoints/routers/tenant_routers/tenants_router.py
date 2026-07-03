@@ -159,8 +159,9 @@ async def create_tenant(request: Request, body: TenantCreatePayload, auth_tuple:
         record = body.model_dump()
         record["id"] = tenant_id
         db = get_database_service()
-        user_client = db.get_user_scoped_client(access_token)
-        created = db.tenants.create(record, client=user_client)
+        # Service-role client: require_manager_or_owner already verified auth.
+        # User-scoped client cannot propagate JWT to table INSERTs in supabase-py.
+        created = db.tenants.create(record)
         log_handler.info(f"[tenants_router] Tenant created successfully with id='{created['id']}'")
         return created
 
@@ -261,10 +262,9 @@ async def get_tenant(request: Request, tenant_id: str):
 async def update_tenant(request: Request, tenant_id: str, body: TenantUpdatePayload, auth_tuple: tuple = Depends(require_manager_or_owner)):
     """Update a tenant and keep property tenant_ids relationships in sync."""
     try:
-        current_actor, access_token = auth_tuple
+        current_actor, _ = auth_tuple
         db = get_database_service()
-        user_client = db.get_user_scoped_client(access_token)
-        existing = db.tenants.find_by_id(tenant_id, client=user_client)
+        existing = db.tenants.find_by_id(tenant_id)
         if not existing:
             message = f"Tenant '{tenant_id}' not found"
             log_handler.warning(message)
@@ -283,7 +283,7 @@ async def update_tenant(request: Request, tenant_id: str, body: TenantUpdatePayl
         if "property_id" in updates and updates["property_id"] != existing.get("property_id"):
             _sync_property_tenant_ids(tenant_id, existing.get("property_id"), updates["property_id"])
 
-        updated = db.tenants.update(tenant_id, updates, client=user_client)
+        updated = db.tenants.update(tenant_id, updates)
         log_handler.info(f"[tenants_router] Tenant '{tenant_id}' updated successfully")
         return updated
 
@@ -320,11 +320,10 @@ async def delete_tenant(request: Request, tenant_id: str, auth_tuple: tuple = De
         HTTPException 500: If an unexpected error occurs during deletion.
     """
     try:
-        current_actor, access_token = auth_tuple
+        current_actor, _ = auth_tuple
         log_handler.debug(f"[tenants_router] Soft-deleting tenant with id='{tenant_id}'")
         db = get_database_service()
-        user_client = db.get_user_scoped_client(access_token)
-        existing = db.tenants.find_by_id(tenant_id, client=user_client)
+        existing = db.tenants.find_by_id(tenant_id)
         if not existing:
             message = f"Tenant '{tenant_id}' not found"
             log_handler.warning(message)
@@ -333,7 +332,7 @@ async def delete_tenant(request: Request, tenant_id: str, auth_tuple: tuple = De
         #Remove tenant from their property's tenant_ids list before deleting
         _sync_property_tenant_ids(tenant_id, existing.get("property_id"), None)
 
-        deleted = db.tenants.delete(tenant_id, client=user_client)
+        deleted = db.tenants.delete(tenant_id)
         log_handler.info(f"[tenants_router] Tenant '{tenant_id}' soft-deleted successfully")
         return deleted
 

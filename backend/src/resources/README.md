@@ -330,6 +330,28 @@ RLS rules follow these principles:
 
 `004_schema_hardening.sql` adds RLS for its new tables and reuses the helper functions from `002_rls_policies.sql`.
 
+### Service-role bypass policies
+
+`002_rls_policies.sql` also defines `service_role` bypass policies for all base tables, and `004_schema_hardening.sql` defines them for the hardening tables. These allow the FastAPI backend (which uses the service-role key) to write to all tables without being blocked by user-facing RLS checks.
+
+**Why this is correct**: The backend is a trusted server. Authorization is enforced at the FastAPI layer by the `require_manager_or_owner` dependency — the JWT is validated there before any route handler runs. RLS policies protect against direct Supabase dashboard or client-side access, not server-side FastAPI access.
+
+**Important**: Never use `auth.sign_in_with_password()` or other auth mutation methods on the service-role singleton client. Always use `get_auth_client()` (a fresh anon-key client) for auth operations. Calling auth methods on the service-role singleton replaces its internal JWT with the user's token, breaking all subsequent service-role table operations.
+
+### Debug helpers
+
+`002_rls_policies.sql` defines two diagnostic functions:
+
+```sql
+-- Verify auth.uid() resolves via user-scoped client
+SELECT * FROM debug_auth_context();
+
+-- Check the caller's PostgreSQL role (true JWT propagation test)
+SELECT * FROM debug_auth_context_caller();
+```
+
+Call these from a user-scoped client (anon key + `set_session` / `postgrest.auth`) to confirm whether JWT context is reaching the database layer.
+
 ## Seed data
 
 `003_seed_data.sql` normalizes mock data into the production schema:

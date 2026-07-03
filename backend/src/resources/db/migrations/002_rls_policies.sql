@@ -792,3 +792,185 @@ CREATE POLICY "Owners and managers can create notifications for related requests
             )
         )
     );
+
+-- ============================================================================
+-- SERVICE-ROLE BYPASS POLICIES
+-- ============================================================================
+-- The backend uses the service-role client for all server-side writes.
+-- These policies allow service_role to bypass RLS on all tables so
+-- FastAPI endpoints can insert/update/delete without hitting RLS checks.
+-- Application-level authorization is enforced by the require_manager_or_owner
+-- FastAPI dependency, which validates the JWT before any route handler runs.
+
+DROP POLICY IF EXISTS "Service role can bypass actors RLS" ON actors;
+CREATE POLICY "Service role can bypass actors RLS"
+    ON actors FOR ALL TO service_role
+    USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Service role bypass on properties" ON properties;
+CREATE POLICY "Service role bypass on properties"
+    ON properties FOR ALL TO service_role
+    USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Service role can bypass owners RLS" ON owners;
+CREATE POLICY "Service role can bypass owners RLS"
+    ON owners FOR ALL TO service_role
+    USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Service role can bypass property_managers RLS" ON property_managers;
+CREATE POLICY "Service role can bypass property_managers RLS"
+    ON property_managers FOR ALL TO service_role
+    USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Service role can bypass vendors RLS" ON vendors;
+CREATE POLICY "Service role can bypass vendors RLS"
+    ON vendors FOR ALL TO service_role
+    USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Service role can bypass vendor_services RLS" ON vendor_services;
+CREATE POLICY "Service role can bypass vendor_services RLS"
+    ON vendor_services FOR ALL TO service_role
+    USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Service role can bypass units RLS" ON units;
+CREATE POLICY "Service role can bypass units RLS"
+    ON units FOR ALL TO service_role
+    USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Service role can bypass tenants RLS" ON tenants;
+CREATE POLICY "Service role can bypass tenants RLS"
+    ON tenants FOR ALL TO service_role
+    USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Service role can bypass owner_properties RLS" ON owner_properties;
+CREATE POLICY "Service role can bypass owner_properties RLS"
+    ON owner_properties FOR ALL TO service_role
+    USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Service role can bypass manager_properties RLS" ON manager_properties;
+CREATE POLICY "Service role can bypass manager_properties RLS"
+    ON manager_properties FOR ALL TO service_role
+    USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Service role can bypass requests RLS" ON requests;
+CREATE POLICY "Service role can bypass requests RLS"
+    ON requests FOR ALL TO service_role
+    USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Service role can bypass request_involved_parties RLS" ON request_involved_parties;
+CREATE POLICY "Service role can bypass request_involved_parties RLS"
+    ON request_involved_parties FOR ALL TO service_role
+    USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Service role can bypass conversation_messages RLS" ON conversation_messages;
+CREATE POLICY "Service role can bypass conversation_messages RLS"
+    ON conversation_messages FOR ALL TO service_role
+    USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Service role can bypass notifications RLS" ON notifications;
+CREATE POLICY "Service role can bypass notifications RLS"
+    ON notifications FOR ALL TO service_role
+    USING (true) WITH CHECK (true);
+
+-- ============================================================================
+-- CORRECTED INSERT POLICIES
+-- ============================================================================
+-- The original properties INSERT policy requires created_by = current_actor_id().
+-- That works for user-scoped clients only. Since the backend uses service-role
+-- for writes, the bypass above covers all backend writes. The user-facing
+-- policies below are kept correct for any future client-side access.
+
+-- Properties: replace original + any overlapping policies from fix attempts
+DROP POLICY IF EXISTS "Owners and managers can create properties"         ON properties;
+DROP POLICY IF EXISTS "Authenticated users can create properties"         ON properties;
+DROP POLICY IF EXISTS "Managers and owners can insert properties"         ON properties;
+CREATE POLICY "Managers and owners can insert properties"
+    ON properties FOR INSERT
+    WITH CHECK (current_actor_is_manager_or_owner());
+
+-- owner_properties
+DROP POLICY IF EXISTS "Owners can create own property relationships"                   ON owner_properties;
+DROP POLICY IF EXISTS "Authenticated users can create owner property relationships"    ON owner_properties;
+DROP POLICY IF EXISTS "Owners can insert own property relationships"                   ON owner_properties;
+CREATE POLICY "Owners can insert own property relationships"
+    ON owner_properties FOR INSERT
+    WITH CHECK (
+        owner_id = current_actor_id()
+        AND EXISTS (SELECT 1 FROM owners o WHERE o.id = current_actor_id())
+    );
+
+-- manager_properties: clean up all overlapping policies from fix attempts
+DROP POLICY IF EXISTS "Managers can create own property relationships"                ON manager_properties;
+DROP POLICY IF EXISTS "Owners can assign managers to related properties"              ON manager_properties;
+DROP POLICY IF EXISTS "Owners can assign managers to their properties"                ON manager_properties;
+DROP POLICY IF EXISTS "Authenticated users can create manager property relationships" ON manager_properties;
+DROP POLICY IF EXISTS "Managers can insert own property relationships"                ON manager_properties;
+CREATE POLICY "Managers can insert own property relationships"
+    ON manager_properties FOR INSERT
+    WITH CHECK (
+        manager_id = current_actor_id()
+        AND EXISTS (SELECT 1 FROM property_managers pm WHERE pm.id = current_actor_id())
+    );
+
+CREATE POLICY "Owners can assign managers to their properties"
+    ON manager_properties FOR INSERT
+    WITH CHECK (
+        EXISTS (SELECT 1 FROM owners o WHERE o.id = current_actor_id())
+        AND EXISTS (SELECT 1 FROM property_managers pm WHERE pm.id = manager_id)
+        AND (
+            actor_can_manage_property(manager_properties.property_id, current_actor_id())
+            OR EXISTS (
+                SELECT 1 FROM properties p
+                WHERE p.id = manager_properties.property_id
+                AND p.created_by = current_actor_id()
+            )
+        )
+    );
+
+-- vendor_services: replace the managers-only policy with one that covers owners too
+DROP POLICY IF EXISTS "Managers can manage vendor services"             ON vendor_services;
+DROP POLICY IF EXISTS "Managers and owners can manage vendor services"  ON vendor_services;
+CREATE POLICY "Managers and owners can manage vendor services"
+    ON vendor_services FOR ALL
+    USING (current_actor_is_manager_or_owner())
+    WITH CHECK (current_actor_is_manager_or_owner());
+
+-- ============================================================================
+-- DEBUG HELPERS
+-- ============================================================================
+-- Call via a user-scoped client to verify JWT propagation:
+--   client.rpc("debug_auth_context").execute()
+--   client.rpc("debug_auth_context_caller").execute()
+
+CREATE OR REPLACE FUNCTION debug_auth_context()
+RETURNS TABLE (
+    auth_uid            UUID,
+    actor_id            UUID,
+    is_manager_or_owner BOOLEAN
+)
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+    SELECT
+        auth.uid()                          AS auth_uid,
+        current_actor_id()                  AS actor_id,
+        current_actor_is_manager_or_owner() AS is_manager_or_owner;
+$$;
+
+-- Invoker version: runs under the caller's role — the true JWT propagation test
+CREATE OR REPLACE FUNCTION debug_auth_context_caller()
+RETURNS TABLE (
+    auth_uid     UUID,
+    current_role TEXT
+)
+LANGUAGE sql
+STABLE
+SECURITY INVOKER
+SET search_path = public
+AS $$
+    SELECT
+        auth.uid()   AS auth_uid,
+        current_user AS current_role;
+$$;

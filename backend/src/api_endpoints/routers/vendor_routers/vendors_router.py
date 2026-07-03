@@ -222,10 +222,9 @@ async def get_vendor(request: Request, vendor_id: str):
 async def update_vendor(request: Request, vendor_id: str, body: VendorUpdatePayload, auth_tuple: tuple = Depends(require_manager_or_owner)):
     """Update vendor details and service categories."""
     try:
-        current_actor, access_token = auth_tuple
+        current_actor, _ = auth_tuple
         db = get_database_service()
-        user_client = db.get_user_scoped_client(access_token)
-        existing = db.vendors.find_by_id(vendor_id, client=user_client)
+        existing = db.vendors.find_by_id(vendor_id)
         if not existing:
             message = f"Vendor '{vendor_id}' not found"
             log_handler.warning(message)

@@ -229,6 +229,8 @@ class SupabasePropertyRepository(BasePropertyRepository):
         }
         if "id" in data:
             prop_data["id"] = data["id"]
+        if "created_by" in data:
+            prop_data["created_by"] = data["created_by"]
             
         res = sb.table("properties").insert(prop_data).execute()
         prop_id = res.data[0]["id"]
