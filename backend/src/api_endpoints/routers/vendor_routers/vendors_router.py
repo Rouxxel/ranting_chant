@@ -240,7 +240,7 @@ async def update_vendor(request: Request, vendor_id: str, body: VendorUpdatePayl
         if "phone" in updates:
             validate_phone_format(updates["phone"])
 
-        updated = db.vendors.update(vendor_id, updates, client=user_client)
+        updated = db.vendors.update(vendor_id, updates)
         log_handler.info(f"[vendors_router] Vendor '{vendor_id}' updated successfully")
         return updated
 

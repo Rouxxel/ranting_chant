@@ -963,7 +963,7 @@ $$;
 CREATE OR REPLACE FUNCTION debug_auth_context_caller()
 RETURNS TABLE (
     auth_uid     UUID,
-    current_role TEXT
+    pg_role      TEXT
 )
 LANGUAGE sql
 STABLE
@@ -972,5 +972,5 @@ SET search_path = public
 AS $$
     SELECT
         auth.uid()   AS auth_uid,
-        current_user AS current_role;
+        current_user AS pg_role;
 $$;
