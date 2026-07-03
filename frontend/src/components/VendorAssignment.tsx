@@ -1,16 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Search, Building2, Star, Clock, Phone, Mail } from 'lucide-react'
-
-interface Vendor {
-  id: string
-  name: string
-  service: string
-  rating: number
-  emergencyAvailable: boolean
-  responseTime: string
-  phone: string
-  email: string
-}
+import { toast } from 'sonner'
+import { getVendors, getVendorsByService, updateRequest } from '../services/api'
+import type { Vendor } from '../types'
 
 interface VendorAssignmentProps {
   requestId: string
@@ -22,61 +14,49 @@ interface VendorAssignmentProps {
 export function VendorAssignment({ requestId, serviceType, onAssign, className = '' }: VendorAssignmentProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null)
+  const [vendors, setVendors] = useState<Vendor[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [isAssigning, setIsAssigning] = useState(false)
 
-  // TODO: Wire to GET /vendors and GET /vendors/by-service/{service}
-  const vendors: Vendor[] = [
-    {
-      id: 'vendor_001',
-      name: 'QuickFix Locksmith',
-      service: 'locksmith',
-      rating: 4.8,
-      emergencyAvailable: true,
-      responseTime: '15-30 min',
-      phone: '+1-555-4444',
-      email: 'dispatch@quickfix.com'
-    },
-    {
-      id: 'vendor_002',
-      name: 'AquaFlow Plumbing',
-      service: 'plumbing',
-      rating: 4.6,
-      emergencyAvailable: true,
-      responseTime: '30-45 min',
-      phone: '+1-555-5555',
-      email: 'service@aquaflow.com'
-    },
-    {
-      id: 'vendor_003',
-      name: 'VoltPro Electrical',
-      service: 'electrical',
-      rating: 4.7,
-      emergencyAvailable: true,
-      responseTime: '20-40 min',
-      phone: '+1-555-6666',
-      email: 'emergency@voltpro.com'
-    },
-    {
-      id: 'vendor_004',
-      name: 'ArcticAir HVAC',
-      service: 'hvac',
-      rating: 4.5,
-      emergencyAvailable: false,
-      responseTime: '1-2 hours',
-      phone: '+1-555-7777',
-      email: 'booking@arcticair.com'
+  useEffect(() => {
+    const fetchVendors = async () => {
+      try {
+        const data = serviceType
+          ? await getVendorsByService(serviceType)
+          : await getVendors()
+        setVendors(data)
+      } catch (error) {
+        console.error('Failed to fetch vendors:', error)
+        toast.error('Failed to load vendors')
+      } finally {
+        setIsLoading(false)
+      }
     }
-  ]
+
+    fetchVendors()
+  }, [serviceType])
 
   const filteredVendors = vendors.filter(vendor =>
     vendor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    vendor.service.toLowerCase().includes(searchQuery.toLowerCase())
+    vendor.services.some(s => s.toLowerCase().includes(searchQuery.toLowerCase()))
   )
 
-  const handleAssign = () => {
-    if (selectedVendor && onAssign) {
-      onAssign(selectedVendor.id)
+  const handleAssign = async () => {
+    if (!selectedVendor) return
+
+    setIsAssigning(true)
+    try {
+      await updateRequest(requestId, { vendor_id: selectedVendor.id })
+      toast.success('Vendor assigned successfully')
+      if (onAssign) {
+        onAssign(selectedVendor.id)
+      }
+    } catch (error) {
+      console.error('Failed to assign vendor:', error)
+      toast.error('Failed to assign vendor')
+    } finally {
+      setIsAssigning(false)
     }
-    // TODO: Wire to backend PATCH /requests/{requestId} with vendor_id
   }
 
   return (
@@ -100,41 +80,49 @@ export function VendorAssignment({ requestId, serviceType, onAssign, className =
 
       {/* Vendor List */}
       <div className="space-y-2 max-h-64 overflow-y-auto mb-4">
-        {filteredVendors.map(vendor => (
-          <button
-            key={vendor.id}
-            onClick={() => setSelectedVendor(vendor)}
-            className={`w-full text-left p-4 rounded-lg transition-colors ${
-              selectedVendor?.id === vendor.id
-                ? 'bg-ranting-sky/20 border border-ranting-sky/50'
-                : 'bg-ranting-deep/20 hover:bg-ranting-deep/30 border border-transparent'
-            }`}
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <p className="text-ranting-ice font-medium text-sm">{vendor.name}</p>
-                  {vendor.emergencyAvailable && (
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-red-500/20 text-red-400">
-                      Emergency
-                    </span>
-                  )}
-                </div>
-                <p className="text-ranting-muted text-xs capitalize">{vendor.service}</p>
-                <div className="flex items-center gap-3 mt-2 text-xs text-ranting-muted">
-                  <div className="flex items-center gap-1">
-                    <Star className="w-3 h-3 text-yellow-400" />
-                    <span>{vendor.rating}</span>
+        {isLoading ? (
+          <div className="text-center text-ranting-muted py-8">Loading vendors...</div>
+        ) : filteredVendors.length === 0 ? (
+          <div className="text-center text-ranting-muted py-8">No vendors found</div>
+        ) : (
+          filteredVendors.map(vendor => (
+            <button
+              key={vendor.id}
+              onClick={() => setSelectedVendor(vendor)}
+              className={`w-full text-left p-4 rounded-lg transition-colors ${
+                selectedVendor?.id === vendor.id
+                  ? 'bg-ranting-sky/20 border border-ranting-sky/50'
+                  : 'bg-ranting-deep/20 hover:bg-ranting-deep/30 border border-transparent'
+              }`}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="text-ranting-ice font-medium text-sm">{vendor.name}</p>
+                    {vendor.emergency_available && (
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-red-500/20 text-red-400">
+                        Emergency
+                      </span>
+                    )}
                   </div>
-                  <div className="flex items-center gap-1">
-                    <Clock className="w-3 h-3" />
-                    <span>{vendor.responseTime}</span>
+                  <p className="text-ranting-muted text-xs capitalize">{vendor.services.join(', ')}</p>
+                  <div className="flex items-center gap-3 mt-2 text-xs text-ranting-muted">
+                    <div className="flex items-center gap-1">
+                      <Star className="w-3 h-3 text-yellow-400" />
+                      <span>{vendor.rating || 'N/A'}</span>
+                    </div>
+                    {vendor.response_time && (
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        <span>{vendor.response_time}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
-            </div>
-          </button>
-        ))}
+            </button>
+          ))
+        )}
       </div>
 
       {/* Selected Vendor Details */}
@@ -157,10 +145,10 @@ export function VendorAssignment({ requestId, serviceType, onAssign, className =
       {/* Assign Button */}
       <button
         onClick={handleAssign}
-        disabled={!selectedVendor}
+        disabled={!selectedVendor || isAssigning}
         className="glossy-btn w-full flex items-center justify-center gap-2 px-4 py-3 rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        Assign Vendor
+        {isAssigning ? 'Assigning...' : 'Assign Vendor'}
       </button>
     </div>
   )

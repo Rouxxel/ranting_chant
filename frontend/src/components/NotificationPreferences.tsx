@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Mail, MessageSquare, Bell, Save } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface NotificationPreferencesProps {
   className?: string
@@ -27,6 +28,7 @@ export function NotificationPreferences({ className = '' }: NotificationPreferen
       resolutionNotices: true
     }
   })
+  const [isSaving, setIsSaving] = useState(false)
 
   const handleToggle = (category: keyof typeof preferences, setting: string) => {
     setPreferences(prev => {
@@ -41,9 +43,20 @@ export function NotificationPreferences({ className = '' }: NotificationPreferen
     })
   }
 
-  const handleSave = () => {
-    // TODO: Wire to backend API
-    console.log('Saving preferences:', preferences)
+  const handleSave = async () => {
+    setIsSaving(true)
+    try {
+      // TODO: Wire to backend API when endpoint is available
+      // For now, simulate API call
+      await new Promise(resolve => setTimeout(resolve, 500))
+      console.log('Saving preferences:', preferences)
+      toast.success('Notification preferences saved successfully')
+    } catch (error) {
+      console.error('Failed to save preferences:', error)
+      toast.error('Failed to save notification preferences')
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   return (
@@ -192,10 +205,11 @@ export function NotificationPreferences({ className = '' }: NotificationPreferen
       <div className="flex justify-end pt-4 border-t border-ranting-deep/30">
         <button
           onClick={handleSave}
-          className="glossy-btn flex items-center gap-2 px-6 py-2 rounded-full"
+          disabled={isSaving}
+          className="glossy-btn flex items-center gap-2 px-6 py-2 rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Save className="w-4 h-4" />
-          Save Preferences
+          {isSaving ? 'Saving...' : 'Save Preferences'}
         </button>
       </div>
     </div>

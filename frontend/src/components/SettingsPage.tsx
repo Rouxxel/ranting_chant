@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Settings, User, Bell, Palette, Shield, Save, ChevronRight } from 'lucide-react'
+import { NotificationPreferences } from './NotificationPreferences'
 
 interface SettingsPageProps {
   className?: string
@@ -104,38 +105,7 @@ function NotificationSettings() {
   return (
     <div className="glass-panel-strong p-6 rounded-lg">
       <h3 className="text-ranting-ice text-lg font-semibold mb-6">Notification Settings</h3>
-      <p className="text-ranting-muted text-sm mb-4">
-        TODO: Integrate NotificationPreferences component here
-      </p>
-      <div className="space-y-4">
-        <div className="flex items-center justify-between p-4 glass-panel rounded-lg">
-          <div>
-            <p className="text-ranting-ice text-sm font-medium">Email Notifications</p>
-            <p className="text-ranting-muted text-xs">Receive updates via email</p>
-          </div>
-          <button className="glossy-btn-ghost p-2 rounded-full">
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-        <div className="flex items-center justify-between p-4 glass-panel rounded-lg">
-          <div>
-            <p className="text-ranting-ice text-sm font-medium">SMS Notifications</p>
-            <p className="text-ranting-muted text-xs">Receive urgent updates via SMS</p>
-          </div>
-          <button className="glossy-btn-ghost p-2 rounded-full">
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-        <div className="flex items-center justify-between p-4 glass-panel rounded-lg">
-          <div>
-            <p className="text-ranting-ice text-sm font-medium">Push Notifications</p>
-            <p className="text-ranting-muted text-xs">Browser push notifications</p>
-          </div>
-          <button className="glossy-btn-ghost p-2 rounded-full">
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
+      <NotificationPreferences />
     </div>
   )
 }
