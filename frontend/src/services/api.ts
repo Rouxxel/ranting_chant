@@ -551,29 +551,6 @@ export const signupOwner = async (data: {
   return response.data;
 };
 
-// @deprecated — kept for backward compatibility. Use authLogin instead.
-export const login = async (email: string, password: string, role: 'tenant' | 'manager') => {
-  // TODO: Remove once all callers migrated to authLogin
-  // POST /api/auth/login
-  const response = await apiClient.post('/api/auth/login', { email, password, role });
-  return response.data;
-};
-
-// @deprecated — kept for backward compatibility. Use authLogout instead.
-export const logout = async () => {
-  // TODO: Remove once all callers migrated to authLogout
-  // POST /api/auth/logout
-  const response = await apiClient.post('/api/auth/logout');
-  return response.data;
-};
-
-// @deprecated — kept for backward compatibility. Use authRefresh instead.
-export const refreshToken = async () => {
-  // TODO: Remove once all callers migrated to authRefresh
-  // POST /api/auth/refresh
-  const response = await apiClient.post('/api/auth/refresh');
-  return response.data;
-};
 
 export const forgotPassword = async (email: string) => {
   const response = await apiClient.post('/auth/forgot-password', { email });

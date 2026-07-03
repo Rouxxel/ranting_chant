@@ -1,20 +1,100 @@
 import { Building2, Users, AlertTriangle, CheckCircle, TrendingUp, Clock } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { getProperties, getTenants, getRequests } from '../services/api'
 
 interface ManagerDashboardStatsProps {
   managerId: string
+  propertyIds?: string[]
   className?: string
 }
 
-export function ManagerDashboardStats({ managerId, className = '' }: ManagerDashboardStatsProps) {
-  // TODO: Wire to backend API for real stats
-  const stats = {
-    totalProperties: 3,
-    totalTenants: 8,
-    activeRequests: 5,
-    escalatedRequests: 2,
-    resolvedThisWeek: 12,
-    avgResponseTime: '2.5 hours'
-  }
+export function ManagerDashboardStats({ managerId, propertyIds = [], className = '' }: ManagerDashboardStatsProps) {
+  const [stats, setStats] = useState({
+    totalProperties: 0,
+    totalTenants: 0,
+    activeRequests: 0,
+    escalatedRequests: 0,
+    resolvedThisWeek: 0,
+    avgResponseTime: '0 hours'
+  })
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        // Fetch all data
+        const [properties, tenants, requests] = await Promise.all([
+          getProperties(),
+          getTenants(),
+          getRequests()
+        ])
+
+        // Filter properties by manager (if propertyIds provided)
+        const managerProperties = propertyIds.length > 0
+          ? properties.filter(p => propertyIds.includes(p.id))
+          : properties
+
+        // Get property IDs for filtering
+        const managedPropertyIds = managerProperties.map(p => p.id)
+
+        // Filter tenants by managed properties
+        const managedTenants = tenants.filter(t =>
+          t.property_id && managedPropertyIds.includes(t.property_id)
+        )
+
+        // Filter requests by managed properties
+        const managedRequests = requests.filter(r =>
+          r.property_id && managedPropertyIds.includes(r.property_id)
+        )
+
+        // Calculate stats
+        const activeRequests = managedRequests.filter(r =>
+          r.status === 'pending' || r.status === 'in_progress'
+        ).length
+
+        const escalatedRequests = managedRequests.filter(r => r.escalated).length
+
+        // Calculate resolved this week (last 7 days)
+        const oneWeekAgo = new Date()
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
+        const resolvedThisWeek = managedRequests.filter(r =>
+          r.status === 'resolved' &&
+          r.resolved_at &&
+          new Date(r.resolved_at) >= oneWeekAgo
+        ).length
+
+        // Calculate average response time (simplified)
+        const resolvedRequests = managedRequests.filter(r => r.status === 'resolved' && r.created_at && r.resolved_at)
+        let avgResponseTime = '0 hours'
+        if (resolvedRequests.length > 0) {
+          const totalHours = resolvedRequests.reduce((sum, r) => {
+            const created = new Date(r.created_at).getTime()
+            const resolved = new Date(r.resolved_at!).getTime()
+            return sum + (resolved - created) / (1000 * 60 * 60)
+          }, 0)
+          const avgHours = totalHours / resolvedRequests.length
+          avgResponseTime = avgHours < 1
+            ? `${Math.round(avgHours * 60)} min`
+            : `${avgHours.toFixed(1)} hours`
+        }
+
+        setStats({
+          totalProperties: managerProperties.length,
+          totalTenants: managedTenants.length,
+          activeRequests,
+          escalatedRequests,
+          resolvedThisWeek,
+          avgResponseTime
+        })
+      } catch (error) {
+        console.error('Failed to fetch stats:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchStats()
+  }, [managerId, propertyIds])
 
   const statCards = [
     {
