@@ -155,6 +155,10 @@ export interface NotificationEvent {
   id?: string;
   type: "email" | "sms";
   recipient: string;
+  recipient_actor_id?: string;
+  recipient_name?: string;
+  recipient_email?: string;
+  recipient_phone?: string;
   status?: string;
   timestamp: string;
   summary?: string;
@@ -166,7 +170,7 @@ export interface Request {
   type: RequestType;
   description: string;
   requester_id: string;
-  tenant_name?: string;
+  tenant_name: string;
   property: string;
   property_id?: string;
   urgency: Urgency;

@@ -132,6 +132,27 @@ The backend includes routers for:
 - **MCP**: tool discovery and MCP-style operations (property, tenant, vendor, request, notification)
 - **Authentication**: login, logout, refresh, and current user endpoints
 
+### Actor ID Resolution
+
+The backend resolves actor IDs to display names and contact information at the API layer to provide a unified data structure for the frontend. This applies to both PostgreSQL and mock data stores.
+
+**Request responses** include:
+- `tenant_name`: Resolved from `requester_id` via `tenants.actors.display_name`
+- `requester_id`: Original actor UUID for reference
+
+**Notification events** include:
+- `recipient_actor_id`: Original actor UUID for reference
+- `recipient_name`: Display name from `actors.display_name`
+- `recipient_email`: Email from `actors.email`
+- `recipient_phone`: Phone from `actors.phone`
+- `recipient`: Backward-compatible field containing email (for type="email") or phone (for type="sms")
+
+The Supabase repository (`src/database/repositories/supabase_repo.py`) performs SQL JOINs to resolve actor IDs:
+- Requests: `SELECT r.*, tenants(id, actors(display_name, email, phone))`
+- Notifications: `SELECT n.*, actors(id, display_name, email, phone)`
+
+Frontend components handle missing resolved data gracefully with fallbacks (e.g., `tenant_name || requester_id || "Unknown"`).
+
 ### Sign-Up Endpoints
 
 The backend provides self-registration endpoints for new managers and owners:

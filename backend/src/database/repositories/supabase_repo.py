@@ -4,9 +4,12 @@ supabase_repo.py
 Supabase/PostgreSQL-backed concrete implementations of the repository interfaces.
 """
 
+import logging
 from typing import Any, Dict, List, Optional
 from datetime import datetime, timezone
 import uuid
+
+logger = logging.getLogger(__name__)
 
 from src.database.repositories.base import (
     BaseTenantRepository,
@@ -497,24 +500,66 @@ class SupabaseRequestRepository(BaseRequestRepository):
         notifs = []
         raw_notifs = row.get("notifications", []) or []
         for n in sorted(raw_notifs, key=lambda x: x.get("created_at") or ""):
-            recipient_str = ""
             recipient_actor_id = n.get("recipient_actor_id")
-            if recipient_actor_id:
-                # Fetch actor details to get email/phone
-                actor_res = self.supabase.table("actors").select("email, phone, display_name").eq("id", recipient_actor_id).execute()
-                if actor_res.data:
-                    recipient_actor = actor_res.data[0]
-                    if n.get("type") == "email":
-                        recipient_str = recipient_actor.get("email") or recipient_actor.get("display_name") or ""
-                    else:
-                        recipient_str = recipient_actor.get("phone") or recipient_actor.get("display_name") or ""
+            actor_data = n.get("actors")
+
+            if actor_data:
+                recipient_name = actor_data.get("display_name")
+                recipient_email = actor_data.get("email")
+                recipient_phone = actor_data.get("phone")
+
+                # Populate recipient for backward compatibility: email for type="email",
+                # phone for type="sms", falling back to display_name then "Unknown"
+                if n.get("type") == "email":
+                    recipient_str = recipient_email or recipient_name or "Unknown"
+                else:
+                    recipient_str = recipient_phone or recipient_name or "Unknown"
+            else:
+                recipient_name = None
+                recipient_email = None
+                recipient_phone = None
+                recipient_str = "Unknown"
+                logger.warning(
+                    "Notification %s has no actor data (recipient_actor_id=%s)",
+                    n.get("id"),
+                    recipient_actor_id,
+                )
+
             notifs.append({
                 "id": n.get("id"),
                 "type": n.get("type"),
                 "recipient": recipient_str,
+                "recipient_actor_id": recipient_actor_id,
+                "recipient_name": recipient_name,
+                "recipient_email": recipient_email,
+                "recipient_phone": recipient_phone,
                 "status": n.get("status"),
                 "timestamp": n.get("created_at")
             })
+
+        # Resolve tenant_name via two-level JOIN: tenants -> actors -> display_name
+        tenant_name = None
+        tenants_data = row.get("tenants")
+        if tenants_data:
+            actors_data = tenants_data.get("actors")
+            if actors_data:
+                tenant_name = actors_data.get("display_name")
+            else:
+                logger.warning(
+                    "tenant_name resolution failed for request_id=%s: "
+                    "tenants.actors is missing (requester_id=%s)",
+                    row.get("id"),
+                    row.get("requester_id"),
+                )
+        else:
+            requester_id = row.get("requester_id")
+            if requester_id:
+                logger.warning(
+                    "tenant_name resolution failed for request_id=%s: "
+                    "tenants join data is missing (requester_id=%s)",
+                    row.get("id"),
+                    requester_id,
+                )
 
         return {
             "id": row.get("id"),
@@ -539,18 +584,18 @@ class SupabaseRequestRepository(BaseRequestRepository):
             "resolved_at": row.get("resolved_at"),
             "resolved_by": row.get("resolved_by"),
             "resolution_note": row.get("resolution_note"),
-            "tenant_name": row.get("tenants", {}).get("display_name") if row.get("tenants") else None,
+            "tenant_name": tenant_name,
         }
 
     def list(self) -> List[Dict[str, Any]]:
         res = self.supabase.table("requests").select(
-            "*, properties(name), request_involved_parties(actor_id), conversation_messages(*), notifications(*, actors(email, phone, display_name))"
+            "*, properties(name), tenants(id, actors(display_name, email, phone)), request_involved_parties(actor_id), conversation_messages(*), notifications(*, actors(id, display_name, email, phone))"
         ).eq("is_active", True).execute()
         return [self._map_row(row) for row in res.data]
 
     def find_by_id(self, request_id: str) -> Optional[Dict[str, Any]]:
         res = self.supabase.table("requests").select(
-            "*, properties(name), request_involved_parties(actor_id), conversation_messages(*), notifications(*, actors(email, phone, display_name))"
+            "*, properties(name), tenants(id, actors(display_name, email, phone)), request_involved_parties(actor_id), conversation_messages(*), notifications(*, actors(id, display_name, email, phone))"
         ).eq("id", request_id).execute()
         if not res.data:
             return None
@@ -559,7 +604,7 @@ class SupabaseRequestRepository(BaseRequestRepository):
     def find_by_field(self, field: str, value: Any) -> List[Dict[str, Any]]:
         if field == "requester_id":
             res = self.supabase.table("requests").select(
-                "*, properties(name), request_involved_parties(actor_id), conversation_messages(*), notifications(*, actors(email, phone, display_name))"
+                "*, properties(name), tenants(id, actors(display_name, email, phone)), request_involved_parties(actor_id), conversation_messages(*), notifications(*, actors(id, display_name, email, phone))"
             ).eq("requester_id", value).eq("is_active", True).execute()
             return [self._map_row(row) for row in res.data]
         else:

@@ -270,6 +270,48 @@ There is no `party_type` or `party_id`.
 
 It does not recreate `units`, does not backfill tenants from legacy `property_id`/`unit` columns, and does not alter ownership fields on `properties`.
 
+## Actor Resolution Strategy
+
+The PostgreSQL schema uses normalized actor IDs, but the API layer resolves these to display names and contact information for frontend consumption. This provides a unified data structure across both PostgreSQL and mock data stores.
+
+### API Response Structure
+
+**Requests** include resolved tenant information:
+- `tenant_name`: Resolved from `requester_id` via `tenants` → `actors.display_name`
+- `requester_id`: Original actor UUID for reference
+
+**Notifications** include resolved recipient information:
+- `recipient_actor_id`: Original actor UUID for reference
+- `recipient_name`: Display name from `actors.display_name`
+- `recipient_email`: Email from `actors.email`
+- `recipient_phone`: Phone from `actors.phone`
+- `recipient`: Backward-compatible field (email for type="email", phone for type="sms")
+
+### SQL JOIN Patterns
+
+The Supabase repository (`src/database/repositories/supabase_repo.py`) performs SQL JOINs to resolve actor IDs:
+
+**Request queries:**
+```sql
+SELECT r.*, properties(name), tenants(id, actors(display_name, email, phone)),
+       request_involved_parties(actor_id), conversation_messages(*),
+       notifications(*, actors(id, display_name, email, phone))
+FROM requests r
+```
+
+**Notification mapping:**
+- Joins `notifications` with `actors` on `recipient_actor_id`
+- Extracts `display_name`, `email`, and `phone` from the actor record
+- Populates enhanced notification fields while maintaining backward compatibility
+
+### Mock Data Consistency
+
+Mock JSON files in `mock_db_jsons/` are updated to match the enhanced API response structure:
+- `requests.json`: Each request includes `tenant_name` field
+- `requests.json`: Each notification includes `recipient_actor_id`, `recipient_name`, `recipient_email`, `recipient_phone`
+
+This ensures that mock data and PostgreSQL data produce identical API response shapes, allowing the frontend to work seamlessly with either data source.
+
 ### `request_attachments`
 
 | Column | Type | Notes |

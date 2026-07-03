@@ -200,33 +200,36 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
           </section>
 
           <section>
-            {/*TODO: for some reason notified parties contacts are not displayed*/}
             <SectionTitle>Notified parties</SectionTitle>
             {req.notifications_sent?.length > 0 ? (
-              <ul className="space-y-1.5 glass-panel p-3">
+              <ul className="space-y-2 glass-panel p-3">
                 {req.notifications_sent.map((n: any, i: number) => (
                   <li
                     key={n.id ?? `notif-${i}`}
-                    className="flex items-center gap-2 text-xs text-ranting-ice/85"
+                    className="flex flex-col gap-1 text-xs text-ranting-ice/85"
                   >
-                    {n.type === "email" ? (
-                      <Mail className="h-3.5 w-3.5 text-ranting-sky" />
-                    ) : (
-                      <MessageCircle className="h-3.5 w-3.5 text-ranting-sky" />
-                    )}
-                    <span className="font-medium">{n.recipient}</span>
-                    <span className="text-ranting-deep">
-                      ·{" "}
-                      {n.timestamp ? new Date(n.timestamp).toLocaleString([], {
-                        month: "short",
-                        day: "numeric",
-                        hour: "numeric",
-                        minute: "2-digit",
-                      }) : "Invalid Date"}
-                    </span>
-                    {n.status === "failed" && (
-                      <span className="text-red-400">(failed)</span>
-                    )}
+                    <div className="flex items-center gap-2">
+                      {n.type === "email" ? (
+                        <Mail className="h-3.5 w-3.5 text-ranting-sky" />
+                      ) : (
+                        <MessageCircle className="h-3.5 w-3.5 text-ranting-sky" />
+                      )}
+                      <span className="font-medium">{n.recipient_name || n.recipient}</span>
+                      <span className="text-ranting-deep">
+                        ·{" "}
+                        {n.timestamp ? new Date(n.timestamp).toLocaleString([], {
+                          month: "short",
+                          day: "numeric",
+                          hour: "numeric",
+                          minute: "2-digit",
+                        }) : "Invalid Date"}
+                      </span>
+                      {n.status === "failed" && (
+                        <span className="text-red-400">(failed)</span>
+                      )}
+                    </div>
+                    {n.recipient_email && <div className="text-xs text-ranting-muted ml-5">{n.recipient_email}</div>}
+                    {n.recipient_phone && <div className="text-xs text-ranting-muted ml-5">{n.recipient_phone}</div>}
                   </li>
                 ))}
               </ul>
