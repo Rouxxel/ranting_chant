@@ -154,6 +154,62 @@ class DatabaseService:
 
         return info
 
+    # ------------------------------------------------------------------
+    # User-scoped client factory
+    # ------------------------------------------------------------------
+
+    def get_user_scoped_client(self, access_token: str, refresh_token: str | None = None):
+        """
+        Create a Supabase client with user authentication context for RLS.
+
+        Uses the anon key to create a client and sets the session using both
+        access_token and refresh_token so that auth.uid() resolves correctly
+        in RLS policies for both RPC calls and table INSERT/UPDATE/DELETE.
+
+        Args:
+            access_token: The user's JWT access token from the auth response.
+            refresh_token: The user's refresh token (optional but recommended).
+
+        Returns:
+            A supabase.Client instance configured with user context.
+
+        Raises:
+            RuntimeError: If called when the backend is ``json``.
+        """
+        if not self.is_supabase:
+            raise RuntimeError(
+                "User-scoped client is not available when DATA_BACKEND='json'. "
+                "Set DATA_BACKEND='supabase' in backend/.env to enable it."
+            )
+
+        from supabase import create_client
+        from src.database.supabase_client import _require_env
+
+        url = _require_env("SUPABASE_URL")
+        anon_key = _require_env("SUPABASE_ANON_KEY")
+
+        client = create_client(url, anon_key)
+
+        # set_session requires a real refresh_token to fully establish the
+        # session so that auth.uid() resolves in ALL contexts (RPC + tables).
+        # Fall back to using the access_token as a dummy refresh_token if
+        # no refresh_token is provided — this is enough for single-request
+        # scoped clients that never need to refresh.
+        rt = refresh_token if refresh_token else access_token
+        try:
+            client.auth.set_session(access_token, rt)
+        except Exception as e:
+            log_handler.warning(f"[database_service] set_session failed: {e}")
+
+        # Belt-and-suspenders: also set the PostgREST Authorization header
+        client.postgrest.auth(access_token)
+
+        log_handler.debug(
+            f"[database_service] User-scoped client created "
+            f"(token length: {len(access_token)}, has_refresh_token: {refresh_token is not None})"
+        )
+        return client
+
 
 @lru_cache(maxsize=1)
 def get_database_service() -> DatabaseService:

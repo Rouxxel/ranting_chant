@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { authGetMe, authLogin, authLogout, authRefresh } from '../services/api'
 
 interface User {
   id: string
@@ -25,22 +26,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // TODO: Check for existing token/session on mount
-    // Wire to backend authentication endpoint
     const checkAuth = async () => {
       try {
-        // const token = localStorage.getItem('auth_token')
-        // if (token) {
-        //   const response = await fetch('/api/auth/verify', {
-        //     headers: { Authorization: `Bearer ${token}` }
-        //   })
-        //   if (response.ok) {
-        //     const userData = await response.json()
-        //     setUser(userData)
-        //   }
-        // }
+        const token = localStorage.getItem('auth_token')
+        if (token) {
+          const userData = await authGetMe()
+          setUser({
+            id: userData.id,
+            name: userData.name,
+            email: userData.email || '',
+            role: userData.role as 'tenant' | 'manager' | 'admin',
+            unit: undefined,
+            propertyId: undefined
+          })
+        }
       } catch (error) {
         console.error('Auth check failed:', error)
+        localStorage.removeItem('auth_token')
       } finally {
         setIsLoading(false)
       }
@@ -50,27 +52,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const login = async (email: string, password: string, role: 'tenant' | 'manager') => {
-    // TODO: Wire to backend login endpoint
-    // POST /api/auth/login
     try {
-      // const response = await fetch('/api/auth/login', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ email, password, role })
-      // })
-      // if (!response.ok) throw new Error('Login failed')
-      // const { user: userData, token } = await response.json()
-      // localStorage.setItem('auth_token', token)
-      // setUser(userData)
-
-      // Mock login for shell
+      const response = await authLogin(email, password)
+      localStorage.setItem('auth_token', response.access_token)
+      if (response.refresh_token) {
+        localStorage.setItem('refresh_token', response.refresh_token)
+      }
       setUser({
-        id: 'user_001',
-        name: 'John Doe',
-        email,
-        role,
-        unit: role === 'tenant' ? '4B' : undefined,
-        propertyId: 'property_001'
+        id: response.actor.id,
+        name: response.actor.name,
+        email: response.actor.email || '',
+        role: response.role as 'tenant' | 'manager' | 'admin',
+        unit: undefined,
+        propertyId: undefined
       })
     } catch (error) {
       throw error
@@ -78,31 +72,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const logout = async () => {
-    // TODO: Wire to backend logout endpoint
-    // POST /api/auth/logout
     try {
-      // await fetch('/api/auth/logout', {
-      //   method: 'POST',
-      //   headers: { Authorization: `Bearer ${localStorage.getItem('auth_token')}` }
-      // })
-      localStorage.removeItem('auth_token')
-      setUser(null)
+      await authLogout()
     } catch (error) {
       console.error('Logout failed:', error)
+    } finally {
+      localStorage.removeItem('auth_token')
+      localStorage.removeItem('refresh_token')
+      setUser(null)
     }
   }
 
   const refreshToken = async () => {
-    // TODO: Wire to backend refresh token endpoint
-    // POST /api/auth/refresh
     try {
-      // const response = await fetch('/api/auth/refresh', {
-      //   method: 'POST',
-      //   headers: { Authorization: `Bearer ${localStorage.getItem('auth_token')}` }
-      // })
-      // if (!response.ok) throw new Error('Token refresh failed')
-      // const { token } = await response.json()
-      // localStorage.setItem('auth_token', token)
+      const currentRefreshToken = localStorage.getItem('refresh_token')
+      if (!currentRefreshToken) {
+        throw new Error('No refresh token available')
+      }
+      const response = await authRefresh(currentRefreshToken)
+      localStorage.setItem('auth_token', response.access_token)
+      if (response.refresh_token) {
+        localStorage.setItem('refresh_token', response.refresh_token)
+      }
+      setUser({
+        id: response.actor.id,
+        name: response.actor.name,
+        email: response.actor.email || '',
+        role: response.role as 'tenant' | 'manager' | 'admin',
+        unit: undefined,
+        propertyId: undefined
+      })
     } catch (error) {
       console.error('Token refresh failed:', error)
       await logout()

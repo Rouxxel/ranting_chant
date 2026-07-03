@@ -2,6 +2,7 @@
   {
     "id": "120c6930-919d-5495-bc33-c20e069c03b0",
     "requester_id": "b1c4a072-618b-53a2-a16e-d2387c1efa14",
+    "tenant_name": "John Tenant",
     "type": "plumbing",
     "description": "i have an issue with my plumbing",
     "status": "resolved",
@@ -99,6 +100,10 @@
       {
         "type": "email",
         "recipient": "sarah@gmail.com",
+        "recipient_actor_id": "manager_001",
+        "recipient_name": "Sara Johnson",
+        "recipient_email": "sarah@gmail.com",
+        "recipient_phone": "+14155552673",
         "status": "sent",
         "timestamp": "2026-06-04T22:59:59.602997+00:00"
       }
@@ -114,6 +119,7 @@
   {
     "id": "f635bdb9-bf83-5f87-aad4-7e03c9146375",
     "requester_id": "b1c4a072-618b-53a2-a16e-d2387c1efa14",
+    "tenant_name": "John Tenant",
     "type": "general",
     "description": "I have an electrical issue, there is no power and i need it for my respiratory system",
     "status": "pending",
@@ -204,6 +210,7 @@
   {
     "id": "150d4621-859d-5b23-8937-8ef8eeed4612",
     "requester_id": "b1c4a072-618b-53a2-a16e-d2387c1efa14",
+    "tenant_name": "John Tenant",
     "type": "emergency",
     "description": "i have an issue, there is a small gas leak i can smell it",
     "status": "pending",
@@ -246,6 +253,7 @@
   {
     "id": "b7d42924-0c76-59cb-a5d3-8ec22b876a32",
     "requester_id": "7b668b94-8223-5104-9e69-3d210db1bddb",
+    "tenant_name": "Michael Brown",
     "type": "hvac",
     "description": "The heating system is not working and the apartment is very cold.",
     "status": "pending",
@@ -296,12 +304,20 @@
       {
         "type": "email",
         "recipient": "david.reynolds@gmail.com",
+        "recipient_actor_id": "manager_002",
+        "recipient_name": "David Reynolds",
+        "recipient_email": "david.reynolds@gmail.com",
+        "recipient_phone": "+14155552673",
         "status": "sent",
         "timestamp": "2026-06-01T08:17:20Z"
       },
       {
         "type": "email",
         "recipient": "arcticservice@gmail.com",
+        "recipient_actor_id": "2e72d98f-663c-5729-bdc4-97dd5d3fe122",
+        "recipient_name": "ArcticAir HVAC Solutions Co.",
+        "recipient_email": "arcticservice@gmail.com",
+        "recipient_phone": "+14155552673",
         "status": "sent",
         "timestamp": "2026-06-01T08:17:20Z"
       }
@@ -314,6 +330,7 @@
   {
     "id": "f42d7e74-0782-5895-9217-33ae12a6155a",
     "requester_id": "5803e546-c51d-50b5-965a-862e45879d09",
+    "tenant_name": "Sophia Williams",
     "type": "electrical",
     "description": "Half of the outlets in my apartment stopped working.",
     "status": "in_progress",
@@ -358,12 +375,20 @@
       {
         "type": "email",
         "recipient": "david.reynolds@gmail.com",
+        "recipient_actor_id": "manager_002",
+        "recipient_name": "David Reynolds",
+        "recipient_email": "david.reynolds@gmail.com",
+        "recipient_phone": "+14155552673",
         "status": "sent",
         "timestamp": "2026-06-02T13:46:30Z"
       },
       {
         "type": "email",
         "recipient": "voltprocontact@gmail.com",
+        "recipient_actor_id": "1826caf4-711c-5f17-b943-9bfb98f9b80d",
+        "recipient_name": "VoltPro Electrical Services",
+        "recipient_email": "voltprocontact@gmail.com",
+        "recipient_phone": "+14155552673",
         "status": "sent",
         "timestamp": "2026-06-02T13:46:30Z"
       }
@@ -376,6 +401,7 @@
   {
     "id": "d3277eb0-d021-50c4-b2cd-bf229e9175d5",
     "requester_id": "0414e2e5-7f9e-5034-8066-793217eb84c5",
+    "tenant_name": "Daniel Johnson",
     "type": "pest_control",
     "description": "I have noticed cockroaches in the kitchen for the past week.",
     "status": "pending",
@@ -414,6 +440,10 @@
       {
         "type": "email",
         "recipient": "laura.mitchell@gmail.com",
+        "recipient_actor_id": "manager_003",
+        "recipient_name": "Laura Mitchell",
+        "recipient_email": "laura.mitchell@gmail.com",
+        "recipient_phone": "+15552224",
         "status": "sent",
         "timestamp": "2026-06-03T10:11:30Z"
       }
@@ -426,6 +456,7 @@
   {
     "id": "51ad8c00-3497-57e6-b239-a20d1059d2e0",
     "requester_id": "3dc7f9be-4c50-5a9b-a1c5-0b7f4c929f4f",
+    "tenant_name": "Olivia Martinez",
     "type": "locksmith",
     "description": "My apartment key broke inside the lock.",
     "status": "in_progress",
@@ -470,12 +501,20 @@
       {
         "type": "email",
         "recipient": "kevin.thompson@gmail.com",
+        "recipient_actor_id": "manager_004",
+        "recipient_name": "Kevin Thompson",
+        "recipient_email": "kevin.thompson@gmail.com",
+        "recipient_phone": "+15552225",
         "status": "sent",
         "timestamp": "2026-06-04T18:00:40Z"
       },
       {
         "type": "email",
         "recipient": "quickfixdispatch@gmail.com",
+        "recipient_actor_id": "fbb4dc23-6e4a-5ee1-9919-e805f4ded107",
+        "recipient_name": "QuickFix Locksmith",
+        "recipient_email": "quickfixdispatch@gmail.com",
+        "recipient_phone": "+14155552673",
         "status": "sent",
         "timestamp": "2026-06-04T18:00:40Z"
       }
@@ -488,6 +527,7 @@
   {
     "id": "7bf4f762-48b6-5ce1-a962-e7b6b2e6a0c3",
     "requester_id": "b7df001e-0002-507a-9da9-6ac3c990ba6e",
+    "tenant_name": "James Wilson",
     "type": "general",
     "description": "Bedroom window cracked after a storm.",
     "status": "pending",
@@ -526,6 +566,10 @@
       {
         "type": "email",
         "recipient": "kevin.thompson@gmail.com",
+        "recipient_actor_id": "manager_004",
+        "recipient_name": "Kevin Thompson",
+        "recipient_email": "kevin.thompson@gmail.com",
+        "recipient_phone": "+15552225",
         "status": "sent",
         "timestamp": "2026-06-05T09:31:10Z"
       }
@@ -538,6 +582,7 @@
   {
     "id": "91c09665-7f79-5ce6-b5bd-b4f3b9521da3",
     "requester_id": "f6e89e70-803d-5763-845c-edf4402dee60",
+    "tenant_name": "Isabella Anderson",
     "type": "appliance_repair",
     "description": "The refrigerator is not cooling properly.",
     "status": "pending",
@@ -576,6 +621,10 @@
       {
         "type": "email",
         "recipient": "kevin.thompson@gmail.com",
+        "recipient_actor_id": "manager_004",
+        "recipient_name": "Kevin Thompson",
+        "recipient_email": "kevin.thompson@gmail.com",
+        "recipient_phone": "+15552225",
         "status": "sent",
         "timestamp": "2026-06-05T16:16:20Z"
       }
@@ -588,6 +637,7 @@
   {
     "id": "c3734d16-675e-5dff-85f5-265ed8522bc9",
     "requester_id": "d6bdc23b-349c-5314-97ec-adaa065ca11b",
+    "tenant_name": "Ava Taylor",
     "type": "plumbing",
     "description": "Kitchen sink drain is completely clogged.",
     "status": "in_progress",
@@ -626,12 +676,20 @@
       {
         "type": "email",
         "recipient": "sreynolds@gmail.com",
+        "recipient_actor_id": "ed84c333-2c85-5ae5-9916-60f4d6c9921b",
+        "recipient_name": "Sophia Reynolds",
+        "recipient_email": "sreynolds@gmail.com",
+        "recipient_phone": "+14155552673",
         "status": "sent",
         "timestamp": "2026-06-05T12:01:00Z"
       },
       {
         "type": "email",
         "recipient": "clearflowservice@gmail.com",
+        "recipient_actor_id": "1b583821-f90d-5e5e-aa8d-e31039c66a9f",
+        "recipient_name": "ClearFlow Drain Services",
+        "recipient_email": "clearflowservice@gmail.com",
+        "recipient_phone": "+14155552673",
         "status": "sent",
         "timestamp": "2026-06-05T12:01:00Z"
       }
@@ -644,6 +702,7 @@
   {
     "id": "785b41e2-f04e-5baa-8221-a67f7f88c46e",
     "requester_id": "d6bdc23b-349c-5314-97ec-adaa065ca11b",
+    "tenant_name": "Ava Taylor",
     "type": "access_control",
     "description": "The main building entrance access keypad is malfunctioning.",
     "status": "pending",
@@ -688,12 +747,20 @@
       {
         "type": "email",
         "recipient": "sreynolds@gmail.com",
+        "recipient_actor_id": "ed84c333-2c85-5ae5-9916-60f4d6c9921b",
+        "recipient_name": "Sophia Reynolds",
+        "recipient_email": "sreynolds@gmail.com",
+        "recipient_phone": "+14155552673",
         "status": "sent",
         "timestamp": "2026-06-06T06:21:15Z"
       },
       {
         "type": "email",
         "recipient": "SecureAccessSupport@gmail.com",
+        "recipient_actor_id": "090f9c13-33df-5899-b3ff-c9f0617f0816",
+        "recipient_name": "SecureAccess Systems",
+        "recipient_email": "SecureAccessSupport@gmail.com",
+        "recipient_phone": "+14155552673",
         "status": "sent",
         "timestamp": "2026-06-06T06:21:15Z"
       }
@@ -706,6 +773,7 @@
   {
     "id": "705aa687-9ba1-5234-902b-2310d1c4a020",
     "requester_id": "b1c4a072-618b-53a2-a16e-d2387c1efa14",
+    "tenant_name": "John Tenant",
     "type": "electrical",
     "description": "I have a problem with the electricity in my apartment, please send an email to the manager my apartment",
     "status": "pending",
@@ -796,6 +864,7 @@
   {
     "id": "645f7295-3a7c-5deb-a037-9b5b634bbf45",
     "requester_id": "b1c4a072-618b-53a2-a16e-d2387c1efa14",
+    "tenant_name": "John Tenant",
     "type": "emergency",
     "description": "I have a gas leak",
     "status": "resolved",
@@ -831,14 +900,22 @@
     "vendor_id": null,
     "notifications_sent": [
       {
-        "recipient": "Sara Johnson",
         "type": "email",
+        "recipient": "sarah@gmail.com",
+        "recipient_actor_id": "manager_001",
+        "recipient_name": "Sara Johnson",
+        "recipient_email": "sarah@gmail.com",
+        "recipient_phone": "+14155552673",
         "status": "failed",
         "timestamp": "2026-06-06T11:34:13.796886+00:00"
       },
       {
-        "recipient": "Sara Johnson",
         "type": "sms",
+        "recipient": "+14155552673",
+        "recipient_actor_id": "manager_001",
+        "recipient_name": "Sara Johnson",
+        "recipient_email": "sarah@gmail.com",
+        "recipient_phone": "+14155552673",
         "status": "failed",
         "timestamp": "2026-06-06T11:34:13.796886+00:00"
       }
@@ -854,6 +931,7 @@
   {
     "id": "request_33a2a50d",
     "requester_id": "tenant_001",
+    "tenant_name": null,
     "type": "emergency",
     "description": "There is a burning smell and no power",
     "status": "pending",

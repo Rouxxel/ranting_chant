@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Wifi, WifiOff, RefreshCw } from 'lucide-react'
+import apiClient from '../services/api'
 
 interface ConnectionStatusProps {
   className?: string
@@ -9,25 +10,54 @@ export function ConnectionStatus({ className = '' }: ConnectionStatusProps) {
   const [isConnected, setIsConnected] = useState(true)
   const [isReconnecting, setIsReconnecting] = useState(false)
 
-  useEffect(() => {
-    // Monitor connection state and update accordingly
-    const checkConnection = () => {
-      // Mock connection check
+  const checkConnection = useCallback(async () => {
+    try {
+      // Simple health check - try to reach the backend
+      await apiClient.get('/auth/me', { timeout: 5000 })
       setIsConnected(true)
+    } catch (error) {
+      setIsConnected(false)
     }
-
-    const interval = setInterval(checkConnection, 30000) // Check every 30 seconds
-    return () => clearInterval(interval)
   }, [])
 
-  const handleReconnect = () => {
+  useEffect(() => {
+    // Initial connection check
+    checkConnection()
+
+    // Monitor connection state periodically
+    const interval = setInterval(checkConnection, 30000) // Check every 30 seconds
+    return () => clearInterval(interval)
+  }, [checkConnection])
+
+  const handleReconnect = useCallback(async () => {
     setIsReconnecting(true)
-    // TODO: Trigger reconnection logic
-    setTimeout(() => {
-      setIsReconnecting(false)
-      setIsConnected(true)
-    }, 2000)
-  }
+    let attempt = 0
+    const maxAttempts = 5
+    const baseDelay = 1000 // 1 second
+
+    const attemptReconnect = async () => {
+      try {
+        await apiClient.get('/auth/me', { timeout: 5000 })
+        setIsConnected(true)
+        setIsReconnecting(false)
+        return
+      } catch (error) {
+        // Connection failed, continue retrying
+      }
+
+      attempt++
+      if (attempt < maxAttempts) {
+        // Exponential backoff: 1s, 2s, 4s, 8s, 16s
+        const delay = baseDelay * Math.pow(2, attempt)
+        setTimeout(attemptReconnect, delay)
+      } else {
+        // Max attempts reached, give up
+        setIsReconnecting(false)
+      }
+    }
+
+    attemptReconnect()
+  }, [])
 
   if (isConnected) {
     return (

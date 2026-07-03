@@ -85,8 +85,11 @@ async def login(request: Request, credentials: LoginRequest) -> AuthResponse:
         auth_email = result.data[0]["email"]
     
     try:
-        # Step 2: Authenticate with Supabase Auth
-        auth_response = supabase_client.auth.sign_in_with_password({
+        # Step 2: Authenticate with Supabase Auth using the auth-only client
+        # (must NOT use the service-role singleton — signing in would overwrite
+        #  its internal session with the user's JWT and break subsequent RLS-bypassed calls)
+        auth_only_client = get_auth_client()
+        auth_response = auth_only_client.auth.sign_in_with_password({
             "email": auth_email,
             "password": credentials.password
         })
@@ -204,11 +207,10 @@ async def reset_password(request: Request, body: ResetPasswordRequest):
     log_handler.info(f"[auth] Password reset attempt")
 
     try:
-        # Set the access token to authenticate the user
-        supabase_client.auth.set_session(body.token, "")
-
-        # Update the user's password
-        supabase_client.auth.update_user({
+        # Use auth-only client to avoid contaminating the service-role singleton session
+        auth_only_client = get_auth_client()
+        auth_only_client.auth.set_session(body.token, "")
+        auth_only_client.auth.update_user({
             "password": body.password
         })
 
@@ -223,9 +225,10 @@ async def reset_password(request: Request, body: ResetPasswordRequest):
         )
 
 
-async def get_current_actor(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
+async def get_current_actor(credentials: HTTPAuthorizationCredentials = Depends(security)) -> tuple[dict, str]:
     """
-    Dependency that returns the current authenticated actor (manager or owner) from the access token.
+    Dependency that returns the current authenticated actor (manager or owner) and access token.
+    Returns tuple: (actor_dict, access_token)
     """
     try:
         # Step 1: Validate JWT with Supabase
@@ -259,7 +262,7 @@ async def get_current_actor(credentials: HTTPAuthorizationCredentials = Depends(
             managed_props_result = supabase_client.table("manager_properties").select("property_id").eq("manager_id", manager["id"]).execute()
             managed_property_ids = [mp["property_id"] for mp in managed_props_result.data]
             
-            return {
+            actor_dict = {
                 "id": manager["id"],
                 "name": actor.get("display_name"),
                 "email": actor.get("email"),
@@ -267,6 +270,7 @@ async def get_current_actor(credentials: HTTPAuthorizationCredentials = Depends(
                 "role": "manager",
                 "managed_properties": managed_property_ids
             }
+            return actor_dict, credentials.credentials
         
         else:  # owner
             owner_result = supabase_client.table("owners").select("*").eq("id", user_account["actor_id"]).execute()
@@ -277,7 +281,7 @@ async def get_current_actor(credentials: HTTPAuthorizationCredentials = Depends(
             owned_props_result = supabase_client.table("owner_properties").select("property_id").eq("owner_id", owner["id"]).execute()
             owned_property_ids = [op["property_id"] for op in owned_props_result.data]
             
-            return {
+            actor_dict = {
                 "id": owner["id"],
                 "name": actor.get("display_name"),
                 "email": actor.get("email"),
@@ -285,6 +289,7 @@ async def get_current_actor(credentials: HTTPAuthorizationCredentials = Depends(
                 "role": "owner",
                 "owned_properties": owned_property_ids
             }
+            return actor_dict, credentials.credentials
             
     except Exception as e:
         log_handler.error(f"[auth] Token validation failed: {e}")
@@ -294,40 +299,46 @@ async def get_current_actor(credentials: HTTPAuthorizationCredentials = Depends(
         )
 
 
-async def require_manager_or_owner(current_actor: dict = Depends(get_current_actor)) -> dict:
+async def require_manager_or_owner(auth_tuple: tuple[dict, str] = Depends(get_current_actor)) -> tuple[dict, str]:
     """
     Dependency that ensures the current user is either a manager or owner.
+    Returns tuple: (actor_dict, access_token)
     """
+    current_actor, access_token = auth_tuple
     if current_actor["role"] not in ["manager", "owner"]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You don't have permission to access this resource"
         )
-    return current_actor
+    return current_actor, access_token
 
 
-async def require_owner(current_actor: dict = Depends(get_current_actor)) -> dict:
+async def require_owner(auth_tuple: tuple[dict, str] = Depends(get_current_actor)) -> tuple[dict, str]:
     """
     Dependency that ensures the current user is an owner.
+    Returns tuple: (actor_dict, access_token)
     """
+    current_actor, access_token = auth_tuple
     if current_actor["role"] != "owner":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You don't have permission to access this resource"
         )
-    return current_actor
+    return current_actor, access_token
 
 
-async def require_manager(current_actor: dict = Depends(get_current_actor)) -> dict:
+async def require_manager(auth_tuple: tuple[dict, str] = Depends(get_current_actor)) -> tuple[dict, str]:
     """
     Dependency that ensures the current user is a manager.
+    Returns tuple: (actor_dict, access_token)
     """
+    current_actor, access_token = auth_tuple
     if current_actor["role"] != "manager":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You don't have permission to access this resource"
         )
-    return current_actor
+    return current_actor, access_token
 
 
 @router.get(config_loader['endpoints']['auth_endpoint']['me_route'])
@@ -335,10 +346,11 @@ async def require_manager(current_actor: dict = Depends(get_current_actor)) -> d
     f"{config_loader['endpoints']['auth_endpoint']['request_limit']}/"
     f"{config_loader['endpoints']['auth_endpoint']['unit_of_time_for_limit']}"
 )
-async def get_me(request: Request, current_actor: dict = Depends(get_current_actor)) -> dict:
+async def get_me(request: Request, auth_tuple: tuple[dict, str] = Depends(get_current_actor)) -> dict:
     """
     Return the current authenticated actor's profile.
     """
+    current_actor, _ = auth_tuple
     return current_actor
 
 
@@ -347,12 +359,16 @@ async def get_me(request: Request, current_actor: dict = Depends(get_current_act
     f"{config_loader['endpoints']['auth_endpoint']['request_limit']}/"
     f"{config_loader['endpoints']['auth_endpoint']['unit_of_time_for_limit']}"
 )
-async def logout(request: Request, current_actor: dict = Depends(get_current_actor)) -> dict:
+async def logout(request: Request, auth_tuple: tuple[dict, str] = Depends(get_current_actor)) -> dict:
     """
     Logout the current user (invalidate the session on Supabase).
     """
+    current_actor, access_token = auth_tuple
     try:
-        supabase_client.auth.sign_out()
+        # Use auth-only client to avoid contaminating the service-role singleton session
+        auth_only_client = get_auth_client()
+        auth_only_client.auth.set_session(access_token, "")
+        auth_only_client.auth.sign_out()
         log_handler.info(f"[auth] Logout successful for {current_actor['role']}: {current_actor['email']}")
         return {"message": "Logged out successfully"}
     except Exception as e:
@@ -370,7 +386,9 @@ async def refresh_token(request: Request, refresh_token: str) -> AuthResponse:
     Refresh an expired access token using a valid refresh token.
     """
     try:
-        auth_response = supabase_client.auth.refresh_session(refresh_token)
+        # Use auth-only client for token refresh to avoid contaminating the service-role singleton
+        auth_only_client = get_auth_client()
+        auth_response = auth_only_client.auth.refresh_session(refresh_token)
         if not auth_response.user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

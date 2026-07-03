@@ -150,6 +150,29 @@ Current request type UI support:
 - management filters include all canonical request types
 - chat/save metadata sends a canonical type instead of deriving type from status
 
+### Data Resolution Patterns
+
+The frontend receives resolved actor data from the backend API, eliminating the need for client-side ID resolution.
+
+**Request interface** (`src/types/index.ts`):
+- `tenant_name: string` - Required field, resolved from `requester_id` by backend
+- `requester_id: string` - Original actor UUID for reference
+- Components use fallback: `r.tenant_name || r.requester_id || "Unknown"`
+
+**NotificationEvent interface** (`src/types/index.ts`):
+- `recipient_actor_id?: string` - Original actor UUID for reference
+- `recipient_name?: string` - Display name from backend resolution
+- `recipient_email?: string` - Email from backend resolution
+- `recipient_phone?: string` - Phone from backend resolution
+- `recipient: string` - Backward-compatible field (email for type="email", phone for type="sms")
+
+**Component display patterns**:
+- `RequestTable`: Displays `tenant_name` with fallback to `requester_id`
+- `RequestTimeline`: Shows `recipient_name` with conditional email/phone display
+- `RequestDetailPanel`: Displays recipient name, email, and phone for notified parties
+
+All components handle missing resolved data gracefully with fallbacks to ensure UI stability.
+
 ## Design System — Retro Frutiger Aero
 
 Design tokens and utilities live in `src/styles.css`. The aesthetic is built on three pillars:

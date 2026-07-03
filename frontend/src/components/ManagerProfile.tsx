@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { User, Mail, Phone, Building2, Edit, Save, X } from 'lucide-react'
+import { toast } from 'sonner'
+import { getManagerById, updateManagerProfile } from '../services/api'
 
 interface ManagerProfileProps {
   managerId: string
@@ -8,24 +10,74 @@ interface ManagerProfileProps {
 
 export function ManagerProfile({ managerId, className = '' }: ManagerProfileProps) {
   const [isEditing, setIsEditing] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [originalProfile, setOriginalProfile] = useState<any>(null)
   const [profile, setProfile] = useState({
     id: managerId,
-    name: 'John Management',
-    email: 'john@management.com',
-    phone: '+1-555-2222',
-    managedProperties: ['property_001', 'property_002', 'property_003'],
-    department: 'Property Management',
-    startDate: '2022-01-15'
+    name: '',
+    email: '',
+    phone: '',
+    managed_properties: [] as string[],
+    department: '',
+    startDate: ''
   })
 
-  const handleSave = () => {
-    // TODO: Wire to backend PATCH /managers/{manager_id}
-    setIsEditing(false)
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const data = await getManagerById(managerId)
+        setProfile({
+          id: data.id,
+          name: data.name,
+          email: data.email || '',
+          phone: data.phone || '',
+          managed_properties: data.managed_properties || [],
+          department: 'Property Management',
+          startDate: '2022-01-15'
+        })
+        setOriginalProfile(data)
+      } catch (error) {
+        console.error('Failed to fetch manager profile:', error)
+        toast.error('Failed to load profile')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchProfile()
+  }, [managerId])
+
+  const handleSave = async () => {
+    try {
+      await updateManagerProfile(managerId, {
+        email: profile.email,
+        phone: profile.phone
+      })
+      toast.success('Profile updated successfully')
+      setIsEditing(false)
+      // Refresh profile data
+      const data = await getManagerById(managerId)
+      setOriginalProfile(data)
+    } catch (error) {
+      console.error('Failed to update profile:', error)
+      toast.error('Failed to update profile')
+    }
   }
 
   const handleCancel = () => {
     setIsEditing(false)
     // Reset to original values
+    if (originalProfile) {
+      setProfile({
+        id: originalProfile.id,
+        name: originalProfile.name,
+        email: originalProfile.email || '',
+        phone: originalProfile.phone || '',
+        managed_properties: originalProfile.managed_properties || [],
+        department: 'Property Management',
+        startDate: '2022-01-15'
+      })
+    }
   }
 
   return (
@@ -119,7 +171,7 @@ export function ManagerProfile({ managerId, className = '' }: ManagerProfileProp
             <p className="text-ranting-muted text-xs">Managed Properties</p>
           </div>
           <div className="space-y-2">
-            {profile.managedProperties.map(propertyId => (
+            {profile.managed_properties.map((propertyId: string) => (
               <div key={propertyId} className="glass-panel p-3 rounded-lg">
                 <p className="text-ranting-ice text-sm font-mono">{propertyId}</p>
               </div>

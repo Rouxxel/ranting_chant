@@ -285,3 +285,10 @@ Apply migrations `001` through `004` in order. Details: `backend/src/resources/R
 ## License
 
 This project is provided as-is for educational and development purposes.
+
+
+error whentrying to sign in as a owner 
+"INFO:     127.0.0.1:55553 - "OPTIONS /owners/signup HTTP/1.1" 200 OK
+2026-07-02 15:14:59 006Z | INFO | [owners_router] Owner signup attempt for email: sebastianrusso.lascolinas@gmail.com
+2026-07-02 15:15:02 030Z | ERROR | [owners_router] Failed to create actor record: {'code': '42501', 'details': None, 'hint': None, 'message': 'new row violates row-level security policy for table "actors"'}
+INFO:     127.0.0.1:55553 - "POST /owners/signup HTTP/1.1" 500 Internal Server Error"

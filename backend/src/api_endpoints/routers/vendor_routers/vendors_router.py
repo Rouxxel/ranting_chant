@@ -96,9 +96,10 @@ async def list_vendors(request: Request):
     f"{config_loader['endpoints']['vendors_endpoint']['request_limit']}/"
     f"{config_loader['endpoints']['vendors_endpoint']['unit_of_time_for_limit']}"
 )
-async def create_vendor(request: Request, body: VendorCreatePayload, current_actor: dict = Depends(require_manager_or_owner)):
+async def create_vendor(request: Request, body: VendorCreatePayload, auth_tuple: tuple = Depends(require_manager_or_owner)):
     """Create a vendor record."""
     try:
+        current_actor, access_token = auth_tuple
         #Validate contact fields against config-driven rules
         validate_email_format(body.email)
         validate_phone_format(body.phone)
@@ -107,7 +108,8 @@ async def create_vendor(request: Request, body: VendorCreatePayload, current_act
         record["id"] = str(uuid.uuid4())
 
         db = get_database_service()
-        created = db.vendors.create(record)
+        user_client = db.get_user_scoped_client(access_token)
+        created = db.vendors.create(record, client=user_client)
         log_handler.info(f"[vendors_router] Vendor created successfully with id='{created['id']}'")
         return created
 
@@ -217,9 +219,10 @@ async def get_vendor(request: Request, vendor_id: str):
     f"{config_loader['endpoints']['vendors_endpoint']['request_limit']}/"
     f"{config_loader['endpoints']['vendors_endpoint']['unit_of_time_for_limit']}"
 )
-async def update_vendor(request: Request, vendor_id: str, body: VendorUpdatePayload, current_actor: dict = Depends(require_manager_or_owner)):
+async def update_vendor(request: Request, vendor_id: str, body: VendorUpdatePayload, auth_tuple: tuple = Depends(require_manager_or_owner)):
     """Update vendor details and service categories."""
     try:
+        current_actor, _ = auth_tuple
         db = get_database_service()
         existing = db.vendors.find_by_id(vendor_id)
         if not existing:
@@ -254,11 +257,13 @@ async def update_vendor(request: Request, vendor_id: str, body: VendorUpdatePayl
     f"{config_loader['endpoints']['vendors_endpoint']['request_limit']}/"
     f"{config_loader['endpoints']['vendors_endpoint']['unit_of_time_for_limit']}"
 )
-async def remove_vendor(request: Request, vendor_id: str, current_actor: dict = Depends(require_manager_or_owner)):
+async def remove_vendor(request: Request, vendor_id: str, auth_tuple: tuple = Depends(require_manager_or_owner)):
     """Delete a vendor unless currently assigned to an open request."""
     try:
+        current_actor, access_token = auth_tuple
         db = get_database_service()
-        existing = db.vendors.find_by_id(vendor_id)
+        user_client = db.get_user_scoped_client(access_token)
+        existing = db.vendors.find_by_id(vendor_id, client=user_client)
         if not existing:
             message = f"Vendor '{vendor_id}' not found"
             log_handler.warning(message)
@@ -274,16 +279,7 @@ async def remove_vendor(request: Request, vendor_id: str, current_actor: dict = 
                 detail=f"Vendor '{vendor_id}' is assigned to open requests",
             )
 
-        # Note: in repository pattern we can add delete or keep it if needed.
-        # But wait! We did not define delete on BaseVendorRepository!
-        # Ah! Let's check if delete is needed.
-        # Let's see: yes, remove_vendor deletes a vendor. Let's make sure we implement delete on vendor repo too,
-        # or we delete the actor directly since the vendor references actors(id) cascade delete!
-        # In json_repo, it has delete_record("vendors", vendor_id) or similar.
-        # Let's add delete to BaseVendorRepository and its JSON/Supabase implementations to make sure!
-        # Yes, we will modify BaseVendorRepository and JSON/Supabase concrete classes to include delete.
-        # Let's call db.vendors.delete(vendor_id) here.
-        deleted = db.vendors.delete(vendor_id)
+        deleted = db.vendors.delete(vendor_id, client=user_client)
         log_handler.info(f"[vendors_router] Vendor '{vendor_id}' deleted successfully")
         return deleted
 

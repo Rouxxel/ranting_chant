@@ -38,7 +38,6 @@ export function RequestTimeline({ req, tenantName = "Tenant" }: RequestTimelineP
           className="absolute left-2 top-1 bottom-1 w-px"
           style={{ background: "linear-gradient(180deg, rgba(126,200,227,0.7), rgba(126,200,227,0.15))", boxShadow: "0 0 10px rgba(126,200,227,0.6)" }}
         />
-        {/*TODO: For some reason, the sms and email of the parties does not show */}
         <ul className="space-y-4 glass-panel p-8 rounded-lg">
           {nodes.map((n, i) => (
             <li key={i} className="relative">
@@ -73,7 +72,9 @@ export function RequestTimeline({ req, tenantName = "Tenant" }: RequestTimelineP
                       <span>·</span>
                       <span>{new Date(n.data.timestamp).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</span>
                     </div>
-                    <div className="text-ranting-ice/80">{n.data.recipient}</div>
+                    <div className="font-medium">{n.data.recipient_name || n.data.recipient}</div>
+                    {n.data.recipient_email && <div className="text-xs text-ranting-muted">{n.data.recipient_email}</div>}
+                    {n.data.recipient_phone && <div className="text-xs text-ranting-muted">{n.data.recipient_phone}</div>}
                     {n.data.summary && <div className="mt-1 text-ranting-ice/70">— {n.data.summary}</div>}
                   </div>
                 </div>

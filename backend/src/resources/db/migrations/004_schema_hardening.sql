@@ -338,4 +338,30 @@ CREATE POLICY "Users can update own account"
         AND role IN ('owner', 'manager')
     );
 
+-- ============================================================================
+-- 7. SERVICE-ROLE BYPASS FOR HARDENING TABLES
+-- ============================================================================
+-- These tables are created in this migration with RLS enabled.
+-- Add service-role bypass so the backend can write to them without restriction.
+
+DROP POLICY IF EXISTS "Service role can bypass user_accounts RLS" ON user_accounts;
+CREATE POLICY "Service role can bypass user_accounts RLS"
+    ON user_accounts FOR ALL TO service_role
+    USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Service role can bypass request_attachments RLS" ON request_attachments;
+CREATE POLICY "Service role can bypass request_attachments RLS"
+    ON request_attachments FOR ALL TO service_role
+    USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Service role can bypass request_status_history RLS" ON request_status_history;
+CREATE POLICY "Service role can bypass request_status_history RLS"
+    ON request_status_history FOR ALL TO service_role
+    USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Service role can bypass request_assignments RLS" ON request_assignments;
+CREATE POLICY "Service role can bypass request_assignments RLS"
+    ON request_assignments FOR ALL TO service_role
+    USING (true) WITH CHECK (true);
+
 COMMIT;

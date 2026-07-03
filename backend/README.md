@@ -132,6 +132,27 @@ The backend includes routers for:
 - **MCP**: tool discovery and MCP-style operations (property, tenant, vendor, request, notification)
 - **Authentication**: login, logout, refresh, and current user endpoints
 
+### Actor ID Resolution
+
+The backend resolves actor IDs to display names and contact information at the API layer to provide a unified data structure for the frontend. This applies to both PostgreSQL and mock data stores.
+
+**Request responses** include:
+- `tenant_name`: Resolved from `requester_id` via `tenants.actors.display_name`
+- `requester_id`: Original actor UUID for reference
+
+**Notification events** include:
+- `recipient_actor_id`: Original actor UUID for reference
+- `recipient_name`: Display name from `actors.display_name`
+- `recipient_email`: Email from `actors.email`
+- `recipient_phone`: Phone from `actors.phone`
+- `recipient`: Backward-compatible field containing email (for type="email") or phone (for type="sms")
+
+The Supabase repository (`src/database/repositories/supabase_repo.py`) performs SQL JOINs to resolve actor IDs:
+- Requests: `SELECT r.*, tenants(id, actors(display_name, email, phone))`
+- Notifications: `SELECT n.*, actors(id, display_name, email, phone)`
+
+Frontend components handle missing resolved data gracefully with fallbacks (e.g., `tenant_name || requester_id || "Unknown"`).
+
 ### Sign-Up Endpoints
 
 The backend provides self-registration endpoints for new managers and owners:
@@ -254,6 +275,49 @@ async def example_endpoint(request: Request):
 - The `notifications_sent` field in mock data uses a detailed format: `[{type, recipient, status, timestamp}]` instead of simple ID strings.
 - Backend authentication uses Supabase Auth for managers/owners with JWT token validation. The `user_accounts` table maps Supabase auth users to application actors.
 - When migrating runtime code from JSON to PostgreSQL, follow `src/resources/README.md` for the canonical schema; do not mirror SQL-only tables (`request_status_history`, `request_assignments`) in mock JSON until the API layer supports them.
+
+## Supabase Client Usage
+
+The backend uses three distinct Supabase client patterns. Using the wrong one causes either RLS violations or session contamination.
+
+### Service-role client (default for all server-side operations)
+
+```python
+from src.database.supabase_client import get_supabase_client
+
+supabase = get_supabase_client()  # singleton, bypasses RLS
+```
+
+Use for all table reads and writes from FastAPI route handlers. The service-role key bypasses RLS entirely. Authorization is enforced at the FastAPI layer through `require_manager_or_owner`, not at the database layer.
+
+### Auth-only client (sign-in, sign-out, token operations)
+
+```python
+from src.database.supabase_client import get_auth_client
+
+auth_client = get_auth_client()  # fresh client per call, anon key
+auth_client.auth.sign_in_with_password({"email": ..., "password": ...})
+```
+
+**Always use this for auth operations** — never call `auth.sign_in_with_password()`, `auth.sign_out()`, `auth.refresh_session()`, or `auth.set_session()` on the service-role singleton. Doing so replaces the singleton's internal JWT with the user's token, causing all subsequent service-role table operations to run under RLS instead of bypassing it.
+
+### User-scoped client (diagnostic and future client-side use only)
+
+```python
+user_client = db.get_user_scoped_client(access_token)
+```
+
+Creates an anon-key client with the user JWT set via `set_session` and `postgrest.auth`. Due to a `supabase-py` limitation, this propagates `auth.uid()` correctly for RPC calls but **not** for table INSERT/UPDATE/DELETE operations. Do not use for server-side writes — use the service-role client instead.
+
+### Decision table
+
+| Operation | Client to use |
+|---|---|
+| Table read (SELECT) | service-role singleton |
+| Table write (INSERT/UPDATE/DELETE) | service-role singleton |
+| Sign-in / sign-out / token refresh | `get_auth_client()` (fresh per call) |
+| RPC debug calls | user-scoped client (anon + JWT) |
+| Signup (creating auth users) | `get_auth_client()` (fresh per call) |
 
 ## Google Cloud OAuth Setup (Future)
 

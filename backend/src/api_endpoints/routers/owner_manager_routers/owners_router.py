@@ -27,7 +27,7 @@ from src.core_specs.configuration.config_loader import config_loader
 from src.database import get_database_service
 from src.utils.validators import validate_email_format, validate_phone_format
 from src.api_endpoints.routers.owner_manager_routers.auth_router import require_manager_or_owner
-from src.database.supabase_client import get_supabase_client
+from src.database.supabase_client import get_supabase_client, get_auth_client
 
 """PYDANTIC MODELS-----------------------------------------------------------"""
 class OwnerSignupPayload(BaseModel):
@@ -95,9 +95,10 @@ async def list_owners(request: Request):
     f"{config_loader['endpoints']['owners_endpoint']['request_limit']}/"
     f"{config_loader['endpoints']['owners_endpoint']['unit_of_time_for_limit']}"
 )
-async def update_owner_profile(request: Request, owner_id: str, body: OwnerProfileUpdatePayload, current_actor: dict = Depends(require_manager_or_owner)):
+async def update_owner_profile(request: Request, owner_id: str, body: OwnerProfileUpdatePayload, auth_tuple: tuple = Depends(require_manager_or_owner)):
     """Update owner profile fields without changing owned properties."""
     try:
+        current_actor, _ = auth_tuple
         db = get_database_service()
         existing = db.owners.find_by_id(owner_id)
         if not existing:
@@ -203,8 +204,10 @@ async def owner_signup(request: Request, payload: OwnerSignupPayload) -> SignupR
                 )
 
         # Step 3: Create Supabase auth user with email confirmation
+        # Use auth-only client to avoid polluting service-role client's session
+        auth_client = get_auth_client()
         try:
-            auth_response = supabase_client.auth.sign_up({
+            auth_response = auth_client.auth.sign_up({
                 "email": payload.email,
                 "password": payload.password,
                 "options": {
@@ -245,6 +248,7 @@ async def owner_signup(request: Request, payload: OwnerSignupPayload) -> SignupR
             log_handler.error(f"[owners_router] Failed to create actor record: {actor_error}")
             # Clean up auth user if actor creation fails
             try:
+                # Use service-role client for admin operations
                 supabase_client.auth.admin.delete_user(auth_user_id)
             except:
                 pass
