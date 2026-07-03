@@ -110,15 +110,15 @@
     background:
       linear-gradient(
         180deg,
-        rgba(255,255,255,0.85) 0%,   /* was 0.55 */
-        rgba(255,255,255,0.35) 45%,  /* was 0.18 */
-        rgba(126,200,227,0.30) 100%  /* was 0.18 */
+        rgba(255,255,255,0.90) 0%,   /* 0.55 */
+        rgba(255,255,255,0.45) 45%,  /* 0.18 */
+        rgba(126,200,227,0.40) 100%  /* 0.18 */
       );
 
     backdrop-filter: blur(18px) saturate(140%);
     -webkit-backdrop-filter: blur(18px) saturate(140%);
 
-    border: 1px solid rgba(255, 255, 255, 0.9); /* more solid */
+    border: 1px solid rgba(255, 255, 255, 0.85); /* 0.9 */
 
     border-radius: 20px;
 
@@ -300,7 +300,7 @@
   .glass-panel [class*="text-ranting-ice"],
   .glass-panel-strong [class*="text-ranting-ice"] { color: var(--ranting-navy) !important; }
   .glass-panel [class*="text-ranting-deep"],
-  .glass-panel-strong [class*="text-ranting-deep"] { color: var(--ranting-deep) !important; opacity: 0.9; }
+  .glass-panel-strong [class*="text-ranting-deep"] { color: var(--ranting-deep) !important; opacity: 0.85; }
 
   /* Status glows */
   .glow-pending { background: rgba(245, 158, 11, 0.18); border: 1px solid rgba(245, 158, 11, 0.5); box-shadow: 0 0 10px rgba(245, 158, 11, 0.5); color: #fcd34d; }
