@@ -29,7 +29,7 @@ jobs:
       VITE_LOCAL_BACKEND: http://localhost:8000
       VITE_DEPLOYED_BACKEND: https://ci.example.test
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-node@v4
         with:
@@ -55,7 +55,7 @@ jobs:
   supply-chain:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-node@v4
         with:
