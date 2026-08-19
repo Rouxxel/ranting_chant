@@ -6,7 +6,7 @@ cryptography==46.0.7
 requests==2.33.1
 pydantic==2.11.4
 elevenlabs==2.49.0
-resend==2.30.1
+resend==2.36.0
 google-genai==1.72.0
 twilio==9.10.9
 Flask==3.0.3
