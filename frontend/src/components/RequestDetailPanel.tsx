@@ -47,10 +47,10 @@ export function RequestDetailPanel({
       if (cachedT && cachedV && cachedM && cachedO) {
         try {
           const map: Record<string, string> = {};
-          JSON.parse(cachedT).forEach((t: any) => (map[t.id] = t.name));
-          JSON.parse(cachedV).forEach((v: any) => (map[v.id] = v.name));
-          JSON.parse(cachedM).forEach((m: any) => (map[m.id] = m.name));
-          JSON.parse(cachedO).forEach((o: any) => (map[o.id] = o.name));
+          JSON.parse(cachedT).forEach((t: Tenant) => (map[t.id] = t.name));
+          JSON.parse(cachedV).forEach((v: Vendor) => (map[v.id] = v.name));
+          JSON.parse(cachedM).forEach((m: Manager) => (map[m.id] = m.name));
+          JSON.parse(cachedO).forEach((o: Owner) => (map[o.id] = o.name));
           setPartyNames(map);
         } catch (e) {
           console.error("Failed to parse cached party names:", e);
@@ -124,7 +124,7 @@ export function RequestDetailPanel({
     };
 
     loadSummary();
-  }, [req.id]);
+  }, [req.id, req.summary]);
 
   return (
     <>
@@ -195,7 +195,7 @@ export function RequestDetailPanel({
             <div className="glass-panel p-3">
               <div className="space-y-2">
                 {req.conversation_history &&
-                  req.conversation_history.map((m: any, i: number) => (
+                  req.conversation_history.map((m: ConversationMessage, i: number) => (
                     <div
                       key={m.id ?? `msg-${i}`}
                       className={`flex ${m.role === "tenant" ? "justify-end" : "justify-start"}`}
@@ -221,7 +221,7 @@ export function RequestDetailPanel({
             <SectionTitle>Notified parties</SectionTitle>
             {req.notifications_sent?.length > 0 ? (
               <ul className="space-y-2 glass-panel p-3">
-                {req.notifications_sent.map((n: any, i: number) => (
+                {req.notifications_sent.map((n: NotificationEvent, i: number) => (
                   <li
                     key={n.id ?? `notif-${i}`}
                     className="flex flex-col gap-1 text-xs text-ranting-ice/85"

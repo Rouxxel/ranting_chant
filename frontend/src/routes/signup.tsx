@@ -23,7 +23,7 @@ export const Route = createFileRoute("/signup")({
     const userRole = localStorage.getItem("user_role");
 
     if (token && (currentManager || userRole)) {
-      throw redirect({ to: "/management" as any });
+      throw redirect({ to: "/management" });
     }
   },
   head: () => ({ meta: [{ title: "Ranting Chant — Sign Up" }] }),
@@ -54,7 +54,7 @@ function SignupPage() {
 
   const validatePhone = (phone: string) => {
     if (!phone) return true; // Optional field
-    const re = /^[\d\s\-\(\)\+]{10,}$/;
+    const re = /^[\d\s()+-]{10,}$/;
     return re.test(phone);
   };
 

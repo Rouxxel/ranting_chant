@@ -19,7 +19,7 @@ function ResetPasswordPage() {
 
   // Get the token from the URL hash (Supabase sends it as #access_token=...)
   const hashParams = new URLSearchParams(window.location.hash.substring(1));
-  const token = hashParams.get("access_token") || (search as any).token || "";
+  const token = hashParams.get("access_token") || (search as Record<string, string>).token || "";
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

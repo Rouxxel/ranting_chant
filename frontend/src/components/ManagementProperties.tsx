@@ -62,8 +62,9 @@ export function ManagementProperties() {
   const ownsProperty = useCallback(
     (p: Property) => {
       if (!currentManager) return false;
-      const managedProps = (currentManager as any).managed_properties || [];
-      const ownedProps = (currentManager as any).owned_properties || [];
+      const managedProps = currentManager.managed_properties || [];
+      const ownedProps =
+        (currentManager as Manager & { owned_properties?: string[] }).owned_properties || [];
       return (
         managedProps.includes(p.id) ||
         ownedProps.includes(p.id) ||
@@ -118,7 +119,10 @@ export function ManagementProperties() {
       localStorage.setItem(propertiesCacheKey, JSON.stringify(next));
       // Invalidate requests cache since property changes may affect request filtering
       if (currentManager) {
-        const role = (currentManager as any).managed_properties ? "manager" : "owner";
+        const role =
+          currentManager.managed_properties && currentManager.managed_properties.length > 0
+            ? "manager"
+            : "owner";
         localStorage.removeItem(`requests_${role}_${currentManager.id}`);
       }
       setIsCreateDialogOpen(false);
@@ -161,7 +165,10 @@ export function ManagementProperties() {
       localStorage.setItem(propertiesCacheKey, JSON.stringify(next));
       // Invalidate requests cache since property changes may affect request filtering
       if (currentManager) {
-        const role = (currentManager as any).managed_properties ? "manager" : "owner";
+        const role =
+          currentManager.managed_properties && currentManager.managed_properties.length > 0
+            ? "manager"
+            : "owner";
         localStorage.removeItem(`requests_${role}_${currentManager.id}`);
       }
       setSelected(updatedProperty);
@@ -197,7 +204,10 @@ export function ManagementProperties() {
       localStorage.setItem(propertiesCacheKey, JSON.stringify(next));
       // Invalidate requests cache since property changes may affect request filtering
       if (currentManager) {
-        const role = (currentManager as any).managed_properties ? "manager" : "owner";
+        const role =
+          currentManager.managed_properties && currentManager.managed_properties.length > 0
+            ? "manager"
+            : "owner";
         localStorage.removeItem(`requests_${role}_${currentManager.id}`);
       }
       setSelected(null);

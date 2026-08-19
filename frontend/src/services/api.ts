@@ -442,7 +442,7 @@ export const getConversationHistory = async (
 export const saveConversation = async (data: {
   session_id: string;
   tenant_id: string;
-  conversation_history: any[];
+  conversation_history: ConversationMessage[];
   metadata: {
     type?: RequestType;
     description?: string;
@@ -462,12 +462,17 @@ export const sendNotifications = async (data: {
   tenant_id: string;
   request_id: string;
   contacts: SuggestedContact[];
-}): Promise<{ success: boolean; total: number; sent: number; results: any[] }> => {
+}): Promise<{
+  success: boolean;
+  total: number;
+  sent: number;
+  results: Array<{ id: string; status: string }>;
+}> => {
   const response = await apiClient.post<{
     success: boolean;
     total: number;
     sent: number;
-    results: any[];
+    results: Array<{ id: string; status: string }>;
   }>("/conversation/send-notifications", data);
   return response.data;
 };

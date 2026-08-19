@@ -33,7 +33,7 @@ function ManagementPage() {
   // Build role-namespaced cache keys so different managers sharing a browser
   // don't bleed each other's filtered request lists.
   const requestsCacheKey = currentManager
-    ? `requests_${(currentManager as any).managed_properties ? "manager" : "owner"}_${currentManager.id}`
+    ? `requests_${currentManager.managed_properties && currentManager.managed_properties.length > 0 ? "manager" : "owner"}_${currentManager.id}`
     : "requests";
 
   const [activeTab, setActiveTab] = useState<
@@ -51,8 +51,8 @@ function ManagementPage() {
   const filterForManager = (allRequests: Request[]) =>
     allRequests.filter((r) => {
       if (!currentManager || !r.property_id) return false;
-      const properties =
-        (currentManager as any).managed_properties || (currentManager as any).owned_properties;
+      const manager = currentManager as Manager & { owned_properties?: string[] };
+      const properties = manager.managed_properties || manager.owned_properties;
       return Array.isArray(properties) && properties.includes(r.property_id);
     });
 

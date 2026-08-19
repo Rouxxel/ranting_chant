@@ -7,7 +7,7 @@ import type { Status } from "../types";
 interface RequestWorkflowActionsProps {
   requestId: string;
   currentStatus: string;
-  onAction?: (action: string, data?: any) => void;
+  onAction?: (action: string, data?: Record<string, unknown>) => void;
   className?: string;
 }
 

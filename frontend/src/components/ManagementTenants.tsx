@@ -56,8 +56,9 @@ export function ManagementTenants() {
   const ownsProperty = useCallback(
     (p: Property) => {
       if (!currentManager) return false;
-      const managedProps = (currentManager as any).managed_properties || [];
-      const ownedProps = (currentManager as any).owned_properties || [];
+      const managedProps = currentManager.managed_properties || [];
+      const ownedProps =
+        (currentManager as Manager & { owned_properties?: string[] }).owned_properties || [];
       return (
         managedProps.includes(p.id) ||
         ownedProps.includes(p.id) ||

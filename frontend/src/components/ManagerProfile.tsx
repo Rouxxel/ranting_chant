@@ -11,7 +11,7 @@ interface ManagerProfileProps {
 export function ManagerProfile({ managerId, className = "" }: ManagerProfileProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [originalProfile, setOriginalProfile] = useState<any>(null);
+  const [originalProfile, setOriginalProfile] = useState<Manager | null>(null);
   const [profile, setProfile] = useState({
     id: managerId,
     name: "",

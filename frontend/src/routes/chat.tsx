@@ -257,13 +257,7 @@ function ChatPage() {
   }
 
   // Handle voice recording completion
-  useEffect(() => {
-    if (audioBlob && !isRecording) {
-      handleVoiceSubmit();
-    }
-  }, [audioBlob, isRecording]);
-
-  async function handleVoiceSubmit() {
+  const handleVoiceSubmit = useCallback(async () => {
     if (!audioBlob || !requestId) return;
 
     setTyping(true);
@@ -328,6 +322,8 @@ function ChatPage() {
     } finally {
       setTyping(false);
       resetRecording();
+    }
+  }, [audioBlob, isRecording, requestId, tenantId, voiceProvider, voiceId]);
     }
   }
 

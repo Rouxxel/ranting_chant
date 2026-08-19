@@ -52,23 +52,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string, role: "tenant" | "manager") => {
-    try {
-      const response = await authLogin(email, password);
-      localStorage.setItem("auth_token", response.access_token);
-      if (response.refresh_token) {
-        localStorage.setItem("refresh_token", response.refresh_token);
-      }
-      setUser({
-        id: response.actor.id,
-        name: response.actor.name,
-        email: response.actor.email || "",
-        role: response.role as "tenant" | "manager" | "admin",
-        unit: undefined,
-        propertyId: undefined,
-      });
-    } catch (error) {
-      throw error;
+    const response = await authLogin(email, password);
+    localStorage.setItem("auth_token", response.access_token);
+    if (response.refresh_token) {
+      localStorage.setItem("refresh_token", response.refresh_token);
     }
+    setUser({
+      id: response.actor.id,
+      name: response.actor.name,
+      email: response.actor.email || "",
+      role: response.role as "tenant" | "manager" | "admin",
+      unit: undefined,
+      propertyId: undefined,
+    });
   };
 
   const logout = async () => {
