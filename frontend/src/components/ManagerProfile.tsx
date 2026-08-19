@@ -1,84 +1,84 @@
-import { useState, useEffect } from 'react'
-import { User, Mail, Phone, Building2, Edit, Save, X } from 'lucide-react'
-import { toast } from 'sonner'
-import { getManagerById, updateManagerProfile } from '../services/api'
+import { useState, useEffect } from "react";
+import { User, Mail, Phone, Building2, Edit, Save, X } from "lucide-react";
+import { toast } from "sonner";
+import { getManagerById, updateManagerProfile } from "../services/api";
 
 interface ManagerProfileProps {
-  managerId: string
-  className?: string
+  managerId: string;
+  className?: string;
 }
 
-export function ManagerProfile({ managerId, className = '' }: ManagerProfileProps) {
-  const [isEditing, setIsEditing] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-  const [originalProfile, setOriginalProfile] = useState<any>(null)
+export function ManagerProfile({ managerId, className = "" }: ManagerProfileProps) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [originalProfile, setOriginalProfile] = useState<any>(null);
   const [profile, setProfile] = useState({
     id: managerId,
-    name: '',
-    email: '',
-    phone: '',
+    name: "",
+    email: "",
+    phone: "",
     managed_properties: [] as string[],
-    department: '',
-    startDate: ''
-  })
+    department: "",
+    startDate: "",
+  });
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const data = await getManagerById(managerId)
+        const data = await getManagerById(managerId);
         setProfile({
           id: data.id,
           name: data.name,
-          email: data.email || '',
-          phone: data.phone || '',
+          email: data.email || "",
+          phone: data.phone || "",
           managed_properties: data.managed_properties || [],
-          department: 'Property Management',
-          startDate: '2022-01-15'
-        })
-        setOriginalProfile(data)
+          department: "Property Management",
+          startDate: "2022-01-15",
+        });
+        setOriginalProfile(data);
       } catch (error) {
-        console.error('Failed to fetch manager profile:', error)
-        toast.error('Failed to load profile')
+        console.error("Failed to fetch manager profile:", error);
+        toast.error("Failed to load profile");
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchProfile()
-  }, [managerId])
+    fetchProfile();
+  }, [managerId]);
 
   const handleSave = async () => {
     try {
       await updateManagerProfile(managerId, {
         email: profile.email,
-        phone: profile.phone
-      })
-      toast.success('Profile updated successfully')
-      setIsEditing(false)
+        phone: profile.phone,
+      });
+      toast.success("Profile updated successfully");
+      setIsEditing(false);
       // Refresh profile data
-      const data = await getManagerById(managerId)
-      setOriginalProfile(data)
+      const data = await getManagerById(managerId);
+      setOriginalProfile(data);
     } catch (error) {
-      console.error('Failed to update profile:', error)
-      toast.error('Failed to update profile')
+      console.error("Failed to update profile:", error);
+      toast.error("Failed to update profile");
     }
-  }
+  };
 
   const handleCancel = () => {
-    setIsEditing(false)
+    setIsEditing(false);
     // Reset to original values
     if (originalProfile) {
       setProfile({
         id: originalProfile.id,
         name: originalProfile.name,
-        email: originalProfile.email || '',
-        phone: originalProfile.phone || '',
+        email: originalProfile.email || "",
+        phone: originalProfile.phone || "",
         managed_properties: originalProfile.managed_properties || [],
-        department: 'Property Management',
-        startDate: '2022-01-15'
-      })
+        department: "Property Management",
+        startDate: "2022-01-15",
+      });
     }
-  }
+  };
 
   return (
     <div className={`glass-panel p-6 rounded-lg ${className}`}>
@@ -119,7 +119,10 @@ export function ManagerProfile({ managerId, className = '' }: ManagerProfileProp
         {/* Avatar Section */}
         <div className="flex items-center gap-4 p-4 glass-panel-strong rounded-lg">
           <div className="w-16 h-16 rounded-full bg-linear-to-br from-ranting-sky to-ranting-accent flex items-center justify-center text-ranting-navy text-2xl font-bold">
-            {profile.name.split(' ').map(n => n[0]).join('')}
+            {profile.name
+              .split(" ")
+              .map((n) => n[0])
+              .join("")}
           </div>
           <div>
             <p className="text-ranting-ice font-semibold text-lg">{profile.name}</p>
@@ -192,5 +195,5 @@ export function ManagerProfile({ managerId, className = '' }: ManagerProfileProp
         </div>
       </div>
     </div>
-  )
+  );
 }

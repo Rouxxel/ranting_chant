@@ -1,10 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  Outlet,
-  Link,
-  createRootRouteWithContext,
-  useRouter,
-} from "@tanstack/react-router";
+import { Outlet, Link, createRootRouteWithContext, useRouter } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
 import { AeroBackground } from "@/components/AeroBackground";
@@ -74,7 +69,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Ranting Chant — AI-Powered Property Operations" },
-      { name: "description", content: "Autonomous AI coordinator for tenants, managers, owners, and vendors." },
+      {
+        name: "description",
+        content: "Autonomous AI coordinator for tenants, managers, owners, and vendors.",
+      },
       { property: "og:title", content: "Ranting Chant" },
       { property: "og:description", content: "AI-Powered Property Operations" },
       { property: "og:type", content: "website" },

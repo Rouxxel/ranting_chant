@@ -25,7 +25,9 @@ function getRecipientType(recipient: string, recipientType?: string): string {
 }
 
 export function RequestTimeline({ req, tenantName = "Tenant" }: RequestTimelineProps) {
-  type Node = { kind: "msg"; data: ConversationMessage } | { kind: "notif"; data: NotificationEvent };
+  type Node =
+    | { kind: "msg"; data: ConversationMessage }
+    | { kind: "notif"; data: NotificationEvent };
   const nodes: Node[] = [
     ...(req.conversation_history || []).map((m) => ({ kind: "msg" as const, data: m })),
     ...(req.notifications_sent || []).map((n) => ({ kind: "notif" as const, data: n })),
@@ -36,7 +38,10 @@ export function RequestTimeline({ req, tenantName = "Tenant" }: RequestTimelineP
       <div className="relative pl-6">
         <div
           className="absolute left-2 top-1 bottom-1 w-px"
-          style={{ background: "linear-gradient(180deg, rgba(126,200,227,0.7), rgba(126,200,227,0.15))", boxShadow: "0 0 10px rgba(126,200,227,0.6)" }}
+          style={{
+            background: "linear-gradient(180deg, rgba(126,200,227,0.7), rgba(126,200,227,0.15))",
+            boxShadow: "0 0 10px rgba(126,200,227,0.6)",
+          }}
         />
         <ul className="space-y-4 glass-panel p-8 rounded-lg">
           {nodes.map((n, i) => (
@@ -47,10 +52,18 @@ export function RequestTimeline({ req, tenantName = "Tenant" }: RequestTimelineP
               />
               {n.kind === "msg" ? (
                 <div className="flex items-start gap-2">
-                  <Avatar name={n.data.role === "ai" ? "Ranting Chant" : tenantName} size={24} glow={false} />
+                  <Avatar
+                    name={n.data.role === "ai" ? "Ranting Chant" : tenantName}
+                    size={24}
+                    glow={false}
+                  />
                   <div className="glass-panel max-w-[80%] px-3 py-2 text-xs text-ranting-ice">
                     <div className="mb-0.5 text-[10px] uppercase tracking-wider text-ranting-deep font-semibold">
-                      {n.data.role === "ai" ? "AI" : tenantName} · {new Date(n.data.timestamp).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+                      {n.data.role === "ai" ? "AI" : tenantName} ·{" "}
+                      {new Date(n.data.timestamp).toLocaleTimeString([], {
+                        hour: "numeric",
+                        minute: "2-digit",
+                      })}
                     </div>
                     {n.data.message}
                   </div>
@@ -58,7 +71,11 @@ export function RequestTimeline({ req, tenantName = "Tenant" }: RequestTimelineP
               ) : (
                 <div className="flex items-start gap-2">
                   <div className="flex h-6 w-6 items-center justify-center rounded-full bg-ranting-sky/30">
-                    {n.data.type === "email" ? <Mail className="h-3.5 w-3.5 text-ranting-ice" /> : <MessageCircle className="h-3.5 w-3.5 text-ranting-ice" />}
+                    {n.data.type === "email" ? (
+                      <Mail className="h-3.5 w-3.5 text-ranting-ice" />
+                    ) : (
+                      <MessageCircle className="h-3.5 w-3.5 text-ranting-ice" />
+                    )}
                   </div>
                   <div className="glass-panel max-w-[80%] px-3 py-2 text-xs text-ranting-ice">
                     <div className="mb-0.5 flex items-center gap-2 text-[10px] uppercase tracking-wider text-ranting-deep font-semibold">
@@ -70,12 +87,23 @@ export function RequestTimeline({ req, tenantName = "Tenant" }: RequestTimelineP
                         </>
                       )}
                       <span>·</span>
-                      <span>{new Date(n.data.timestamp).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</span>
+                      <span>
+                        {new Date(n.data.timestamp).toLocaleTimeString([], {
+                          hour: "numeric",
+                          minute: "2-digit",
+                        })}
+                      </span>
                     </div>
                     <div className="font-medium">{n.data.recipient_name || n.data.recipient}</div>
-                    {n.data.recipient_email && <div className="text-xs text-ranting-muted">{n.data.recipient_email}</div>}
-                    {n.data.recipient_phone && <div className="text-xs text-ranting-muted">{n.data.recipient_phone}</div>}
-                    {n.data.summary && <div className="mt-1 text-ranting-ice/70">— {n.data.summary}</div>}
+                    {n.data.recipient_email && (
+                      <div className="text-xs text-ranting-muted">{n.data.recipient_email}</div>
+                    )}
+                    {n.data.recipient_phone && (
+                      <div className="text-xs text-ranting-muted">{n.data.recipient_phone}</div>
+                    )}
+                    {n.data.summary && (
+                      <div className="mt-1 text-ranting-ice/70">— {n.data.summary}</div>
+                    )}
                   </div>
                 </div>
               )}
@@ -83,13 +111,16 @@ export function RequestTimeline({ req, tenantName = "Tenant" }: RequestTimelineP
           ))}
           {req.status === "resolved" && (
             <div className="mt-5 glass-panel p-3">
-              <div className="mb-1 text-[10px] uppercase tracking-wider text-ranting-muted">Resolution</div>
+              <div className="mb-1 text-[10px] uppercase tracking-wider text-ranting-muted">
+                Resolution
+              </div>
               <p className="text-xs text-ranting-ice/90">
                 {req.resolution_note || "Marked resolved (no note provided)."}
               </p>
               {req.resolved_at && (
                 <p className="mt-1 text-[10px] text-ranting-muted">
-                  Resolved on {new Date(req.resolved_at || "").toLocaleDateString()} by {req.resolved_by_name || req.resolved_by}
+                  Resolved on {new Date(req.resolved_at || "").toLocaleDateString()} by{" "}
+                  {req.resolved_by_name || req.resolved_by}
                 </p>
               )}
             </div>

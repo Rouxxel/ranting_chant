@@ -2,7 +2,14 @@ import { useState, useEffect, useCallback } from "react";
 import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { useApp } from "@/context/AppContext";
-import { getTenants, createTenant, updateTenant, deleteTenant, getProperties, describeValidationError } from "@/services/api";
+import {
+  getTenants,
+  createTenant,
+  updateTenant,
+  deleteTenant,
+  getProperties,
+  describeValidationError,
+} from "@/services/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -40,30 +47,36 @@ export function ManagementTenants() {
   // Namespaced cache keys for tenant and property lists.
   const propertiesCacheKey = currentManager
     ? `properties_${userRole}_${currentManager.id}`
-    : 'properties';
-  const tenantsCacheKey = 'tenants'; // tenants list is shared; filtering is client-side
+    : "properties";
+  const tenantsCacheKey = "tenants"; // tenants list is shared; filtering is client-side
 
   // A property belongs to the current manager/owner if it's in their managed/owned
   // list OR its manager_id/owner_id points at them (covers freshly created properties
   // whose ids aren't yet in the cached user record).
-  const ownsProperty = useCallback((p: Property) => {
-    if (!currentManager) return false;
-    const managedProps = (currentManager as any).managed_properties || [];
-    const ownedProps = (currentManager as any).owned_properties || [];
-    return (
-      managedProps.includes(p.id) ||
-      ownedProps.includes(p.id) ||
-      p.manager_id === currentManager.id ||
-      p.owner_id === currentManager.id
-    );
-  }, [currentManager]);
+  const ownsProperty = useCallback(
+    (p: Property) => {
+      if (!currentManager) return false;
+      const managedProps = (currentManager as any).managed_properties || [];
+      const ownedProps = (currentManager as any).owned_properties || [];
+      return (
+        managedProps.includes(p.id) ||
+        ownedProps.includes(p.id) ||
+        p.manager_id === currentManager.id ||
+        p.owner_id === currentManager.id
+      );
+    },
+    [currentManager],
+  );
 
-  const applyData = useCallback((allTenants: Tenant[], allProperties: Property[]) => {
-    const myProperties = allProperties.filter(ownsProperty);
-    const myPropertyIds = new Set(myProperties.map((p) => p.id));
-    setProperties(myProperties);
-    setTenants(allTenants.filter((t) => t.property_id && myPropertyIds.has(t.property_id)));
-  }, [ownsProperty]);
+  const applyData = useCallback(
+    (allTenants: Tenant[], allProperties: Property[]) => {
+      const myProperties = allProperties.filter(ownsProperty);
+      const myPropertyIds = new Set(myProperties.map((p) => p.id));
+      setProperties(myProperties);
+      setTenants(allTenants.filter((t) => t.property_id && myPropertyIds.has(t.property_id)));
+    },
+    [ownsProperty],
+  );
 
   const fetchData = useCallback(async () => {
     setIsRefreshing(true);
@@ -105,7 +118,7 @@ export function ManagementTenants() {
       localStorage.setItem(tenantsCacheKey, JSON.stringify([...all, newTenant]));
       // Invalidate requests cache since tenant changes may affect request filtering
       if (currentManager) {
-        const role = userRole === 'owner' ? 'owner' : 'manager';
+        const role = userRole === "owner" ? "owner" : "manager";
         localStorage.removeItem(`requests_${role}_${currentManager.id}`);
       }
       setIsCreateDialogOpen(false);
@@ -139,19 +152,20 @@ export function ManagementTenants() {
     setIsSubmitting(true);
     try {
       const updatedTenant = await updateTenant(selected.id, changes);
-      const next = tenants.map(t => t.id === selected.id ? updatedTenant : t);
+      const next = tenants.map((t) => (t.id === selected.id ? updatedTenant : t));
       setTenants(next);
       // Update shared tenants cache
       const allCached = localStorage.getItem(tenantsCacheKey);
       if (allCached) {
         const all: Tenant[] = JSON.parse(allCached);
-        localStorage.setItem(tenantsCacheKey, JSON.stringify(
-          all.map(t => t.id === selected.id ? updatedTenant : t)
-        ));
+        localStorage.setItem(
+          tenantsCacheKey,
+          JSON.stringify(all.map((t) => (t.id === selected.id ? updatedTenant : t))),
+        );
       }
       // Invalidate requests cache since tenant changes may affect request filtering
       if (currentManager) {
-        const role = userRole === 'owner' ? 'owner' : 'manager';
+        const role = userRole === "owner" ? "owner" : "manager";
         localStorage.removeItem(`requests_${role}_${currentManager.id}`);
       }
       setSelected(updatedTenant);
@@ -179,19 +193,20 @@ export function ManagementTenants() {
     setIsDeleting(true);
     try {
       await deleteTenant(selected.id);
-      const next = tenants.filter(t => t.id !== selected.id);
+      const next = tenants.filter((t) => t.id !== selected.id);
       setTenants(next);
       // Update shared tenants cache
       const allCached = localStorage.getItem(tenantsCacheKey);
       if (allCached) {
         const all: Tenant[] = JSON.parse(allCached);
-        localStorage.setItem(tenantsCacheKey, JSON.stringify(
-          all.filter(t => t.id !== selected.id)
-        ));
+        localStorage.setItem(
+          tenantsCacheKey,
+          JSON.stringify(all.filter((t) => t.id !== selected.id)),
+        );
       }
       // Invalidate requests cache since tenant changes may affect request filtering
       if (currentManager) {
-        const role = userRole === 'owner' ? 'owner' : 'manager';
+        const role = userRole === "owner" ? "owner" : "manager";
         localStorage.removeItem(`requests_${role}_${currentManager.id}`);
       }
       setSelected(null);
@@ -293,7 +308,12 @@ export function ManagementTenants() {
                   />
                 </div>
                 <DialogFooter>
-                  <Button type="button" variant="ghost" onClick={() => setIsCreateDialogOpen(false)} className="glossy-btn-ghost">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setIsCreateDialogOpen(false)}
+                    className="glossy-btn-ghost"
+                  >
                     Cancel
                   </Button>
                   <Button type="submit" disabled={isSubmitting} className="glossy-btn">
@@ -313,11 +333,21 @@ export function ManagementTenants() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-ranting-sky/20">
-                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-deep">Name</th>
-                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-deep">Unit</th>
-                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-deep">Property</th>
-                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-deep">Email</th>
-                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-deep">Phone</th>
+                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-deep">
+                  Name
+                </th>
+                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-deep">
+                  Unit
+                </th>
+                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-deep">
+                  Property
+                </th>
+                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-deep">
+                  Email
+                </th>
+                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-deep">
+                  Phone
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -329,7 +359,11 @@ export function ManagementTenants() {
                 >
                   <td className="px-4 py-3 text-sm text-ranting-ice">{tenant.name}</td>
                   <td className="px-4 py-3 text-sm text-ranting-deep">{tenant.unit}</td>
-                  <td className="px-4 py-3 text-sm text-ranting-deep">{tenant.property_id ? properties.find(p => p.id === tenant.property_id)?.name || "-" : "-"}</td>
+                  <td className="px-4 py-3 text-sm text-ranting-deep">
+                    {tenant.property_id
+                      ? properties.find((p) => p.id === tenant.property_id)?.name || "-"
+                      : "-"}
+                  </td>
                   <td className="px-4 py-3 text-sm text-ranting-deep">{tenant.email || "-"}</td>
                   <td className="px-4 py-3 text-sm text-ranting-deep">{tenant.phone || "-"}</td>
                 </tr>
@@ -341,7 +375,9 @@ export function ManagementTenants() {
 
       {selected && (
         <div className="glass-panel mt-4 p-6">
-          <label className="block text-xs uppercase tracking-wider text-ranting-deep mb-1">Tenant's Name</label>
+          <label className="block text-xs uppercase tracking-wider text-ranting-deep mb-1">
+            Tenant's Name
+          </label>
           <div className="mb-4 flex items-center justify-between">
             <h3 className="text-lg font-semibold text-ranting-ice">{selected.name}</h3>
             <div className="flex gap-2">
@@ -358,10 +394,21 @@ export function ManagementTenants() {
             </div>
           </div>
           <div className="space-y-2 text-sm">
-            <div><span className="text-ranting-deep">Unit:</span> {selected.unit}</div>
-            <div><span className="text-ranting-deep">Property:</span> {selected.property_id ? properties.find(p => p.id === selected.property_id)?.name || "-" : "-"}</div>
-            <div><span className="text-ranting-deep">Email:</span> {selected.email || "-"}</div>
-            <div><span className="text-ranting-deep">Phone:</span> {selected.phone || "-"}</div>
+            <div>
+              <span className="text-ranting-deep">Unit:</span> {selected.unit}
+            </div>
+            <div>
+              <span className="text-ranting-deep">Property:</span>{" "}
+              {selected.property_id
+                ? properties.find((p) => p.id === selected.property_id)?.name || "-"
+                : "-"}
+            </div>
+            <div>
+              <span className="text-ranting-deep">Email:</span> {selected.email || "-"}
+            </div>
+            <div>
+              <span className="text-ranting-deep">Phone:</span> {selected.phone || "-"}
+            </div>
           </div>
         </div>
       )}
@@ -402,7 +449,12 @@ export function ManagementTenants() {
               </select>
             </div>
             <DialogFooter>
-              <Button type="button" variant="ghost" onClick={() => setIsEditDialogOpen(false)} className="glossy-btn-ghost">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setIsEditDialogOpen(false)}
+                className="glossy-btn-ghost"
+              >
                 Cancel
               </Button>
               <Button type="submit" disabled={isSubmitting} className="glossy-btn">

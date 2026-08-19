@@ -2,12 +2,12 @@
 // Based on backend endpoints defined in documentation/postman_reference.md
 // Base URL: http://localhost:8000
 
-import axios, { AxiosInstance } from 'axios';
-import { toast } from 'sonner';
+import axios, { AxiosInstance } from "axios";
+import { toast } from "sonner";
 
 // Allow individual requests to opt out of the generic error toast so the
 // caller can show its own field-specific message (e.g. profile validation).
-declare module 'axios' {
+declare module "axios" {
   export interface AxiosRequestConfig {
     suppressErrorToast?: boolean;
   }
@@ -48,14 +48,14 @@ import type {
   VendorUpdateRequest,
   ProfileUpdateRequest,
   RequestCancelRequest,
-  RequestCompleteRequest
-} from '../types';
+  RequestCompleteRequest,
+} from "../types";
 
 // Fallback endpoints from environment variables
 // Try deployed backend first, fall back to local backend
 const ENDPOINTS = [
   import.meta.env.VITE_DEPLOYED_BACKEND,
-  import.meta.env.VITE_LOCAL_BACKEND || 'http://localhost:8000'
+  import.meta.env.VITE_LOCAL_BACKEND || "http://localhost:8000",
 ].filter(Boolean);
 
 let currentEndpointIndex = 0;
@@ -65,7 +65,7 @@ let hasShownConnectionError = false;
 const apiClient: AxiosInstance = axios.create({
   baseURL: ENDPOINTS[0],
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
   timeout: 30000,
 });
@@ -73,13 +73,13 @@ const apiClient: AxiosInstance = axios.create({
 // Request interceptor to add auth token if available
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('auth_token');
+    const token = localStorage.getItem("auth_token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 // Response interceptor with fallback logic
@@ -89,7 +89,7 @@ apiClient.interceptors.response.use(
     const originalRequest = error.config;
 
     // If the error is a network error or 5xx, try the next endpoint
-    if ((error.code === 'ERR_NETWORK' || !error.response) && !originalRequest._retry) {
+    if ((error.code === "ERR_NETWORK" || !error.response) && !originalRequest._retry) {
       originalRequest._retry = true;
 
       // Try next endpoint (only move forward, don't cycle)
@@ -106,8 +106,8 @@ apiClient.interceptors.response.use(
           // If retry also fails, show error message
           if (!hasShownConnectionError) {
             hasShownConnectionError = true;
-            toast.error('Connection Error', {
-              description: 'We are having some troubles, please try again later',
+            toast.error("Connection Error", {
+              description: "We are having some troubles, please try again later",
               duration: 10000,
             });
 
@@ -122,13 +122,13 @@ apiClient.interceptors.response.use(
     }
 
     // If we've tried all endpoints or it's a different error, show error
-    if (!hasShownConnectionError && (error.code === 'ERR_NETWORK' || !error.response)) {
+    if (!hasShownConnectionError && (error.code === "ERR_NETWORK" || !error.response)) {
       hasShownConnectionError = true;
-      toast.error('Connection Error', {
-        description: 'We are having some troubles, please try again later',
+      toast.error("Connection Error", {
+        description: "We are having some troubles, please try again later",
         duration: 10000,
       });
-      
+
       // Reset flag after 30 seconds to allow showing error again
       setTimeout(() => {
         hasShownConnectionError = false;
@@ -136,28 +136,28 @@ apiClient.interceptors.response.use(
     }
 
     const status = error.response?.status;
-    
+
     if (status === 401) {
       // Unauthorized - clear session and redirect to login
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('auth_refresh_token');
-      localStorage.removeItem('current_manager');
-      localStorage.removeItem('user_role');
-      window.location.href = '/';
+      localStorage.removeItem("auth_token");
+      localStorage.removeItem("auth_refresh_token");
+      localStorage.removeItem("current_manager");
+      localStorage.removeItem("user_role");
+      window.location.href = "/";
     } else if (status && status >= 400 && status < 600) {
-      const message = error.response?.data?.detail || error.message || 'An error occurred';
+      const message = error.response?.data?.detail || error.message || "An error occurred";
       console.error(`API Error ${status}:`, message);
 
       // Skip the generic toast when the caller handles its own messaging
       if (!error.config?.suppressErrorToast) {
-        toast.error(status >= 500 ? 'Server Error' : 'Request Error', {
+        toast.error(status >= 500 ? "Server Error" : "Request Error", {
           description: message,
         });
       }
     }
-    
+
     return Promise.reject(error);
-  }
+  },
 );
 
 // Map a backend validation error (400 / 422) to a friendly, field-specific
@@ -207,14 +207,14 @@ export function describeValidationError(error: unknown, fallback: string): strin
 // ==================== Root Endpoint ====================
 
 export const getHealth = async () => {
-  const response = await apiClient.get('/');
+  const response = await apiClient.get("/");
   return response.data;
 };
 
 // ==================== Tenants ====================
 
 export const getTenants = async (): Promise<Tenant[]> => {
-  const response = await apiClient.get<Tenant[]>('/tenants');
+  const response = await apiClient.get<Tenant[]>("/tenants");
   return response.data;
 };
 
@@ -229,24 +229,34 @@ export const getTenantsByProperty = async (propertyId: string): Promise<Tenant[]
 };
 
 export const createTenant = async (data: TenantCreateRequest): Promise<Tenant> => {
-  const response = await apiClient.post<Tenant>('/tenants', data, { suppressErrorToast: true });
+  const response = await apiClient.post<Tenant>("/tenants", data, { suppressErrorToast: true });
   return response.data;
 };
 
-export const updateTenant = async (tenantId: string, data: TenantUpdateRequest): Promise<Tenant> => {
-  const response = await apiClient.patch<Tenant>(`/tenants/${tenantId}`, data, { suppressErrorToast: true });
+export const updateTenant = async (
+  tenantId: string,
+  data: TenantUpdateRequest,
+): Promise<Tenant> => {
+  const response = await apiClient.patch<Tenant>(`/tenants/${tenantId}`, data, {
+    suppressErrorToast: true,
+  });
   return response.data;
 };
 
-export const updateTenantProfile = async (tenantId: string, data: ProfileUpdateRequest): Promise<Tenant> => {
-  const response = await apiClient.patch<Tenant>(`/tenants/${tenantId}/profile`, data, { suppressErrorToast: true });
+export const updateTenantProfile = async (
+  tenantId: string,
+  data: ProfileUpdateRequest,
+): Promise<Tenant> => {
+  const response = await apiClient.patch<Tenant>(`/tenants/${tenantId}/profile`, data, {
+    suppressErrorToast: true,
+  });
   return response.data;
 };
 
 // ==================== Properties ====================
 
 export const getProperties = async (): Promise<Property[]> => {
-  const response = await apiClient.get<Property[]>('/properties');
+  const response = await apiClient.get<Property[]>("/properties");
   return response.data;
 };
 
@@ -256,19 +266,26 @@ export const getPropertyById = async (propertyId: string): Promise<Property> => 
 };
 
 export const createProperty = async (data: PropertyCreateRequest): Promise<Property> => {
-  const response = await apiClient.post<Property>('/properties', data, { suppressErrorToast: true });
+  const response = await apiClient.post<Property>("/properties", data, {
+    suppressErrorToast: true,
+  });
   return response.data;
 };
 
-export const updateProperty = async (propertyId: string, data: PropertyUpdateRequest): Promise<Property> => {
-  const response = await apiClient.patch<Property>(`/properties/${propertyId}`, data, { suppressErrorToast: true });
+export const updateProperty = async (
+  propertyId: string,
+  data: PropertyUpdateRequest,
+): Promise<Property> => {
+  const response = await apiClient.patch<Property>(`/properties/${propertyId}`, data, {
+    suppressErrorToast: true,
+  });
   return response.data;
 };
 
 // ==================== Vendors ====================
 
 export const getVendors = async (): Promise<Vendor[]> => {
-  const response = await apiClient.get<Vendor[]>('/vendors');
+  const response = await apiClient.get<Vendor[]>("/vendors");
   return response.data;
 };
 
@@ -283,12 +300,17 @@ export const getVendorsByService = async (service: string): Promise<Vendor[]> =>
 };
 
 export const createVendor = async (data: VendorCreateRequest): Promise<Vendor> => {
-  const response = await apiClient.post<Vendor>('/vendors', data, { suppressErrorToast: true });
+  const response = await apiClient.post<Vendor>("/vendors", data, { suppressErrorToast: true });
   return response.data;
 };
 
-export const updateVendor = async (vendorId: string, data: VendorUpdateRequest): Promise<Vendor> => {
-  const response = await apiClient.patch<Vendor>(`/vendors/${vendorId}`, data, { suppressErrorToast: true });
+export const updateVendor = async (
+  vendorId: string,
+  data: VendorUpdateRequest,
+): Promise<Vendor> => {
+  const response = await apiClient.patch<Vendor>(`/vendors/${vendorId}`, data, {
+    suppressErrorToast: true,
+  });
   return response.data;
 };
 
@@ -307,7 +329,7 @@ export const deleteProperty = async (propertyId: string): Promise<void> => {
 // ==================== Managers ====================
 
 export const getManagers = async (): Promise<Manager[]> => {
-  const response = await apiClient.get<Manager[]>('/managers');
+  const response = await apiClient.get<Manager[]>("/managers");
   return response.data;
 };
 
@@ -316,25 +338,35 @@ export const getManagerById = async (managerId: string): Promise<Manager> => {
   return response.data;
 };
 
-export const updateManagerProfile = async (managerId: string, data: ProfileUpdateRequest): Promise<Manager> => {
-  const response = await apiClient.patch<Manager>(`/managers/${managerId}/profile`, data, { suppressErrorToast: true });
+export const updateManagerProfile = async (
+  managerId: string,
+  data: ProfileUpdateRequest,
+): Promise<Manager> => {
+  const response = await apiClient.patch<Manager>(`/managers/${managerId}/profile`, data, {
+    suppressErrorToast: true,
+  });
   return response.data;
 };
 
 export const getOwners = async (): Promise<Owner[]> => {
-  const response = await apiClient.get<Owner[]>('/owners');
+  const response = await apiClient.get<Owner[]>("/owners");
   return response.data;
 };
 
-export const updateOwnerProfile = async (ownerId: string, data: ProfileUpdateRequest): Promise<Owner> => {
-  const response = await apiClient.patch<Owner>(`/owners/${ownerId}/profile`, data, { suppressErrorToast: true });
+export const updateOwnerProfile = async (
+  ownerId: string,
+  data: ProfileUpdateRequest,
+): Promise<Owner> => {
+  const response = await apiClient.patch<Owner>(`/owners/${ownerId}/profile`, data, {
+    suppressErrorToast: true,
+  });
   return response.data;
 };
 
 // ==================== Requests ====================
 
 export const getRequests = async (): Promise<Request[]> => {
-  const response = await apiClient.get<Request[]>('/requests');
+  const response = await apiClient.get<Request[]>("/requests");
   return response.data;
 };
 
@@ -354,39 +386,56 @@ export const getRequestNotifications = async (requestId: string) => {
 };
 
 export const createRequest = async (requestData: Partial<Request>): Promise<Request> => {
-  const response = await apiClient.post<Request>('/requests', requestData);
+  const response = await apiClient.post<Request>("/requests", requestData);
   return response.data;
 };
 
-export const updateRequest = async (requestId: string, requestData: Partial<Request>): Promise<Request> => {
+export const updateRequest = async (
+  requestId: string,
+  requestData: Partial<Request>,
+): Promise<Request> => {
   const response = await apiClient.patch<Request>(`/requests/${requestId}`, requestData);
   return response.data;
 };
 
-export const cancelRequest = async (requestId: string, data: RequestCancelRequest): Promise<Request> => {
+export const cancelRequest = async (
+  requestId: string,
+  data: RequestCancelRequest,
+): Promise<Request> => {
   const response = await apiClient.post<Request>(`/requests/${requestId}/cancel`, data);
   return response.data;
 };
 
-export const completeRequest = async (requestId: string, data: RequestCompleteRequest): Promise<Request> => {
+export const completeRequest = async (
+  requestId: string,
+  data: RequestCompleteRequest,
+): Promise<Request> => {
   const response = await apiClient.post<Request>(`/requests/${requestId}/complete`, data);
   return response.data;
 };
 
 // ==================== Conversation ====================
 
-export const startConversation = async (data: ConversationStartRequest): Promise<ConversationStartResponse> => {
-  const response = await apiClient.post<ConversationStartResponse>('/conversation/start', data);
+export const startConversation = async (
+  data: ConversationStartRequest,
+): Promise<ConversationStartResponse> => {
+  const response = await apiClient.post<ConversationStartResponse>("/conversation/start", data);
   return response.data;
 };
 
-export const sendMessage = async (data: ConversationMessageRequest): Promise<ConversationMessageResponse> => {
-  const response = await apiClient.post<ConversationMessageResponse>('/conversation/message', data);
+export const sendMessage = async (
+  data: ConversationMessageRequest,
+): Promise<ConversationMessageResponse> => {
+  const response = await apiClient.post<ConversationMessageResponse>("/conversation/message", data);
   return response.data;
 };
 
-export const getConversationHistory = async (requestId: string): Promise<ConversationHistoryResponse> => {
-  const response = await apiClient.get<ConversationHistoryResponse>(`/conversation/${requestId}/history`);
+export const getConversationHistory = async (
+  requestId: string,
+): Promise<ConversationHistoryResponse> => {
+  const response = await apiClient.get<ConversationHistoryResponse>(
+    `/conversation/${requestId}/history`,
+  );
   return response.data;
 };
 
@@ -405,7 +454,7 @@ export const saveConversation = async (data: {
     property_id?: string;
   };
 }): Promise<Request> => {
-  const response = await apiClient.post<Request>('/conversation/save-conversation', data);
+  const response = await apiClient.post<Request>("/conversation/save-conversation", data);
   return response.data;
 };
 
@@ -414,7 +463,12 @@ export const sendNotifications = async (data: {
   request_id: string;
   contacts: SuggestedContact[];
 }): Promise<{ success: boolean; total: number; sent: number; results: any[] }> => {
-  const response = await apiClient.post<{ success: boolean; total: number; sent: number; results: any[] }>('/conversation/send-notifications', data);
+  const response = await apiClient.post<{
+    success: boolean;
+    total: number;
+    sent: number;
+    results: any[];
+  }>("/conversation/send-notifications", data);
   return response.data;
 };
 
@@ -426,46 +480,51 @@ export const sendRequestNotifications = async (requestId: string): Promise<Reque
 // ==================== Voice ====================
 
 export const getVoiceProviders = async (): Promise<VoiceProvidersResponse> => {
-  const response = await apiClient.get<VoiceProvidersResponse>('/voice/providers');
+  const response = await apiClient.get<VoiceProvidersResponse>("/voice/providers");
   return response.data;
 };
 
-export const getVoiceProviderVoices = async (provider: VoiceProviderId): Promise<VoiceProviderVoicesResponse> => {
-  const response = await apiClient.get<VoiceProviderVoicesResponse>('/voice/voices', {
+export const getVoiceProviderVoices = async (
+  provider: VoiceProviderId,
+): Promise<VoiceProviderVoicesResponse> => {
+  const response = await apiClient.get<VoiceProviderVoicesResponse>("/voice/voices", {
     params: { provider },
   });
   return response.data;
 };
 
-export const transcribeAudio = async (audioFile: File, provider?: VoiceProviderId): Promise<VoiceTranscribeResponse> => {
+export const transcribeAudio = async (
+  audioFile: File,
+  provider?: VoiceProviderId,
+): Promise<VoiceTranscribeResponse> => {
   const formData = new FormData();
-  formData.append('audio', audioFile);
+  formData.append("audio", audioFile);
   if (provider) {
-    formData.append('provider', provider);
+    formData.append("provider", provider);
   }
-  
-  const response = await apiClient.post<VoiceTranscribeResponse>('/voice/transcribe', formData, {
+
+  const response = await apiClient.post<VoiceTranscribeResponse>("/voice/transcribe", formData, {
     headers: {
-      'Content-Type': 'multipart/form-data',
+      "Content-Type": "multipart/form-data",
     },
   });
   return response.data;
 };
 
 export const startVoiceSession = async (data: VoiceStartRequest): Promise<VoiceStartResponse> => {
-  const response = await apiClient.post<VoiceStartResponse>('/voice/start', data);
+  const response = await apiClient.post<VoiceStartResponse>("/voice/start", data);
   return response.data;
 };
 
 export const respondToVoice = async (data: VoiceRespondRequest): Promise<VoiceRespondResponse> => {
-  const response = await apiClient.post<VoiceRespondResponse>('/voice/respond', data);
+  const response = await apiClient.post<VoiceRespondResponse>("/voice/respond", data);
   return response.data;
 };
 
 // ==================== MCP ====================
 
 export const getMCPTools = async (): Promise<MCPToolsResponse> => {
-  const response = await apiClient.get<MCPToolsResponse>('/mcp/tools');
+  const response = await apiClient.get<MCPToolsResponse>("/mcp/tools");
   return response.data;
 };
 
@@ -474,12 +533,17 @@ export const getMCPTools = async (): Promise<MCPToolsResponse> => {
 // POST /auth/login
 export const authLogin = async (
   identifier: string,
-  password: string
-): Promise<{ access_token: string; refresh_token?: string; role: string; actor: Manager | Owner }> => {
+  password: string,
+): Promise<{
+  access_token: string;
+  refresh_token?: string;
+  role: string;
+  actor: Manager | Owner;
+}> => {
   const response = await apiClient.post(
-    '/auth/login',
+    "/auth/login",
     { identifier, password },
-    { suppressErrorToast: true }
+    { suppressErrorToast: true },
   );
   return response.data;
 };
@@ -487,7 +551,7 @@ export const authLogin = async (
 // POST /auth/logout — fire and forget, never throws
 export const authLogout = async (): Promise<void> => {
   try {
-    await apiClient.post('/auth/logout');
+    await apiClient.post("/auth/logout");
   } catch {
     // ignore — token may already be expired
   }
@@ -495,13 +559,17 @@ export const authLogout = async (): Promise<void> => {
 
 // POST /auth/refresh
 export const authRefresh = async (
-  refreshToken: string
-): Promise<{ access_token: string; refresh_token?: string; role: string; actor: Manager | Owner }> => {
-  const response = await apiClient.post(
-    `/auth/refresh`,
-    null,
-    { params: { refresh_token: refreshToken }, suppressErrorToast: true }
-  );
+  refreshToken: string,
+): Promise<{
+  access_token: string;
+  refresh_token?: string;
+  role: string;
+  actor: Manager | Owner;
+}> => {
+  const response = await apiClient.post(`/auth/refresh`, null, {
+    params: { refresh_token: refreshToken },
+    suppressErrorToast: true,
+  });
   return response.data;
 };
 
@@ -515,7 +583,7 @@ export const authGetMe = async (): Promise<{
   managed_properties?: string[];
   owned_properties?: string[];
 }> => {
-  const response = await apiClient.get('/auth/me');
+  const response = await apiClient.get("/auth/me");
   return response.data;
 };
 
@@ -528,9 +596,9 @@ export const signupManager = async (data: {
   username?: string;
 }): Promise<{ message: string; email: string }> => {
   const response = await apiClient.post<{ message: string; email: string }>(
-    '/managers/signup',
+    "/managers/signup",
     data,
-    { suppressErrorToast: true }
+    { suppressErrorToast: true },
   );
   return response.data;
 };
@@ -544,21 +612,20 @@ export const signupOwner = async (data: {
   username?: string;
 }): Promise<{ message: string; email: string }> => {
   const response = await apiClient.post<{ message: string; email: string }>(
-    '/owners/signup',
+    "/owners/signup",
     data,
-    { suppressErrorToast: true }
+    { suppressErrorToast: true },
   );
   return response.data;
 };
 
-
 export const forgotPassword = async (email: string) => {
-  const response = await apiClient.post('/auth/forgot-password', { email });
+  const response = await apiClient.post("/auth/forgot-password", { email });
   return response.data;
 };
 
 export const resetPassword = async (token: string, password: string) => {
-  const response = await apiClient.post('/auth/reset-password', { token, password });
+  const response = await apiClient.post("/auth/reset-password", { token, password });
   return response.data;
 };
 

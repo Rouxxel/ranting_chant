@@ -18,7 +18,7 @@ export function StatusBadge({ status, className }: { status: Status; className?:
       className={cn(
         "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium",
         `glow-${status}`,
-        className
+        className,
       )}
     >
       <span className="h-1.5 w-1.5 rounded-full bg-current" />
@@ -33,7 +33,7 @@ export function UrgencyBadge({ urgency, className }: { urgency: Urgency; classNa
       className={cn(
         "inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider",
         `urg-${urgency}`,
-        className
+        className,
       )}
     >
       {urgency}
@@ -41,12 +41,18 @@ export function UrgencyBadge({ urgency, className }: { urgency: Urgency; classNa
   );
 }
 
-export function RequestTypeBadge({ type, className }: { type: RequestType | string; className?: string }) {
+export function RequestTypeBadge({
+  type,
+  className,
+}: {
+  type: RequestType | string;
+  className?: string;
+}) {
   return (
     <span
       className={cn(
         "aero-type-chip inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-semibold",
-        className
+        className,
       )}
     >
       {getRequestTypeLabel(type)}

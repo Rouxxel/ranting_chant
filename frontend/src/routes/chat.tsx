@@ -9,9 +9,24 @@ import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useApp } from "@/context/AppContext";
 import { requireTenantAuth } from "@/lib/auth";
-import { startConversation, sendMessage, transcribeAudio, respondToVoice, saveConversation, sendRequestNotifications, getVoiceProviderVoices } from "@/services/api";
+import {
+  startConversation,
+  sendMessage,
+  transcribeAudio,
+  respondToVoice,
+  saveConversation,
+  sendRequestNotifications,
+  getVoiceProviderVoices,
+} from "@/services/api";
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
-import type { ConversationMessage, RequestType, Status, Urgency, Voice, SuggestedContact } from "@/types";
+import type {
+  ConversationMessage,
+  RequestType,
+  Status,
+  Urgency,
+  Voice,
+  SuggestedContact,
+} from "@/types";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/chat")({
@@ -43,7 +58,8 @@ function ChatPage() {
   // Guards against React StrictMode's double-mount starting two backend sessions.
   const startedForTenantRef = useRef<string | null>(null);
 
-  const { isRecording, audioBlob, startRecording, stopRecording, resetRecording } = useVoiceRecorder();
+  const { isRecording, audioBlob, startRecording, stopRecording, resetRecording } =
+    useVoiceRecorder();
 
   // On mount: start conversation
   useEffect(() => {
@@ -55,16 +71,20 @@ function ChatPage() {
       try {
         const response = await startConversation({
           tenant_id: tenantId,
-          message: "Hello, I need help with a property issue."
+          message: "Hello, I need help with a property issue.",
         });
         setRequestId(response.session_id); // Use session_id instead of request_id
         // Backend returns greeting, not conversation
-        setMessages([{
-          id: crypto.randomUUID(),
-          role: "ai",
-          message: response.greeting || `Hello ${name}! I'm Ranting Chant, your property operations assistant. How can I help you today?, please detail your request as much as you can for best results`,
-          timestamp: new Date().toISOString()
-        }]);
+        setMessages([
+          {
+            id: crypto.randomUUID(),
+            role: "ai",
+            message:
+              response.greeting ||
+              `Hello ${name}! I'm Ranting Chant, your property operations assistant. How can I help you today?, please detail your request as much as you can for best results`,
+            timestamp: new Date().toISOString(),
+          },
+        ]);
         setStatus("pending");
         setUrgency("low");
         setEscalated(false);
@@ -72,12 +92,14 @@ function ChatPage() {
       } catch (error) {
         console.error("Failed to start conversation:", error);
         // Fallback to mock greeting if API fails
-        setMessages([{
-          id: "1",
-          role: "ai",
-          message: `Hello ${name}! I'm Ranting Chant, your property operations assistant. How can I help you today?, please detail your request as much as you can for best results.`,
-          timestamp: new Date().toISOString()
-        }]);
+        setMessages([
+          {
+            id: "1",
+            role: "ai",
+            message: `Hello ${name}! I'm Ranting Chant, your property operations assistant. How can I help you today?, please detail your request as much as you can for best results.`,
+            timestamp: new Date().toISOString(),
+          },
+        ]);
       } finally {
         setIsLoading(false);
       }
@@ -92,24 +114,25 @@ function ChatPage() {
 
   useEffect(() => {
     const loadProviderVoices = async () => {
-      const capabilityVoices = voiceProviders.find((provider) => provider.id === voiceProvider)?.voices ?? [];
+      const capabilityVoices =
+        voiceProviders.find((provider) => provider.id === voiceProvider)?.voices ?? [];
 
       try {
         const response = await getVoiceProviderVoices(voiceProvider);
         setVoices(response.voices);
-        setVoiceId((currentVoiceId) => (
+        setVoiceId((currentVoiceId) =>
           response.voices.some((voice) => voice.id === currentVoiceId)
             ? currentVoiceId
-            : response.voices[0]?.id
-        ));
+            : response.voices[0]?.id,
+        );
       } catch (error) {
         console.error("Failed to load provider voices:", error);
         setVoices(capabilityVoices);
-        setVoiceId((currentVoiceId) => (
+        setVoiceId((currentVoiceId) =>
           capabilityVoices.some((voice) => voice.id === currentVoiceId)
             ? currentVoiceId
-            : capabilityVoices[0]?.id
-        ));
+            : capabilityVoices[0]?.id,
+        );
       }
     };
 
@@ -121,7 +144,10 @@ function ChatPage() {
     if (!t || !requestId) return;
 
     const now = new Date().toISOString();
-    setMessages((m) => [...m, { id: crypto.randomUUID(), role: "tenant", message: t, timestamp: now }]);
+    setMessages((m) => [
+      ...m,
+      { id: crypto.randomUUID(), role: "tenant", message: t, timestamp: now },
+    ]);
     setInput("");
     setTyping(true);
 
@@ -129,7 +155,7 @@ function ChatPage() {
       const response = await sendMessage({
         request_id: requestId,
         tenant_id: tenantId,
-        message: t
+        message: t,
       });
 
       // If this was the first message, update requestId with the actual request_id
@@ -140,13 +166,16 @@ function ChatPage() {
       }
 
       // Backend returns reply, not conversation array
-      setMessages((m) => [...m, {
-        id: crypto.randomUUID(),
-        role: "ai",
-        message: response.reply,
-        timestamp: new Date().toISOString(),
-        web_results: response.web_results
-      }]);
+      setMessages((m) => [
+        ...m,
+        {
+          id: crypto.randomUUID(),
+          role: "ai",
+          message: response.reply,
+          timestamp: new Date().toISOString(),
+          web_results: response.web_results,
+        },
+      ]);
       setStatus(response.status);
       setRequestType(response.type ?? "general");
       setUrgency(response.urgency);
@@ -154,12 +183,15 @@ function ChatPage() {
       setSuggestedContacts(response.suggested_contacts || []);
     } catch (error) {
       console.error("Failed to send message:", error);
-      setMessages((m) => [...m, {
-        id: crypto.randomUUID(),
-        role: "ai",
-        message: "Sorry, I'm having trouble connecting. Please try again.",
-        timestamp: new Date().toISOString()
-      }]);
+      setMessages((m) => [
+        ...m,
+        {
+          id: crypto.randomUUID(),
+          role: "ai",
+          message: "Sorry, I'm having trouble connecting. Please try again.",
+          timestamp: new Date().toISOString(),
+        },
+      ]);
     } finally {
       setTyping(false);
     }
@@ -175,13 +207,14 @@ function ChatPage() {
         conversation_history: messages,
         metadata: {
           type: requestType,
-          description: messages.find(m => m.role === "tenant")?.message || "Conversation saved by user",
+          description:
+            messages.find((m) => m.role === "tenant")?.message || "Conversation saved by user",
           urgency: urgency,
           escalated: escalated,
           sentiment: "neutral",
           confidence: 1.0,
-          property_id: currentTenant?.property_id
-        }
+          property_id: currentTenant?.property_id,
+        },
       });
 
       setRequestId(savedRequest.id);
@@ -245,7 +278,10 @@ function ChatPage() {
 
       // Add transcript as tenant message
       const now = new Date().toISOString();
-      setMessages((m) => [...m, { id: crypto.randomUUID(), role: "tenant", message: transcript, timestamp: now }]);
+      setMessages((m) => [
+        ...m,
+        { id: crypto.randomUUID(), role: "tenant", message: transcript, timestamp: now },
+      ]);
 
       // Send to voice respond endpoint
       const voiceResponse = await respondToVoice({
@@ -253,16 +289,19 @@ function ChatPage() {
         tenant_id: tenantId,
         transcript,
         provider: voiceProvider,
-        voice_id: voiceId
+        voice_id: voiceId,
       });
 
       // Add AI response
-      setMessages((m) => [...m, {
-        id: crypto.randomUUID(),
-        role: "ai",
-        message: voiceResponse.reply_text,
-        timestamp: new Date().toISOString()
-      }]);
+      setMessages((m) => [
+        ...m,
+        {
+          id: crypto.randomUUID(),
+          role: "ai",
+          message: voiceResponse.reply_text,
+          timestamp: new Date().toISOString(),
+        },
+      ]);
 
       // Play audio response if available
       if (voiceResponse.audio_base64) {
@@ -277,12 +316,15 @@ function ChatPage() {
       setEscalated(voiceResponse.escalated);
     } catch (error) {
       console.error("Failed to process voice:", error);
-      setMessages((m) => [...m, {
-        id: crypto.randomUUID(),
-        role: "ai",
-        message: "Sorry, I couldn't process your voice message. Please try again.",
-        timestamp: new Date().toISOString()
-      }]);
+      setMessages((m) => [
+        ...m,
+        {
+          id: crypto.randomUUID(),
+          role: "ai",
+          message: "Sorry, I couldn't process your voice message. Please try again.",
+          timestamp: new Date().toISOString(),
+        },
+      ]);
     } finally {
       setTyping(false);
       resetRecording();
@@ -294,8 +336,9 @@ function ChatPage() {
       <main className="mx-auto flex min-h-[calc(100vh-130px)] max-w-[1400px] gap-5">
         {/* Sidebar */}
         <aside className="glass-panel hidden w-[280px] shrink-0 flex-col p-5 md:flex">
-
-          <div className="text-[rgb(51,71,88)] font-bold mb-2 text-[10px] uppercase tracking-wider">Current request</div>
+          <div className="text-[rgb(51,71,88)] font-bold mb-2 text-[10px] uppercase tracking-wider">
+            Current request
+          </div>
           <div className="mb-1 text-sm text-ranting-ice">Property Issue</div>
           <StatusBadge status={status} className="self-start" />
           {requestId && <div className="mt-2 text-[11px] text-ranting-muted">ID · {requestId}</div>}
@@ -317,7 +360,10 @@ function ChatPage() {
               <Send className="h-4 w-4" />
               Send Notifications
             </button>
-            <Link to="/requests" className="glossy-btn-ghost flex items-center justify-center gap-2 px-3 py-2 text-sm">
+            <Link
+              to="/requests"
+              className="glossy-btn-ghost flex items-center justify-center gap-2 px-3 py-2 text-sm"
+            >
               <MessageSquareText className="h-4 w-4" /> View My Requests
             </Link>
           </div>
@@ -326,7 +372,10 @@ function ChatPage() {
         {/* Chat */}
         <section className="glass-panel-strong flex flex-1 flex-col overflow-hidden">
           {escalated && (
-            <div className="flex items-center gap-2 border-b border-red-400/30 bg-red-500/10 px-5 py-3 text-sm" style={{ color: "#991b1b", boxShadow: "inset 0 0 24px rgba(239,68,68,0.25)" }}>
+            <div
+              className="flex items-center gap-2 border-b border-red-400/30 bg-red-500/10 px-5 py-3 text-sm"
+              style={{ color: "#991b1b", boxShadow: "inset 0 0 24px rgba(239,68,68,0.25)" }}
+            >
               <AlertTriangle className="h-4 w-4" />
               This request has been escalated — urgency: {urgency.toUpperCase()}
             </div>
@@ -343,16 +392,20 @@ function ChatPage() {
                   </div>
                 </div>
               </div>
-            ) : messages.map((m, index) => (
-              <MessageBubble
-                key={m.id}
-                msg={m}
-                tenantName={name}
-                suggestedContacts={m.role === "ai" && index === messages.length - 1 ? suggestedContacts : []}
-                tenantId={tenantId}
-                requestId={requestId || undefined}
-              />
-            ))}
+            ) : (
+              messages.map((m, index) => (
+                <MessageBubble
+                  key={m.id}
+                  msg={m}
+                  tenantName={name}
+                  suggestedContacts={
+                    m.role === "ai" && index === messages.length - 1 ? suggestedContacts : []
+                  }
+                  tenantId={tenantId}
+                  requestId={requestId || undefined}
+                />
+              ))
+            )}
             {typing && (
               <div className="flex items-end gap-2">
                 <Avatar name="Ranting Chant" size={28} />
@@ -385,5 +438,3 @@ function ChatPage() {
     </AuthenticatedLayout>
   );
 }
-
-

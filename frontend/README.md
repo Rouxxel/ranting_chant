@@ -6,17 +6,17 @@ The visual language is **retro Frutiger Aero** (circa 2004–2013): bright sky-b
 
 ## Tech Stack
 
-| Layer | Choice |
-|---|---|
-| Framework | React 19 + TypeScript |
-| Build/dev server | Vite 7 |
-| Routing | TanStack Router file routes in `src/routes/` |
-| Data fetching | Axios through `src/services/api.ts` |
-| Styling | Tailwind CSS v4 via `src/styles.css` |
-| Components | shadcn/ui Radix primitives in `src/components/ui/` |
-| Icons | lucide-react |
-| Toasts | Sonner |
-| Package manager | bun |
+| Layer            | Choice                                             |
+| ---------------- | -------------------------------------------------- |
+| Framework        | React 19 + TypeScript                              |
+| Build/dev server | Vite 7                                             |
+| Routing          | TanStack Router file routes in `src/routes/`       |
+| Data fetching    | Axios through `src/services/api.ts`                |
+| Styling          | Tailwind CSS v4 via `src/styles.css`               |
+| Components       | shadcn/ui Radix primitives in `src/components/ui/` |
+| Icons            | lucide-react                                       |
+| Toasts           | Sonner                                             |
+| Package manager  | bun                                                |
 
 Use `Link`, `useNavigate`, and route APIs from `@tanstack/react-router`. This app does not use React Router DOM.
 
@@ -56,14 +56,14 @@ Backend authentication uses Supabase Auth for managers/owners with JWT token val
 
 ### Routes
 
-| File | URL | Purpose |
-|---|---|---|
-| `index.tsx` | `/` | Tenant and manager/owner login |
-| `chat.tsx` | `/chat` | Tenant AI conversation with text and voice input |
-| `dashboard.tsx` | `/dashboard` | Tenant request list and timelines |
-| `profile.tsx` | `/profile` | Tenant profile with editable email/phone and property representative contact |
+| File             | URL           | Purpose                                                                                   |
+| ---------------- | ------------- | ----------------------------------------------------------------------------------------- |
+| `index.tsx`      | `/`           | Tenant and manager/owner login                                                            |
+| `chat.tsx`       | `/chat`       | Tenant AI conversation with text and voice input                                          |
+| `dashboard.tsx`  | `/dashboard`  | Tenant request list and timelines                                                         |
+| `profile.tsx`    | `/profile`    | Tenant profile with editable email/phone and property representative contact              |
 | `management.tsx` | `/management` | Manager/owner dashboard with tabs for Requests, Properties, Tenants, Vendors, and Profile |
-| `vendors.tsx` | `/vendors` | Vendor directory with search and service filtering |
+| `vendors.tsx`    | `/vendors`    | Vendor directory with search and service filtering                                        |
 
 Protected route behavior:
 
@@ -155,11 +155,13 @@ Current request type UI support:
 The frontend receives resolved actor data from the backend API, eliminating the need for client-side ID resolution.
 
 **Request interface** (`src/types/index.ts`):
+
 - `tenant_name: string` - Required field, resolved from `requester_id` by backend
 - `requester_id: string` - Original actor UUID for reference
 - Components use fallback: `r.tenant_name || r.requester_id || "Unknown"`
 
 **NotificationEvent interface** (`src/types/index.ts`):
+
 - `recipient_actor_id?: string` - Original actor UUID for reference
 - `recipient_name?: string` - Display name from backend resolution
 - `recipient_email?: string` - Email from backend resolution
@@ -167,6 +169,7 @@ The frontend receives resolved actor data from the backend API, eliminating the 
 - `recipient: string` - Backward-compatible field (email for type="email", phone for type="sms")
 
 **Component display patterns**:
+
 - `RequestTable`: Displays `tenant_name` with fallback to `requester_id`
 - `RequestTimeline`: Shows `recipient_name` with conditional email/phone display
 - `RequestDetailPanel`: Displays recipient name, email, and phone for notified parties
@@ -195,21 +198,21 @@ Core tokens (brightened palette):
 
 Reusable utility classes:
 
-| Class | Purpose |
-|---|---|
-| `.aero-bg` | Sky-to-grass gradient fallback (background image is preferred) |
-| `.glass-panel` / `.glass-panel-strong` | Translucent glossy glass surfaces (with top-highlight arc) |
-| `.glossy-btn` / `.glossy-btn-green` / `.glossy-btn-ghost` / `.glossy-btn-ghost-active` | Candy-pill buttons |
-| `.aero-input` | Pill-shaped translucent input |
-| `.aero-bubble` | Floating bubble (`bubbleFloat` 14s loop) |
-| `.glow-{status}` | Status badge glow (pending / in_progress / escalated / resolved / pending_approval / pending_review / cancelled) |
-| `.urg-{level}` | Urgency badge colors (low / medium / high) |
-| `.left-glow-escalated` / `.left-glow-high` | Table row urgency accents |
-| `.mic-pulse` | Recording-state pulsing red ring |
-| `.typing-dot` | Chat typing indicator |
-| `.shimmer` | Loading placeholders |
-| `.underline-glow` | Heading underline |
-| `.text-glow-sky` | White headline with sky-blue halo |
+| Class                                                                                  | Purpose                                                                                                          |
+| -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `.aero-bg`                                                                             | Sky-to-grass gradient fallback (background image is preferred)                                                   |
+| `.glass-panel` / `.glass-panel-strong`                                                 | Translucent glossy glass surfaces (with top-highlight arc)                                                       |
+| `.glossy-btn` / `.glossy-btn-green` / `.glossy-btn-ghost` / `.glossy-btn-ghost-active` | Candy-pill buttons                                                                                               |
+| `.aero-input`                                                                          | Pill-shaped translucent input                                                                                    |
+| `.aero-bubble`                                                                         | Floating bubble (`bubbleFloat` 14s loop)                                                                         |
+| `.glow-{status}`                                                                       | Status badge glow (pending / in_progress / escalated / resolved / pending_approval / pending_review / cancelled) |
+| `.urg-{level}`                                                                         | Urgency badge colors (low / medium / high)                                                                       |
+| `.left-glow-escalated` / `.left-glow-high`                                             | Table row urgency accents                                                                                        |
+| `.mic-pulse`                                                                           | Recording-state pulsing red ring                                                                                 |
+| `.typing-dot`                                                                          | Chat typing indicator                                                                                            |
+| `.shimmer`                                                                             | Loading placeholders                                                                                             |
+| `.underline-glow`                                                                      | Heading underline                                                                                                |
+| `.text-glow-sky`                                                                       | White headline with sky-blue halo                                                                                |
 
 ### Aesthetic guidelines for new UI
 
@@ -218,7 +221,6 @@ Reusable utility classes:
 - Keep body text dark (`text-ranting-navy` or default panel color). Reserve white text for hero headlines + `text-glow-sky`.
 - Add `.aero-bubble` divs sparingly for ornament. The background already provides ambient bubbles.
 - Status pills should always use `.glow-*` classes for the glowing edge — never plain `bg-*` swatches.
-
 
 ## Project Layout
 

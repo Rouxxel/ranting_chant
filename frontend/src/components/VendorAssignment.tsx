@@ -1,63 +1,67 @@
-import { useState, useEffect } from 'react'
-import { Search, Building2, Star, Clock, Phone, Mail } from 'lucide-react'
-import { toast } from 'sonner'
-import { getVendors, getVendorsByService, updateRequest } from '../services/api'
-import type { Vendor } from '../types'
+import { useState, useEffect } from "react";
+import { Search, Building2, Star, Clock, Phone, Mail } from "lucide-react";
+import { toast } from "sonner";
+import { getVendors, getVendorsByService, updateRequest } from "../services/api";
+import type { Vendor } from "../types";
 
 interface VendorAssignmentProps {
-  requestId: string
-  serviceType?: string
-  onAssign?: (vendorId: string) => void
-  className?: string
+  requestId: string;
+  serviceType?: string;
+  onAssign?: (vendorId: string) => void;
+  className?: string;
 }
 
-export function VendorAssignment({ requestId, serviceType, onAssign, className = '' }: VendorAssignmentProps) {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null)
-  const [vendors, setVendors] = useState<Vendor[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [isAssigning, setIsAssigning] = useState(false)
+export function VendorAssignment({
+  requestId,
+  serviceType,
+  onAssign,
+  className = "",
+}: VendorAssignmentProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
+  const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAssigning, setIsAssigning] = useState(false);
 
   useEffect(() => {
     const fetchVendors = async () => {
       try {
-        const data = serviceType
-          ? await getVendorsByService(serviceType)
-          : await getVendors()
-        setVendors(data)
+        const data = serviceType ? await getVendorsByService(serviceType) : await getVendors();
+        setVendors(data);
       } catch (error) {
-        console.error('Failed to fetch vendors:', error)
-        toast.error('Failed to load vendors')
+        console.error("Failed to fetch vendors:", error);
+        toast.error("Failed to load vendors");
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchVendors()
-  }, [serviceType])
+    fetchVendors();
+  }, [serviceType]);
 
-  const filteredVendors = vendors.filter(vendor =>
-    vendor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    vendor.services.some(s => s.toLowerCase().includes(searchQuery.toLowerCase()))
-  )
+  const filteredVendors = vendors.filter(
+    (vendor) =>
+      vendor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      vendor.services.some((s) => s.toLowerCase().includes(searchQuery.toLowerCase())),
+  );
 
   const handleAssign = async () => {
-    if (!selectedVendor) return
+    if (!selectedVendor) return;
 
-    setIsAssigning(true)
+    setIsAssigning(true);
     try {
-      await updateRequest(requestId, { vendor_id: selectedVendor.id })
-      toast.success('Vendor assigned successfully')
+      await updateRequest(requestId, { vendor_id: selectedVendor.id });
+      toast.success("Vendor assigned successfully");
       if (onAssign) {
-        onAssign(selectedVendor.id)
+        onAssign(selectedVendor.id);
       }
     } catch (error) {
-      console.error('Failed to assign vendor:', error)
-      toast.error('Failed to assign vendor')
+      console.error("Failed to assign vendor:", error);
+      toast.error("Failed to assign vendor");
     } finally {
-      setIsAssigning(false)
+      setIsAssigning(false);
     }
-  }
+  };
 
   return (
     <div className={`glass-panel p-6 rounded-lg ${className}`}>
@@ -85,14 +89,14 @@ export function VendorAssignment({ requestId, serviceType, onAssign, className =
         ) : filteredVendors.length === 0 ? (
           <div className="text-center text-ranting-muted py-8">No vendors found</div>
         ) : (
-          filteredVendors.map(vendor => (
+          filteredVendors.map((vendor) => (
             <button
               key={vendor.id}
               onClick={() => setSelectedVendor(vendor)}
               className={`w-full text-left p-4 rounded-lg transition-colors ${
                 selectedVendor?.id === vendor.id
-                  ? 'bg-ranting-sky/20 border border-ranting-sky/50'
-                  : 'bg-ranting-deep/20 hover:bg-ranting-deep/30 border border-transparent'
+                  ? "bg-ranting-sky/20 border border-ranting-sky/50"
+                  : "bg-ranting-deep/20 hover:bg-ranting-deep/30 border border-transparent"
               }`}
             >
               <div className="flex items-start justify-between gap-3">
@@ -105,11 +109,13 @@ export function VendorAssignment({ requestId, serviceType, onAssign, className =
                       </span>
                     )}
                   </div>
-                  <p className="text-ranting-muted text-xs capitalize">{vendor.services.join(', ')}</p>
+                  <p className="text-ranting-muted text-xs capitalize">
+                    {vendor.services.join(", ")}
+                  </p>
                   <div className="flex items-center gap-3 mt-2 text-xs text-ranting-muted">
                     <div className="flex items-center gap-1">
                       <Star className="w-3 h-3 text-yellow-400" />
-                      <span>{vendor.rating || 'N/A'}</span>
+                      <span>{vendor.rating || "N/A"}</span>
                     </div>
                     {vendor.response_time && (
                       <div className="flex items-center gap-1">
@@ -148,8 +154,8 @@ export function VendorAssignment({ requestId, serviceType, onAssign, className =
         disabled={!selectedVendor || isAssigning}
         className="glossy-btn w-full flex items-center justify-center gap-2 px-4 py-3 rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {isAssigning ? 'Assigning...' : 'Assign Vendor'}
+        {isAssigning ? "Assigning..." : "Assign Vendor"}
       </button>
     </div>
-  )
+  );
 }

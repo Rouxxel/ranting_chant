@@ -18,16 +18,16 @@ export function PropertyRepresentative() {
 
       try {
         // Check localStorage for cached properties and managers
-        const cachedProperties = localStorage.getItem('properties');
-        const cachedManagers = localStorage.getItem('managers');
+        const cachedProperties = localStorage.getItem("properties");
+        const cachedManagers = localStorage.getItem("managers");
         if (cachedProperties && cachedManagers) {
           const parsedProperties = JSON.parse(cachedProperties) as Property[];
           const parsedManagers = JSON.parse(cachedManagers) as Manager[];
-          const tenantProperty = parsedProperties.find(p => p.id === currentTenant.property_id);
+          const tenantProperty = parsedProperties.find((p) => p.id === currentTenant.property_id);
           setProperty(tenantProperty || null);
 
           if (tenantProperty?.manager_id) {
-            const propertyManager = parsedManagers.find(m => m.id === tenantProperty.manager_id);
+            const propertyManager = parsedManagers.find((m) => m.id === tenantProperty.manager_id);
             setManager(propertyManager || null);
           }
           setIsLoading(false);
@@ -35,8 +35,8 @@ export function PropertyRepresentative() {
 
         // Load the tenant's property
         const properties = await getProperties();
-        localStorage.setItem('properties', JSON.stringify(properties));
-        const tenantProperty = properties.find(p => p.id === currentTenant.property_id);
+        localStorage.setItem("properties", JSON.stringify(properties));
+        const tenantProperty = properties.find((p) => p.id === currentTenant.property_id);
         setProperty(tenantProperty || null);
 
         if (!tenantProperty?.manager_id) {
@@ -46,8 +46,8 @@ export function PropertyRepresentative() {
 
         // Load the manager
         const managers = await getManagers();
-        localStorage.setItem('managers', JSON.stringify(managers));
-        const propertyManager = managers.find(m => m.id === tenantProperty.manager_id);
+        localStorage.setItem("managers", JSON.stringify(managers));
+        const propertyManager = managers.find((m) => m.id === tenantProperty.manager_id);
         setManager(propertyManager || null);
       } catch (error) {
         console.error("Failed to load property manager:", error);
@@ -76,7 +76,9 @@ export function PropertyRepresentative() {
         <div className="mb-4">
           <h3 className="text-lg font-semibold text-ranting-ice">Property Manager</h3>
         </div>
-        <div className="text-sm text-ranting-muted">No property manager assigned to this property.</div>
+        <div className="text-sm text-ranting-muted">
+          No property manager assigned to this property.
+        </div>
       </div>
     );
   }

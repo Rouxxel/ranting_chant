@@ -63,7 +63,9 @@ export function ManagementProfile() {
       <div className="glass-panel p-6">
         <div className="space-y-4">
           <div>
-            <label className="block text-xs uppercase tracking-wider mb-1">{isOwner ? "Owner" : "Manager"}</label>
+            <label className="block text-xs uppercase tracking-wider mb-1">
+              {isOwner ? "Owner" : "Manager"}
+            </label>
             {isEditing ? (
               <input
                 type="text"
@@ -77,7 +79,9 @@ export function ManagementProfile() {
           </div>
 
           <div>
-            <label className="block text-xs uppercase tracking-wider text-ranting-muted mb-1">Email (not editable)</label>
+            <label className="block text-xs uppercase tracking-wider text-ranting-muted mb-1">
+              Email (not editable)
+            </label>
             {/* Commented out to prevent mismatch between actors table and auth table */}
             {/* {isEditing ? (
               <input
@@ -87,12 +91,14 @@ export function ManagementProfile() {
                 className="aero-input w-full px-3 py-2 text-sm"
               />
             ) : ( */}
-              <div className="text-sm text-ranting-ice">{email || "-"}</div>
+            <div className="text-sm text-ranting-ice">{email || "-"}</div>
             {/* )} */}
           </div>
 
           <div>
-            <label className="block text-xs uppercase tracking-wider text-ranting-muted mb-1">Phone</label>
+            <label className="block text-xs uppercase tracking-wider text-ranting-muted mb-1">
+              Phone
+            </label>
             {isEditing ? (
               <input
                 type="tel"
@@ -126,10 +132,7 @@ export function ManagementProfile() {
                 </button>
               </>
             ) : (
-              <button
-                onClick={() => setIsEditing(true)}
-                className="glossy-btn px-4 py-2 text-xs"
-              >
+              <button onClick={() => setIsEditing(true)} className="glossy-btn px-4 py-2 text-xs">
                 Edit Profile
               </button>
             )}

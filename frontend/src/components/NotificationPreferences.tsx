@@ -1,63 +1,63 @@
-import { useState } from 'react'
-import { Mail, MessageSquare, Bell, Save } from 'lucide-react'
-import { toast } from 'sonner'
+import { useState } from "react";
+import { Mail, MessageSquare, Bell, Save } from "lucide-react";
+import { toast } from "sonner";
 
 interface NotificationPreferencesProps {
-  className?: string
+  className?: string;
 }
 
-export function NotificationPreferences({ className = '' }: NotificationPreferencesProps) {
+export function NotificationPreferences({ className = "" }: NotificationPreferencesProps) {
   const [preferences, setPreferences] = useState({
     email: {
       enabled: true,
       requestUpdates: true,
       escalationAlerts: true,
       resolutionNotices: true,
-      vendorAssignments: true
+      vendorAssignments: true,
     },
     sms: {
       enabled: false,
       emergencyOnly: true,
       requestUpdates: false,
-      escalationAlerts: true
+      escalationAlerts: true,
     },
     push: {
       enabled: true,
       requestUpdates: true,
       escalationAlerts: true,
-      resolutionNotices: true
-    }
-  })
-  const [isSaving, setIsSaving] = useState(false)
+      resolutionNotices: true,
+    },
+  });
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleToggle = (category: keyof typeof preferences, setting: string) => {
-    setPreferences(prev => {
-      const categoryData = prev[category]
+    setPreferences((prev) => {
+      const categoryData = prev[category];
       return {
         ...prev,
         [category]: {
           ...categoryData,
-          [setting]: !(categoryData as Record<string, boolean>)[setting]
-        }
-      }
-    })
-  }
+          [setting]: !(categoryData as Record<string, boolean>)[setting],
+        },
+      };
+    });
+  };
 
   const handleSave = async () => {
-    setIsSaving(true)
+    setIsSaving(true);
     try {
       // TODO: Wire to backend API when endpoint is available
       // For now, simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500))
-      console.log('Saving preferences:', preferences)
-      toast.success('Notification preferences saved successfully')
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      console.log("Saving preferences:", preferences);
+      toast.success("Notification preferences saved successfully");
     } catch (error) {
-      console.error('Failed to save preferences:', error)
-      toast.error('Failed to save notification preferences')
+      console.error("Failed to save preferences:", error);
+      toast.error("Failed to save notification preferences");
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }
+  };
 
   return (
     <div className={`glass-panel p-6 rounded-lg ${className}`}>
@@ -79,30 +79,32 @@ export function NotificationPreferences({ className = '' }: NotificationPreferen
             </div>
           </div>
           <button
-            onClick={() => handleToggle('email', 'enabled')}
+            onClick={() => handleToggle("email", "enabled")}
             className={`w-12 h-6 rounded-full transition-colors ${
-              preferences.email.enabled ? 'bg-ranting-accent' : 'bg-ranting-deep'
+              preferences.email.enabled ? "bg-ranting-accent" : "bg-ranting-deep"
             }`}
           >
-            <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
-              preferences.email.enabled ? 'translate-x-6' : 'translate-x-0.5'
-            }`} />
+            <div
+              className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                preferences.email.enabled ? "translate-x-6" : "translate-x-0.5"
+              }`}
+            />
           </button>
         </div>
 
         {preferences.email.enabled && (
           <div className="ml-12 space-y-3">
             {[
-              { key: 'requestUpdates', label: 'Request status updates' },
-              { key: 'escalationAlerts', label: 'Escalation alerts' },
-              { key: 'resolutionNotices', label: 'Resolution notices' },
-              { key: 'vendorAssignments', label: 'Vendor assignments' }
+              { key: "requestUpdates", label: "Request status updates" },
+              { key: "escalationAlerts", label: "Escalation alerts" },
+              { key: "resolutionNotices", label: "Resolution notices" },
+              { key: "vendorAssignments", label: "Vendor assignments" },
             ].map(({ key, label }) => (
               <label key={key} className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={preferences.email[key as keyof typeof preferences.email] as boolean}
-                  onChange={() => handleToggle('email', key)}
+                  onChange={() => handleToggle("email", key)}
                   className="w-4 h-4 rounded border-ranting-deep bg-ranting-navy text-ranting-accent focus:ring-ranting-sky"
                 />
                 <span className="text-ranting-muted text-sm">{label}</span>
@@ -125,29 +127,31 @@ export function NotificationPreferences({ className = '' }: NotificationPreferen
             </div>
           </div>
           <button
-            onClick={() => handleToggle('sms', 'enabled')}
+            onClick={() => handleToggle("sms", "enabled")}
             className={`w-12 h-6 rounded-full transition-colors ${
-              preferences.sms.enabled ? 'bg-ranting-accent' : 'bg-ranting-deep'
+              preferences.sms.enabled ? "bg-ranting-accent" : "bg-ranting-deep"
             }`}
           >
-            <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
-              preferences.sms.enabled ? 'translate-x-6' : 'translate-x-0.5'
-            }`} />
+            <div
+              className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                preferences.sms.enabled ? "translate-x-6" : "translate-x-0.5"
+              }`}
+            />
           </button>
         </div>
 
         {preferences.sms.enabled && (
           <div className="ml-12 space-y-3">
             {[
-              { key: 'emergencyOnly', label: 'Emergency alerts only' },
-              { key: 'requestUpdates', label: 'Request status updates' },
-              { key: 'escalationAlerts', label: 'Escalation alerts' }
+              { key: "emergencyOnly", label: "Emergency alerts only" },
+              { key: "requestUpdates", label: "Request status updates" },
+              { key: "escalationAlerts", label: "Escalation alerts" },
             ].map(({ key, label }) => (
               <label key={key} className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={preferences.sms[key as keyof typeof preferences.sms] as boolean}
-                  onChange={() => handleToggle('sms', key)}
+                  onChange={() => handleToggle("sms", key)}
                   className="w-4 h-4 rounded border-ranting-deep bg-ranting-navy text-ranting-accent focus:ring-ranting-sky"
                 />
                 <span className="text-ranting-muted text-sm">{label}</span>
@@ -170,29 +174,31 @@ export function NotificationPreferences({ className = '' }: NotificationPreferen
             </div>
           </div>
           <button
-            onClick={() => handleToggle('push', 'enabled')}
+            onClick={() => handleToggle("push", "enabled")}
             className={`w-12 h-6 rounded-full transition-colors ${
-              preferences.push.enabled ? 'bg-ranting-accent' : 'bg-ranting-deep'
+              preferences.push.enabled ? "bg-ranting-accent" : "bg-ranting-deep"
             }`}
           >
-            <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
-              preferences.push.enabled ? 'translate-x-6' : 'translate-x-0.5'
-            }`} />
+            <div
+              className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                preferences.push.enabled ? "translate-x-6" : "translate-x-0.5"
+              }`}
+            />
           </button>
         </div>
 
         {preferences.push.enabled && (
           <div className="ml-12 space-y-3">
             {[
-              { key: 'requestUpdates', label: 'Request status updates' },
-              { key: 'escalationAlerts', label: 'Escalation alerts' },
-              { key: 'resolutionNotices', label: 'Resolution notices' }
+              { key: "requestUpdates", label: "Request status updates" },
+              { key: "escalationAlerts", label: "Escalation alerts" },
+              { key: "resolutionNotices", label: "Resolution notices" },
             ].map(({ key, label }) => (
               <label key={key} className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={preferences.push[key as keyof typeof preferences.push] as boolean}
-                  onChange={() => handleToggle('push', key)}
+                  onChange={() => handleToggle("push", key)}
                   className="w-4 h-4 rounded border-ranting-deep bg-ranting-navy text-ranting-accent focus:ring-ranting-sky"
                 />
                 <span className="text-ranting-muted text-sm">{label}</span>
@@ -209,9 +215,9 @@ export function NotificationPreferences({ className = '' }: NotificationPreferen
           className="glossy-btn flex items-center gap-2 px-6 py-2 rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Save className="w-4 h-4" />
-          {isSaving ? 'Saving...' : 'Save Preferences'}
+          {isSaving ? "Saving..." : "Save Preferences"}
         </button>
       </div>
     </div>
-  )
+  );
 }

@@ -18,16 +18,16 @@ export function OwnerRepresentative() {
 
       try {
         // Check localStorage for cached properties and owners
-        const cachedProperties = localStorage.getItem('properties');
-        const cachedOwners = localStorage.getItem('owners');
+        const cachedProperties = localStorage.getItem("properties");
+        const cachedOwners = localStorage.getItem("owners");
         if (cachedProperties && cachedOwners) {
           const parsedProperties = JSON.parse(cachedProperties) as Property[];
           const parsedOwners = JSON.parse(cachedOwners) as Owner[];
-          const tenantProperty = parsedProperties.find(p => p.id === currentTenant.property_id);
+          const tenantProperty = parsedProperties.find((p) => p.id === currentTenant.property_id);
           setProperty(tenantProperty || null);
 
           if (tenantProperty?.owner_id) {
-            const propertyOwner = parsedOwners.find(o => o.id === tenantProperty.owner_id);
+            const propertyOwner = parsedOwners.find((o) => o.id === tenantProperty.owner_id);
             setOwner(propertyOwner || null);
           }
           setIsLoading(false);
@@ -35,8 +35,8 @@ export function OwnerRepresentative() {
 
         // Load the tenant's property
         const properties = await getProperties();
-        localStorage.setItem('properties', JSON.stringify(properties));
-        const tenantProperty = properties.find(p => p.id === currentTenant.property_id);
+        localStorage.setItem("properties", JSON.stringify(properties));
+        const tenantProperty = properties.find((p) => p.id === currentTenant.property_id);
         setProperty(tenantProperty || null);
 
         if (!tenantProperty?.owner_id) {
@@ -46,8 +46,8 @@ export function OwnerRepresentative() {
 
         // Load the owner
         const owners = await getOwners();
-        localStorage.setItem('owners', JSON.stringify(owners));
-        const propertyOwner = owners.find(o => o.id === tenantProperty.owner_id);
+        localStorage.setItem("owners", JSON.stringify(owners));
+        const propertyOwner = owners.find((o) => o.id === tenantProperty.owner_id);
         setOwner(propertyOwner || null);
       } catch (error) {
         console.error("Failed to load property owner:", error);

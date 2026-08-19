@@ -1,6 +1,12 @@
 import type { RequestType } from "@/types";
 
-export type Status = "pending" | "in_progress" | "escalated" | "resolved" | "pending_approval" | "pending_review";
+export type Status =
+  | "pending"
+  | "in_progress"
+  | "escalated"
+  | "resolved"
+  | "pending_approval"
+  | "pending_review";
 export type Urgency = "low" | "medium" | "high";
 
 export interface Tenant {
@@ -62,11 +68,21 @@ export const tenants: Tenant[] = [
 
 export const tenantById = (id: string) => tenants.find((t) => t.id === id)!;
 
-const mkConv = (msgs: Array<[ConversationMessage["role"], string, string]>): ConversationMessage[] =>
+const mkConv = (
+  msgs: Array<[ConversationMessage["role"], string, string]>,
+): ConversationMessage[] =>
   msgs.map(([role, text, timestamp], i) => ({ id: `m${i}`, role, text, timestamp }));
 
-const mkNotif = (items: Array<[NotificationEvent["channel"], string, string, string]>): NotificationEvent[] =>
-  items.map(([channel, recipient, timestamp, summary], i) => ({ id: `n${i}`, channel, recipient, timestamp, summary }));
+const mkNotif = (
+  items: Array<[NotificationEvent["channel"], string, string, string]>,
+): NotificationEvent[] =>
+  items.map(([channel, recipient, timestamp, summary], i) => ({
+    id: `n${i}`,
+    channel,
+    recipient,
+    timestamp,
+    summary,
+  }));
 
 export const requests: RequestItem[] = [
   {
@@ -85,14 +101,23 @@ export const requests: RequestItem[] = [
       { id: "p2", name: "Sunset Mgmt", role: "Manager" },
     ],
     conversation: mkConv([
-      ["ai", "Hello John! I'm Ranting Chant, your property operations assistant. How can I help you today?", "10:02 AM"],
+      [
+        "ai",
+        "Hello John! I'm Ranting Chant, your property operations assistant. How can I help you today?",
+        "10:02 AM",
+      ],
       ["tenant", "I lost my apartment key", "10:03 AM"],
       ["ai", "I'm sorry to hear that. Was the key lost or stolen?", "10:03 AM"],
       ["tenant", "Lost", "10:04 AM"],
       ["ai", "Do you still have access to your apartment?", "10:04 AM"],
     ]),
     notifications: mkNotif([
-      ["email", "manager@sunsetapts.com", "10:05 AM", "New key replacement request opened for unit 3B"],
+      [
+        "email",
+        "manager@sunsetapts.com",
+        "10:05 AM",
+        "New key replacement request opened for unit 3B",
+      ],
     ]),
   },
   {
@@ -188,7 +213,12 @@ export const requests: RequestItem[] = [
       ["ai", "Got it. I'll forward this to the owner for approval.", "11:21 AM"],
     ]),
     notifications: mkNotif([
-      ["email", "owner@sunsetapts.com", "11:22 AM", "Lease extension approval requested for unit 5A"],
+      [
+        "email",
+        "owner@sunsetapts.com",
+        "11:22 AM",
+        "Lease extension approval requested for unit 5A",
+      ],
     ]),
   },
   {
@@ -210,9 +240,7 @@ export const requests: RequestItem[] = [
       ["tenant", "Locked out of my unit!", "7:42 AM"],
       ["ai", "Dispatching locksmith. ETA 20 minutes.", "7:43 AM"],
     ]),
-    notifications: mkNotif([
-      ["sms", "+1 555 0144", "7:43 AM", "Locksmith en route to 6E"],
-    ]),
+    notifications: mkNotif([["sms", "+1 555 0144", "7:43 AM", "Locksmith en route to 6E"]]),
   },
   {
     id: "REQ-1007",
@@ -279,9 +307,7 @@ export const requests: RequestItem[] = [
       ["tenant", "Front door handle is loose", "12:00 PM"],
       ["ai", "Handyman scheduled for tomorrow.", "12:05 PM"],
     ]),
-    notifications: mkNotif([
-      ["email", "ops@handyman.com", "12:06 PM", "Door repair at 4B"],
-    ]),
+    notifications: mkNotif([["email", "ops@handyman.com", "12:06 PM", "Door repair at 4B"]]),
   },
   {
     id: "REQ-1010",

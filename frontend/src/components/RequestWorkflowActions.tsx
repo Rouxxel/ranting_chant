@@ -1,111 +1,116 @@
-import { useState } from 'react'
-import { ArrowUp, Check, AlertTriangle, UserCheck, FileCheck, XCircle } from 'lucide-react'
-import { toast } from 'sonner'
-import { updateRequest } from '../services/api'
-import type { Status } from '../types'
+import { useState } from "react";
+import { ArrowUp, Check, AlertTriangle, UserCheck, FileCheck, XCircle } from "lucide-react";
+import { toast } from "sonner";
+import { updateRequest } from "../services/api";
+import type { Status } from "../types";
 
 interface RequestWorkflowActionsProps {
-  requestId: string
-  currentStatus: string
-  onAction?: (action: string, data?: any) => void
-  className?: string
+  requestId: string;
+  currentStatus: string;
+  onAction?: (action: string, data?: any) => void;
+  className?: string;
 }
 
-export function RequestWorkflowActions({ requestId, currentStatus, onAction, className = '' }: RequestWorkflowActionsProps) {
-  const [selectedAction, setSelectedAction] = useState<string | null>(null)
-  const [isProcessing, setIsProcessing] = useState(false)
+export function RequestWorkflowActions({
+  requestId,
+  currentStatus,
+  onAction,
+  className = "",
+}: RequestWorkflowActionsProps) {
+  const [selectedAction, setSelectedAction] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const handleAction = async (action: string) => {
-    setSelectedAction(action)
-    setIsProcessing(true)
-    
+    setSelectedAction(action);
+    setIsProcessing(true);
+
     try {
       // Map action to appropriate status update
       const statusMap: Record<string, Status> = {
-        escalate: 'escalated',
-        approve: 'in_progress',
-        reject: 'cancelled',
-        review: 'pending_review'
-      }
+        escalate: "escalated",
+        approve: "in_progress",
+        reject: "cancelled",
+        review: "pending_review",
+      };
 
-      const newStatus = statusMap[action]
+      const newStatus = statusMap[action];
       if (newStatus) {
-        await updateRequest(requestId, { status: newStatus })
-        toast.success(`Request ${action}d successfully`)
-      } else if (action === 'assign_manager') {
+        await updateRequest(requestId, { status: newStatus });
+        toast.success(`Request ${action}d successfully`);
+      } else if (action === "assign_manager") {
         // For assign_manager, we might need additional logic
         // For now, just mark as in_progress
-        await updateRequest(requestId, { status: 'in_progress' as Status })
-        toast.success('Manager assigned successfully')
+        await updateRequest(requestId, { status: "in_progress" as Status });
+        toast.success("Manager assigned successfully");
       }
 
       if (onAction) {
-        onAction(action)
+        onAction(action);
       }
     } catch (error) {
-      console.error('Failed to perform action:', error)
-      toast.error(`Failed to ${action} request`)
+      console.error("Failed to perform action:", error);
+      toast.error(`Failed to ${action} request`);
     } finally {
-      setIsProcessing(false)
-      setSelectedAction(null)
+      setIsProcessing(false);
+      setSelectedAction(null);
     }
-  }
+  };
 
   const actions = [
     {
-      id: 'escalate',
-      label: 'Escalate',
+      id: "escalate",
+      label: "Escalate",
       icon: ArrowUp,
-      description: 'Escalate to emergency status',
-      color: 'red',
-      available: ['pending', 'in_progress']
+      description: "Escalate to emergency status",
+      color: "red",
+      available: ["pending", "in_progress"],
     },
     {
-      id: 'approve',
-      label: 'Approve',
+      id: "approve",
+      label: "Approve",
       icon: Check,
-      description: 'Approve pending request',
-      color: 'green',
-      available: ['pending_approval']
+      description: "Approve pending request",
+      color: "green",
+      available: ["pending_approval"],
     },
     {
-      id: 'assign_manager',
-      label: 'Assign Manager',
+      id: "assign_manager",
+      label: "Assign Manager",
       icon: UserCheck,
-      description: 'Assign to property manager',
-      color: 'blue',
-      available: ['pending', 'in_progress']
+      description: "Assign to property manager",
+      color: "blue",
+      available: ["pending", "in_progress"],
     },
     {
-      id: 'review',
-      label: 'Review',
+      id: "review",
+      label: "Review",
       icon: FileCheck,
-      description: 'Mark for review',
-      color: 'purple',
-      available: ['resolved', 'escalated']
+      description: "Mark for review",
+      color: "purple",
+      available: ["resolved", "escalated"],
     },
     {
-      id: 'reject',
-      label: 'Reject',
+      id: "reject",
+      label: "Reject",
       icon: XCircle,
-      description: 'Reject the request',
-      color: 'gray',
-      available: ['pending_approval', 'pending_review']
-    }
-  ]
+      description: "Reject the request",
+      color: "gray",
+      available: ["pending_approval", "pending_review"],
+    },
+  ];
 
-  const availableActions = actions.filter(action => action.available.includes(currentStatus))
+  const availableActions = actions.filter((action) => action.available.includes(currentStatus));
 
   const getColorClasses = (color: string) => {
     const colors = {
-      red: 'bg-red-500/20 text-red-400 border-red-400/50 hover:bg-red-500/30',
-      green: 'bg-green-500/20 text-green-400 border-green-400/50 hover:bg-green-500/30',
-      blue: 'bg-blue-500/20 text-blue-400 border-blue-400/50 hover:bg-blue-500/30',
-      purple: 'bg-purple-500/20 text-purple-400 border-purple-400/50 hover:bg-purple-500/30',
-      gray: 'bg-gray-500/20 text-gray-400 border-gray-400/50 hover:bg-gray-500/30'
-    }
-    return colors[color as keyof typeof colors] || colors.gray
-  }
+      red: "bg-red-500/20 text-red-400 border-red-400/50 hover:bg-red-500/30",
+      green: "bg-green-500/20 text-green-400 border-green-400/50 hover:bg-green-500/30",
+      blue: "bg-blue-500/20 text-blue-400 border-blue-400/50 hover:bg-blue-500/30",
+      purple: "bg-purple-500/20 text-purple-400 border-purple-400/50 hover:bg-purple-500/30",
+      gray: "bg-gray-500/20 text-gray-400 border-gray-400/50 hover:bg-gray-500/30",
+    };
+    return colors[color as keyof typeof colors] || colors.gray;
+  };
 
   return (
     <div className={`glass-panel p-6 rounded-lg ${className}`}>
@@ -117,8 +122,8 @@ export function RequestWorkflowActions({ requestId, currentStatus, onAction, cla
         </div>
       ) : (
         <div className="space-y-3">
-          {availableActions.map(action => {
-            const Icon = action.icon
+          {availableActions.map((action) => {
+            const Icon = action.icon;
             return (
               <button
                 key={action.id}
@@ -133,7 +138,7 @@ export function RequestWorkflowActions({ requestId, currentStatus, onAction, cla
                   <p className="text-xs opacity-80">{action.description}</p>
                 </div>
               </button>
-            )
+            );
           })}
         </div>
       )}
@@ -151,5 +156,5 @@ export function RequestWorkflowActions({ requestId, currentStatus, onAction, cla
         </div>
       )}
     </div>
-  )
+  );
 }

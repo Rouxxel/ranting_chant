@@ -18,7 +18,14 @@ interface RequestCardProps {
   onComplete?: (requestId: string) => void;
 }
 
-export function RequestCard({ req, open, onToggle, tenantName = "Tenant", onCancel, onComplete }: RequestCardProps) {
+export function RequestCard({
+  req,
+  open,
+  onToggle,
+  tenantName = "Tenant",
+  onCancel,
+  onComplete,
+}: RequestCardProps) {
   const { userRole, currentTenant } = useApp();
   const createdDate = new Date(req.created_at).toLocaleDateString();
   const isCancellable = req.status === "pending" || req.status === "in_progress";
@@ -44,28 +51,41 @@ export function RequestCard({ req, open, onToggle, tenantName = "Tenant", onCanc
       <button onClick={onToggle} className="flex w-full items-start gap-4 p-5 text-left">
         <div className="flex-1">
           <div className="mb-1 flex items-center gap-2 flex-wrap">
-            <h2 className="text-lg font-semibold text-ranting-ice">{getRequestTypeLabel(req.type)}</h2>
+            <h2 className="text-lg font-semibold text-ranting-ice">
+              {getRequestTypeLabel(req.type)}
+            </h2>
             <StatusBadge status={req.status} />
             <UrgencyBadge urgency={req.urgency} />
           </div>
           <p className="mb-3 text-sm text-ranting-muted">{req.description}</p>
           <div className="flex flex-wrap items-center gap-3">
-            <span className="text-[11px] text-[rgb(51,71,88)] font-bold">Created on {createdDate}</span>
+            <span className="text-[11px] text-[rgb(51,71,88)] font-bold">
+              Created on {createdDate}
+            </span>
             {req.status === "cancelled" && (
               <span className="text-[rgb(51,71,88)] text-[11px] font-medium">
-                Cancelled on{req.cancelled_at ? ` ${new Date(req.cancelled_at).toLocaleDateString()}` : ""}
+                Cancelled on
+                {req.cancelled_at ? ` ${new Date(req.cancelled_at).toLocaleDateString()}` : ""}
               </span>
             )}
             {req.involved_parties && req.involved_parties.length > 0 && (
-              <span className="text-[11px] text-[rgb(51,71,88)]">{req.involved_parties.length} party(s) involved</span>
+              <span className="text-[11px] text-[rgb(51,71,88)]">
+                {req.involved_parties.length} party(s) involved
+              </span>
             )}
           </div>
         </div>
-        <ChevronDown className={`h-5 w-5 text-ranting-sky transition-transform ${open ? "rotate-180" : ""}`} />
+        <ChevronDown
+          className={`h-5 w-5 text-ranting-sky transition-transform ${open ? "rotate-180" : ""}`}
+        />
       </button>
-      {(userRole === "tenant" && isCancellable && onCancel) && (
+      {userRole === "tenant" && isCancellable && onCancel && (
         <div className="border-t border-ranting-sky/20 px-5 py-3">
-          <Button onClick={() => setIsCancelDialogOpen(true)} variant="ghost" className="glossy-btn-ghost text-red-400 hover:text-red-300 text-xs">
+          <Button
+            onClick={() => setIsCancelDialogOpen(true)}
+            variant="ghost"
+            className="glossy-btn-ghost text-red-400 hover:text-red-300 text-xs"
+          >
             Cancel Request
           </Button>
         </div>

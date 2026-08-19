@@ -2,7 +2,13 @@ import { useState, useEffect, useCallback } from "react";
 import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { useApp } from "@/context/AppContext";
-import { getProperties, createProperty, updateProperty, deleteProperty, describeValidationError } from "@/services/api";
+import {
+  getProperties,
+  createProperty,
+  updateProperty,
+  deleteProperty,
+  describeValidationError,
+} from "@/services/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -48,22 +54,25 @@ export function ManagementProperties() {
   // Namespaced cache key so manager_A and manager_B don't share a property list.
   const propertiesCacheKey = currentManager
     ? `properties_${userRole}_${currentManager.id}`
-    : 'properties';
+    : "properties";
 
   // A property belongs to the current manager/owner if it's in their managed/owned
   // list OR its manager_id/owner_id points at them (covers freshly created properties
   // whose ids aren't yet in the cached user record).
-  const ownsProperty = useCallback((p: Property) => {
-    if (!currentManager) return false;
-    const managedProps = (currentManager as any).managed_properties || [];
-    const ownedProps = (currentManager as any).owned_properties || [];
-    return (
-      managedProps.includes(p.id) ||
-      ownedProps.includes(p.id) ||
-      p.manager_id === currentManager.id ||
-      p.owner_id === currentManager.id
-    );
-  }, [currentManager]);
+  const ownsProperty = useCallback(
+    (p: Property) => {
+      if (!currentManager) return false;
+      const managedProps = (currentManager as any).managed_properties || [];
+      const ownedProps = (currentManager as any).owned_properties || [];
+      return (
+        managedProps.includes(p.id) ||
+        ownedProps.includes(p.id) ||
+        p.manager_id === currentManager.id ||
+        p.owner_id === currentManager.id
+      );
+    },
+    [currentManager],
+  );
 
   const fetchProperties = useCallback(async () => {
     setIsRefreshing(true);
@@ -109,7 +118,7 @@ export function ManagementProperties() {
       localStorage.setItem(propertiesCacheKey, JSON.stringify(next));
       // Invalidate requests cache since property changes may affect request filtering
       if (currentManager) {
-        const role = (currentManager as any).managed_properties ? 'manager' : 'owner';
+        const role = (currentManager as any).managed_properties ? "manager" : "owner";
         localStorage.removeItem(`requests_${role}_${currentManager.id}`);
       }
       setIsCreateDialogOpen(false);
@@ -128,11 +137,16 @@ export function ManagementProperties() {
 
     // Only send fields that actually changed from the cached property.
     const changes: PropertyUpdateRequest = {};
-    if (editForm.name !== undefined && editForm.name !== selected.name) changes.name = editForm.name;
-    if (editForm.address !== undefined && editForm.address !== selected.address) changes.address = editForm.address;
-    if (editForm.year_built !== undefined && editForm.year_built !== selected.year_built) changes.year_built = editForm.year_built;
-    if (editForm.property_type !== undefined && editForm.property_type !== selected.property_type) changes.property_type = editForm.property_type;
-    if (editForm.unit_count !== undefined && editForm.unit_count !== selected.unit_count) changes.unit_count = editForm.unit_count;
+    if (editForm.name !== undefined && editForm.name !== selected.name)
+      changes.name = editForm.name;
+    if (editForm.address !== undefined && editForm.address !== selected.address)
+      changes.address = editForm.address;
+    if (editForm.year_built !== undefined && editForm.year_built !== selected.year_built)
+      changes.year_built = editForm.year_built;
+    if (editForm.property_type !== undefined && editForm.property_type !== selected.property_type)
+      changes.property_type = editForm.property_type;
+    if (editForm.unit_count !== undefined && editForm.unit_count !== selected.unit_count)
+      changes.unit_count = editForm.unit_count;
 
     if (Object.keys(changes).length === 0) {
       toast.error("Please enter your changes");
@@ -142,12 +156,12 @@ export function ManagementProperties() {
     setIsSubmitting(true);
     try {
       const updatedProperty = await updateProperty(selected.id, changes);
-      const next = properties.map(p => p.id === selected.id ? updatedProperty : p);
+      const next = properties.map((p) => (p.id === selected.id ? updatedProperty : p));
       setProperties(next);
       localStorage.setItem(propertiesCacheKey, JSON.stringify(next));
       // Invalidate requests cache since property changes may affect request filtering
       if (currentManager) {
-        const role = (currentManager as any).managed_properties ? 'manager' : 'owner';
+        const role = (currentManager as any).managed_properties ? "manager" : "owner";
         localStorage.removeItem(`requests_${role}_${currentManager.id}`);
       }
       setSelected(updatedProperty);
@@ -178,12 +192,12 @@ export function ManagementProperties() {
     setIsDeleting(true);
     try {
       await deleteProperty(selected.id);
-      const next = properties.filter(p => p.id !== selected.id);
+      const next = properties.filter((p) => p.id !== selected.id);
       setProperties(next);
       localStorage.setItem(propertiesCacheKey, JSON.stringify(next));
       // Invalidate requests cache since property changes may affect request filtering
       if (currentManager) {
-        const role = (currentManager as any).managed_properties ? 'manager' : 'owner';
+        const role = (currentManager as any).managed_properties ? "manager" : "owner";
         localStorage.removeItem(`requests_${role}_${currentManager.id}`);
       }
       setSelected(null);
@@ -198,7 +212,9 @@ export function ManagementProperties() {
   };
 
   if (isLoading) {
-    return <div className="glass-panel p-8 text-center text-ranting-deep">Loading properties...</div>;
+    return (
+      <div className="glass-panel p-8 text-center text-ranting-deep">Loading properties...</div>
+    );
   }
 
   return (
@@ -252,7 +268,9 @@ export function ManagementProperties() {
                   <Label htmlFor="create-type">Type</Label>
                   <Select
                     value={createForm.property_type ?? ""}
-                    onValueChange={(value) => setCreateForm({ ...createForm, property_type: value })}
+                    onValueChange={(value) =>
+                      setCreateForm({ ...createForm, property_type: value })
+                    }
                   >
                     <SelectTrigger id="create-type" className="aero-input">
                       <SelectValue placeholder="Select a property type" />
@@ -272,7 +290,12 @@ export function ManagementProperties() {
                     id="create-units"
                     type="number"
                     value={createForm.unit_count || ""}
-                    onChange={(e) => setCreateForm({ ...createForm, unit_count: parseInt(e.target.value) || undefined })}
+                    onChange={(e) =>
+                      setCreateForm({
+                        ...createForm,
+                        unit_count: parseInt(e.target.value) || undefined,
+                      })
+                    }
                     className="aero-input"
                   />
                 </div>
@@ -287,14 +310,21 @@ export function ManagementProperties() {
                       const parsed = parseInt(e.target.value);
                       setCreateForm({
                         ...createForm,
-                        year_built: Number.isNaN(parsed) ? undefined : Math.min(parsed, CURRENT_YEAR),
+                        year_built: Number.isNaN(parsed)
+                          ? undefined
+                          : Math.min(parsed, CURRENT_YEAR),
                       });
                     }}
                     className="aero-input"
                   />
                 </div>
                 <DialogFooter>
-                  <Button type="button" variant="ghost" onClick={() => setIsCreateDialogOpen(false)} className="glossy-btn-ghost">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setIsCreateDialogOpen(false)}
+                    className="glossy-btn-ghost"
+                  >
                     Cancel
                   </Button>
                   <Button type="submit" disabled={isSubmitting} className="glossy-btn">
@@ -314,10 +344,18 @@ export function ManagementProperties() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-ranting-sky/20">
-                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-deep">Name</th>
-                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-deep">Address</th>
-                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-deep">Type</th>
-                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-deep">Units</th>
+                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-deep">
+                  Name
+                </th>
+                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-deep">
+                  Address
+                </th>
+                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-deep">
+                  Type
+                </th>
+                <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-ranting-deep">
+                  Units
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -329,8 +367,12 @@ export function ManagementProperties() {
                 >
                   <td className="px-4 py-3 text-sm text-ranting-ice">{property.name}</td>
                   <td className="px-4 py-3 text-sm text-ranting-deep">{property.address}</td>
-                  <td className="px-4 py-3 text-sm text-ranting-deep">{property.property_type ? getPropertyTypeLabel(property.property_type) : "-"}</td>
-                  <td className="px-4 py-3 text-sm text-ranting-deep">{property.unit_count || "-"}</td>
+                  <td className="px-4 py-3 text-sm text-ranting-deep">
+                    {property.property_type ? getPropertyTypeLabel(property.property_type) : "-"}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-ranting-deep">
+                    {property.unit_count || "-"}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -340,7 +382,9 @@ export function ManagementProperties() {
 
       {selected && (
         <div className="glass-panel mt-4 p-6">
-          <label className="block text-xs uppercase tracking-wider text-ranting-deep mb-1">Property Name</label>
+          <label className="block text-xs uppercase tracking-wider text-ranting-deep mb-1">
+            Property Name
+          </label>
           <div className="mb-4 flex items-center justify-between">
             <h3 className="text-lg font-semibold text-ranting-ice">{selected.name}</h3>
             <div className="flex gap-2">
@@ -357,10 +401,19 @@ export function ManagementProperties() {
             </div>
           </div>
           <div className="space-y-2 text-sm">
-            <div><span className="text-ranting-deep">Address:</span> {selected.address}</div>
-            <div><span className="text-ranting-deep">Type:</span> {selected.property_type ? getPropertyTypeLabel(selected.property_type) : "-"}</div>
-            <div><span className="text-ranting-deep">Units:</span> {selected.unit_count || "-"}</div>
-            <div><span className="text-ranting-deep">Year Built:</span> {selected.year_built || "-"}</div>
+            <div>
+              <span className="text-ranting-deep">Address:</span> {selected.address}
+            </div>
+            <div>
+              <span className="text-ranting-deep">Type:</span>{" "}
+              {selected.property_type ? getPropertyTypeLabel(selected.property_type) : "-"}
+            </div>
+            <div>
+              <span className="text-ranting-deep">Units:</span> {selected.unit_count || "-"}
+            </div>
+            <div>
+              <span className="text-ranting-deep">Year Built:</span> {selected.year_built || "-"}
+            </div>
           </div>
         </div>
       )}
@@ -416,7 +469,9 @@ export function ManagementProperties() {
                 id="edit-units"
                 type="number"
                 value={editForm.unit_count || ""}
-                onChange={(e) => setEditForm({ ...editForm, unit_count: parseInt(e.target.value) || undefined })}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, unit_count: parseInt(e.target.value) || undefined })
+                }
                 className="aero-input"
               />
             </div>
@@ -438,7 +493,12 @@ export function ManagementProperties() {
               />
             </div>
             <DialogFooter>
-              <Button type="button" variant="ghost" onClick={() => setIsEditDialogOpen(false)} className="glossy-btn-ghost">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setIsEditDialogOpen(false)}
+                className="glossy-btn-ghost"
+              >
                 Cancel
               </Button>
               <Button type="submit" disabled={isSubmitting} className="glossy-btn">

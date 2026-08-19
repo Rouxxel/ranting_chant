@@ -43,14 +43,21 @@ export function AuthenticatedLayout({ children }: { children: ReactNode }) {
   const navLinks = getNavLinks(role);
 
   async function handleLogout() {
-    if (role === 'manager' || role === 'owner') {
+    if (role === "manager" || role === "owner") {
       await logout(); // invalidates backend session, clears auth_token + manager state
     } else {
       clearUser(); // full session clear for tenants
     }
 
     const keysToClear = Object.keys(localStorage).filter(
-      (key) => key.startsWith("requests_") || key === "vendors" || key === "properties" || key === "tenants" || key === "requests" || key === "managers" || key === "owners",
+      (key) =>
+        key.startsWith("requests_") ||
+        key === "vendors" ||
+        key === "properties" ||
+        key === "tenants" ||
+        key === "requests" ||
+        key === "managers" ||
+        key === "owners",
     );
     keysToClear.forEach((key) => localStorage.removeItem(key));
 
@@ -81,15 +88,14 @@ export function AuthenticatedLayout({ children }: { children: ReactNode }) {
           <Avatar name={displayName} size={36} />
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <button className="glossy-btn-ghost px-3 py-1.5 text-xs">
-                Logout
-              </button>
+              <button className="glossy-btn-ghost px-3 py-1.5 text-xs">Logout</button>
             </AlertDialogTrigger>
             <AlertDialogContent className="aero-surface">
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you sure you want to log out?</AlertDialogTitle>
                 <AlertDialogDescription className="text-ranting-deep">
-                  You will return to the login screen and your current local session will be cleared.
+                  You will return to the login screen and your current local session will be
+                  cleared.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>

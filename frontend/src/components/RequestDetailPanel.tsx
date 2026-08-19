@@ -22,7 +22,12 @@ interface RequestDetailPanelProps {
   onComplete?: (resolutionNote?: string) => Promise<void> | void;
 }
 
-export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: RequestDetailPanelProps) {
+export function RequestDetailPanel({
+  req,
+  onClose,
+  onApprove,
+  onComplete,
+}: RequestDetailPanelProps) {
   const [summary, setSummary] = useState<string | null>(req.summary || null);
   const [loadingSummary, setLoadingSummary] = useState(false);
   const [isCompleteDialogOpen, setIsCompleteDialogOpen] = useState(false);
@@ -34,18 +39,18 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
   useEffect(() => {
     const load = async () => {
       // 1. Try cache first
-      const cachedT = localStorage.getItem('tenants');
-      const cachedV = localStorage.getItem('vendors');
-      const cachedM = localStorage.getItem('managers');
-      const cachedO = localStorage.getItem('owners');
+      const cachedT = localStorage.getItem("tenants");
+      const cachedV = localStorage.getItem("vendors");
+      const cachedM = localStorage.getItem("managers");
+      const cachedO = localStorage.getItem("owners");
 
       if (cachedT && cachedV && cachedM && cachedO) {
         try {
           const map: Record<string, string> = {};
-          JSON.parse(cachedT).forEach((t: any) => map[t.id] = t.name);
-          JSON.parse(cachedV).forEach((v: any) => map[v.id] = v.name);
-          JSON.parse(cachedM).forEach((m: any) => map[m.id] = m.name);
-          JSON.parse(cachedO).forEach((o: any) => map[o.id] = o.name);
+          JSON.parse(cachedT).forEach((t: any) => (map[t.id] = t.name));
+          JSON.parse(cachedV).forEach((v: any) => (map[v.id] = v.name));
+          JSON.parse(cachedM).forEach((m: any) => (map[m.id] = m.name));
+          JSON.parse(cachedO).forEach((o: any) => (map[o.id] = o.name));
           setPartyNames(map);
         } catch (e) {
           console.error("Failed to parse cached party names:", e);
@@ -60,18 +65,18 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
           getManagers().catch(() => []),
           getOwners().catch(() => []),
         ]);
-        
+
         const map: Record<string, string> = {};
-        tenants.forEach(t => map[t.id] = t.name);
-        vendors.forEach(v => map[v.id] = v.name);
-        managers.forEach(m => map[m.id] = m.name);
-        owners.forEach(o => map[o.id] = o.name);
+        tenants.forEach((t) => (map[t.id] = t.name));
+        vendors.forEach((v) => (map[v.id] = v.name));
+        managers.forEach((m) => (map[m.id] = m.name));
+        owners.forEach((o) => (map[o.id] = o.name));
         setPartyNames(map);
 
-        localStorage.setItem('tenants', JSON.stringify(tenants));
-        localStorage.setItem('vendors', JSON.stringify(vendors));
-        localStorage.setItem('managers', JSON.stringify(managers));
-        localStorage.setItem('owners', JSON.stringify(owners));
+        localStorage.setItem("tenants", JSON.stringify(tenants));
+        localStorage.setItem("vendors", JSON.stringify(vendors));
+        localStorage.setItem("managers", JSON.stringify(managers));
+        localStorage.setItem("owners", JSON.stringify(owners));
       } catch (error) {
         console.error("Failed to refresh party names from server:", error);
       }
@@ -143,13 +148,17 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
         <header className="flex items-start justify-between border-b border-white/10 px-5 py-4">
           <div className="min-w-0">
             <div className="text-[11px] text-ranting-deep">{req.id}</div>
-            <h2 className="truncate text-lg font-semibold text-ranting-ice">{getRequestTypeLabel(req.type)}</h2>
+            <h2 className="truncate text-lg font-semibold text-ranting-ice">
+              {getRequestTypeLabel(req.type)}
+            </h2>
             <div className="mt-2 flex items-center gap-2">
               <StatusBadge status={req.status} />
               <UrgencyBadge urgency={req.urgency} />
             </div>
           </div>
-          <button onClick={onClose} className="glossy-btn-ghost p-1.5"><X className="h-4 w-4" /></button>
+          <button onClick={onClose} className="glossy-btn-ghost p-1.5">
+            <X className="h-4 w-4" />
+          </button>
         </header>
 
         <div className="flex-1 space-y-5 overflow-y-auto px-5 py-5">
@@ -185,16 +194,25 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
             <SectionTitle>Conversation</SectionTitle>
             <div className="glass-panel p-3">
               <div className="space-y-2">
-                {req.conversation_history && req.conversation_history.map((m: any, i: number) => (
-                  <div key={m.id ?? `msg-${i}`} className={`flex ${m.role === "tenant" ? "justify-end" : "justify-start"}`}>
+                {req.conversation_history &&
+                  req.conversation_history.map((m: any, i: number) => (
                     <div
-                      className={`glass-panel max-w-[80%] px-3 py-2 text-xs text-ranting-ice ${m.role === "tenant" ? "rounded-br-md" : ""}`}
+                      key={m.id ?? `msg-${i}`}
+                      className={`flex ${m.role === "tenant" ? "justify-end" : "justify-start"}`}
                     >
-                      {m.message}
-                      <div className="mt-0.5 text-[9px] text-ranting-deep">{new Date(m.timestamp).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</div>
+                      <div
+                        className={`glass-panel max-w-[80%] px-3 py-2 text-xs text-ranting-ice ${m.role === "tenant" ? "rounded-br-md" : ""}`}
+                      >
+                        {m.message}
+                        <div className="mt-0.5 text-[9px] text-ranting-deep">
+                          {new Date(m.timestamp).toLocaleTimeString([], {
+                            hour: "numeric",
+                            minute: "2-digit",
+                          })}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             </div>
           </section>
@@ -217,19 +235,23 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
                       <span className="font-medium">{n.recipient_name || n.recipient}</span>
                       <span className="text-ranting-deep">
                         ·{" "}
-                        {n.timestamp ? new Date(n.timestamp).toLocaleString([], {
-                          month: "short",
-                          day: "numeric",
-                          hour: "numeric",
-                          minute: "2-digit",
-                        }) : "Invalid Date"}
+                        {n.timestamp
+                          ? new Date(n.timestamp).toLocaleString([], {
+                              month: "short",
+                              day: "numeric",
+                              hour: "numeric",
+                              minute: "2-digit",
+                            })
+                          : "Invalid Date"}
                       </span>
-                      {n.status === "failed" && (
-                        <span className="text-red-400">(failed)</span>
-                      )}
+                      {n.status === "failed" && <span className="text-red-400">(failed)</span>}
                     </div>
-                    {n.recipient_email && <div className="text-xs text-ranting-muted ml-5">{n.recipient_email}</div>}
-                    {n.recipient_phone && <div className="text-xs text-ranting-muted ml-5">{n.recipient_phone}</div>}
+                    {n.recipient_email && (
+                      <div className="text-xs text-ranting-muted ml-5">{n.recipient_email}</div>
+                    )}
+                    {n.recipient_phone && (
+                      <div className="text-xs text-ranting-muted ml-5">{n.recipient_phone}</div>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -248,7 +270,9 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
                   <div className="shimmer h-3 w-4/5 rounded" />
                   <div className="shimmer h-3 w-full rounded" />
                   <div className="shimmer h-3 w-3/5 rounded" />
-                  <div className="pt-1 text-[11px] italic text-ranting-deep">Generating summary…</div>
+                  <div className="pt-1 text-[11px] italic text-ranting-deep">
+                    Generating summary…
+                  </div>
                 </>
               ) : (
                 <p className="text-sm text-ranting-ice/90">{summary || "No summary available."}</p>
@@ -262,7 +286,8 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
               <div className="glass-panel space-y-2 p-3">
                 <p className="text-sm text-ranting-ice/90">{req.resolution_note}</p>
                 <div className="text-[11px] italic text-ranting-deep">
-                  Resolved on {new Date(req.resolved_at || "").toLocaleDateString()} by {req.resolved_by_name || partyNames[req.resolved_by || ""] || "Unknown"}
+                  Resolved on {new Date(req.resolved_at || "").toLocaleDateString()} by{" "}
+                  {req.resolved_by_name || partyNames[req.resolved_by || ""] || "Unknown"}
                 </div>
               </div>
             </section>
@@ -271,7 +296,10 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
 
         {req.status === "pending_approval" && (
           <footer className="border-t border-white/10 p-4">
-            <button onClick={onApprove} className="glossy-btn-green inline-flex w-full items-center justify-center gap-2 px-4 py-2.5 text-sm">
+            <button
+              onClick={onApprove}
+              className="glossy-btn-green inline-flex w-full items-center justify-center gap-2 px-4 py-2.5 text-sm"
+            >
               <Check className="h-4 w-4" /> Approve Request
             </button>
           </footer>
@@ -330,5 +358,7 @@ export function RequestDetailPanel({ req, onClose, onApprove, onComplete }: Requ
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <div className="mb-2 text-[10px] uppercase tracking-wider text-ranting-deep">{children}</div>;
+  return (
+    <div className="mb-2 text-[10px] uppercase tracking-wider text-ranting-deep">{children}</div>
+  );
 }

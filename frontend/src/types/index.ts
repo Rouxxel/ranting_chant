@@ -3,7 +3,14 @@
 
 // ==================== Common Types ====================
 
-export type Status = "pending" | "in_progress" | "escalated" | "resolved" | "pending_approval" | "pending_review" | "cancelled";
+export type Status =
+  | "pending"
+  | "in_progress"
+  | "escalated"
+  | "resolved"
+  | "pending_approval"
+  | "pending_review"
+  | "cancelled";
 export type Urgency = "low" | "medium" | "high";
 export const REQUEST_TYPES = [
   "plumbing",
@@ -82,7 +89,10 @@ export const propertyTypeLabels: Record<PropertyType, string> = {
 };
 
 export function getPropertyTypeLabel(type: PropertyType | string) {
-  return propertyTypeLabels[type as PropertyType] ?? type.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  return (
+    propertyTypeLabels[type as PropertyType] ??
+    type.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+  );
 }
 
 export interface Property {

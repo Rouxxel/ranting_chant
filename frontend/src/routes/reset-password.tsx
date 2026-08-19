@@ -27,7 +27,7 @@ function ResetPasswordPage() {
     if (password.length < 8) return setError("Password must be at least 8 characters long.");
     if (password !== confirmPassword) return setError("Passwords do not match.");
     if (!token) return setError("Invalid reset link. Please request a new password reset.");
-    
+
     setError(null);
     setIsLoading(true);
 
@@ -35,11 +35,16 @@ function ResetPasswordPage() {
       await resetPassword(token, password);
       setSuccess(true);
     } catch (error: unknown) {
-      const isAxiosError = (e: unknown): e is { response?: { status?: number; data?: { detail?: string } } } =>
-        typeof e === 'object' && e !== null && 'response' in e;
+      const isAxiosError = (
+        e: unknown,
+      ): e is { response?: { status?: number; data?: { detail?: string } } } =>
+        typeof e === "object" && e !== null && "response" in e;
 
       if (isAxiosError(error)) {
-        setError(error.response?.data?.detail || "Failed to reset password. The link may be invalid or expired.");
+        setError(
+          error.response?.data?.detail ||
+            "Failed to reset password. The link may be invalid or expired.",
+        );
       } else {
         setError("Failed to reset password. Please try again.");
       }
@@ -82,15 +87,11 @@ function ResetPasswordPage() {
         </div>
 
         <h1 className="mb-2 text-2xl font-semibold text-ranting-ice">Reset Password</h1>
-        <p className="mb-6 text-sm text-ranting-deep">
-          Enter your new password below.
-        </p>
+        <p className="mb-6 text-sm text-ranting-deep">Enter your new password below.</p>
 
         {success ? (
           <div className="rounded-lg bg-green-500/10 p-4 text-center">
-            <p className="text-sm text-green-400">
-              Your password has been reset successfully.
-            </p>
+            <p className="text-sm text-green-400">Your password has been reset successfully.</p>
             <button
               onClick={() => navigate({ to: "/" })}
               className="mt-4 w-full glossy-btn px-4 py-2.5 text-sm"

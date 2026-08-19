@@ -21,7 +21,9 @@ export function AeroBackground() {
       {/* Sun halo */}
       <div
         className="absolute -top-24 right-10 h-[420px] w-[420px] rounded-full blur-3xl opacity-70"
-        style={{ background: "radial-gradient(circle, rgba(255,255,230,0.85), rgba(255,255,200,0) 70%)" }}
+        style={{
+          background: "radial-gradient(circle, rgba(255,255,230,0.85), rgba(255,255,200,0) 70%)",
+        }}
       />
       {/* Bokeh blobs */}
       <div
@@ -44,7 +46,17 @@ export function AeroBackground() {
   );
 }
 
-function Bubble({ size, top, left, delay }: { size: number; top: string; left: string; delay: string }) {
+function Bubble({
+  size,
+  top,
+  left,
+  delay,
+}: {
+  size: number;
+  top: string;
+  left: string;
+  delay: string;
+}) {
   return (
     <div
       className="absolute rounded-full pointer-events-none aero-bubble"

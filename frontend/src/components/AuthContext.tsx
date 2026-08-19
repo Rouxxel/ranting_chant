@@ -1,112 +1,112 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
-import { authGetMe, authLogin, authLogout, authRefresh } from '../services/api'
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { authGetMe, authLogin, authLogout, authRefresh } from "../services/api";
 
 interface User {
-  id: string
-  name: string
-  email: string
-  role: 'tenant' | 'manager' | 'admin'
-  unit?: string
-  propertyId?: string
+  id: string;
+  name: string;
+  email: string;
+  role: "tenant" | "manager" | "admin";
+  unit?: string;
+  propertyId?: string;
 }
 
 interface AuthContextType {
-  user: User | null
-  isLoading: boolean
-  isAuthenticated: boolean
-  login: (email: string, password: string, role: 'tenant' | 'manager') => Promise<void>
-  logout: () => Promise<void>
-  refreshToken: () => Promise<void>
+  user: User | null;
+  isLoading: boolean;
+  isAuthenticated: boolean;
+  login: (email: string, password: string, role: "tenant" | "manager") => Promise<void>;
+  logout: () => Promise<void>;
+  refreshToken: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const token = localStorage.getItem('auth_token')
+        const token = localStorage.getItem("auth_token");
         if (token) {
-          const userData = await authGetMe()
+          const userData = await authGetMe();
           setUser({
             id: userData.id,
             name: userData.name,
-            email: userData.email || '',
-            role: userData.role as 'tenant' | 'manager' | 'admin',
+            email: userData.email || "",
+            role: userData.role as "tenant" | "manager" | "admin",
             unit: undefined,
-            propertyId: undefined
-          })
+            propertyId: undefined,
+          });
         }
       } catch (error) {
-        console.error('Auth check failed:', error)
-        localStorage.removeItem('auth_token')
+        console.error("Auth check failed:", error);
+        localStorage.removeItem("auth_token");
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    checkAuth()
-  }, [])
+    checkAuth();
+  }, []);
 
-  const login = async (email: string, password: string, role: 'tenant' | 'manager') => {
+  const login = async (email: string, password: string, role: "tenant" | "manager") => {
     try {
-      const response = await authLogin(email, password)
-      localStorage.setItem('auth_token', response.access_token)
+      const response = await authLogin(email, password);
+      localStorage.setItem("auth_token", response.access_token);
       if (response.refresh_token) {
-        localStorage.setItem('refresh_token', response.refresh_token)
+        localStorage.setItem("refresh_token", response.refresh_token);
       }
       setUser({
         id: response.actor.id,
         name: response.actor.name,
-        email: response.actor.email || '',
-        role: response.role as 'tenant' | 'manager' | 'admin',
+        email: response.actor.email || "",
+        role: response.role as "tenant" | "manager" | "admin",
         unit: undefined,
-        propertyId: undefined
-      })
+        propertyId: undefined,
+      });
     } catch (error) {
-      throw error
+      throw error;
     }
-  }
+  };
 
   const logout = async () => {
     try {
-      await authLogout()
+      await authLogout();
     } catch (error) {
-      console.error('Logout failed:', error)
+      console.error("Logout failed:", error);
     } finally {
-      localStorage.removeItem('auth_token')
-      localStorage.removeItem('refresh_token')
-      setUser(null)
+      localStorage.removeItem("auth_token");
+      localStorage.removeItem("refresh_token");
+      setUser(null);
     }
-  }
+  };
 
   const refreshToken = async () => {
     try {
-      const currentRefreshToken = localStorage.getItem('refresh_token')
+      const currentRefreshToken = localStorage.getItem("refresh_token");
       if (!currentRefreshToken) {
-        throw new Error('No refresh token available')
+        throw new Error("No refresh token available");
       }
-      const response = await authRefresh(currentRefreshToken)
-      localStorage.setItem('auth_token', response.access_token)
+      const response = await authRefresh(currentRefreshToken);
+      localStorage.setItem("auth_token", response.access_token);
       if (response.refresh_token) {
-        localStorage.setItem('refresh_token', response.refresh_token)
+        localStorage.setItem("refresh_token", response.refresh_token);
       }
       setUser({
         id: response.actor.id,
         name: response.actor.name,
-        email: response.actor.email || '',
-        role: response.role as 'tenant' | 'manager' | 'admin',
+        email: response.actor.email || "",
+        role: response.role as "tenant" | "manager" | "admin",
         unit: undefined,
-        propertyId: undefined
-      })
+        propertyId: undefined,
+      });
     } catch (error) {
-      console.error('Token refresh failed:', error)
-      await logout()
+      console.error("Token refresh failed:", error);
+      await logout();
     }
-  }
+  };
 
   return (
     <AuthContext.Provider
@@ -116,18 +116,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticated: !!user,
         login,
         logout,
-        refreshToken
+        refreshToken,
       }}
     >
       {children}
     </AuthContext.Provider>
-  )
+  );
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext)
+  const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider')
+    throw new Error("useAuth must be used within an AuthProvider");
   }
-  return context
+  return context;
 }

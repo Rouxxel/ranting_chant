@@ -1,48 +1,97 @@
-import { useState } from 'react'
-import { Search, Wrench, Play, History } from 'lucide-react'
+import { useState } from "react";
+import { Search, Wrench, Play, History } from "lucide-react";
 
 interface MCPTool {
-  name: string
-  description: string
-  category: string
+  name: string;
+  description: string;
+  category: string;
 }
 
 interface MCPToolsBrowserProps {
-  className?: string
+  className?: string;
 }
 
-export function MCPToolsBrowser({ className = '' }: MCPToolsBrowserProps) {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedTool, setSelectedTool] = useState<MCPTool | null>(null)
-  const [selectedCategory, setSelectedCategory] = useState<string>('all')
+export function MCPToolsBrowser({ className = "" }: MCPToolsBrowserProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTool, setSelectedTool] = useState<MCPTool | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   const tools: MCPTool[] = [
-    { name: 'lookup_tenant', description: 'Look up a tenant record by ID', category: 'Tenants' },
-    { name: 'get_tenant_by_name_and_unit', description: 'Find a tenant by name and address unit', category: 'Tenants' },
-    { name: 'get_tenant_property', description: 'Return the property record associated with a tenant', category: 'Tenants' },
-    { name: 'lookup_property', description: 'Look up a property record by ID', category: 'Properties' },
-    { name: 'get_property_manager', description: 'Return the manager record for a property', category: 'Properties' },
-    { name: 'get_property_owner', description: 'Return the owner record for a property', category: 'Properties' },
-    { name: 'find_vendors_by_service', description: 'Return all vendors offering a given service category', category: 'Vendors' },
-    { name: 'get_emergency_vendors', description: 'Return emergency-available vendors for a service category', category: 'Vendors' },
-    { name: 'get_vendor', description: 'Look up a vendor record by ID', category: 'Vendors' },
-    { name: 'create_request', description: 'Create a new service/maintenance request record', category: 'Requests' },
-    { name: 'update_request', description: 'Merge updates into an existing request record', category: 'Requests' },
-    { name: 'get_request', description: 'Look up a request record by ID', category: 'Requests' },
-    { name: 'list_requests_by_tenant', description: 'Return all requests submitted by a specific tenant', category: 'Requests' },
-    { name: 'list_all_requests', description: 'Return all request records', category: 'Requests' },
-    { name: 'escalate_request', description: 'Escalate a request and append the reason to its history', category: 'Requests' },
-    { name: 'append_conversation_turn', description: 'Append a conversation message to a request\'s history', category: 'Requests' }
-  ]
+    { name: "lookup_tenant", description: "Look up a tenant record by ID", category: "Tenants" },
+    {
+      name: "get_tenant_by_name_and_unit",
+      description: "Find a tenant by name and address unit",
+      category: "Tenants",
+    },
+    {
+      name: "get_tenant_property",
+      description: "Return the property record associated with a tenant",
+      category: "Tenants",
+    },
+    {
+      name: "lookup_property",
+      description: "Look up a property record by ID",
+      category: "Properties",
+    },
+    {
+      name: "get_property_manager",
+      description: "Return the manager record for a property",
+      category: "Properties",
+    },
+    {
+      name: "get_property_owner",
+      description: "Return the owner record for a property",
+      category: "Properties",
+    },
+    {
+      name: "find_vendors_by_service",
+      description: "Return all vendors offering a given service category",
+      category: "Vendors",
+    },
+    {
+      name: "get_emergency_vendors",
+      description: "Return emergency-available vendors for a service category",
+      category: "Vendors",
+    },
+    { name: "get_vendor", description: "Look up a vendor record by ID", category: "Vendors" },
+    {
+      name: "create_request",
+      description: "Create a new service/maintenance request record",
+      category: "Requests",
+    },
+    {
+      name: "update_request",
+      description: "Merge updates into an existing request record",
+      category: "Requests",
+    },
+    { name: "get_request", description: "Look up a request record by ID", category: "Requests" },
+    {
+      name: "list_requests_by_tenant",
+      description: "Return all requests submitted by a specific tenant",
+      category: "Requests",
+    },
+    { name: "list_all_requests", description: "Return all request records", category: "Requests" },
+    {
+      name: "escalate_request",
+      description: "Escalate a request and append the reason to its history",
+      category: "Requests",
+    },
+    {
+      name: "append_conversation_turn",
+      description: "Append a conversation message to a request's history",
+      category: "Requests",
+    },
+  ];
 
-  const categories = ['all', 'Tenants', 'Properties', 'Vendors', 'Requests']
+  const categories = ["all", "Tenants", "Properties", "Vendors", "Requests"];
 
-  const filteredTools = tools.filter(tool => {
-    const matchesSearch = tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         tool.description.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesCategory = selectedCategory === 'all' || tool.category === selectedCategory
-    return matchesSearch && matchesCategory
-  })
+  const filteredTools = tools.filter((tool) => {
+    const matchesSearch =
+      tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tool.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === "all" || tool.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
 
   return (
     <div className={`glass-panel p-6 rounded-lg ${className}`}>
@@ -74,9 +123,9 @@ export function MCPToolsBrowser({ className = '' }: MCPToolsBrowserProps) {
           onChange={(e) => setSelectedCategory(e.target.value)}
           className="aero-input px-4 py-2"
         >
-          {categories.map(category => (
+          {categories.map((category) => (
             <option key={category} value={category}>
-              {category === 'all' ? 'All Categories' : category}
+              {category === "all" ? "All Categories" : category}
             </option>
           ))}
         </select>
@@ -85,14 +134,14 @@ export function MCPToolsBrowser({ className = '' }: MCPToolsBrowserProps) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Tools List */}
         <div className="space-y-2 max-h-96 overflow-y-auto">
-          {filteredTools.map(tool => (
+          {filteredTools.map((tool) => (
             <button
               key={tool.name}
               onClick={() => setSelectedTool(tool)}
               className={`w-full text-left p-4 rounded-lg transition-colors ${
                 selectedTool?.name === tool.name
-                  ? 'bg-ranting-sky/20 border border-ranting-sky/50'
-                  : 'bg-ranting-deep/20 hover:bg-ranting-deep/30 border border-transparent'
+                  ? "bg-ranting-sky/20 border border-ranting-sky/50"
+                  : "bg-ranting-deep/20 hover:bg-ranting-deep/30 border border-transparent"
               }`}
             >
               <div className="flex items-start justify-between gap-3">
@@ -138,5 +187,5 @@ export function MCPToolsBrowser({ className = '' }: MCPToolsBrowserProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }

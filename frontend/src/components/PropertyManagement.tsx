@@ -1,95 +1,96 @@
-import { useState, useEffect } from 'react'
-import { Building2, MapPin, Calendar, Users, Plus, Search, Edit, Trash2 } from 'lucide-react'
-import { toast } from 'sonner'
-import { getProperties, getPropertyById, createProperty, deleteProperty } from '../services/api'
-import type { Property } from '../types'
+import { useState, useEffect } from "react";
+import { Building2, MapPin, Calendar, Users, Plus, Search, Edit, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import { getProperties, getPropertyById, createProperty, deleteProperty } from "../services/api";
+import type { Property } from "../types";
 
 interface PropertyManagementProps {
-  className?: string
+  className?: string;
 }
 
-export function PropertyManagement({ className = '' }: PropertyManagementProps) {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null)
-  const [isAdding, setIsAdding] = useState(false)
-  const [properties, setProperties] = useState<Property[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [isCreating, setIsCreating] = useState(false)
+export function PropertyManagement({ className = "" }: PropertyManagementProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  const [isAdding, setIsAdding] = useState(false);
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isCreating, setIsCreating] = useState(false);
   const [newProperty, setNewProperty] = useState({
-    name: '',
-    address: '',
+    name: "",
+    address: "",
     year_built: new Date().getFullYear(),
-    property_type: 'apartment_building' as string,
-    unit_count: 1
-  })
+    property_type: "apartment_building" as string,
+    unit_count: 1,
+  });
 
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        const data = await getProperties()
-        setProperties(data)
+        const data = await getProperties();
+        setProperties(data);
       } catch (error) {
-        console.error('Failed to fetch properties:', error)
-        toast.error('Failed to load properties')
+        console.error("Failed to fetch properties:", error);
+        toast.error("Failed to load properties");
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchProperties()
-  }, [])
+    fetchProperties();
+  }, []);
 
-  const filteredProperties = properties.filter(property =>
-    property.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    property.address.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  const filteredProperties = properties.filter(
+    (property) =>
+      property.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      property.address.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
 
   const handlePropertySelect = async (property: Property) => {
-    setSelectedProperty(property)
-  }
+    setSelectedProperty(property);
+  };
 
   const handleDeleteProperty = async (propertyId: string) => {
     try {
-      await deleteProperty(propertyId)
-      toast.success('Property deleted successfully')
-      setProperties(properties.filter(p => p.id !== propertyId))
+      await deleteProperty(propertyId);
+      toast.success("Property deleted successfully");
+      setProperties(properties.filter((p) => p.id !== propertyId));
       if (selectedProperty?.id === propertyId) {
-        setSelectedProperty(null)
+        setSelectedProperty(null);
       }
     } catch (error) {
-      console.error('Failed to delete property:', error)
-      toast.error('Failed to delete property')
+      console.error("Failed to delete property:", error);
+      toast.error("Failed to delete property");
     }
-  }
+  };
 
   const handleCreateProperty = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsCreating(true)
+    e.preventDefault();
+    setIsCreating(true);
     try {
       const created = await createProperty({
         name: newProperty.name,
         address: newProperty.address,
         year_built: newProperty.year_built,
         property_type: newProperty.property_type,
-        unit_count: newProperty.unit_count
-      })
-      toast.success('Property created successfully')
-      setProperties([...properties, created])
-      setIsAdding(false)
+        unit_count: newProperty.unit_count,
+      });
+      toast.success("Property created successfully");
+      setProperties([...properties, created]);
+      setIsAdding(false);
       setNewProperty({
-        name: '',
-        address: '',
+        name: "",
+        address: "",
         year_built: new Date().getFullYear(),
-        property_type: 'apartment_building',
-        unit_count: 1
-      })
+        property_type: "apartment_building",
+        unit_count: 1,
+      });
     } catch (error) {
-      console.error('Failed to create property:', error)
-      toast.error('Failed to create property')
+      console.error("Failed to create property:", error);
+      toast.error("Failed to create property");
     } finally {
-      setIsCreating(false)
+      setIsCreating(false);
     }
-  }
+  };
 
   return (
     <div className={`glass-panel p-6 rounded-lg ${className}`}>
@@ -127,24 +128,26 @@ export function PropertyManagement({ className = '' }: PropertyManagementProps) 
           ) : filteredProperties.length === 0 ? (
             <div className="text-center text-ranting-muted py-8">No properties found</div>
           ) : (
-            filteredProperties.map(property => (
+            filteredProperties.map((property) => (
               <button
                 key={property.id}
                 onClick={() => handlePropertySelect(property)}
                 className={`w-full text-left p-4 rounded-lg transition-colors ${
                   selectedProperty?.id === property.id
-                    ? 'bg-ranting-sky/20 border border-ranting-sky/50'
-                    : 'bg-ranting-deep/20 hover:bg-ranting-deep/30 border border-transparent'
+                    ? "bg-ranting-sky/20 border border-ranting-sky/50"
+                    : "bg-ranting-deep/20 hover:bg-ranting-deep/30 border border-transparent"
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <p className="text-ranting-ice font-medium">{property.name}</p>
-                    <p className="text-ranting-muted text-xs mt-1 line-clamp-2">{property.address}</p>
+                    <p className="text-ranting-muted text-xs mt-1 line-clamp-2">
+                      {property.address}
+                    </p>
                     <div className="flex items-center gap-3 mt-2 text-xs text-ranting-muted">
                       <div className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
-                        <span>{property.year_built || 'N/A'}</span>
+                        <span>{property.year_built || "N/A"}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Users className="w-3 h-3" />
@@ -189,19 +192,27 @@ export function PropertyManagement({ className = '' }: PropertyManagementProps) 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="glass-panel p-3 rounded-lg">
                     <p className="text-ranting-muted text-xs mb-1">Year Built</p>
-                    <p className="text-ranting-ice font-medium">{selectedProperty.year_built || 'N/A'}</p>
+                    <p className="text-ranting-ice font-medium">
+                      {selectedProperty.year_built || "N/A"}
+                    </p>
                   </div>
                   <div className="glass-panel p-3 rounded-lg">
                     <p className="text-ranting-muted text-xs mb-1">Type</p>
-                    <p className="text-ranting-ice text-sm capitalize">{selectedProperty.property_type?.replace('_', ' ') || 'N/A'}</p>
+                    <p className="text-ranting-ice text-sm capitalize">
+                      {selectedProperty.property_type?.replace("_", " ") || "N/A"}
+                    </p>
                   </div>
                   <div className="glass-panel p-3 rounded-lg">
                     <p className="text-ranting-muted text-xs mb-1">Units</p>
-                    <p className="text-ranting-ice font-medium">{selectedProperty.unit_count || 0}</p>
+                    <p className="text-ranting-ice font-medium">
+                      {selectedProperty.unit_count || 0}
+                    </p>
                   </div>
                   <div className="glass-panel p-3 rounded-lg">
                     <p className="text-ranting-muted text-xs mb-1">Manager ID</p>
-                    <p className="text-ranting-ice font-mono text-sm">{selectedProperty.manager_id || 'N/A'}</p>
+                    <p className="text-ranting-ice font-mono text-sm">
+                      {selectedProperty.manager_id || "N/A"}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -251,7 +262,9 @@ export function PropertyManagement({ className = '' }: PropertyManagementProps) 
                     min="1800"
                     max={new Date().getFullYear() + 10}
                     value={newProperty.year_built}
-                    onChange={(e) => setNewProperty({ ...newProperty, year_built: parseInt(e.target.value) })}
+                    onChange={(e) =>
+                      setNewProperty({ ...newProperty, year_built: parseInt(e.target.value) })
+                    }
                     className="aero-input w-full px-3 py-2"
                   />
                 </div>
@@ -262,7 +275,9 @@ export function PropertyManagement({ className = '' }: PropertyManagementProps) 
                     required
                     min="1"
                     value={newProperty.unit_count}
-                    onChange={(e) => setNewProperty({ ...newProperty, unit_count: parseInt(e.target.value) })}
+                    onChange={(e) =>
+                      setNewProperty({ ...newProperty, unit_count: parseInt(e.target.value) })
+                    }
                     className="aero-input w-full px-3 py-2"
                   />
                 </div>
@@ -272,7 +287,9 @@ export function PropertyManagement({ className = '' }: PropertyManagementProps) 
                 <select
                   required
                   value={newProperty.property_type}
-                  onChange={(e) => setNewProperty({ ...newProperty, property_type: e.target.value })}
+                  onChange={(e) =>
+                    setNewProperty({ ...newProperty, property_type: e.target.value })
+                  }
                   className="aero-input w-full px-3 py-2"
                 >
                   <option value="apartment_building">Apartment Building</option>
@@ -300,7 +317,7 @@ export function PropertyManagement({ className = '' }: PropertyManagementProps) 
                   className="glossy-btn flex-1 px-4 py-2 rounded-full"
                   disabled={isCreating}
                 >
-                  {isCreating ? 'Creating...' : 'Create'}
+                  {isCreating ? "Creating..." : "Create"}
                 </button>
               </div>
             </form>
@@ -308,5 +325,5 @@ export function PropertyManagement({ className = '' }: PropertyManagementProps) 
         </div>
       )}
     </div>
-  )
+  );
 }

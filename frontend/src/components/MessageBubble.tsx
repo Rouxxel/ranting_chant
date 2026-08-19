@@ -40,9 +40,18 @@ function renderLinkedText(text: string) {
   });
 }
 
-export function MessageBubble({ msg, tenantName = "Tenant", suggestedContacts = [], tenantId, requestId }: MessageBubbleProps) {
+export function MessageBubble({
+  msg,
+  tenantName = "Tenant",
+  suggestedContacts = [],
+  tenantId,
+  requestId,
+}: MessageBubbleProps) {
   const isTenant = msg.role === "tenant";
-  const timestamp = new Date(msg.timestamp).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  const timestamp = new Date(msg.timestamp).toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit",
+  });
   const sources = msg.web_results?.results?.slice(0, 3) ?? [];
   const [selectedContacts, setSelectedContacts] = useState<Set<string>>(new Set());
   const [isSending, setIsSending] = useState(false);
@@ -69,11 +78,11 @@ export function MessageBubble({ msg, tenantName = "Tenant", suggestedContacts = 
 
     setIsSending(true);
     try {
-      const contactsToSend = suggestedContacts.filter(c => selectedContacts.has(c.name));
+      const contactsToSend = suggestedContacts.filter((c) => selectedContacts.has(c.name));
       const result = await sendNotifications({
         tenant_id: tenantId,
         request_id: requestId,
-        contacts: contactsToSend
+        contacts: contactsToSend,
       });
 
       if (result.success) {
@@ -94,7 +103,9 @@ export function MessageBubble({ msg, tenantName = "Tenant", suggestedContacts = 
   };
 
   return (
-    <div className={`wrap-break-words flex items-end gap-2 ${isTenant ? "justify-end" : "justify-start"}`}>
+    <div
+      className={`wrap-break-words flex items-end gap-2 ${isTenant ? "justify-end" : "justify-start"}`}
+    >
       {!isTenant && <Avatar name="Ranting Chant" size={28} />}
       <div className={`max-w-[72%] ${isTenant ? "items-end" : "items-start"} flex flex-col gap-1`}>
         <div
@@ -104,7 +115,10 @@ export function MessageBubble({ msg, tenantName = "Tenant", suggestedContacts = 
         </div>
         {!isTenant && suggestedContacts.length > 0 && showSuggestions && (
           <div className="mt-2 w-full max-w-[560px] rounded-sm border border-ranting-sky/20 bg-ranting-navy/45 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
-            <div className="mb-3 wrap-break-words text-[11px] font-semibold uppercase tracking-[0.22em]" style={{ color: "#1e3a5f" }}>
+            <div
+              className="mb-3 wrap-break-words text-[11px] font-semibold uppercase tracking-[0.22em]"
+              style={{ color: "#1e3a5f" }}
+            >
               Suggested Contacts
             </div>
             <div className="wrap-break-words space-y-2">
@@ -118,11 +132,13 @@ export function MessageBubble({ msg, tenantName = "Tenant", suggestedContacts = 
                       : "border-white/30 bg-white/30 hover:border-ranting-sky/40 hover:bg-white/50"
                   }`}
                 >
-                  <div className={`flex h-5 w-5 items-center justify-center rounded-full border transition ${
-                    selectedContacts.has(contact.name)
-                      ? "border-ranting-sky bg-ranting-sky"
-                      : "border-ranting-muted bg-white/50"
-                  }`}>
+                  <div
+                    className={`flex h-5 w-5 items-center justify-center rounded-full border transition ${
+                      selectedContacts.has(contact.name)
+                        ? "border-ranting-sky bg-ranting-sky"
+                        : "border-ranting-muted bg-white/50"
+                    }`}
+                  >
                     {selectedContacts.has(contact.name) && <Check className="h-3 w-3 text-white" />}
                   </div>
                   <div className="flex-1">
@@ -139,11 +155,17 @@ export function MessageBubble({ msg, tenantName = "Tenant", suggestedContacts = 
             <div className="mt-3 flex gap-2">
               <button
                 onClick={handleSendNotifications}
-                disabled={isSending || selectedContacts.size === 0 || !!requestId?.startsWith("session_")}
+                disabled={
+                  isSending || selectedContacts.size === 0 || !!requestId?.startsWith("session_")
+                }
                 className="glossy-btn flex-1 px-3 py-1.5 text-xs font-medium disabled:opacity-50"
                 title={requestId?.startsWith("session_") ? "Save conversation first" : ""}
               >
-                {isSending ? "Sending..." : requestId?.startsWith("session_") ? "Save conversation first" : `Send (${selectedContacts.size})`}
+                {isSending
+                  ? "Sending..."
+                  : requestId?.startsWith("session_")
+                    ? "Save conversation first"
+                    : `Send (${selectedContacts.size})`}
               </button>
               <button
                 onClick={handleDismiss}
@@ -156,7 +178,10 @@ export function MessageBubble({ msg, tenantName = "Tenant", suggestedContacts = 
         )}
         {!isTenant && sources.length > 0 && (
           <div className="mt-1 w-full max-w-[560px] rounded-sm border border-ranting-sky/20 bg-ranting-navy/45 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
-            <div className="ml-3 mb-2 wrap-break-words text-[10px] font-semibold uppercase tracking-[0.22em]" style={{ color: "#1e3a5f" }}>
+            <div
+              className="ml-3 mb-2 wrap-break-words text-[10px] font-semibold uppercase tracking-[0.22em]"
+              style={{ color: "#1e3a5f" }}
+            >
               Sources
             </div>
             <div className="wrap-break-words grid gap-2">
@@ -172,14 +197,23 @@ export function MessageBubble({ msg, tenantName = "Tenant", suggestedContacts = 
                     <div className="text-xs font-semibold" style={{ color: "#0f2b4a" }}>
                       {source.title}
                     </div>
-                    <ExternalLink className="wrap-break-words mt-0.5 h-3.5 w-3.5 shrink-0" style={{ color: "#163a5e" }} />
+                    <ExternalLink
+                      className="wrap-break-words mt-0.5 h-3.5 w-3.5 shrink-0"
+                      style={{ color: "#163a5e" }}
+                    />
                   </div>
                   {source.content_snippet && (
-                    <p className="wrap-break-words mt-1 line-clamp-2 text-[11px] leading-4" style={{ color: "#1e3a5f" }}>
+                    <p
+                      className="wrap-break-words mt-1 line-clamp-2 text-[11px] leading-4"
+                      style={{ color: "#1e3a5f" }}
+                    >
                       {source.content_snippet}
                     </p>
                   )}
-                  <div className="wrap-break-words mt-2 truncate text-[10px]" style={{ color: "#1a4060" }}>
+                  <div
+                    className="wrap-break-words mt-2 truncate text-[10px]"
+                    style={{ color: "#1a4060" }}
+                  >
                     {source.url}
                   </div>
                 </a>
@@ -187,7 +221,11 @@ export function MessageBubble({ msg, tenantName = "Tenant", suggestedContacts = 
             </div>
           </div>
         )}
-        <span className={`px-1 text-[10px] text-ranting-muted ${isTenant ? "text-right" : "text-left"}`}>{timestamp}</span>
+        <span
+          className={`px-1 text-[10px] text-ranting-muted ${isTenant ? "text-right" : "text-left"}`}
+        >
+          {timestamp}
+        </span>
       </div>
     </div>
   );

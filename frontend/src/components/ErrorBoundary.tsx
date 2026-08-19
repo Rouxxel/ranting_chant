@@ -1,42 +1,42 @@
-import { Component, ReactNode } from 'react'
-import { AlertTriangle, RefreshCw, Home } from 'lucide-react'
+import { Component, ReactNode } from "react";
+import { AlertTriangle, RefreshCw, Home } from "lucide-react";
 
 interface Props {
-  children: ReactNode
-  fallback?: ReactNode
+  children: ReactNode;
+  fallback?: ReactNode;
 }
 
 interface State {
-  hasError: boolean
-  error: Error | null
+  hasError: boolean;
+  error: Error | null;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
-    super(props)
-    this.state = { hasError: false, error: null }
+    super(props);
+    this.state = { hasError: false, error: null };
   }
 
   static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error }
+    return { hasError: true, error };
   }
 
   componentDidCatch(error: Error, errorInfo: any) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo)
+    console.error("ErrorBoundary caught an error:", error, errorInfo);
   }
 
   handleReset = () => {
-    this.setState({ hasError: false, error: null })
-  }
+    this.setState({ hasError: false, error: null });
+  };
 
   handleGoHome = () => {
-    window.location.href = '/'
-  }
+    window.location.href = "/";
+  };
 
   render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
-        return this.props.fallback
+        return this.props.fallback;
       }
 
       return (
@@ -48,7 +48,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
             <h1 className="text-ranting-ice text-2xl font-semibold mb-2">Something went wrong</h1>
             <p className="text-ranting-muted text-sm mb-6">
-              {this.state.error?.message || 'An unexpected error occurred'}
+              {this.state.error?.message || "An unexpected error occurred"}
             </p>
 
             <div className="flex flex-col gap-3">
@@ -68,7 +68,7 @@ export class ErrorBoundary extends Component<Props, State> {
               </button>
             </div>
 
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {process.env.NODE_ENV === "development" && this.state.error && (
               <details className="mt-6 text-left">
                 <summary className="text-ranting-muted text-xs cursor-pointer hover:text-ranting-sky">
                   Error Details
@@ -80,9 +80,9 @@ export class ErrorBoundary extends Component<Props, State> {
             )}
           </div>
         </div>
-      )
+      );
     }
 
-    return this.props.children
+    return this.props.children;
   }
 }

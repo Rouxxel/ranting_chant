@@ -1,33 +1,37 @@
-import { useState } from 'react'
-import { User, Building2, Mail, Lock, AlertCircle } from 'lucide-react'
+import { useState } from "react";
+import { User, Building2, Mail, Lock, AlertCircle } from "lucide-react";
 
 interface EnhancedLoginFormProps {
-  onLogin: (email: string, password: string, role: 'tenant' | 'manager') => Promise<void>
-  isLoading?: boolean
-  className?: string
+  onLogin: (email: string, password: string, role: "tenant" | "manager") => Promise<void>;
+  isLoading?: boolean;
+  className?: string;
 }
 
-export function EnhancedLoginForm({ onLogin, isLoading = false, className = '' }: EnhancedLoginFormProps) {
-  const [role, setRole] = useState<'tenant' | 'manager'>('tenant')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
+export function EnhancedLoginForm({
+  onLogin,
+  isLoading = false,
+  className = "",
+}: EnhancedLoginFormProps) {
+  const [role, setRole] = useState<"tenant" | "manager">("tenant");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
+    e.preventDefault();
+    setError("");
 
     if (!email || !password) {
-      setError('Please fill in all fields')
-      return
+      setError("Please fill in all fields");
+      return;
     }
 
     try {
-      await onLogin(email, password, role)
+      await onLogin(email, password, role);
     } catch (err) {
-      setError('Login failed. Please check your credentials.')
+      setError("Login failed. Please check your credentials.");
     }
-  }
+  };
 
   return (
     <div className={`glass-panel p-8 rounded-lg w-full max-w-md ${className}`}>
@@ -39,22 +43,22 @@ export function EnhancedLoginForm({ onLogin, isLoading = false, className = '' }
       {/* Role Tabs */}
       <div className="flex gap-2 mb-6">
         <button
-          onClick={() => setRole('tenant')}
+          onClick={() => setRole("tenant")}
           className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg transition-colors ${
-            role === 'tenant'
-              ? 'bg-ranting-sky/20 border border-ranting-sky/50 text-ranting-ice'
-              : 'bg-ranting-deep/20 border border-transparent text-ranting-muted hover:bg-ranting-deep/30'
+            role === "tenant"
+              ? "bg-ranting-sky/20 border border-ranting-sky/50 text-ranting-ice"
+              : "bg-ranting-deep/20 border border-transparent text-ranting-muted hover:bg-ranting-deep/30"
           }`}
         >
           <User className="w-4 h-4" />
           Tenant
         </button>
         <button
-          onClick={() => setRole('manager')}
+          onClick={() => setRole("manager")}
           className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg transition-colors ${
-            role === 'manager'
-              ? 'bg-ranting-sky/20 border border-ranting-sky/50 text-ranting-ice'
-              : 'bg-ranting-deep/20 border border-transparent text-ranting-muted hover:bg-ranting-deep/30'
+            role === "manager"
+              ? "bg-ranting-sky/20 border border-ranting-sky/50 text-ranting-ice"
+              : "bg-ranting-deep/20 border border-transparent text-ranting-muted hover:bg-ranting-deep/30"
           }`}
         >
           <Building2 className="w-4 h-4" />
@@ -104,7 +108,7 @@ export function EnhancedLoginForm({ onLogin, isLoading = false, className = '' }
           disabled={isLoading}
           className="glossy-btn w-full flex items-center justify-center gap-2 px-4 py-3 rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isLoading ? 'Signing in...' : 'Sign In'}
+          {isLoading ? "Signing in..." : "Sign In"}
         </button>
       </form>
 
@@ -114,12 +118,12 @@ export function EnhancedLoginForm({ onLogin, isLoading = false, className = '' }
           Forgot password?
         </a>
         <p className="text-ranting-muted text-xs">
-          Don't have an account?{' '}
+          Don't have an account?{" "}
           <a href="#" className="text-ranting-sky hover:underline">
             Contact your property manager
           </a>
         </p>
       </div>
     </div>
-  )
+  );
 }

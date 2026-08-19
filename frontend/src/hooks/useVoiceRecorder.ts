@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback } from "react";
 
 export function useVoiceRecorder() {
   const [isRecording, setIsRecording] = useState(false);
@@ -10,7 +10,7 @@ export function useVoiceRecorder() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mediaRecorder = new MediaRecorder(stream);
-      
+
       mediaRecorderRef.current = mediaRecorder;
       chunksRef.current = [];
 
@@ -21,15 +21,15 @@ export function useVoiceRecorder() {
       };
 
       mediaRecorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
+        const blob = new Blob(chunksRef.current, { type: "audio/webm" });
         setAudioBlob(blob);
-        stream.getTracks().forEach(track => track.stop());
+        stream.getTracks().forEach((track) => track.stop());
       };
 
       mediaRecorder.start();
       setIsRecording(true);
     } catch (error) {
-      console.error('Failed to start recording:', error);
+      console.error("Failed to start recording:", error);
       throw error;
     }
   }, []);
@@ -51,6 +51,6 @@ export function useVoiceRecorder() {
     audioBlob,
     startRecording,
     stopRecording,
-    resetRecording
+    resetRecording,
   };
 }

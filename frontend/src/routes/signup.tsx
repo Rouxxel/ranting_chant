@@ -3,14 +3,24 @@ import { useState, useEffect } from "react";
 import { Logo } from "@/components/Logo";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { signupManager, signupOwner } from "@/services/api";
-import { User, Building2, Mail, Lock, UserCircle, Phone, CheckCircle, AlertCircle, ArrowLeft } from "lucide-react";
+import {
+  User,
+  Building2,
+  Mail,
+  Lock,
+  UserCircle,
+  Phone,
+  CheckCircle,
+  AlertCircle,
+  ArrowLeft,
+} from "lucide-react";
 
 export const Route = createFileRoute("/signup")({
   beforeLoad: () => {
     // Redirect authenticated users away from sign-up page
-    const token = localStorage.getItem('auth_token');
-    const currentManager = localStorage.getItem('current_manager');
-    const userRole = localStorage.getItem('user_role');
+    const token = localStorage.getItem("auth_token");
+    const currentManager = localStorage.getItem("current_manager");
+    const userRole = localStorage.getItem("user_role");
 
     if (token && (currentManager || userRole)) {
       throw redirect({ to: "/management" as any });
@@ -33,7 +43,9 @@ function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [passwordStrength, setPasswordStrength] = useState<"weak" | "medium" | "strong" | null>(null);
+  const [passwordStrength, setPasswordStrength] = useState<"weak" | "medium" | "strong" | null>(
+    null,
+  );
 
   const validateEmail = (email: string) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -54,7 +66,7 @@ function SignupPage() {
     if (/[A-Z]/.test(password)) strength++;
     if (/[0-9]/.test(password)) strength++;
     if (/[^A-Za-z0-9]/.test(password)) strength++;
-    
+
     if (strength <= 2) return "weak";
     if (strength <= 3) return "medium";
     return "strong";
@@ -118,7 +130,9 @@ function SignupPage() {
 
       setSuccess(true);
     } catch (err: unknown) {
-      const isAxiosError = (e: unknown): e is { response?: { data?: { detail?: string }; status?: number } } =>
+      const isAxiosError = (
+        e: unknown,
+      ): e is { response?: { data?: { detail?: string }; status?: number } } =>
         typeof e === "object" && e !== null && "response" in e;
 
       if (isAxiosError(err) && err.response?.data?.detail) {
@@ -144,8 +158,9 @@ function SignupPage() {
             <h2 className="text-ranting-ice text-2xl font-semibold">Check Your Email</h2>
           </div>
           <p className="text-ranting-muted mb-6 text-sm">
-            We've sent a confirmation link to <span className="text-ranting-ice font-semibold">{email}</span>.
-            Please check your inbox and click the link to activate your account.
+            We've sent a confirmation link to{" "}
+            <span className="text-ranting-ice font-semibold">{email}</span>. Please check your inbox
+            and click the link to activate your account.
           </p>
           <button
             onClick={() => navigate({ to: "/" })}
@@ -173,7 +188,12 @@ function SignupPage() {
           <p className="text-sm text-ranting-muted">Create Your Account</p>
         </div>
 
-        <Tabs defaultValue="manager" value={role} onValueChange={(v) => setRole(v as "manager" | "owner")} className="w-full">
+        <Tabs
+          defaultValue="manager"
+          value={role}
+          onValueChange={(v) => setRole(v as "manager" | "owner")}
+          className="w-full"
+        >
           <TabsList className="mb-5 grid w-full grid-cols-2 gap-2 bg-transparent p-0 h-auto">
             <TabsTrigger value="manager" className="aero-tab px-4 py-2 text-sm font-semibold">
               <Building2 className="mr-2 h-4 w-4" />
@@ -232,8 +252,8 @@ function SignupPage() {
                         passwordStrength === "weak"
                           ? "w-1/3 bg-red-400"
                           : passwordStrength === "medium"
-                          ? "w-2/3 bg-yellow-400"
-                          : "w-full bg-green-400"
+                            ? "w-2/3 bg-yellow-400"
+                            : "w-full bg-green-400"
                       }`}
                     />
                   </div>
@@ -297,7 +317,11 @@ function SignupPage() {
                 </div>
               )}
 
-              <button type="submit" className="glossy-btn mt-2 px-4 py-2.5 text-sm" disabled={isLoading}>
+              <button
+                type="submit"
+                className="glossy-btn mt-2 px-4 py-2.5 text-sm"
+                disabled={isLoading}
+              >
                 {isLoading ? "Creating Account..." : "Sign Up as Manager"}
               </button>
             </form>
@@ -350,8 +374,8 @@ function SignupPage() {
                         passwordStrength === "weak"
                           ? "w-1/3 bg-red-400"
                           : passwordStrength === "medium"
-                          ? "w-2/3 bg-yellow-400"
-                          : "w-full bg-green-400"
+                            ? "w-2/3 bg-yellow-400"
+                            : "w-full bg-green-400"
                       }`}
                     />
                   </div>
@@ -415,7 +439,11 @@ function SignupPage() {
                 </div>
               )}
 
-              <button type="submit" className="glossy-btn mt-2 px-4 py-2.5 text-sm" disabled={isLoading}>
+              <button
+                type="submit"
+                className="glossy-btn mt-2 px-4 py-2.5 text-sm"
+                disabled={isLoading}
+              >
                 {isLoading ? "Creating Account..." : "Sign Up as Owner"}
               </button>
             </form>
@@ -425,10 +453,7 @@ function SignupPage() {
         <div className="mt-6 text-center">
           <p className="text-color-black text-xs">
             Already have an account?{" "}
-            <button
-              onClick={() => navigate({ to: "/" })}
-              className="text-color-blue underline"
-            >
+            <button onClick={() => navigate({ to: "/" })} className="text-color-blue underline">
               Sign In
             </button>
           </p>

@@ -26,7 +26,7 @@ export function TenantProfile() {
   useEffect(() => {
     const loadProperties = async () => {
       // 1. Try cache first
-      const cached = localStorage.getItem('properties');
+      const cached = localStorage.getItem("properties");
       if (cached) {
         try {
           setProperties(JSON.parse(cached));
@@ -40,7 +40,7 @@ export function TenantProfile() {
       try {
         const props = await getProperties();
         setProperties(props);
-        localStorage.setItem('properties', JSON.stringify(props));
+        localStorage.setItem("properties", JSON.stringify(props));
       } catch (error) {
         console.error("Failed to load properties:", error);
       } finally {
@@ -58,7 +58,9 @@ export function TenantProfile() {
 
   // Find property name by property_id
   const property = currentTenant?.property_id
-    ? properties.find(p => p.id === currentTenant.property_id)?.name || currentTenant.property || "-"
+    ? properties.find((p) => p.id === currentTenant.property_id)?.name ||
+      currentTenant.property ||
+      "-"
     : currentTenant?.property || "-";
 
   const handleSave = async (e: React.FormEvent) => {
@@ -156,11 +158,7 @@ export function TenantProfile() {
       <div className="flex gap-2 pt-4">
         {isEditing ? (
           <>
-            <Button
-              onClick={handleSave}
-              disabled={isSubmitting}
-              className="glossy-btn"
-            >
+            <Button onClick={handleSave} disabled={isSubmitting} className="glossy-btn">
               {isSubmitting ? "Saving..." : "Save"}
             </Button>
             <Button
@@ -175,10 +173,7 @@ export function TenantProfile() {
             </Button>
           </>
         ) : (
-          <Button
-            onClick={() => setIsEditing(true)}
-            className="glossy-btn"
-          >
+          <Button onClick={() => setIsEditing(true)} className="glossy-btn">
             Edit Profile
           </Button>
         )}

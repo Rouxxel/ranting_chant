@@ -24,31 +24,34 @@ interface ChatInputProps {
   disabled?: boolean;
 }
 
-export function ChatInput({ 
-  value, 
-  onChange, 
-  onSend, 
-  onVoiceToggle, 
+export function ChatInput({
+  value,
+  onChange,
+  onSend,
+  onVoiceToggle,
   voiceProvider,
   voiceProviders,
   voiceId,
   voices,
   onVoiceProviderChange,
   onVoiceChange,
-  isRecording, 
+  isRecording,
   isTyping,
-  disabled = false 
+  disabled = false,
 }: ChatInputProps) {
-  const providerOptions = voiceProviders.length > 0
-    ? voiceProviders
-    : [{
-        id: "elevenlabs" as VoiceProviderId,
-        display_name: "ElevenLabs",
-        configured: true,
-        enabled: true,
-        supports: { tts: true, stt: true, streaming_tts: false },
-        voices: [],
-      }];
+  const providerOptions =
+    voiceProviders.length > 0
+      ? voiceProviders
+      : [
+          {
+            id: "elevenlabs" as VoiceProviderId,
+            display_name: "ElevenLabs",
+            configured: true,
+            enabled: true,
+            supports: { tts: true, stt: true, streaming_tts: false },
+            voices: [],
+          },
+        ];
 
   return (
     <div className="border-t border-white/10 p-4">
@@ -102,7 +105,12 @@ export function ChatInput({
         <textarea
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); onSend(); } }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              onSend();
+            }
+          }}
           rows={1}
           placeholder="Type your message…"
           className="aero-input flex-1 resize-none px-3.5 py-2.5 text-sm"
@@ -123,7 +131,11 @@ export function ChatInput({
         </button>
       </div>
       <div className="mt-1.5 text-[11px] text-ranting-deep">
-        {isRecording ? "Recording… tap mic to stop" : isTyping ? "Processing…" : "Press Enter to send · Shift+Enter for newline"}
+        {isRecording
+          ? "Recording… tap mic to stop"
+          : isTyping
+            ? "Processing…"
+            : "Press Enter to send · Shift+Enter for newline"}
       </div>
     </div>
   );

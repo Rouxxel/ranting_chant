@@ -1,37 +1,37 @@
-import { useState } from 'react'
-import { Mic, MicOff, Square } from 'lucide-react'
+import { useState } from "react";
+import { Mic, MicOff, Square } from "lucide-react";
 
 interface VoiceRecorderProps {
-  onRecordingComplete?: (audioBlob: Blob) => void
-  className?: string
+  onRecordingComplete?: (audioBlob: Blob) => void;
+  className?: string;
 }
 
-export function VoiceRecorder({ onRecordingComplete, className = '' }: VoiceRecorderProps) {
-  const [isRecording, setIsRecording] = useState(false)
-  const [recordingTime, setRecordingTime] = useState(0)
+export function VoiceRecorder({ onRecordingComplete, className = "" }: VoiceRecorderProps) {
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
 
   // TODO: Wire to Web Audio API / MediaRecorder
   const handleStartRecording = () => {
-    setIsRecording(true)
+    setIsRecording(true);
     // Start timer for visual feedback
     const timer = setInterval(() => {
-      setRecordingTime(prev => prev + 1)
-    }, 1000)
+      setRecordingTime((prev) => prev + 1);
+    }, 1000);
     // Store timer ID for cleanup
-    return () => clearInterval(timer)
-  }
+    return () => clearInterval(timer);
+  };
 
   const handleStopRecording = () => {
-    setIsRecording(false)
-    setRecordingTime(0)
+    setIsRecording(false);
+    setRecordingTime(0);
     // TODO: Create audio blob and call onRecordingComplete
-  }
+  };
 
   const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${mins}:${secs.toString().padStart(2, '0')}`
-  }
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
 
   return (
     <div className={`flex items-center gap-3 ${className}`}>
@@ -59,5 +59,5 @@ export function VoiceRecorder({ onRecordingComplete, className = '' }: VoiceReco
         </div>
       )}
     </div>
-  )
+  );
 }

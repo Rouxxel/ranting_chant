@@ -30,7 +30,7 @@ function LoginPage() {
     try {
       // 1. Try cache first
       let tenants: Tenant[] = [];
-      const cached = localStorage.getItem('tenants');
+      const cached = localStorage.getItem("tenants");
       if (cached) {
         try {
           tenants = JSON.parse(cached);
@@ -40,27 +40,29 @@ function LoginPage() {
       }
 
       let matchedTenant = tenants.find(
-        t => t.name.toLowerCase() === tName.trim().toLowerCase() &&
-          t.unit.toLowerCase() === tUnit.trim().toLowerCase()
+        (t) =>
+          t.name.toLowerCase() === tName.trim().toLowerCase() &&
+          t.unit.toLowerCase() === tUnit.trim().toLowerCase(),
       );
 
       // 2. Fetch fresh from network if not cached or if lookup failed
       if (!matchedTenant) {
         const freshTenants = await getTenants();
-        localStorage.setItem('tenants', JSON.stringify(freshTenants));
+        localStorage.setItem("tenants", JSON.stringify(freshTenants));
         matchedTenant = freshTenants.find(
-          t => t.name.toLowerCase() === tName.trim().toLowerCase() &&
-            t.unit.toLowerCase() === tUnit.trim().toLowerCase()
+          (t) =>
+            t.name.toLowerCase() === tName.trim().toLowerCase() &&
+            t.unit.toLowerCase() === tUnit.trim().toLowerCase(),
         );
       }
 
       if (matchedTenant) {
         // Persist synchronously: route guards read localStorage in beforeLoad,
         // which runs before AppContext's post-render effects would write it.
-        localStorage.setItem('current_tenant', JSON.stringify(matchedTenant));
-        localStorage.setItem('user_role', 'tenant');
+        localStorage.setItem("current_tenant", JSON.stringify(matchedTenant));
+        localStorage.setItem("user_role", "tenant");
         setCurrentTenant(matchedTenant);
-        setUserRole('tenant');
+        setUserRole("tenant");
         navigate({ to: "/chat" });
       } else {
         setErr("No tenant found with that name and unit. Please check your information.");
@@ -75,7 +77,8 @@ function LoginPage() {
 
   async function managerSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!mIdentifier.trim() || !mPassword.trim()) return setErr("Please enter your email/username and password.");
+    if (!mIdentifier.trim() || !mPassword.trim())
+      return setErr("Please enter your email/username and password.");
     setErr(null);
     setIsLoading(true);
 
@@ -83,25 +86,25 @@ function LoginPage() {
       const result = await authLogin(mIdentifier.trim(), mPassword);
 
       // Store tokens
-      localStorage.setItem('auth_token', result.access_token);
+      localStorage.setItem("auth_token", result.access_token);
       if (result.refresh_token) {
-        localStorage.setItem('auth_refresh_token', result.refresh_token);
+        localStorage.setItem("auth_refresh_token", result.refresh_token);
       }
 
       // Clear tenant data when logging in as manager/owner
-      localStorage.removeItem('current_tenant');
+      localStorage.removeItem("current_tenant");
       setCurrentTenant(null);
 
       // Persist actor + role synchronously so route guard passes on first navigation
-      localStorage.setItem('current_manager', JSON.stringify(result.actor));
-      localStorage.setItem('user_role', result.role);
+      localStorage.setItem("current_manager", JSON.stringify(result.actor));
+      localStorage.setItem("user_role", result.role);
       setCurrentManager(result.actor);
-      setUserRole(result.role as 'manager' | 'owner');
+      setUserRole(result.role as "manager" | "owner");
 
       navigate({ to: "/management" });
     } catch (error: unknown) {
       const isAxiosError = (e: unknown): e is { response?: { status?: number } } =>
-        typeof e === 'object' && e !== null && 'response' in e;
+        typeof e === "object" && e !== null && "response" in e;
 
       if (isAxiosError(error) && error.response?.status === 401) {
         setErr("Invalid credentials. Please check your email and password.");
@@ -136,10 +139,26 @@ function LoginPage() {
 
           <TabsContent value="tenant">
             <form onSubmit={tenantSubmit} className="flex flex-col gap-3">
-              <input className="aero-input px-3.5 py-2.5 text-sm" placeholder="Full name" value={tName} onChange={(e) => setTName(e.target.value)} disabled={isLoading} />
-              <input className="aero-input px-3.5 py-2.5 text-sm" placeholder="Unit / Apartment #" value={tUnit} onChange={(e) => setTUnit(e.target.value)} disabled={isLoading} />
+              <input
+                className="aero-input px-3.5 py-2.5 text-sm"
+                placeholder="Full name"
+                value={tName}
+                onChange={(e) => setTName(e.target.value)}
+                disabled={isLoading}
+              />
+              <input
+                className="aero-input px-3.5 py-2.5 text-sm"
+                placeholder="Unit / Apartment #"
+                value={tUnit}
+                onChange={(e) => setTUnit(e.target.value)}
+                disabled={isLoading}
+              />
               {err && <p className="text-xs text-red-300">{err}</p>}
-              <button type="submit" className="glossy-btn mt-2 px-4 py-2.5 text-sm" disabled={isLoading}>
+              <button
+                type="submit"
+                className="glossy-btn mt-2 px-4 py-2.5 text-sm"
+                disabled={isLoading}
+              >
                 {isLoading ? "Signing in..." : "Enter Ranting Chant"}
               </button>
             </form>
@@ -147,8 +166,23 @@ function LoginPage() {
 
           <TabsContent value="manager">
             <form onSubmit={managerSubmit} className="flex flex-col gap-3">
-              <input className="aero-input px-3.5 py-2.5 text-sm" placeholder="Email" value={mIdentifier} onChange={(e) => setMIdentifier(e.target.value)} disabled={isLoading} autoComplete="username" />
-              <input className="aero-input px-3.5 py-2.5 text-sm" type="password" placeholder="Password" value={mPassword} onChange={(e) => setMPassword(e.target.value)} disabled={isLoading} autoComplete="current-password" />
+              <input
+                className="aero-input px-3.5 py-2.5 text-sm"
+                placeholder="Email"
+                value={mIdentifier}
+                onChange={(e) => setMIdentifier(e.target.value)}
+                disabled={isLoading}
+                autoComplete="username"
+              />
+              <input
+                className="aero-input px-3.5 py-2.5 text-sm"
+                type="password"
+                placeholder="Password"
+                value={mPassword}
+                onChange={(e) => setMPassword(e.target.value)}
+                disabled={isLoading}
+                autoComplete="current-password"
+              />
               {/* TODO: Disabled until database is correctly configured
               <div className="text-right">
                 <button
@@ -161,12 +195,16 @@ function LoginPage() {
               </div>
               */}
               {err && <p className="text-xs text-red-300">{err}</p>}
-              <button type="submit" className="glossy-btn mt-2 px-4 py-2.5 text-sm" disabled={isLoading}>
+              <button
+                type="submit"
+                className="glossy-btn mt-2 px-4 py-2.5 text-sm"
+                disabled={isLoading}
+              >
                 {isLoading ? "Signing in..." : "Enter Dashboard"}
               </button>
               <div className="text-center">
                 <p className="text-color-black text-xs">
-                  No account? {" "}
+                  No account?{" "}
                   <button
                     type="button"
                     onClick={() => navigate({ to: "/signup" })}

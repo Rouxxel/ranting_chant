@@ -33,10 +33,12 @@ function ManagementPage() {
   // Build role-namespaced cache keys so different managers sharing a browser
   // don't bleed each other's filtered request lists.
   const requestsCacheKey = currentManager
-    ? `requests_${(currentManager as any).managed_properties ? 'manager' : 'owner'}_${currentManager.id}`
-    : 'requests';
+    ? `requests_${(currentManager as any).managed_properties ? "manager" : "owner"}_${currentManager.id}`
+    : "requests";
 
-  const [activeTab, setActiveTab] = useState<"requests" | "properties" | "tenants" | "vendors" | "profile">("requests");
+  const [activeTab, setActiveTab] = useState<
+    "requests" | "properties" | "tenants" | "vendors" | "profile"
+  >("requests");
   const [rows, setRows] = useState<Request[]>([]);
   const [typeF, setTypeF] = useState<RequestType | "all">("all");
   const [statusF, setStatusF] = useState<Status | "all">("all");
@@ -47,9 +49,10 @@ function ManagementPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const filterForManager = (allRequests: Request[]) =>
-    allRequests.filter(r => {
+    allRequests.filter((r) => {
       if (!currentManager || !r.property_id) return false;
-      const properties = (currentManager as any).managed_properties || (currentManager as any).owned_properties;
+      const properties =
+        (currentManager as any).managed_properties || (currentManager as any).owned_properties;
       return Array.isArray(properties) && properties.includes(r.property_id);
     });
 
@@ -95,19 +98,23 @@ function ManagementPage() {
 
   const properties = useMemo(() => Array.from(new Set(rows.map((r) => r.property))), [rows]);
 
-  const filtered = rows.filter((r) =>
-    (typeF === "all" || r.type === typeF) &&
-    (statusF === "all" || r.status === statusF) &&
-    (urgencyF === "all" || r.urgency === urgencyF) &&
-    (propertyF === "all" || r.property === propertyF)
+  const filtered = rows.filter(
+    (r) =>
+      (typeF === "all" || r.type === typeF) &&
+      (statusF === "all" || r.status === statusF) &&
+      (urgencyF === "all" || r.urgency === urgencyF) &&
+      (propertyF === "all" || r.property === propertyF),
   );
 
-  const stats = useMemo(() => ({
-    total: rows.length,
-    escalated: rows.filter((r) => r.status === "escalated").length,
-    pendingApproval: rows.filter((r) => r.status === "pending_approval").length,
-    resolved: rows.filter((r) => r.status === "resolved").length,
-  }), [rows]);
+  const stats = useMemo(
+    () => ({
+      total: rows.length,
+      escalated: rows.filter((r) => r.status === "escalated").length,
+      pendingApproval: rows.filter((r) => r.status === "pending_approval").length,
+      resolved: rows.filter((r) => r.status === "resolved").length,
+    }),
+    [rows],
+  );
 
   async function approve(id: string) {
     try {
@@ -124,7 +131,10 @@ function ManagementPage() {
   async function handleComplete(id: string, resolutionNote?: string) {
     if (!currentManager) return;
     try {
-      const updated = await completeRequest(id, { resolved_by: currentManager.id, resolution_note: resolutionNote });
+      const updated = await completeRequest(id, {
+        resolved_by: currentManager.id,
+        resolution_note: resolutionNote,
+      });
       const next = rows.map((r) => (r.id === id ? { ...r, ...updated } : r));
       setRows(next);
       localStorage.setItem(requestsCacheKey, JSON.stringify(next));
@@ -140,7 +150,9 @@ function ManagementPage() {
       <main className="mx-auto min-h-[calc(100vh-130px)] max-w-[1400px]">
         <header className="flex items-center justify-between">
           <div className="mb-8 pl-5">
-            <h1 className="underline-glow text-3xl font-semibold tracking-tight text-ranting-ice">Management</h1>
+            <h1 className="underline-glow text-3xl font-semibold tracking-tight text-ranting-ice">
+              Management
+            </h1>
           </div>
         </header>
 
@@ -155,10 +167,9 @@ function ManagementPage() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 text-xs ${activeTab === tab.id
-                ? "glossy-btn"
-                : "glossy-btn-ghost"
-                }`}
+              className={`px-4 py-2 text-xs ${
+                activeTab === tab.id ? "glossy-btn" : "glossy-btn-ghost"
+              }`}
             >
               {tab.label}
             </button>
@@ -189,7 +200,9 @@ function ManagementPage() {
 
             {/* Filters */}
             <div className="glass-panel mb-4 flex flex-wrap items-center gap-3 px-4 py-3">
-              <span className="text-xs font-semibold uppercase tracking-wider text-ranting-deep">Filter</span>
+              <span className="text-xs font-semibold uppercase tracking-wider text-ranting-deep">
+                Filter
+              </span>
               <Select value={typeF} onValueChange={(v) => setTypeF(v as RequestType | "all")}>
                 <SelectTrigger className="h-auto py-1.5 px-3 text-xs w-auto min-w-[120px]">
                   <SelectValue placeholder="All types" />
@@ -197,7 +210,9 @@ function ManagementPage() {
                 <SelectContent>
                   <SelectItem value="all">All types</SelectItem>
                   {REQUEST_TYPES.map((type) => (
-                    <SelectItem key={type} value={type}>{getRequestTypeLabel(type)}</SelectItem>
+                    <SelectItem key={type} value={type}>
+                      {getRequestTypeLabel(type)}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -234,26 +249,35 @@ function ManagementPage() {
                 <SelectContent>
                   <SelectItem value="all">All properties</SelectItem>
                   {properties.map((p) => (
-                    <SelectItem key={p} value={p}>{p}</SelectItem>
+                    <SelectItem key={p} value={p}>
+                      {p}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              <span className="ml-auto text-xs text-ranting-deep">{filtered.length} of {rows.length}</span>
+              <span className="ml-auto text-xs text-ranting-deep">
+                {filtered.length} of {rows.length}
+              </span>
             </div>
 
             {/* Table */}
             {isLoading ? (
-              <div className="glass-panel p-8 text-center text-ranting-muted">Loading requests...</div>
+              <div className="glass-panel p-8 text-center text-ranting-muted">
+                Loading requests...
+              </div>
             ) : (
-              <RequestTable
-                requests={filtered}
-                onRowClick={setSelected}
-                onApprove={approve}
-              />
+              <RequestTable requests={filtered} onRowClick={setSelected} onApprove={approve} />
             )}
 
             {/* Detail panel */}
-            {selected && <RequestDetailPanel req={selected} onClose={() => setSelected(null)} onApprove={() => approve(selected.id)} onComplete={(note) => handleComplete(selected.id, note)} />}
+            {selected && (
+              <RequestDetailPanel
+                req={selected}
+                onClose={() => setSelected(null)}
+                onApprove={() => approve(selected.id)}
+                onComplete={(note) => handleComplete(selected.id, note)}
+              />
+            )}
           </>
         )}
 
@@ -276,7 +300,15 @@ function ManagementPage() {
   );
 }
 
-function StatCard({ label, value, accent }: { label: string; value: number; accent: "sky" | "red" | "purple" | "green" }) {
+function StatCard({
+  label,
+  value,
+  accent,
+}: {
+  label: string;
+  value: number;
+  accent: "sky" | "red" | "purple" | "green";
+}) {
   const map = {
     sky: "rgba(126,200,227,0.55)",
     red: "rgba(239,68,68,0.6)",
@@ -285,12 +317,12 @@ function StatCard({ label, value, accent }: { label: string; value: number; acce
   } as const;
   return (
     <div className="glass-panel relative overflow-hidden px-5 py-4">
-      <div className="absolute -right-6 -top-6 h-20 w-20 rounded-full blur-2xl" style={{ background: map[accent] }} />
+      <div
+        className="absolute -right-6 -top-6 h-20 w-20 rounded-full blur-2xl"
+        style={{ background: map[accent] }}
+      />
       <div className="text-[11px] uppercase tracking-wider text-ranting-muted">{label}</div>
       <div className="mt-1 text-3xl font-semibold text-ranting-ice text-glow-sky">{value}</div>
     </div>
   );
 }
-
-
-

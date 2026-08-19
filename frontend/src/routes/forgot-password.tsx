@@ -27,7 +27,7 @@ function ForgotPasswordPage() {
       setSuccess(true);
     } catch (error: unknown) {
       const isAxiosError = (e: unknown): e is { response?: { status?: number } } =>
-        typeof e === 'object' && e !== null && 'response' in e;
+        typeof e === "object" && e !== null && "response" in e;
 
       if (isAxiosError(error) && !error.response) {
         setError("Failed to connect to server. Please try again.");

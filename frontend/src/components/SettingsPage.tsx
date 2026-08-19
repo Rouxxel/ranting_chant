@@ -1,20 +1,20 @@
-import { useState } from 'react'
-import { Settings, User, Bell, Palette, Shield, Save, ChevronRight } from 'lucide-react'
-import { NotificationPreferences } from './NotificationPreferences'
+import { useState } from "react";
+import { Settings, User, Bell, Palette, Shield, Save, ChevronRight } from "lucide-react";
+import { NotificationPreferences } from "./NotificationPreferences";
 
 interface SettingsPageProps {
-  className?: string
+  className?: string;
 }
 
-export function SettingsPage({ className = '' }: SettingsPageProps) {
-  const [activeSection, setActiveSection] = useState('profile')
+export function SettingsPage({ className = "" }: SettingsPageProps) {
+  const [activeSection, setActiveSection] = useState("profile");
 
   const sections = [
-    { id: 'profile', label: 'Profile', icon: User },
-    { id: 'notifications', label: 'Notifications', icon: Bell },
-    { id: 'appearance', label: 'Appearance', icon: Palette },
-    { id: 'security', label: 'Security', icon: Shield }
-  ]
+    { id: "profile", label: "Profile", icon: User },
+    { id: "notifications", label: "Notifications", icon: Bell },
+    { id: "appearance", label: "Appearance", icon: Palette },
+    { id: "security", label: "Security", icon: Shield },
+  ];
 
   return (
     <div className={`glass-panel p-6 rounded-lg ${className}`}>
@@ -28,22 +28,22 @@ export function SettingsPage({ className = '' }: SettingsPageProps) {
         <div className="lg:col-span-1">
           <div className="glass-panel-strong p-4 rounded-lg">
             <nav className="space-y-1">
-              {sections.map(section => {
-                const Icon = section.icon
+              {sections.map((section) => {
+                const Icon = section.icon;
                 return (
                   <button
                     key={section.id}
                     onClick={() => setActiveSection(section.id)}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                       activeSection === section.id
-                        ? 'bg-ranting-sky/20 text-ranting-ice'
-                        : 'text-ranting-muted hover:bg-ranting-deep/30'
+                        ? "bg-ranting-sky/20 text-ranting-ice"
+                        : "text-ranting-muted hover:bg-ranting-deep/30"
                     }`}
                   >
                     <Icon className="w-4 h-4" />
                     <span className="text-sm">{section.label}</span>
                   </button>
-                )
+                );
               })}
             </nav>
           </div>
@@ -51,14 +51,14 @@ export function SettingsPage({ className = '' }: SettingsPageProps) {
 
         {/* Settings Content */}
         <div className="lg:col-span-3">
-          {activeSection === 'profile' && <ProfileSettings />}
-          {activeSection === 'notifications' && <NotificationSettings />}
-          {activeSection === 'appearance' && <AppearanceSettings />}
-          {activeSection === 'security' && <SecuritySettings />}
+          {activeSection === "profile" && <ProfileSettings />}
+          {activeSection === "notifications" && <NotificationSettings />}
+          {activeSection === "appearance" && <AppearanceSettings />}
+          {activeSection === "security" && <SecuritySettings />}
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 function ProfileSettings() {
@@ -68,11 +68,7 @@ function ProfileSettings() {
       <div className="space-y-4">
         <div>
           <label className="block text-ranting-muted text-xs mb-2">Full Name</label>
-          <input
-            type="text"
-            defaultValue="John Doe"
-            className="aero-input w-full px-4 py-2"
-          />
+          <input type="text" defaultValue="John Doe" className="aero-input w-full px-4 py-2" />
         </div>
         <div>
           <label className="block text-ranting-muted text-xs mb-2">Email</label>
@@ -84,11 +80,7 @@ function ProfileSettings() {
         </div>
         <div>
           <label className="block text-ranting-muted text-xs mb-2">Phone</label>
-          <input
-            type="tel"
-            defaultValue="+1-555-1234"
-            className="aero-input w-full px-4 py-2"
-          />
+          <input type="tel" defaultValue="+1-555-1234" className="aero-input w-full px-4 py-2" />
         </div>
         <div className="pt-4 border-t border-ranting-deep/30">
           <button className="glossy-btn flex items-center gap-2 px-6 py-2 rounded-full">
@@ -98,7 +90,7 @@ function ProfileSettings() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 function NotificationSettings() {
@@ -107,7 +99,7 @@ function NotificationSettings() {
       <h3 className="text-ranting-ice text-lg font-semibold mb-6">Notification Settings</h3>
       <NotificationPreferences />
     </div>
-  )
+  );
 }
 
 function AppearanceSettings() {
@@ -139,7 +131,7 @@ function AppearanceSettings() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 function SecuritySettings() {
@@ -149,27 +141,15 @@ function SecuritySettings() {
       <div className="space-y-4">
         <div>
           <label className="block text-ranting-muted text-xs mb-2">Current Password</label>
-          <input
-            type="password"
-            placeholder="••••••••"
-            className="aero-input w-full px-4 py-2"
-          />
+          <input type="password" placeholder="••••••••" className="aero-input w-full px-4 py-2" />
         </div>
         <div>
           <label className="block text-ranting-muted text-xs mb-2">New Password</label>
-          <input
-            type="password"
-            placeholder="••••••••"
-            className="aero-input w-full px-4 py-2"
-          />
+          <input type="password" placeholder="••••••••" className="aero-input w-full px-4 py-2" />
         </div>
         <div>
           <label className="block text-ranting-muted text-xs mb-2">Confirm New Password</label>
-          <input
-            type="password"
-            placeholder="••••••••"
-            className="aero-input w-full px-4 py-2"
-          />
+          <input type="password" placeholder="••••••••" className="aero-input w-full px-4 py-2" />
         </div>
         <div className="pt-4 border-t border-ranting-deep/30">
           <button className="glossy-btn flex items-center gap-2 px-6 py-2 rounded-full">
@@ -179,5 +159,5 @@ function SecuritySettings() {
         </div>
       </div>
     </div>
-  )
+  );
 }
