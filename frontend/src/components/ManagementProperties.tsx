@@ -121,9 +121,7 @@ export function ManagementProperties() {
       if (currentManager) {
         const manager = currentManager as Manager & { owned_properties?: string[] };
         const role =
-          manager.managed_properties && manager.managed_properties.length > 0
-            ? "manager"
-            : "owner";
+          manager.managed_properties && manager.managed_properties.length > 0 ? "manager" : "owner";
         localStorage.removeItem(`requests_${role}_${currentManager.id}`);
       }
       setIsCreateDialogOpen(false);
@@ -168,9 +166,7 @@ export function ManagementProperties() {
       if (currentManager) {
         const manager = currentManager as Manager & { owned_properties?: string[] };
         const role =
-          manager.managed_properties && manager.managed_properties.length > 0
-            ? "manager"
-            : "owner";
+          manager.managed_properties && manager.managed_properties.length > 0 ? "manager" : "owner";
         localStorage.removeItem(`requests_${role}_${currentManager.id}`);
       }
       setSelected(updatedProperty);
@@ -208,9 +204,7 @@ export function ManagementProperties() {
       if (currentManager) {
         const manager = currentManager as Manager & { owned_properties?: string[] };
         const role =
-          manager.managed_properties && manager.managed_properties.length > 0
-            ? "manager"
-            : "owner";
+          manager.managed_properties && manager.managed_properties.length > 0 ? "manager" : "owner";
         localStorage.removeItem(`requests_${role}_${currentManager.id}`);
       }
       setSelected(null);
