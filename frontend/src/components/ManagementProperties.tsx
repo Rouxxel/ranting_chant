@@ -29,7 +29,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
-import type { Property, PropertyCreateRequest, PropertyUpdateRequest } from "@/types";
+import type { Property, PropertyCreateRequest, PropertyUpdateRequest, Manager } from "@/types";
 import { getPropertyTypeLabel, PROPERTY_TYPES, propertyTypeLabels } from "@/types";
 
 const CURRENT_YEAR = new Date().getFullYear();
@@ -62,9 +62,9 @@ export function ManagementProperties() {
   const ownsProperty = useCallback(
     (p: Property) => {
       if (!currentManager) return false;
-      const managedProps = currentManager.managed_properties || [];
-      const ownedProps =
-        (currentManager as Manager & { owned_properties?: string[] }).owned_properties || [];
+      const manager = currentManager as Manager & { owned_properties?: string[] };
+      const managedProps = manager.managed_properties || [];
+      const ownedProps = manager.owned_properties || [];
       return (
         managedProps.includes(p.id) ||
         ownedProps.includes(p.id) ||
@@ -119,8 +119,9 @@ export function ManagementProperties() {
       localStorage.setItem(propertiesCacheKey, JSON.stringify(next));
       // Invalidate requests cache since property changes may affect request filtering
       if (currentManager) {
+        const manager = currentManager as Manager & { owned_properties?: string[] };
         const role =
-          currentManager.managed_properties && currentManager.managed_properties.length > 0
+          manager.managed_properties && manager.managed_properties.length > 0
             ? "manager"
             : "owner";
         localStorage.removeItem(`requests_${role}_${currentManager.id}`);
@@ -165,8 +166,9 @@ export function ManagementProperties() {
       localStorage.setItem(propertiesCacheKey, JSON.stringify(next));
       // Invalidate requests cache since property changes may affect request filtering
       if (currentManager) {
+        const manager = currentManager as Manager & { owned_properties?: string[] };
         const role =
-          currentManager.managed_properties && currentManager.managed_properties.length > 0
+          manager.managed_properties && manager.managed_properties.length > 0
             ? "manager"
             : "owner";
         localStorage.removeItem(`requests_${role}_${currentManager.id}`);
@@ -204,8 +206,9 @@ export function ManagementProperties() {
       localStorage.setItem(propertiesCacheKey, JSON.stringify(next));
       // Invalidate requests cache since property changes may affect request filtering
       if (currentManager) {
+        const manager = currentManager as Manager & { owned_properties?: string[] };
         const role =
-          currentManager.managed_properties && currentManager.managed_properties.length > 0
+          manager.managed_properties && manager.managed_properties.length > 0
             ? "manager"
             : "owner";
         localStorage.removeItem(`requests_${role}_${currentManager.id}`);

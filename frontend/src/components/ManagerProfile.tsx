@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { User, Mail, Phone, Building2, Edit, Save, X } from "lucide-react";
 import { toast } from "sonner";
 import { getManagerById, updateManagerProfile } from "../services/api";
+import type { Manager } from "../types";
 
 interface ManagerProfileProps {
   managerId: string;

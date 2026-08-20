@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { AlertTriangle, MessageSquareText, Send, Save } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
 import { StatusBadge } from "@/components/Badges";

@@ -23,7 +23,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
-import type { Tenant, TenantCreateRequest, TenantUpdateRequest, Property } from "@/types";
+import type { Tenant, TenantCreateRequest, TenantUpdateRequest, Property, Manager } from "@/types";
 
 export function ManagementTenants() {
   const { currentManager, userRole } = useApp();
@@ -56,9 +56,9 @@ export function ManagementTenants() {
   const ownsProperty = useCallback(
     (p: Property) => {
       if (!currentManager) return false;
-      const managedProps = currentManager.managed_properties || [];
-      const ownedProps =
-        (currentManager as Manager & { owned_properties?: string[] }).owned_properties || [];
+      const manager = currentManager as Manager & { owned_properties?: string[] };
+      const managedProps = manager.managed_properties || [];
+      const ownedProps = manager.owned_properties || [];
       return (
         managedProps.includes(p.id) ||
         ownedProps.includes(p.id) ||

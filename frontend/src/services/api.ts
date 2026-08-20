@@ -26,6 +26,7 @@ import type {
   ConversationMessageRequest,
   ConversationMessageResponse,
   ConversationHistoryResponse,
+  ConversationMessage,
   SuggestedContact,
   VoiceTranscribeRequest,
   VoiceTranscribeResponse,

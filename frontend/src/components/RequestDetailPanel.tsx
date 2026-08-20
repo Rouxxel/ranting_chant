@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { getRequestSummary, getTenants, getVendors, getManagers, getOwners } from "@/services/api";
 import { getRequestTypeLabel } from "@/types";
+import type { Tenant, Vendor, Manager, Owner, ConversationMessage, NotificationEvent } from "@/types";
 import type { Request } from "@/types";
 
 interface RequestDetailPanelProps {

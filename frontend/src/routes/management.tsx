@@ -8,7 +8,7 @@ import { useApp } from "@/context/AppContext";
 import { requireManagerOrOwnerAuth } from "@/lib/auth";
 import { getRequests, updateRequest, completeRequest } from "@/services/api";
 import { getRequestTypeLabel, REQUEST_TYPES } from "@/types";
-import type { Request, RequestType, Status, Urgency } from "@/types";
+import type { Request, RequestType, Status, Urgency, Manager } from "@/types";
 import { ManagementProperties } from "@/components/ManagementProperties";
 import { ManagementTenants } from "@/components/ManagementTenants";
 import { ManagementProfile } from "@/components/ManagementProfile";
@@ -33,7 +33,7 @@ function ManagementPage() {
   // Build role-namespaced cache keys so different managers sharing a browser
   // don't bleed each other's filtered request lists.
   const requestsCacheKey = currentManager
-    ? `requests_${currentManager.managed_properties && currentManager.managed_properties.length > 0 ? "manager" : "owner"}_${currentManager.id}`
+    ? `requests_${(currentManager as Manager & { owned_properties?: string[] }).managed_properties && (currentManager as Manager & { owned_properties?: string[] }).managed_properties.length > 0 ? "manager" : "owner"}_${currentManager.id}`
     : "requests";
 
   const [activeTab, setActiveTab] = useState<
