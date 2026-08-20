@@ -29,7 +29,20 @@ function RequestsPage() {
 
   // Fetch fresh data from the API and refresh the cache. Used on first load
   // (when nothing is cached) and by the explicit Reload button.
-  const fetchRequests = async () => {
+  const fetchRequests = useCallback(async () => {
+    if (loadedTenantRef.current === tenantId) return; // already loaded for this tenant
+    loadedTenantRef.current = tenantId;
+
+    // Cache-first: if we already have this tenant's requests cached, use them
+    // and DON'T hit the network. The cache is invalidated on create (chat) and
+    // updated on cancel, and the Reload button forces a fresh fetch.
+    const cachedRequests = localStorage.getItem(`requests_tenant_${tenantId}`);
+    if (cachedRequests) {
+      setRequests(JSON.parse(cachedRequests));
+      setIsLoading(false);
+      return;
+    }
+
     setIsRefreshing(true);
     try {
       const allRequests = await getRequests();
@@ -45,23 +58,6 @@ function RequestsPage() {
       setIsRefreshing(false);
       setIsLoading(false);
     }
-  };
-
-  useEffect(() => {
-    if (loadedTenantRef.current === tenantId) return; // already loaded for this tenant
-    loadedTenantRef.current = tenantId;
-
-    // Cache-first: if we already have this tenant's requests cached, use them
-    // and DON'T hit the network. The cache is invalidated on create (chat) and
-    // updated on cancel, and the Reload button forces a fresh fetch.
-    const cachedRequests = localStorage.getItem(`requests_tenant_${tenantId}`);
-    if (cachedRequests) {
-      setRequests(JSON.parse(cachedRequests));
-      setIsLoading(false);
-      return;
-    }
-
-    fetchRequests();
   }, [tenantId]);
 
   // RequestCard performs the cancel API call; here we update the list and cache.

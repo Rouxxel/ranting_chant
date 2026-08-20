@@ -80,7 +80,7 @@ function ManagementPage() {
     };
 
     loadRequests();
-  }, [currentManager, requestsCacheKey]);
+  }, [currentManager, requestsCacheKey, filterForManager]);
 
   const handleReload = async () => {
     setIsRefreshing(true);

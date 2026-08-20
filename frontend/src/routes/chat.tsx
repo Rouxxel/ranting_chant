@@ -324,8 +324,13 @@ function ChatPage() {
       resetRecording();
     }
   }, [audioBlob, isRecording, requestId, tenantId, voiceProvider, voiceId]);
+
+  // Handle voice recording completion
+  useEffect(() => {
+    if (audioBlob && !isRecording) {
+      handleVoiceSubmit();
     }
-  }
+  }, [audioBlob, isRecording, handleVoiceSubmit]);
 
   return (
     <AuthenticatedLayout>
