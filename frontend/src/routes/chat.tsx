@@ -323,7 +323,7 @@ function ChatPage() {
       setTyping(false);
       resetRecording();
     }
-  }, [audioBlob, isRecording, requestId, tenantId, voiceProvider, voiceId]);
+  }, [audioBlob, requestId, tenantId, voiceProvider, voiceId, resetRecording]);
 
   // Handle voice recording completion
   useEffect(() => {

@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import { RefreshCw } from "lucide-react";
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { RequestTable } from "@/components/RequestTable";
@@ -48,13 +48,16 @@ function ManagementPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const filterForManager = (allRequests: Request[]) =>
-    allRequests.filter((r) => {
-      if (!currentManager || !r.property_id) return false;
-      const manager = currentManager as Manager & { owned_properties?: string[] };
-      const properties = manager.managed_properties || manager.owned_properties;
-      return Array.isArray(properties) && properties.includes(r.property_id);
-    });
+  const filterForManager = useCallback(
+    (allRequests: Request[]) =>
+      allRequests.filter((r) => {
+        if (!currentManager || !r.property_id) return false;
+        const manager = currentManager as Manager & { owned_properties?: string[] };
+        const properties = manager.managed_properties || manager.owned_properties;
+        return Array.isArray(properties) && properties.includes(r.property_id);
+      }),
+    [currentManager],
+  );
 
   useEffect(() => {
     const loadRequests = async () => {
